@@ -1,0 +1,300 @@
+
+
+/////////////////////////////////////////////////
+The one that doesn't work because of &$#@? holes
+/////////////////////////////////////////////////
+bool isPolyhedronGeometricallyConsistent2(Polyhedron* p)
+{
+  Polyhedron::Facet_iterator curF, otherF;
+  curF = p->facets_begin();
+  bool bIntersect = false;
+  for ( ; curF != p->facets_end(); curF++)
+  {
+    Polyhedron::Halfedge_handle heH;
+    heH = curF->halfedge();
+    Polyhedron::Vertex_handle vh[3];
+    vh[0] = heH->vertex();
+    vh[1] = heH->next()->vertex();
+    vh[2] = heH->next()->next()->vertex();
+    
+    //-- check all the incident faces to the 3
+    set<Polyhedron::Facet_handle> incidentFaces;
+    set<Polyhedron::Facet_handle>::iterator itFh;
+    Polyhedron::Halfedge_around_vertex_circulator circ;
+    for (int i=0; i<3; i++)
+    {
+      circ = vh[i]->vertex_begin();
+      do 
+      {
+        incidentFaces.insert(circ->facet());
+      } while ( ++circ != vh[i]->vertex_begin() );
+    }
+     
+    otherF = p->facets_begin();
+    for ( ; otherF != p->facets_end(); otherF++)
+    {
+      if (incidentFaces.count(otherF) == 0)
+      {
+        Triangle t1( vh[0]->point(), vh[1]->point(), vh[2]->point() );
+        Polyhedron::Halfedge_handle heoH = otherF->halfedge();
+        Triangle t2( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
+        if (do_intersect(t1, t2) == true)
+        {
+          bIntersect = true;
+          cout << "INTERSECTION DETECTED!" << t1 << " " << t2 << endl;
+//            break;
+        }
+      }
+    }
+  }
+//    if (bIntersect == true)
+//      break;
+  if (bIntersect == true)
+    return false;
+  else
+    return true;
+}
+        
+        
+        
+//        
+//      if (otherF != curF)
+//      {
+//        bool bIncident = false;
+//        Polyhedron::Halfedge_handle heoH;
+//        heoH = otherF->halfedge();
+//        for (int i = 0; i < 3; i++)
+//        {
+//          if ( (heoH->vertex() == vh[i]) || (heoH->next()->vertex() == vh[i]) || (heoH->next()->next()->vertex() == vh[i]) )
+//          {
+//            bIncident =  true;
+//            break;
+//          }
+//        }
+//        if (bIncident == false)
+//        {
+//          Triangle t1( vh[0]->point(), vh[1]->point(), vh[2]->point() );
+//          Triangle t2( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
+//          if (do_intersect(t1, t2) == true)
+//          {
+//            bIntersect = true;
+//            cout << "INTERSECTION DETECTED!" << t1 << " " << t2 << endl;
+////            break;
+//          }
+//        }
+//      }
+//    }
+////    if (bIntersect == true)
+////      break;
+//  }
+//  if (bIntersect == true)
+//    return false;
+//  else
+//    return true;
+//}
+//
+
+
+bool isPolyhedronGeometricallyConsistent(Polyhedron* p)
+{
+  Polyhedron::Facet_iterator curF, otherF;
+  curF = p->facets_begin();
+  bool bIntersect = false;
+  for ( ; curF != p->facets_end(); curF++)
+  {
+    Polyhedron::Halfedge_handle heH;
+    heH = curF->halfedge();
+    Polyhedron::Vertex_handle vh[3];
+    vh[0] = heH->vertex();
+    vh[1] = heH->next()->vertex();
+    vh[2] = heH->next()->next()->vertex();
+
+    otherF = p->facets_begin();
+    for ( ; otherF != p->facets_end(); otherF++)
+    {
+      if (otherF != curF)
+      {
+        bool bIncident = false;
+        Polyhedron::Halfedge_handle heoH;
+        heoH = otherF->halfedge();
+        for (int i = 0; i < 3; i++)
+        {
+          if ( (heoH->vertex() == vh[i]) || (heoH->next()->vertex() == vh[i]) || (heoH->next()->next()->vertex() == vh[i]) )
+          {
+            bIncident =  true;
+            break;
+          }
+        }
+        if (bIncident == false)
+        {
+          Triangle t1( vh[0]->point(), vh[1]->point(), vh[2]->point() );
+          Triangle t2( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
+          if (do_intersect(t1, t2) == true)
+          {
+            bIntersect = true;
+            cout << "INTERSECTION DETECTED!" << t1 << " " << t2 << endl;
+//            break;
+          }
+        }
+      }
+    }
+//    if (bIntersect == true)
+//      break;
+  }
+  if (bIntersect == true)
+    return false;
+  else
+    return true;
+}
+
+
+
+
+
+/*
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Polyhedron_3.h>
+#include <CGAL/IO/Polyhedron_iostream.h>
+#include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+
+typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
+typedef CGAL::Polyhedron_3<Kernel>  Polyhedron;
+typedef CGAL::Nef_polyhedron_3<Kernel>  Nef_polyhedron;
+
+typedef Kernel::Vector_3  Vector_3;
+typedef Kernel::Aff_transformation_3  Aff_transformation_3;
+
+int main(int argc, char* const argv[])
+{
+
+  Polyhedron P;
+  std::string offf = "OFF\n8 6 0\n0.0 0.0 0.0\n1.0 0.0 0.0\n1.0 1.0 0.0\n0.0 1.0 0.0\n0.0 0.0 1.0\n1.0 0.0 1.0\n1.0 1.0 1.0\n0.0 1.0 1.0\n4 0 3 2 1\n4 4 5 6 7\n4 0 1 5 4\n4 1 2 6 5\n4 2 3 7 6\n4 3 0 4 7\n";
+  std::stringstream bla;
+  bla << offf;
+  bla >> P;
+
+  std::cout << P.size_of_vertices() << std::endl;
+  std::cout << P.is_closed() << std::endl;
+  if (P.empty() == true)
+  {
+    std::cout << "P Invalid 2-manifold" << std::endl;
+    return(0);
+  }
+}
+*/
+
+//  ct.insert(pts2d.begin(), pts2d.end());
+//  //-- attach the vertices IDs and create segments
+//  int i = 0;
+//  CT::Vertex_iterator lbo = --(ct.finite_vertices_end());
+//  CT::Vertex_iterator nextv;
+//  for (CT::Vertex_iterator vi = ct.finite_vertices_begin(); vi != lbo; vi++)
+//  {
+//    vi->info() = ids[i];
+//    nextv = vi;
+//    nextv++;
+//    ct.insert_constraint(vi, nextv);
+//    i++;
+//  }
+//  ct.finite_vertices_end()->info() = ids[numid-1];
+//  ct.insert_constraint(--(ct.finite_vertices_end()), ct.finite_vertices_begin());
+//-- CT constructed --
+
+
+//  if (pgn.is_convex())
+//  {
+//
+//  }
+//  CT::Finite_faces_iterator fi = ct.finite_faces_begin();
+//  for( ; fi != ct.finite_faces_end(); fi++)
+//  {
+//    cout << "tr " << ct.triangle(fi).vertex(0) << endl;
+//  }
+
+
+//  ct.insert(pts2d.begin(), pts2d.end());
+//  //-- attach the vertices IDs and create segments
+//  int i = 0;
+//  CT::Vertex_iterator lbo = --(ct.finite_vertices_end());
+//  CT::Vertex_iterator nextv;
+//  for (CT::Vertex_iterator vi = ct.finite_vertices_begin(); vi != lbo; vi++)
+//  {
+//    vi->info() = ids[i];
+//    nextv = vi;
+//    nextv++;
+//    ct.insert_constraint(vi, nextv);
+//    i++;
+//  }
+//
+//  lbo = --(ct.finite_vertices_end());
+//  lbo->info() = ids[numid-1];
+//  ct.insert_constraint(lbo, ct.finite_vertices_begin());
+//  //-- CT constructed --
+
+
+
+
+
+
+//    ct.insert(tmp.begin(), tmp.end());
+//    ct.insert(Point2(p1.x(), p1.y()));
+//    ct.insert_constraint( tmp[0], tmp[1] );
+
+
+//    if (proj == 2)
+//      ct.insert_constraint( make_pair(Point2(p1.x(), p1.y()), ids[i]), make_pair(Point2(p2.x(), p2.y()), ids[i+1]) );
+//    else if (proj == 1)
+//      ct.insert_constraint( make_pair(Point2(p1.x(), p1.z()), ids[i]), make_pair(Point2(p2.x(), p2.z()), ids[i+1]) );
+//    else
+//      ct.insert_constraint( make_pair(Point2(p1.y(), p1.z()), ids[i]), make_pair(Point2(p2.y(), p2.z()), ids[i+1]) );
+
+//-- segment with last-first points
+//  Point3 p1  = lsPts[ids[numid-1]];
+//  Point3 p2  = lsPts[ids[0]];
+//  if (proj == 2)
+//    ct.insert_constraint( make_pair(Point2(p1.x(), p1.y()), ids[numid-1]), make_pair(Point2(p2.x(), p2.y()), ids[0]) );
+//  else if (proj == 1)
+//    ct.insert_constraint( make_pair(Point2(p1.x(), p1.z()), ids[numid-1]), make_pair(Point2(p2.x(), p2.z()), ids[0]) );
+//  else
+//    ct.insert_constraint( make_pair(Point2(p1.y(), p1.z()), ids[numid-1]), make_pair(Point2(p2.y(), p2.z()), ids[0]) );
+
+//  cout << "CT # of faces " << ct.number_of_faces() << endl;
+//}
+
+
+
+
+
+
+
+/*  infile >> P;
+  Point points[] = { Point(0,0), Point(5.1,0), Point(1,1), Point(0.5,6) };
+  Polygon_2 pgn(points, points+4);
+
+  // check if the polygon is simple.
+  std::cout << "The polygon is " << (pgn.is_simple() ? "" : "not ") << "simple." << std::endl;
+
+  // check if the polygon is convex
+  std::cout << "The polygon is " << (pgn.is_convex() ? "" : "not ") << "convex." << std::endl;
+
+  std::cout << pgn.size() << std::endl;
+
+  if (pgn.is_counterclockwise_oriented() == true)
+  {
+    std::cout << pgn.has_on_positive_side(Point(100.1, 0.1)) << std::endl; // CCW means positive for point-in-polygon
+  }
+  else
+    std::cout << "False" << std::endl;
+
+*/
+
+//  cout << "no of points is " << lsPts.size() << endl;
+//  for (iPoint3 = lsPts.begin(); iPoint3 != lsPts.end(); iPoint3++)
+//  {
+//    cout << *iPoint3 << endl;
+//  }
