@@ -1,6 +1,6 @@
 /*
- Copyright (c) 2011, Hugo Ledoux
- All rights reserved.
+Copyright (c) 2011, Hugo Ledoux
+All rights reserved.
  
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -104,6 +104,8 @@ int main(int argc, char* const argv[])
     cout << "File not there." << endl;
     exit(1);
   }
+  
+  cout << "\n--- Validating " << argv[1] << endl;
 
   vector< Point3 > lsPts;
   vector< vector<int*> > shell; //-- the triangulated shell, each triangle is triplet of IDs from lsPts
@@ -114,7 +116,6 @@ int main(int argc, char* const argv[])
   
   delete p;
 
-  cout << "\nbye bye." << endl;
   return 0;
 }
 
@@ -125,7 +126,7 @@ void check2manifoldness(Polyhedron* p)
 //-- 1. check combinatorial consistency ---
   if (p->empty() == true)
   {
-    std::cout << "INVALID: one/several of the faces have wrong orientation, or dangling faces." << std::endl;
+    std::cout << "\nINVALID: one/several of the faces have wrong orientation, or dangling faces." << std::endl;
     isValid = false;
   }
   else
@@ -232,7 +233,7 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
     }
   }
 
-  cout << "OFF file saved to /home/hugo/temp/zzz.off" << endl;
+  cout << "\nOFF file saved to /home/hugo/temp/zzz.off" << endl;
   fstream filestr ("/home/hugo/temp/zzz.off", fstream::out);
   filestr << offrep.str();
   filestr.close();
