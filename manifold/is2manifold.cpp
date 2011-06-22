@@ -114,6 +114,16 @@ int main(int argc, char* const argv[])
   Polyhedron* p = getPolyhedronDS(shell, lsPts);
   check2manifoldness(p);
   
+  //-- save the polyhedron to a file
+  string opath(argv[1]);
+  string tmp (".poly");
+  size_t s = opath.find(tmp);
+  string offpath = opath.replace(s, 5, ".off");
+  cout << "\nOFF file save to " << offpath << endl;
+  fstream filestr (offpath.c_str(), fstream::out);
+  filestr << *p;
+  filestr.close();
+  
   delete p;
 
   return 0;
@@ -233,10 +243,10 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
     }
   }
 
-  cout << "\nOFF file saved to /home/hugo/temp/zzz.off" << endl;
-  fstream filestr ("/home/hugo/temp/zzz.off", fstream::out);
-  filestr << offrep.str();
-  filestr.close();
+//  cout << "\nOFF file saved to /home/hugo/temp/zzz.off" << endl;
+//  fstream filestr ("zzz.off", fstream::out);
+//  filestr << offrep.str();
+//  filestr.close();
 //  cout << "*********" << endl << offrep.str() << "*********" << endl;
 
   Polyhedron* P = new Polyhedron();
