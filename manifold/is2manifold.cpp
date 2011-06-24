@@ -85,16 +85,10 @@ void test(void);
 
 //--------------------------------------------------------------
 
-void test(void)
-{
-
-}
 
 
 int main(int argc, char* const argv[])
 {
-//  test();
-//  return 0;
   if (argc != 2)
   {
     cout << "You have to give an input POLY file." << endl;
@@ -114,9 +108,12 @@ int main(int argc, char* const argv[])
   getTriangulatedShell(infile, shell, lsPts);
   
   Polyhedron* p = getPolyhedronDS(shell, lsPts);
+  
+  //-- check is polyhedron is 2-manifold (includes intersection tests)
   check2manifoldness(p);
+  
+  //-- check is orientation of the normales is outwards or inwards
   CGAL::Orientation orient = checkGlobalOrientationNormales(p);
-  cout << orient << endl;
   if (orient == CGAL::CLOCKWISE)
     cout << "ORIENTATION: normales pointing OUTSIDE" << endl;
   else if (orient == CGAL::COUNTERCLOCKWISE)
@@ -162,27 +159,24 @@ CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p)
     }
   }
 //  cout << "CONVEX CORNER IS: " << cc->point() << endl;
+
   Polyhedron::Halfedge_handle curhe = cc->halfedge();
   Polyhedron::Halfedge_handle otherhe;
   otherhe = curhe->opposite()->next();
-  Tetrahedron tet(  curhe->vertex()->point(),
-                    curhe->next()->vertex()->point(),
-                    curhe->next()->next()->vertex()->point(),
-                    otherhe->vertex()->point() );
+  CGAL::Orientation orient = orientation( curhe->vertex()->point(),
+                                          curhe->next()->vertex()->point(),
+                                          curhe->next()->next()->vertex()->point(),
+                                          otherhe->vertex()->point() );
   
-  while (tet.orientation() == CGAL::COPLANAR)
+  while (orient == CGAL::COPLANAR)
   {
     otherhe = otherhe->next()->opposite()->next();
-    Tetrahedron tet1(  curhe->vertex()->point(),
-          curhe->next()->vertex()->point(),
-          curhe->next()->next()->vertex()->point(),
-          otherhe->vertex()->point() );
+    orient = orientation( curhe->vertex()->point(),
+                          curhe->next()->vertex()->point(),
+                          curhe->next()->next()->vertex()->point(),
+                          otherhe->vertex()->point() );
   }
-  return tet.orientation();
-//  if (tet.orientation() == -1)
-//    return true;
-//  else if (tet.orientation() == 1)
-//    return false;
+  return orient;
 }
 
 
@@ -205,7 +199,7 @@ void check2manifoldness(Polyhedron* p)
     }
     else
     {
-// 2. check geometrical consistency ---
+// 2. check geometrical consistency (aka intersection tests between faces) ---
       isValid = isPolyhedronGeometricallyConsistent(p);
     }
   }

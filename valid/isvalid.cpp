@@ -34,9 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+
+#include <vector>
 #include <iostream>
 #include <fstream>
-
 
 typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
 typedef CGAL::Polyhedron_3<Kernel>  Polyhedron;
@@ -47,37 +48,46 @@ typedef Kernel::Aff_transformation_3  Aff_transformation_3;
 
 int main(int argc, char* const argv[]) 
 {
-  if (argc != 3)
+  if (argc < 2)
   {
-    std::cout << "You have to give two input OFF files." << std::endl;
+    std::cout << "You have to give at least one input OFF file." << std::endl;
     return(0);
   }
-
+  
+  int numShells = (argc - 1);
+  std::cout << "Processing " << numShells << " file(s)." << std::endl;
+  
+  std::cout << "Reading file " << argv[1] << std::endl;
   Polyhedron oshell;
   std::ifstream infile;
   infile.open(argv[1], std::ifstream::in);
   infile >> oshell;
-  
-  Polyhedron ishell;
-  std::ifstream infile1;
-  infile1.open(argv[2], std::ifstream::in);
-  infile1 >> ishell;
-
-  
-  if (oshell.empty() == true)
-  {
-    std::cout << "oshell: Invalid 2-manifold" << std::endl;
-    return(0);
-  }
-  if (ishell.empty() == true)
-  {
-    std::cout << "ishell: Invalid 2-manifold" << std::endl;
-    return(0);
-  }
-
   Nef_polyhedron onef(oshell);
-  Nef_polyhedron inef(ishell);
-
+  
+  std::vector< Nef_polyhedron > inefs;
+  for (int i=2; i<argc; i++)
+  {
+    std::cout << "Reading file " << argv[i] << std::endl;
+    Polyhedron ishell;
+    std::ifstream infile;
+    infile.open(argv[i], std::ifstream::in);
+    infile >> ishell;
+    Nef_polyhedron inef(ishell);
+    inefs.push_back(inef);
+  }
+  
+  Nef_polyhedron solid = onef - inefs[0];
+  
+//  solid = solid - inefs[1];
+//    
+  
+  if (solid.number_of_volumes() == (numShells+1))
+    std::cout << "Valid." << std::endl;
+  else
+    std::cout << "Invalid. " << solid.number_of_volumes() << std::endl;
+  
+  
+}
 /*
   Nef_polyhedron N1(N);
   Aff_transformation_3 aff(CGAL::SCALING, 0.2);
@@ -89,26 +99,25 @@ int main(int argc, char* const argv[])
   N2.transform(aff3);
 */
   
-  std::cout << "---Stats for onef---" << std::endl;
-  std::cout << "Simple? " << onef.is_simple() << std::endl;
-  std::cout << "Valid? " << onef.is_valid() << std::endl;  
-  std::cout << "# volumes " << onef.number_of_volumes() << std::endl;
+//  std::cout << "---Stats for onef---" << std::endl;
+//  std::cout << "Simple? " << onef.is_simple() << std::endl;
+//  std::cout << "Valid? " << onef.is_valid() << std::endl;  
+//  std::cout << "# volumes " << onef.number_of_volumes() << std::endl;
+//
+//  std::cout << "---Stats for inef---" << std::endl;
+//  std::cout << "Simple? " << inef.is_simple() << std::endl;
+//  std::cout << "Valid? " << inef.is_valid() << std::endl;  
+//  std::cout << "# volumes " << inef.number_of_volumes() << std::endl;
 
-  std::cout << "---Stats for inef---" << std::endl;
-  std::cout << "Simple? " << inef.is_simple() << std::endl;
-  std::cout << "Valid? " << inef.is_valid() << std::endl;  
-  std::cout << "# volumes " << inef.number_of_volumes() << std::endl;
-
-  Nef_polyhedron solid = onef - inef;
 //  solid -= N2;
   
-  std::cout << "---Stats for solid---" << std::endl;
-  std::cout << "Simple? " << solid.is_simple() << std::endl;
-  std::cout << "Valid? " << solid.is_valid() << std::endl;  
-  std::cout << "# volumes " << solid.number_of_volumes() << std::endl;
-  
+//  std::cout << "---Stats for solid---" << std::endl;
+//  std::cout << "Simple? " << solid.is_simple() << std::endl;
+//  std::cout << "Valid? " << solid.is_valid() << std::endl;  
+//  std::cout << "# volumes " << solid.number_of_volumes() << std::endl;
+//  
 //    if(solid.is_simple()) {
 //      solid.convert_to_Polyhedron(P);
 //      std::cout << P;
 //    }
-}
+//}
