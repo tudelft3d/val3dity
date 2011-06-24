@@ -53,6 +53,7 @@ typedef K::Point_2  Point2;
 typedef K::Point_3  Point3;
 typedef K::Vector_3 Vector;
 typedef K::Triangle_3 Triangle;
+typedef K::Tetrahedron_3 Tetrahedron;
 
 typedef CGAL::Triangulation_vertex_base_with_info_2 <unsigned,K>  Vb;
 typedef CGAL::Constrained_triangulation_face_base_2<K>            Fb;
@@ -76,6 +77,7 @@ int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance = 1);
 void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector<Point3>& lsPts);
 void check2manifoldness(Polyhedron* p);
+CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p);
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 bool isPolyhedronGeometricallyConsistent(Polyhedron* p);
 void test(void);
@@ -113,6 +115,12 @@ int main(int argc, char* const argv[])
   
   Polyhedron* p = getPolyhedronDS(shell, lsPts);
   check2manifoldness(p);
+  CGAL::Orientation orient = checkGlobalOrientationNormales(p);
+  cout << orient << endl;
+  if (orient == CGAL::CLOCKWISE)
+    cout << "ORIENTATION: normales pointing OUTSIDE" << endl;
+  else if (orient == CGAL::COUNTERCLOCKWISE)
+    cout << "ORIENTATION: normales pointing INSIDE" << endl;
   
   //-- save the polyhedron to a file
   string opath(argv[1]);
@@ -127,6 +135,54 @@ int main(int argc, char* const argv[])
   delete p;
 
   return 0;
+}
+
+
+CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p)
+{
+  //-- get a 'convex corner', sorting order is x-y-z
+  Polyhedron::Vertex_iterator vIt;
+  vIt = p->vertices_begin();
+  Polyhedron::Vertex_handle cc = vIt;
+  vIt++;
+
+  for ( ; vIt != p->vertices_end(); vIt++)
+  {
+    if (vIt->point().x() > cc->point().x())
+      cc = vIt;
+    else if (vIt->point().x() == cc->point().x())
+    {
+      if (vIt->point().y() > cc->point().y())
+        cc = vIt;
+      else if (vIt->point().y() == cc->point().y())
+      {
+        if (vIt->point().z() > cc->point().z())
+          cc = vIt;
+      }
+    }
+  }
+//  cout << "CONVEX CORNER IS: " << cc->point() << endl;
+  Polyhedron::Halfedge_handle curhe = cc->halfedge();
+  Polyhedron::Halfedge_handle otherhe;
+  otherhe = curhe->opposite()->next();
+  Tetrahedron tet(  curhe->vertex()->point(),
+                    curhe->next()->vertex()->point(),
+                    curhe->next()->next()->vertex()->point(),
+                    otherhe->vertex()->point() );
+  
+  while (tet.orientation() == CGAL::COPLANAR)
+  {
+    otherhe = otherhe->next()->opposite()->next();
+    Tetrahedron tet1(  curhe->vertex()->point(),
+          curhe->next()->vertex()->point(),
+          curhe->next()->next()->vertex()->point(),
+          otherhe->vertex()->point() );
+  }
+  return tet.orientation();
+//  if (tet.orientation() == -1)
+//    return true;
+//  else if (tet.orientation() == 1)
+//    return false;
 }
 
 
