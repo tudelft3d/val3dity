@@ -44,6 +44,7 @@ typedef CGAL::Polyhedron_3<Kernel>  Polyhedron;
 typedef CGAL::Nef_polyhedron_3<Kernel>  Nef_polyhedron;
 
 typedef Kernel::Vector_3  Vector_3;
+typedef Kernel::Point_3  Point_3;
 typedef Kernel::Aff_transformation_3  Aff_transformation_3;
 
 int main(int argc, char* const argv[]) 
@@ -75,13 +76,33 @@ int main(int argc, char* const argv[])
     Nef_polyhedron inef(ishell);
     inefs.push_back(inef);
   }
+
+  Nef_polyhedron solid = onef;
+  std::vector<Nef_polyhedron>::iterator inefsIt = inefs.begin();
+  for ( ; inefsIt != inefs.end(); inefsIt++) 
+    solid -= *inefsIt;
   
-  Nef_polyhedron solid = onef - inefs[0];
+ // std::cout << "---Stats for onef---" << std::endl;
+//	std::cout << "# volumes " << onef.number_of_volumes() << std::endl;
+
+	
+//  Nef_polyhedron solid = onef - inefs[0];
+	std::cout << "---Stats for solid---" << std::endl;
+	std::cout << "# volumes " << solid.number_of_volumes() << std::endl;
+
+	
+//  Nef_polyhedron solid2 = onef + inefs[0];
+//	std::cout << "\n---Stats for solid2---" << std::endl;
+//	std::cout << "# volumes " << solid2.number_of_volumes() << std::endl;
   
-//  solid = solid - inefs[1];
-//    
+ // Nef_polyhedron::Volume_const_handle c;
+//  Nef_polyhedron::Object_handle o = solid.locate(Point_3(0.4, 0.4, 0.31));
+//  CGAL::assign(c,o);
+//  std::cout << "Locating volume" << c->mark() << std::endl;
   
-  if (solid.number_of_volumes() == (numShells+1))
+  
+	
+	if (solid.number_of_volumes() == (numShells+1))
     std::cout << "Valid." << std::endl;
   else
     std::cout << "Invalid. " << solid.number_of_volumes() << std::endl;
