@@ -84,6 +84,7 @@ void construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance = 1);
 void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector<Point3>& lsPts);
+bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts);
 bool check2manifoldness(Polyhedron* p);
 CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p);
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
@@ -107,7 +108,6 @@ int main(int argc, char* const argv[])
   unsigned int numShells = (argc - 1);
   cout << "Processing " << numShells << " file(s)." << endl << endl;
   
-  
   cout << "Validating outer shell: " << argv[1] << endl;
   ifstream infile(argv[1], ifstream::in);
   if (!infile)
@@ -117,12 +117,14 @@ int main(int argc, char* const argv[])
   }
   Polyhedron* p = validateShell(infile, true);  
   if (p != NULL)
-    cout << "\tShell valid." << endl;
+    cout << "Shell valid.\n" << endl;
+  else
+    cout << "Shell invalid.\n" << endl;
   vector<Polyhedron*> polyhedra;
   polyhedra.push_back(p);  
   for (int i=2; i<argc; i++)
   {
-    cout << "Validating outer shell #" << (i-2) << argv[i] << endl;
+    cout << "Validating inner shell #" << (i-2) << argv[i] << endl;
     ifstream infile2(argv[i], ifstream::in);
     if (!infile2)
     {
@@ -131,7 +133,9 @@ int main(int argc, char* const argv[])
     }
     p = validateShell(infile2, false);
     if (p != NULL)
-      cout << "\tShell valid." << endl;
+      cout << "Shell valid.\n" << endl;
+    else
+      cout << "Shell invalid.\n" << endl;
     polyhedra.push_back(p);
   }
 
@@ -148,37 +152,51 @@ int main(int argc, char* const argv[])
   }
   if (isValid == true)
   {
-    cout << endl << "All the shells are individually valid, now validating the whole solid." << endl;
-    vector<Nef_polyhedron> nefs;
-    for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
-    {
-      stringstream offrep (stringstream::in | stringstream::out);
-      offrep << **polyhedraIt;
-      PolyhedronExact pe;
-      offrep >> pe;
-      Nef_polyhedron onef(pe);
-      nefs.push_back(onef);
-//      cout << onef.number_of_volumes() << endl;
-    }
-  
-
-    vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
-    Nef_polyhedron solid = *nefsIt;
-    nefsIt++;
-    for ( ; nefsIt != nefs.end(); nefsIt++) 
-      solid -= *nefsIt;
-//    cout << "# volumes " << solid.number_of_volumes() << endl;
-    if (solid.number_of_volumes() == (numShells+1))
-      cout << "\tValid solid!" << endl;
+    if (numShells == 1)
+      cout << "Solid is valid." << endl;
     else
-      cout << "\tInvalid solid :(" << endl;
+    {
+      cout << "Calculating interactions between the shells." << endl;
+      vector<Nef_polyhedron> nefs;
+      for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
+      {
+        stringstream offrep (stringstream::in | stringstream::out);
+        offrep << **polyhedraIt;
+        PolyhedronExact pe;
+        offrep >> pe;
+        Nef_polyhedron onef(pe);
+        nefs.push_back(onef);
+      }
+      vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
+      Nef_polyhedron solid = *nefsIt;
+      nefsIt++;
+      for ( ; nefsIt != nefs.end(); nefsIt++) 
+        solid -= *nefsIt;
+      if (solid.number_of_volumes() == (numShells+1))
+        cout << "Valid solid. Hourrraaa!" << endl;
+      else
+        cout << "Invalid solid :(" << endl;
+    }
   }
-  
-  
-  
   return(0);
 }
   
+bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts)
+{
+  vector< vector<int*> >::iterator faceIt = shell.begin();
+  int i = 0;
+  bool isValid = true;
+  for ( ; faceIt != shell.end(); faceIt++)
+  {
+    if (is_face_planar(*faceIt, lsPts) == false)
+    {
+      cout << "\tFace #" << i << " not planar" << endl;
+      isValid = false;
+    }
+    i++;
+  }
+  return isValid;
+}  
   
 Polyhedron* validateShell(ifstream& infile, bool outershell)
 {
@@ -186,30 +204,34 @@ Polyhedron* validateShell(ifstream& infile, bool outershell)
   vector< vector<int*> > shell; //-- the triangulated shell, each triangle is triplet of IDs from lsPts
   getTriangulatedShell(infile, shell, lsPts);
   
-  Polyhedron* p = getPolyhedronDS(shell, lsPts);
-  
-  //-- check if polyhedron is 2-manifold (includes intersection tests)
-  bool isValid = check2manifoldness(p);
-  
-  //-- check if orientation of the normales is outwards or inwards
-  if (isValid == true)
+  if (checkPlanarityFaces(shell, lsPts) == true)
   {
-    CGAL::Orientation orient = checkGlobalOrientationNormales(p);
-    if ( ((outershell == true) && (orient != CGAL::CLOCKWISE)) || ((outershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+    Polyhedron* p = getPolyhedronDS(shell, lsPts);
+    //-- check if polyhedron is 2-manifold (includes intersection tests)
+    bool isValid = check2manifoldness(p);
+    //-- check if orientation of the normales is outwards or inwards
+    if (isValid == true)
     {
-        cout << "Normales pointing in wrong direction (all of them)" << endl;
-        isValid = false;
+      CGAL::Orientation orient = checkGlobalOrientationNormales(p);
+      if ( ((outershell == true) && (orient != CGAL::CLOCKWISE)) || ((outershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+      {
+          cout << "\tNormales all pointing in wrong direction." << endl;
+          isValid = false;
+      }
+    }
+    if (isValid == true)
+      return p;
+    else 
+    {
+      delete p;
+      return NULL;
     }
   }
-  if (isValid == true)
-    return p;
-  else 
-  {
-    delete p;
+  else
     return NULL;
-  }
 }
-
+  
+  
 
 CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p)
 {
@@ -262,14 +284,14 @@ bool check2manifoldness(Polyhedron* p)
 //-- 1. check combinatorial consistency ---
   if (p->empty() == true)
   {
-    std::cout << "\nINVALID: one/several of the faces have wrong orientation, or dangling faces." << std::endl;
+    std::cout << "\tOne/several of the faces have wrong orientation, or dangling faces." << std::endl;
     isValid = false;
   }
   else
   {
     if (p->is_closed() == false)
     {
-      cout << "INVALID: one or more faces are missing, 2-manifold not closed." << endl;
+      cout << "\tOne or more faces are missing, 2-manifold not closed." << endl;
       // TODO: find the missing faces and report
       isValid = false;
     }
@@ -333,11 +355,11 @@ bool isPolyhedronGeometricallyConsistent(Polyhedron* p)
         if (assign(asegment, re))
           count++;
         else if (assign(apoint, re) && (incidentFaces.count(otherF) == 0) )
-          cout << "&&&&&&&&&& POINT TOUCHING!" << endl;
+          cout << "\tSelf-intersection of type POINT." << endl;
       }
     }
     if (count > 3)
-      cout << "###############PROBLEMS!!!!!!!" << endl;
+      cout << "\tSelf-intersection of type SEGMENT." << endl;
   }
   return true;
 }
@@ -369,13 +391,6 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
       offrep << "3 " << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
     }
   }
-
-//  cout << "\nOFF file saved to /home/hugo/temp/zzz.off" << endl;
-//  fstream filestr ("zzz.off", fstream::out);
-//  filestr << offrep.str();
-//  filestr.close();
-//  cout << "*********" << endl << offrep.str() << "*********" << endl;
-
   Polyhedron* P = new Polyhedron();
   offrep >> *P;
   return P;
@@ -462,7 +477,6 @@ void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector
     }
     if ( invert == true ) //-- invert
     {
-//      cout << "invert a face orientation." << endl;
       vector<int*>::iterator it3 = oneface.begin();
       int tmp;
       int* id;
@@ -476,12 +490,8 @@ void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector
     }
 
     shell.push_back(oneface);
-    //-- check planarity
-    if (is_face_planar(oneface, lsPts) == false)
-    {
-      cout << "Face not planar" << endl;
-    }
   }
+}
 
 //  cout << "---Global stats---" << endl;
 //  cout << "# faces: " << shell.size() << endl;
@@ -490,7 +500,8 @@ void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector
 //  {
 //    cout << "# tr: " << it->size() << endl;
 //  }
-}
+//}
+
 
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
 {
@@ -509,12 +520,6 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
   }
   if (pgn.is_counterclockwise_oriented() == false)
     pgn.reverse_orientation();
-//  cout << "polygon " << pgn << endl;
-//  cout << pgn.area() << endl;
-//  cout << pgn.size() << endl;
-//  cout << pgn[3] << endl;
-//    cout << "convex? " << pgn.is_convex() << endl;
-//  cout << pgn.is_counterclockwise_oriented() << endl;
 }
 
 
@@ -606,15 +611,19 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
   int* a = *ittr;
   Vector v0 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
   ittr++;
+  bool isPlanar = true;
   for ( ; ittr != trs.end(); ittr++)
   {
     a = *ittr;
     Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
-    K::FT roger = (double)(v0*v1);
-    if ( acos(roger*180/PI) < angleTolerance)
-      return false;
+    if ( (acos((double)(v0*v1))*180/PI) > angleTolerance)
+    {
+      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
+      isPlanar = false;
+      break;
+    }
   }
-  return true;
+  return isPlanar;
 }
 
 
