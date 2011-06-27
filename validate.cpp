@@ -80,10 +80,10 @@ using namespace std;
 
 
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
-void construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface);
+bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance = 1);
-void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector<Point3>& lsPts);
+bool getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector<Point3>& lsPts);
 bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts);
 bool check2manifoldness(Polyhedron* p);
 CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p);
@@ -202,30 +202,36 @@ Polyhedron* validateShell(ifstream& infile, bool outershell)
 {
   vector< Point3 > lsPts;
   vector< vector<int*> > shell; //-- the triangulated shell, each triangle is triplet of IDs from lsPts
-  getTriangulatedShell(infile, shell, lsPts);
+  bool isValid = true;
+  isValid = getTriangulatedShell(infile, shell, lsPts);
   
-  if (checkPlanarityFaces(shell, lsPts) == true)
+  if (isValid == true)
   {
-    Polyhedron* p = getPolyhedronDS(shell, lsPts);
-    //-- check if polyhedron is 2-manifold (includes intersection tests)
-    bool isValid = check2manifoldness(p);
-    //-- check if orientation of the normales is outwards or inwards
-    if (isValid == true)
+    if (checkPlanarityFaces(shell, lsPts) == true)
     {
-      CGAL::Orientation orient = checkGlobalOrientationNormales(p);
-      if ( ((outershell == true) && (orient != CGAL::CLOCKWISE)) || ((outershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+      Polyhedron* p = getPolyhedronDS(shell, lsPts);
+      //-- check if polyhedron is 2-manifold (includes intersection tests)
+      bool isValid = check2manifoldness(p);
+      //-- check if orientation of the normales is outwards or inwards
+      if (isValid == true)
       {
-          cout << "\tNormales all pointing in wrong direction." << endl;
-          isValid = false;
+        CGAL::Orientation orient = checkGlobalOrientationNormales(p);
+        if ( ((outershell == true) && (orient != CGAL::CLOCKWISE)) || ((outershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+        {
+            cout << "\tNormales all pointing in wrong direction." << endl;
+            isValid = false;
+        }
+      }
+      if (isValid == true)
+        return p;
+      else 
+      {
+        delete p;
+        return NULL;
       }
     }
-    if (isValid == true)
-      return p;
-    else 
-    {
-      delete p;
+    else
       return NULL;
-    }
   }
   else
     return NULL;
@@ -315,6 +321,7 @@ bool check2manifoldness(Polyhedron* p)
 
 bool isPolyhedronGeometricallyConsistent(Polyhedron* p)
 {
+  bool isValid = true;
   Polyhedron::Facet_iterator curF, otherF;
   curF = p->facets_begin();
   for ( ; curF != p->facets_end(); curF++)
@@ -355,13 +362,19 @@ bool isPolyhedronGeometricallyConsistent(Polyhedron* p)
         if (assign(asegment, re))
           count++;
         else if (assign(apoint, re) && (incidentFaces.count(otherF) == 0) )
+        {
           cout << "\tSelf-intersection of type POINT." << endl;
+          isValid = false;
+        }
       }
     }
     if (count > 3)
+    {
       cout << "\tSelf-intersection of type SEGMENT." << endl;
+      isValid = false;
+    }
   }
-  return true;
+  return isValid;
 }
 
 
@@ -397,8 +410,9 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
 }
 
 
-void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector<Point3>& lsPts)
+bool getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector<Point3>& lsPts)
 {
+  bool isValid = true;
   //-- read the points
   int num, tmpint;
   float tmpfloat;
@@ -452,7 +466,8 @@ void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector
 
     //-- get projected CT
     vector<int*> oneface;
-    construct_ct(lsPts, pgnids, lsRings, oneface);
+    if (construct_ct(lsPts, pgnids, lsRings, oneface, i) == false)
+      isValid = false;
 
     //-- modify orientation of every triangle if necessary
     bool invert = false;
@@ -488,9 +503,9 @@ void getTriangulatedShell(ifstream& infile, vector< vector<int*> >&shell, vector
         id[1] = tmp;
       }
     }
-
     shell.push_back(oneface);
   }
+  return isValid;
 }
 
 //  cout << "---Global stats---" << endl;
@@ -523,14 +538,22 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
 }
 
 
-void construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface)
+bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum)
 {
+  bool isValid = true;
   vector<int> ids = pgnids[0];
   int proj = projection_plane(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]);
-
+  
   CT ct;
   vector< vector<int> >::const_iterator it = pgnids.begin();
+  
+  int numpts = 0;
   for ( ; it != pgnids.end(); it++)
+  {
+    numpts += it->size();
+  }
+//  cout << "Polygon has # vertices " << numpts << endl;
+  for ( it = pgnids.begin(); it != pgnids.end(); it++)
   {
     vector<Point2> pts2d;
     vector<int>::const_iterator it2 = it->begin();
@@ -567,10 +590,22 @@ void construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
     ct.insert_constraint(v0,firstv);
   }
 //  cout << "faces " << ct.number_of_faces() << endl;
-//  cout << "vertices " << ct.number_of_vertices() << endl;
+//  cout << "ct vertices " << ct.number_of_vertices() << endl;
 //  cout << "constraints " << ct.number_of_constraints() << endl;
 
-  //-- fetch all the triangles forming the polygon (with holes)
+//-- validation of the face itself
+  //-- if the CT introduced new points, then there are irings intersectings either oring or other irings
+  //-- which is not allowed
+  if (numpts < ct.number_of_vertices())
+  {
+    cout << "\tIntersection(s) between rings of the face #" << faceNum << "." << endl;
+    isValid = false;
+  } 
+  //TODO: deal with degenerate case here, ie holes completely outside the oring
+  
+   
+
+//-- fetch all the triangles forming the polygon (with holes)
   CT::Finite_faces_iterator fi = ct.finite_faces_begin();
   for( ; fi != ct.finite_faces_end(); fi++)
   {
@@ -603,6 +638,7 @@ void construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
       oneface.push_back(tr);
     }
   }
+  return isValid;
 }
 
 bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
@@ -618,7 +654,7 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
     Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
     if ( (acos((double)(v0*v1))*180/PI) > angleTolerance)
     {
-      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
+//      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
       isPlanar = false;
       break;
     }
