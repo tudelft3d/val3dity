@@ -547,7 +547,7 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
   CT ct;
   vector< vector<int> >::const_iterator it = pgnids.begin();
   
-  int numpts = 0;
+  unsigned int numpts = 0;
   for ( ; it != pgnids.end(); it++)
   {
     numpts += it->size();
@@ -652,7 +652,7 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
   {
     a = *ittr;
     Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
-    if ( (acos((double)(v0*v1))*180/PI) > angleTolerance)
+    if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
     {
 //      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
       isPlanar = false;
