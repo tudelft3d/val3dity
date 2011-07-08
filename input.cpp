@@ -49,6 +49,7 @@ typedef CGAL::Polygon_2<K> Polygon;
 // STL library
 #include <fstream>
 
+int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
 bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 int projection_plane(Point3 p0, Point3 p1, Point3 p2);
@@ -341,3 +342,20 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
   }
   return isValid;
 }
+
+
+int projection_plane(Point3 p0, Point3 p1, Point3 p2)
+{
+   //-- calculate normale
+   Vector v = normal(p0, p1, p2);
+   int proj = 2; //-- xy plane
+   if (v.z() == 0.0)
+   {
+      if (v.y() == 0.0)
+         proj = 0; //-- yz plane
+      else
+         proj = 1; //-- xz plane
+   }
+   return proj;
+}
+

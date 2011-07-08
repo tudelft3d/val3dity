@@ -60,7 +60,6 @@ typedef CGAL::Nef_polyhedron_3<Ke>  Nef_polyhedron;
 // misc
 #define PI 3.14159265
 
-//int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance = 1);
 bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts);
 bool check2manifoldness(Polyhedron* p);
@@ -371,4 +370,24 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
   return P;
 }
 
+bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
+{
+   vector<int*>::const_iterator ittr = trs.begin();
+   int* a = *ittr;
+   Vector v0 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
+   ittr++;
+   bool isPlanar = true;
+   for ( ; ittr != trs.end(); ittr++)
+   {
+      a = *ittr;
+      Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
+      if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
+      {
+         //      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
+         isPlanar = false;
+         break;
+      }
+   }
+   return isPlanar;
+}
 
