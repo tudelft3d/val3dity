@@ -53,10 +53,10 @@ int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
 bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 int projection_plane(Point3 p0, Point3 p1, Point3 p2);
-bool getTriangulatedShell(ifstream& infile, fullShell& fshell);
+bool getTriangulatedShell(ifstream& infile, triangulatedPolyhedraShell& tshell);
+void getShell(ifstream& infile, polyhedraShell &allShells);
 
-
-void readAllShells(int numShells, char* const filenames[], vector<fullShell*>& polyhedraShells)
+void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells)
 {
    cout << "Processing " << numShells << " file(s)." << endl << endl;
 
@@ -69,14 +69,8 @@ void readAllShells(int numShells, char* const filenames[], vector<fullShell*>& p
    }
 
    // Now let's read in the outer shell from the file.
-   fullShell* fshell = new fullShell;
-   bool isValid = true;
-   isValid = getTriangulatedShell(infile, *fshell);
-   if (isValid == false)
-   {
-      cout << "Could not read in the file." << endl;
-      exit(1);
-   }
+   polyhedraShell* fshell = new polyhedraShell;
+   getShell(infile, *fshell);
 
    polyhedraShells.push_back(fshell);
    fshell = NULL; // don't own this anymore
@@ -91,17 +85,61 @@ void readAllShells(int numShells, char* const filenames[], vector<fullShell*>& p
       }
 
       // Now let's read in the inner shell from the file.
-      fshell = new fullShell;
+      fshell = new polyhedraShell;
       bool isValid = true;
-      isValid = getTriangulatedShell(infile, *fshell);
+      getShell(infile, *fshell);
+
+      polyhedraShells.push_back(fshell);
+      fshell = NULL; // don't own this anymore
+   }
+}
+
+void readAllTriangulatedPolyhedraShells(int numShells, char* const filenames[], vector<triangulatedPolyhedraShell*>& polyhedraShells)
+{
+   cout << "Processing " << numShells << " file(s)." << endl << endl;
+
+   cout << "Reading outer shell: " << filenames[1] << endl;
+   ifstream infile(filenames[1], ifstream::in);
+   if (!infile)
+   {
+      cout << "Error. File not there." << endl;
+      exit(1);
+   }
+
+   // Now let's read in the outer shell from the file.
+   triangulatedPolyhedraShell* tshell = new triangulatedPolyhedraShell;
+   bool isValid = true;
+   isValid = getTriangulatedShell(infile, *tshell);
+   if (isValid == false)
+   {
+      cout << "Could not read in the file." << endl;
+      exit(1);
+   }
+
+   polyhedraShells.push_back(tshell);
+   tshell = NULL; // don't own this anymore
+   for (int is=1; is<numShells; is++)
+   {
+      cout << "Reading inner shell #" << (is-1) << filenames[is] << endl;
+      ifstream infile2(filenames[is], ifstream::in);
+      if (!infile2)
+      {
+         cout << "Error. File not there." << endl;
+         exit(1);
+      }
+
+      // Now let's read in the inner shell from the file.
+      tshell = new triangulatedPolyhedraShell;
+      bool isValid = true;
+      isValid = getTriangulatedShell(infile, *tshell);
       if (isValid == false)
       {
          cout << "Could not read in the file." << endl;
          exit(1);
       }
 
-      polyhedraShells.push_back(fshell);
-      fshell = NULL; // don't own this anymore
+      polyhedraShells.push_back(tshell);
+      tshell = NULL; // don't own this anymore
    }
 
    validatePolyHedra(polyhedraShells, isValid);
@@ -113,9 +151,8 @@ void readAllShells(int numShells, char* const filenames[], vector<fullShell*>& p
 }
 
 
-bool getTriangulatedShell(ifstream& infile, fullShell& fshell)
+void getShell(ifstream& infile, polyhedraShell &allShells)
 {
-  bool isValid = true;
   //-- read the points
   int num, tmpint;
   float tmpfloat;
@@ -125,7 +162,7 @@ bool getTriangulatedShell(ifstream& infile, fullShell& fshell)
   {
     Point3 p;
     infile >> tmpint >> p;
-    fshell.lsPts.push_back(p);
+    allShells.lsPts.push_back(p);
   }
 
   //-- read the facets
@@ -140,13 +177,7 @@ bool getTriangulatedShell(ifstream& infile, fullShell& fshell)
     vector<int> ids(numpt);
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
-    //-- get projected Polygon
-    int proj = projection_plane(fshell.lsPts[ids[0]], fshell.lsPts[ids[1]], fshell.lsPts[ids[2]]);
-//    cout << "proj :" << proj << endl;
-    Polygon pgn;
-    vector<Polygon> lsRings;
-    create_polygon(fshell.lsPts, ids, pgn);
-    lsRings.push_back(pgn);
+
     vector< vector<int> > pgnids;
     pgnids.push_back(ids);
 
@@ -157,58 +188,113 @@ bool getTriangulatedShell(ifstream& infile, fullShell& fshell)
       vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
         infile >> ids[l];
-      //-- get projected Polygon
-      Polygon pgn;
-      create_polygon(fshell.lsPts, ids, pgn);
-      lsRings.push_back(pgn);
+
       pgnids.push_back(ids);
     }
     //-- skip the line about point defining the hole (mandatory in a POLY file)
     if (numf > 1)
       infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
 
-    //-- get projected CT
-    vector<int*> oneface;
-    if (construct_ct(fshell.lsPts, pgnids, lsRings, oneface, i) == false)
-      isValid = false;
-
-    //-- modify orientation of every triangle if necessary
-    bool invert = false;
-    Vector v0 = unit_normal( fshell.lsPts[ids[0]], fshell.lsPts[ids[1]], fshell.lsPts[ids[2]] );
-    if (proj == 2)
-    {
-      Vector n(0, 0, 1);
-      if ( (v0*n) < 0)
-        invert = true;
-    }
-    else if (proj == 1)
-    {
-      Vector n(0, 1, 0);
-      if ( (v0*n) > 0)
-        invert = true;
-    }
-    else
-    {
-      Vector n(1, 0, 0);
-      if ( (v0*n) < 0)
-        invert = true;
-    }
-    if ( invert == true ) //-- invert
-    {
-      vector<int*>::iterator it3 = oneface.begin();
-      int tmp;
-      int* id;
-      for ( ; it3 != oneface.end(); it3++)
-      {
-        id = *it3;
-        tmp = id[0];
-        id[0] = id[1];
-        id[1] = tmp;
-      }
-    }
-    fshell.shell.push_back(oneface);
+    allShells.shells.push_back(pgnids);
   }
-  return isValid;
+}
+
+bool getTriangulatedShell(ifstream& infile, triangulatedPolyhedraShell& tshell)
+{
+   bool isValid = true;
+   //-- read the points
+   int num, tmpint;
+   float tmpfloat;
+   infile >> num >> tmpint >> tmpint >> tmpint;
+   vector< Point3 >::iterator iPoint3;
+   for (int i = 0; i < num; i++)
+   {
+      Point3 p;
+      infile >> tmpint >> p;
+      tshell.lsPts.push_back(p);
+   }
+
+   //-- read the facets
+   infile >> num >> tmpint;
+   int numf, numpt;
+   for (int i = 0; i < num; i++)
+   {
+      //    cout << "---- face ---- " << i << endl;
+      infile >> numf >> tmpint;
+      //-- read oring (there's always one and only one)
+      infile >> numpt;
+      vector<int> ids(numpt);
+      for (int k = 0; k < numpt; k++)
+         infile >> ids[k];
+      //-- get projected Polygon
+      int proj = projection_plane(tshell.lsPts[ids[0]], tshell.lsPts[ids[1]], tshell.lsPts[ids[2]]);
+      //    cout << "proj :" << proj << endl;
+      Polygon pgn;
+      vector<Polygon> lsRings;
+      create_polygon(tshell.lsPts, ids, pgn);
+      lsRings.push_back(pgn);
+      vector< vector<int> > pgnids;
+      pgnids.push_back(ids);
+
+      //-- check for irings
+      for (int j = 1; j < numf; j++)
+      {
+         infile >> numpt;
+         vector<int> ids(numpt);
+         for (int l = 0; l < numpt; l++)
+            infile >> ids[l];
+         //-- get projected Polygon
+         Polygon pgn;
+         create_polygon(tshell.lsPts, ids, pgn);
+         lsRings.push_back(pgn);
+         pgnids.push_back(ids);
+      }
+      //-- skip the line about point defining the hole (mandatory in a POLY file)
+      if (numf > 1)
+         infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
+
+      //-- get projected CT
+      vector<int*> oneface;
+      if (construct_ct(tshell.lsPts, pgnids, lsRings, oneface, i) == false)
+         isValid = false;
+
+      //-- modify orientation of every triangle if necessary
+      bool invert = false;
+      Vector v0 = unit_normal( tshell.lsPts[ids[0]], tshell.lsPts[ids[1]], tshell.lsPts[ids[2]] );
+      if (proj == 2)
+      {
+         Vector n(0, 0, 1);
+         if ( (v0*n) < 0)
+            invert = true;
+      }
+      else if (proj == 1)
+      {
+         Vector n(0, 1, 0);
+         if ( (v0*n) > 0)
+            invert = true;
+      }
+      else
+      {
+         Vector n(1, 0, 0);
+         if ( (v0*n) < 0)
+            invert = true;
+      }
+      if ( invert == true ) //-- invert
+      {
+         vector<int*>::iterator it3 = oneface.begin();
+         int tmp;
+         int* id;
+         for ( ; it3 != oneface.end(); it3++)
+         {
+            id = *it3;
+            tmp = id[0];
+            id[0] = id[1];
+            id[1] = tmp;
+         }
+      }
+      tshell.shell.push_back(oneface);
+   }
+   return isValid;
 }
 
 //  cout << "---Global stats---" << endl;

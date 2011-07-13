@@ -50,18 +50,23 @@ typedef K::Triangle_3 Triangle;
 typedef K::Tetrahedron_3 Tetrahedron;
 
 // convenience structure
-//-- the triangulated shell, each triangle is triplet of IDs from lsPts
-typedef struct fullShell_tag {
+//-- the vector of faces, each which has a vector of rings, 
+//-- which is a vector of IDs from vertex pool lsPts
+typedef struct fullPolyhedraShell_tag {
+   vector< Point3 > lsPts;
+   vector< vector< vector<int> > > shells;
+} polyhedraShell;
+
+typedef struct triangulatedPolyhedraShell_tag {
    vector< Point3 > lsPts;
    vector< vector<int*> > shell;
-} fullShell;
-
+} triangulatedPolyhedraShell;
 
 
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validatePolyHedra(vector<fullShell*> &polyhedraShells, bool& isValid);
+void validatePolyHedra(vector<triangulatedPolyhedraShell*> &polyhedraShells, bool& isValid);
 
 #endif

@@ -35,21 +35,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ifeature.h>
 #include <igeometrytools.h>
 #include <imesh.h>
+#include <iline.h>
+#include <idonut.h>
+#include <icompositesurface.h>
+#include <isimplearea.h>
+#include <ipolygon.h>
+#include <iface.h>
+#include <isurface.h>
+#include <ibrepsolid.h>
+
+#include <iwriter.h>
  
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
 int main(int argc, char* const argv[])
 {
-
-  if (argc < 2)
+  if (argc != 2)
   {
-    cout << "You have to give at least one input POLY file." << endl;
+    cout << "You must give only one input POLY file." << endl;
     return(0);
   }
-
-  vector<fullShell*> polyhedraShells;
-  readAllShells((argc-1), argv, polyhedraShells);
 
   // Initialize FMEObjects
   IFMESession* session(NULL);
@@ -57,36 +63,93 @@ int main(int argc, char* const argv[])
   session->init(NULL);
   IFMEGeometryTools* gt = session->getGeometryTools();
 
-  IFMEMesh* mesh = gt->createMesh();
-  vector<Point3>& thislsPts = polyhedraShells[0]->lsPts; // helpful alias
+  // Use the val3dity code to read in the .poly file
+  vector<polyhedraShell*> polyhedraShells;
+  // We know we are only going to get a single polyhedrashell back.
+  readAllPolyhedraShells((argc-1), argv, polyhedraShells);
 
-  // Add the vertex pool
-  for (unsigned int i(0); i< thislsPts.size(); i++)
-  {
-     mesh->appendVertex(thislsPts[i].x(), thislsPts[i].y(), thislsPts[i].z());
-  }
+  polyhedraShell* thisPolyhedra = polyhedraShells[0]; // helpful alias
+  vector<Point3>& thislsPts = thisPolyhedra->lsPts; // helpful alias
 
-  // Read in all the faces (for now, into one big mesh).
-  for (unsigned int j(0); j< polyhedraShells[0]->shell.size(); j++)
+  // Read in all the faces.
+  IFMECompositeSurface* compositeSurface = gt->createCompositeSurface();
+  for (unsigned int j(0); j< thisPolyhedra->shells.size(); j++)
   {
-     // Add all the triangles for this face
-     vector<int*>& thistrs = polyhedraShells[0]->shell[j]; // helpful alias
-     FME_UInt32 triangle[3];
-     for (vector<int*>::const_iterator ittr = thistrs.begin() ; ittr != thistrs.end(); ittr++)
+     // Add all the shells for this face.  The first one is the outer one.
+     vector< vector<int> >& thisShell = thisPolyhedra->shells[j]; // helpful alias
+     IFMESimpleArea* outerBoundary = NULL;
+     IFMEDonut* boundary = NULL;
+     for (unsigned int k(0); k < thisShell.size(); k++)
      {
-        int* a = *ittr;
-        triangle[0] = a[0];
-        triangle[1] = a[1];
-        triangle[2] = a[2];
-        mesh->addMeshPart(3, triangle, NULL, NULL, 0);
+        vector<int>& thisRing = thisShell[k]; // helpful alias
+        IFMELine* oneLine = gt->createLineWithD(FME_TRUE);
+        for (unsigned int v(0); v < thisRing.size(); v++)
+        {
+           oneLine->appendPointXYZ(thislsPts[thisRing[v]].x(), thislsPts[thisRing[v]].y(), thislsPts[thisRing[v]].z());
+        }
+        
+        // Is this the outer one?
+        if (0==k)
+        {
+           outerBoundary = gt->createPolygonByCurve(oneLine); oneLine = NULL;
+        }
+        else if (1==k) // the first hole?
+        {
+           boundary = gt->createDonutBySimpleArea(outerBoundary); outerBoundary = NULL;
+           boundary->addInnerBoundaryCurve(oneLine); oneLine = NULL;
+        }
+        else
+        {
+           boundary->addInnerBoundaryCurve(oneLine); oneLine = NULL;
+        }
+     }
+
+     if (NULL == boundary)
+     {
+        // We could make a triangle mesh here.
+        //compositeSurface->appendPart(gt->createTriangulatedMeshFromGeometry(gt->createFaceByArea(outerBoundary, FME_CLOSE_3D_EXTEND_MODE))); outerBoundary = NULL;
+        compositeSurface->appendPart(gt->createFaceByArea(outerBoundary, FME_CLOSE_3D_EXTEND_MODE)); outerBoundary = NULL;
+     }
+     else
+     {
+        // We could make a triangle mesh here.
+        //compositeSurface->appendPartgt->createTriangulatedMeshFromGeometry(g(gt->createFaceByArea(boundary, FME_CLOSE_3D_EXTEND_MODE))); boundary = NULL;
+        compositeSurface->appendPart(gt->createFaceByArea(boundary, FME_CLOSE_3D_EXTEND_MODE)); boundary = NULL;
      }
   }
 
-  // See what we got...
+  // Let's not have a composite if we just have one part.
+  IFMESurface* finalSurface = NULL;
+  if (1 == compositeSurface->numParts())
+  {
+     finalSurface = compositeSurface->removeEndPart();
+  }
+  else
+  {
+     finalSurface = compositeSurface;
+  }
+  compositeSurface = NULL;
+
+  gt->createBRepSolidBySurface(finalSurface);
+
+  // make a purdy little feature
   IFMEFeature* feature = session->createFeature();
-  feature->setGeometry(mesh); mesh = NULL;
-  session->logFile()->setFileName("C:\tmp\val3dity.log", FME_FALSE);
-  session->logFile()->logFeature(*feature);
+  feature->setGeometry(gt->createBRepSolidBySurface(finalSurface)); finalSurface = NULL;
+  feature->setFeatureType(argv[1]);
+
+  // Output what we got...
+  IFMEUniversalWriter *wtr = session->createWriter("FFS", NULL);
+  IFMEStringArray* parameters = session->createStringArray();
+  std::string outputfile = argv[1];
+  outputfile += ".ffs";
+  wtr->open(outputfile.data(), *parameters);
+  wtr->write(*feature);
+  wtr->close();
+
+  // Clean up
+  session->destroyFeature(feature); feature = NULL;
+  session->destroyStringArray(parameters); parameters = NULL;
+  session->destroyWriter(wtr); wtr = NULL;
 
   // Shut down FMEObjects
   FME_destroySession(session);

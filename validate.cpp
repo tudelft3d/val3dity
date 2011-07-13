@@ -66,12 +66,12 @@ bool check2manifoldness(Polyhedron* p);
 CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p);
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 bool isPolyhedronGeometricallyConsistent(Polyhedron* p);
-Polyhedron* validateShell(fullShell& fshell, bool outershell);
+Polyhedron* validateTriangulatedPolyhedraShell(triangulatedPolyhedraShell& tshell, bool isOutershell);
 
 
 //--------------------------------------------------------------
 
-void validatePolyHedra(vector<fullShell*> &polyhedraShells, bool& isValid)
+void validatePolyHedra(vector<triangulatedPolyhedraShell*> &polyhedraShells, bool& isValid)
 {
    isValid = true;
 
@@ -87,7 +87,7 @@ void validatePolyHedra(vector<fullShell*> &polyhedraShells, bool& isValid)
    // First, let's do a quick validation of the outer shell
    cout << "Reading outer shell: " << 0 << endl;
 
-   Polyhedron* p = validateShell(*(polyhedraShells[0]), true);  
+   Polyhedron* p = validateTriangulatedPolyhedraShell(*(polyhedraShells[0]), true);  
    if (p != NULL)
       cout << "Outer shell valid.\n" << endl;
    else
@@ -100,7 +100,7 @@ void validatePolyHedra(vector<fullShell*> &polyhedraShells, bool& isValid)
     {
        cout << "Validating inner shell #" << (i-1) << endl;
 
-       p = validateShell(*(polyhedraShells[i]), false);  
+       p = validateTriangulatedPolyhedraShell(*(polyhedraShells[i]), false);  
        if (p != NULL)
           cout << "Inner shell valid.\n" << endl;
        else
@@ -168,19 +168,19 @@ bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts)
   return isValid;
 }  
   
-Polyhedron* validateShell(fullShell& fshell, bool outershell)
+Polyhedron* validateTriangulatedPolyhedraShell( triangulatedPolyhedraShell& tshell, bool isOutershell )
 {
    bool isValid = true;
-   if (checkPlanarityFaces(fshell.shell, fshell.lsPts) == true)
+   if (checkPlanarityFaces(tshell.shell, tshell.lsPts) == true)
    {
-      Polyhedron* p = getPolyhedronDS(fshell.shell, fshell.lsPts);
+      Polyhedron* p = getPolyhedronDS(tshell.shell, tshell.lsPts);
       //-- check if polyhedron is 2-manifold (includes intersection tests)
       bool isValid = check2manifoldness(p);
       //-- check if orientation of the normales is outwards or inwards
       if (isValid == true)
       {
          CGAL::Orientation orient = checkGlobalOrientationNormales(p);
-         if ( ((outershell == true) && (orient != CGAL::CLOCKWISE)) || ((outershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+         if ( ((isOutershell == true) && (orient != CGAL::CLOCKWISE)) || ((isOutershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
          {
             cout << "\tNormales all pointing in wrong direction." << endl;
             isValid = false;
