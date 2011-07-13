@@ -76,8 +76,8 @@ void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyh
    fshell = NULL; // don't own this anymore
    for (int is=1; is<numShells; is++)
    {
-      cout << "Reading inner shell #" << (is-1) << filenames[is] << endl;
-      ifstream infile2(filenames[is], ifstream::in);
+      cout << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
+      ifstream infile2(filenames[(is+1)], ifstream::in);
       if (!infile2)
       {
          cout << "Error. File not there." << endl;
@@ -87,7 +87,7 @@ void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyh
       // Now let's read in the inner shell from the file.
       fshell = new polyhedraShell;
       bool isValid = true;
-      getShell(infile, *fshell);
+      getShell(infile2, *fshell);
 
       polyhedraShells.push_back(fshell);
       fshell = NULL; // don't own this anymore
@@ -120,8 +120,8 @@ void readAllTriangulatedPolyhedraShells(int numShells, char* const filenames[], 
    tshell = NULL; // don't own this anymore
    for (int is=1; is<numShells; is++)
    {
-      cout << "Reading inner shell #" << (is-1) << filenames[is] << endl;
-      ifstream infile2(filenames[is], ifstream::in);
+      cout << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
+      ifstream infile2(filenames[(is+1)], ifstream::in);
       if (!infile2)
       {
          cout << "Error. File not there." << endl;
@@ -131,7 +131,7 @@ void readAllTriangulatedPolyhedraShells(int numShells, char* const filenames[], 
       // Now let's read in the inner shell from the file.
       tshell = new triangulatedPolyhedraShell;
       bool isValid = true;
-      isValid = getTriangulatedShell(infile, *tshell);
+      isValid = getTriangulatedShell(infile2, *tshell);
       if (isValid == false)
       {
          cout << "Could not read in the file." << endl;
