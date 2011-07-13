@@ -45,17 +45,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ibrepsolid.h>
 
 #include <iwriter.h>
- 
+
+void parseFilename( const std::string &inputFilename, std::string &outputpath, std::string &outputbasename );
+
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
 int main(int argc, char* const argv[])
 {
-  if (argc != 2)
-  {
-    cout << "You must give only one input POLY file." << endl;
-    return(0);
-  }
+   if (argc < 2)
+   {
+      cout << "You have to give at least one input POLY file." << endl;
+      return(0);
+   }
 
   // Initialize FMEObjects
   IFMESession* session(NULL);
@@ -65,84 +67,109 @@ int main(int argc, char* const argv[])
 
   // Use the val3dity code to read in the .poly file
   vector<polyhedraShell*> polyhedraShells;
-  // We know we are only going to get a single polyhedrashell back.
   readAllPolyhedraShells((argc-1), argv, polyhedraShells);
 
-  polyhedraShell* thisPolyhedra = polyhedraShells[0]; // helpful alias
-  vector<Point3>& thislsPts = thisPolyhedra->lsPts; // helpful alias
-
-  // Read in all the faces.
-  IFMECompositeSurface* compositeSurface = gt->createCompositeSurface();
-  for (unsigned int j(0); j< thisPolyhedra->shells.size(); j++)
+  // Let's loop through all the polyhedraShells we read in (one from each file)
+  IFMEBRepSolid* polyhedraSolid = NULL;
+  for(unsigned int phs(0); phs<polyhedraShells.size(); phs++)
   {
-     // Add all the shells for this face.  The first one is the outer one.
-     vector< vector<int> >& thisShell = thisPolyhedra->shells[j]; // helpful alias
-     IFMESimpleArea* outerBoundary = NULL;
-     IFMEDonut* boundary = NULL;
-     for (unsigned int k(0); k < thisShell.size(); k++)
+     polyhedraShell* thisPolyhedra = polyhedraShells[phs]; // helpful alias
+     vector<Point3>& thislsPts = thisPolyhedra->lsPts; // helpful alias
+
+     // Read in all the faces.
+     IFMECompositeSurface* compositeSurface = gt->createCompositeSurface();
+     for (unsigned int j(0); j< thisPolyhedra->shells.size(); j++)
      {
-        vector<int>& thisRing = thisShell[k]; // helpful alias
-        IFMELine* oneLine = gt->createLineWithD(FME_TRUE);
-        for (unsigned int v(0); v < thisRing.size(); v++)
+        // Add all the shells for this face.  The first one is the outer one.
+        vector< vector<int> >& thisShell = thisPolyhedra->shells[j]; // helpful alias
+        IFMESimpleArea* outerBoundary = NULL;
+        IFMEDonut* boundary = NULL;
+        for (unsigned int k(0); k < thisShell.size(); k++)
         {
-           oneLine->appendPointXYZ(thislsPts[thisRing[v]].x(), thislsPts[thisRing[v]].y(), thislsPts[thisRing[v]].z());
+           vector<int>& thisRing = thisShell[k]; // helpful alias
+           IFMELine* oneLine = gt->createLineWithD(FME_TRUE);
+           for (unsigned int v(0); v < thisRing.size(); v++)
+           {
+              oneLine->appendPointXYZ(thislsPts[thisRing[v]].x(), thislsPts[thisRing[v]].y(), thislsPts[thisRing[v]].z());
+           }
+
+           // Is this the outer one?
+           if (0==k)
+           {
+              outerBoundary = gt->createPolygonByCurve(oneLine); oneLine = NULL;
+           }
+           else if (1==k) // the first hole?
+           {
+              boundary = gt->createDonutBySimpleArea(outerBoundary); outerBoundary = NULL;
+              boundary->addInnerBoundaryCurve(oneLine); oneLine = NULL;
+           }
+           else
+           {
+              boundary->addInnerBoundaryCurve(oneLine); oneLine = NULL;
+           }
         }
-        
-        // Is this the outer one?
-        if (0==k)
+
+        if (NULL == boundary)
         {
-           outerBoundary = gt->createPolygonByCurve(oneLine); oneLine = NULL;
-        }
-        else if (1==k) // the first hole?
-        {
-           boundary = gt->createDonutBySimpleArea(outerBoundary); outerBoundary = NULL;
-           boundary->addInnerBoundaryCurve(oneLine); oneLine = NULL;
+           // We could make a triangle mesh here.
+           //compositeSurface->appendPart(gt->createTriangulatedMeshFromGeometry(gt->createFaceByArea(outerBoundary, FME_CLOSE_3D_EXTEND_MODE))); outerBoundary = NULL;
+           compositeSurface->appendPart(gt->createFaceByArea(outerBoundary, FME_CLOSE_3D_EXTEND_MODE)); outerBoundary = NULL;
         }
         else
         {
-           boundary->addInnerBoundaryCurve(oneLine); oneLine = NULL;
+           // We could make a triangle mesh here.
+           //compositeSurface->appendPartgt->createTriangulatedMeshFromGeometry(g(gt->createFaceByArea(boundary, FME_CLOSE_3D_EXTEND_MODE))); boundary = NULL;
+           compositeSurface->appendPart(gt->createFaceByArea(boundary, FME_CLOSE_3D_EXTEND_MODE)); boundary = NULL;
         }
      }
 
-     if (NULL == boundary)
+     // Let's not have a composite if we just have one part.
+     IFMESurface* finalSurface = NULL;
+     if (1 == compositeSurface->numParts())
      {
-        // We could make a triangle mesh here.
-        //compositeSurface->appendPart(gt->createTriangulatedMeshFromGeometry(gt->createFaceByArea(outerBoundary, FME_CLOSE_3D_EXTEND_MODE))); outerBoundary = NULL;
-        compositeSurface->appendPart(gt->createFaceByArea(outerBoundary, FME_CLOSE_3D_EXTEND_MODE)); outerBoundary = NULL;
+        finalSurface = compositeSurface->removeEndPart();
      }
      else
      {
-        // We could make a triangle mesh here.
-        //compositeSurface->appendPartgt->createTriangulatedMeshFromGeometry(g(gt->createFaceByArea(boundary, FME_CLOSE_3D_EXTEND_MODE))); boundary = NULL;
-        compositeSurface->appendPart(gt->createFaceByArea(boundary, FME_CLOSE_3D_EXTEND_MODE)); boundary = NULL;
+        finalSurface = compositeSurface;
      }
+     compositeSurface = NULL;
+
+     if (NULL == polyhedraSolid)
+     {
+        polyhedraSolid = gt->createBRepSolidBySurface(finalSurface);
+     }
+     else
+     {
+        polyhedraSolid->addInnerSurface(finalSurface);
+     }
+     finalSurface = NULL;
   }
 
-  // Let's not have a composite if we just have one part.
-  IFMESurface* finalSurface = NULL;
-  if (1 == compositeSurface->numParts())
+  // Let's make the name of our output file.  This is harder than it needs to be!
+  std::string outputfile;
+  std::string outputpath;
+  std::string outputbasename;
+  for(int fname(1); fname<argc; fname++)
   {
-     finalSurface = compositeSurface->removeEndPart();
+     parseFilename(argv[fname], outputpath, outputbasename);
+     if (fname>1)
+     {
+        outputfile += "_";
+     }
+     outputfile += outputbasename;
   }
-  else
-  {
-     finalSurface = compositeSurface;
-  }
-  compositeSurface = NULL;
-
-  gt->createBRepSolidBySurface(finalSurface);
+  std::string outputfileName = outputpath + outputfile + ".ffs";
 
   // make a purdy little feature
   IFMEFeature* feature = session->createFeature();
-  feature->setGeometry(gt->createBRepSolidBySurface(finalSurface)); finalSurface = NULL;
-  feature->setFeatureType(argv[1]);
+  feature->setGeometry(polyhedraSolid); polyhedraSolid = NULL;
+  feature->setFeatureType(outputfile.data());
 
   // Output what we got...
   IFMEUniversalWriter *wtr = session->createWriter("FFS", NULL);
   IFMEStringArray* parameters = session->createStringArray();
-  std::string outputfile = argv[1];
-  outputfile += ".ffs";
-  wtr->open(outputfile.data(), *parameters);
+  wtr->open(outputfileName.data(), *parameters);
   wtr->write(*feature);
   wtr->close();
 
@@ -156,5 +183,25 @@ int main(int argc, char* const argv[])
   session = NULL;
 
   return(0);
+}
+
+void parseFilename( const std::string &inputFilename, std::string &outputpath, std::string &outputbasename )
+{
+   // let's get the location to be the same as the first input file.
+   int basenameloc(-1);
+   basenameloc = inputFilename.find_last_of('/');
+   if (-1==basenameloc)
+   {
+      basenameloc = inputFilename.find_last_of('\\');
+   }
+   if (-1!=basenameloc)
+   {
+      outputpath = inputFilename.substr(0,basenameloc+1);
+   }
+
+   int extentionloc = inputFilename.find_last_of('.');
+   int extentionlength = inputFilename.size()-extentionloc;
+   int basenamelength = inputFilename.size()-basenameloc-extentionlength-1;
+   outputbasename = inputFilename.substr(basenameloc+1,basenamelength);
 }
 
