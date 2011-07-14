@@ -57,16 +57,11 @@ typedef struct fullPolyhedraShell_tag {
    vector< vector< vector<int> > > shells;
 } polyhedraShell;
 
-typedef struct triangulatedPolyhedraShell_tag {
-   vector< Point3 > lsPts;
-   vector< vector<int*> > shell;
-} triangulatedPolyhedraShell;
-
 
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validatePolyHedra(vector<triangulatedPolyhedraShell*> &polyhedraShells, bool& isValid);
+void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid);
 
 #endif

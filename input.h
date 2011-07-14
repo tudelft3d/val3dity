@@ -31,13 +31,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// We are currently only including this to get the definition of polyhedraShell.
 #include "validate.h"
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
 // Ignore the first value in the array filenames for now...
-void readAllTriangulatedPolyhedraShells(int numShells, char* const filenames[], vector<triangulatedPolyhedraShell*>& polyhedraShells);
 void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells);
 
 

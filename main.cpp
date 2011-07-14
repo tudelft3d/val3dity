@@ -44,8 +44,8 @@ int main(int argc, char* const argv[])
     return(0);
   }
 
-  vector<triangulatedPolyhedraShell*> polyhedraShells;
-  readAllTriangulatedPolyhedraShells((argc-1), argv, polyhedraShells);
+  vector<polyhedraShell*> polyhedraShells;
+  readAllPolyhedraShells((argc-1), argv, polyhedraShells);
 
   bool isValid(true);
   validatePolyHedra(polyhedraShells, isValid);

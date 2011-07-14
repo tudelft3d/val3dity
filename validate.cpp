@@ -57,6 +57,11 @@ typedef CGAL::Polyhedron_3<K>       Polyhedron;
 typedef CGAL::Polyhedron_3<Ke>       PolyhedronExact;
 typedef CGAL::Nef_polyhedron_3<Ke>  Nef_polyhedron;
 
+typedef struct triangulatedPolyhedraShell_tag {
+   vector< Point3 > lsPts;
+   vector< vector<int*> > shell;
+} triangulatedPolyhedraShell;
+
 // misc
 #define PI 3.14159265
 
@@ -67,27 +72,41 @@ CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p);
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 bool isPolyhedronGeometricallyConsistent(Polyhedron* p);
 Polyhedron* validateTriangulatedPolyhedraShell(triangulatedPolyhedraShell& tshell, bool isOutershell);
-
+bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells);
+bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tshell);
+int projection_plane(Point3 p0, Point3 p1, Point3 p2);
+bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
+void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
 
 //--------------------------------------------------------------
 
-void validatePolyHedra(vector<triangulatedPolyhedraShell*> &polyhedraShells, bool& isValid)
+void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid)
 {
+   vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
+
+   if (! triangulatePolyhedraShells(polyhedraShells, triangulatedPolyhedraShells))
+   {
+      cout << "polyhedra are not valid enough to be triangulated." << endl;
+      isValid = false;
+      return;
+   }
+
+
    isValid = true;
 
-   if (polyhedraShells.size() < 1)
+   if (triangulatedPolyhedraShells.size() < 1)
    {
       cout << "You have to give at least one input polyhedron." << endl;
       isValid = false;
       return;
    }
 
-   cout << "Validating " << polyhedraShells.size() << " shell(s)." << endl << endl;
+   cout << "Validating " << triangulatedPolyhedraShells.size() << " shell(s)." << endl << endl;
 
    // First, let's do a quick validation of the outer shell
-   cout << "Reading outer shell: " << 0 << endl;
+   cout << "Validating outer shell: " << 0 << endl;
 
-   Polyhedron* p = validateTriangulatedPolyhedraShell(*(polyhedraShells[0]), true);  
+   Polyhedron* p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[0]), true);  
    if (p != NULL)
       cout << "Outer shell valid.\n" << endl;
    else
@@ -96,11 +115,11 @@ void validatePolyHedra(vector<triangulatedPolyhedraShell*> &polyhedraShells, boo
     vector<Polyhedron*> polyhedra;
     polyhedra.push_back(p);  
 
-    for (unsigned int i=1; i<polyhedraShells.size(); i++)
+    for (unsigned int i=1; i<triangulatedPolyhedraShells.size(); i++)
     {
        cout << "Validating inner shell #" << (i-1) << endl;
 
-       p = validateTriangulatedPolyhedraShell(*(polyhedraShells[i]), false);  
+       p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[i]), false);  
        if (p != NULL)
           cout << "Inner shell valid.\n" << endl;
        else
@@ -148,6 +167,276 @@ void validatePolyHedra(vector<triangulatedPolyhedraShell*> &polyhedraShells, boo
     }
     return;
 
+}
+
+
+bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells)
+{
+   cout << "Triangulating " << polyhedraShells.size() << " shell(s)." << endl << endl;
+
+   cout << "Triangulating outer shell." << endl;
+   if (polyhedraShells.size() < 1)
+   {
+      cout << "Error. No outer shell." << endl;
+      return false;
+   }
+
+   // Now let's triangulate the outer shell from the input.
+   triangulatedPolyhedraShell* tshell = new triangulatedPolyhedraShell;
+   if (! triangulateOneShell(*(polyhedraShells[0]), *tshell))
+   {
+      cout << "Could not triangulate in the outer shell." << endl;
+      return false;
+   }
+
+   triangulatedPolyhedraShells.push_back(tshell);
+   tshell = NULL; // don't own this anymore
+   for (unsigned int is=1; is<polyhedraShells.size(); is++)
+   {
+      cout << "Triangulating inner shell #" << (is-1) << endl;
+
+      // Now let's triangulate the inner shell from the input.
+      tshell = new triangulatedPolyhedraShell;
+      if (!triangulateOneShell(*(polyhedraShells[is]), *tshell))
+      {
+         cout << "Could not triangulate in the inner shell #" << (is-1) << endl;
+         return false;
+      }
+
+      triangulatedPolyhedraShells.push_back(tshell);
+      tshell = NULL; // don't own this anymore
+   }
+
+   return true;
+}
+
+bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tshell)
+{
+   //-- read the facets
+   int num = pshell.shells.size();
+   for (int i = 0; i < num; i++)
+   {
+      //    cout << "---- face ---- " << i << endl;
+      
+      // These are the number of rings on this facet
+      int numf = pshell.shells[i].size();
+      //-- read oring (there's always one and only one)
+      if (numf < 1)
+      {
+         cout << "facet does not have an outer boundary." << endl;
+         return false;
+      }
+      vector<int> &ids = pshell.shells[i][0]; // helpful alias for the outer boundary
+
+      //-- We're going to use the outer shell as the reference plane for this entire face.
+      int proj = projection_plane(pshell.lsPts[ids[0]], pshell.lsPts[ids[1]], pshell.lsPts[ids[2]]);
+      Vector v0 = unit_normal( pshell.lsPts[ids[0]], pshell.lsPts[ids[1]], pshell.lsPts[ids[2]] );
+
+      //-- get projected Polygon
+      //    cout << "proj :" << proj << endl;
+      Polygon pgn;
+      vector<Polygon> lsRings;
+      create_polygon(pshell.lsPts, ids, pgn);
+      lsRings.push_back(pgn);
+      vector< vector<int> > pgnids;
+      pgnids.push_back(ids);
+
+      //-- check for irings
+      for (int j = 1; j < numf; j++)
+      {
+         vector<int> &ids2 = pshell.shells[i][j]; // helpful alias for the inner boundary
+
+         //-- get projected Polygon
+         Polygon pgn;
+         create_polygon(pshell.lsPts, ids2, pgn);
+         lsRings.push_back(pgn);
+         pgnids.push_back(ids2);
+      }
+
+      //-- get projected CT
+      vector<int*> oneface;
+      if (construct_ct(pshell.lsPts, pgnids, lsRings, oneface, i) == false)
+      {
+         cout << "cannot triangulate polyhedra face #" << i << endl;
+         return false;
+      }
+
+      //-- modify orientation of every triangle if necessary
+      bool invert = false;
+      if (proj == 2)
+      {
+         Vector n(0, 0, 1);
+         if ( (v0*n) < 0)
+            invert = true;
+      }
+      else if (proj == 1)
+      {
+         Vector n(0, 1, 0);
+         if ( (v0*n) > 0)
+            invert = true;
+      }
+      else
+      {
+         Vector n(1, 0, 0);
+         if ( (v0*n) < 0)
+            invert = true;
+      }
+      if ( invert == true ) //-- invert
+      {
+         vector<int*>::iterator it3 = oneface.begin();
+         int tmp;
+         int* id;
+         for ( ; it3 != oneface.end(); it3++)
+         {
+            id = *it3;
+            tmp = id[0];
+            id[0] = id[1];
+            id[1] = tmp;
+         }
+      }
+      tshell.shell.push_back(oneface);
+   }
+
+   //-- here are the points: 
+   tshell.lsPts = pshell.lsPts;
+   return true;
+}
+
+void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
+{
+   int proj = projection_plane(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]);
+   //-- build projected polygon
+   vector<int>::const_iterator it = ids.begin();
+   for ( ; it != ids.end(); it++)
+   {
+      Point3 p = lsPts[*it];
+      if (proj == 2)
+         pgn.push_back(Point2(p.x(), p.y()));
+      else if (proj == 1)
+         pgn.push_back(Point2(p.x(), p.z()));
+      else
+         pgn.push_back(Point2(p.y(), p.z()));
+   }
+   if (pgn.is_counterclockwise_oriented() == false)
+      pgn.reverse_orientation();
+}
+
+bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum)
+{
+   bool isValid = true;
+   vector<int> ids = pgnids[0];
+   int proj = projection_plane(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]);
+
+   CT ct;
+   vector< vector<int> >::const_iterator it = pgnids.begin();
+
+   unsigned int numpts = 0;
+   for ( ; it != pgnids.end(); it++)
+   {
+      numpts += it->size();
+   }
+   //  cout << "Polygon has # vertices " << numpts << endl;
+   for ( it = pgnids.begin(); it != pgnids.end(); it++)
+   {
+      vector<Point2> pts2d;
+      vector<int>::const_iterator it2 = it->begin();
+      for ( ; it2 != it->end(); it2++)
+      {
+         Point3 p1  = lsPts[*it2];
+         if (proj == 2)
+            pts2d.push_back( Point2(p1.x(), p1.y()) );
+         else if (proj == 1)
+            pts2d.push_back( Point2(p1.x(), p1.z()) );
+         else
+            pts2d.push_back( Point2(p1.y(), p1.z()) );
+      }
+
+      vector<Point2>::const_iterator itPt;
+      CT::Vertex_handle v0;
+      CT::Vertex_handle v1;
+      CT::Vertex_handle firstv;
+      itPt = pts2d.begin();
+      v0 = ct.insert(*itPt);
+      firstv = v0;
+      it2 = it->begin();
+      v0->info() = *it2;
+      itPt++;
+      it2++;
+      for (; itPt != pts2d.end(); itPt++)
+      {
+         v1 = ct.insert(*itPt);
+         v1->info() = *it2;
+         ct.insert_constraint(v0, v1);
+         v0 = v1;
+         it2++;
+      }
+      ct.insert_constraint(v0,firstv);
+   }
+   //  cout << "faces " << ct.number_of_faces() << endl;
+   //  cout << "ct vertices " << ct.number_of_vertices() << endl;
+   //  cout << "constraints " << ct.number_of_constraints() << endl;
+
+   //-- validation of the face itself
+   //-- if the CT introduced new points, then there are irings intersectings either oring or other irings
+   //-- which is not allowed
+   if (numpts < ct.number_of_vertices())
+   {
+      cout << "\tIntersection(s) between rings of the face #" << faceNum << "." << endl;
+      isValid = false;
+   } 
+   //TODO: deal with degenerate case here, ie holes completely outside the oring
+
+
+
+   //-- fetch all the triangles forming the polygon (with holes)
+   CT::Finite_faces_iterator fi = ct.finite_faces_begin();
+   for( ; fi != ct.finite_faces_end(); fi++)
+   {
+      Point2 centre = barycenter( ct.triangle(fi).vertex(0), 1,
+         ct.triangle(fi).vertex(1), 1,
+         ct.triangle(fi).vertex(2), 1);
+      bool inside = true;
+      if (lsRings[0].has_on_negative_side(centre))
+         inside = false;
+      else
+      {
+         vector<Polygon>::const_iterator itpgn = lsRings.begin();
+         itpgn++;
+         for ( ; itpgn != lsRings.end(); itpgn++)   //-- check irings
+         {
+            if (itpgn->has_on_positive_side(centre))
+            {
+               inside = false;
+               break;
+            }
+         }
+      }
+      if (inside == true)
+      {
+         //-- add the IDs to the face
+         int* tr = new int[3];
+         tr[0] = fi->vertex(0)->info();
+         tr[1] = fi->vertex(1)->info();
+         tr[2] = fi->vertex(2)->info();
+         oneface.push_back(tr);
+      }
+   }
+   return isValid;
+}
+
+int projection_plane(Point3 p0, Point3 p1, Point3 p2)
+{
+   //-- calculate normale
+   Vector v = normal(p0, p1, p2);
+   int proj = 2; //-- xy plane
+   if (v.z() == 0.0)
+   {
+      if (v.y() == 0.0)
+         proj = 0; //-- yz plane
+      else
+         proj = 1; //-- xz plane
+   }
+   return proj;
 }
 
 
