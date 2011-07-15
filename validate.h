@@ -58,10 +58,21 @@ typedef struct fullPolyhedraShell_tag {
 } polyhedraShell;
 
 
+// This will hold the return invalidities values.
+// (I don't think we'll need to know right down to the vertex 
+// number, but maybe the facet is good.)
+// 
+typedef struct invalidItem_tag {
+   int errorCode;
+   int polyhedraNum; // -1 means unknown
+   int facetNum;     // -1 means unknown
+   int ringNum;      // -1 means unknown
+   int vertexNum;    // -1 means unknown
+} invalidItem;
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid);
+void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems);
 
 #endif

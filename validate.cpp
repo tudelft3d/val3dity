@@ -80,24 +80,27 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
 
 //--------------------------------------------------------------
 
-void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid)
+void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems)
 {
    vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
 
    if (! triangulatePolyhedraShells(polyhedraShells, triangulatedPolyhedraShells))
    {
       cout << "polyhedra are not valid enough to be triangulated." << endl;
-      isValid = false;
+      invalidItem ii;
+      ii.errorCode = 999;
+      ii.polyhedraNum = -1;
+      invalidItems.push_back(ii);
       return;
    }
-
-
-   isValid = true;
 
    if (triangulatedPolyhedraShells.size() < 1)
    {
       cout << "You have to give at least one input polyhedron." << endl;
-      isValid = false;
+      invalidItem ii;
+      ii.errorCode = 999;
+      ii.polyhedraNum = 0;
+      invalidItems.push_back(ii);
       return;
    }
 
@@ -108,9 +111,17 @@ void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid)
 
    Polyhedron* p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[0]), true);  
    if (p != NULL)
+   {
       cout << "Outer shell valid.\n" << endl;
+   }
    else
+   {
       cout << "Outer shell invalid.\n" << endl;
+      invalidItem ii;
+      ii.errorCode = 999;
+      ii.polyhedraNum = 0;
+      invalidItems.push_back(ii);
+   }
 
     vector<Polyhedron*> polyhedra;
     polyhedra.push_back(p);  
@@ -121,9 +132,17 @@ void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid)
 
        p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[i]), false);  
        if (p != NULL)
+       {
           cout << "Inner shell valid.\n" << endl;
+       }
        else
+       {
           cout << "Inner shell invalid.\n" << endl;
+          invalidItem ii;
+          ii.errorCode = 999;
+          ii.polyhedraNum = i;
+          invalidItems.push_back(ii);
+       }
        polyhedra.push_back(p);
     }
 
@@ -133,14 +152,19 @@ void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid)
     {
        if (*polyhedraIt == NULL)
        {
-          isValid = false;
+          invalidItem ii;
+          ii.errorCode = 999;
+          ii.polyhedraNum = 0;
+          invalidItems.push_back(ii);
           break;
        }
     }
-    if (isValid == true)
+    if (0 == invalidItems.size())
     {
        if (polyhedra.size() == 1)
+       {
           cout << "Solid is valid." << endl;
+       }
        else
        {
           cout << "Calculating interactions between the shells." << endl;
@@ -160,9 +184,17 @@ void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, bool& isValid)
           for ( ; nefsIt != nefs.end(); nefsIt++) 
              solid -= *nefsIt;
           if (solid.number_of_volumes() == (polyhedra.size()+1))
+          {
              cout << "Valid solid. Hourrraaa!" << endl;
+          }
           else
+          {
              cout << "Invalid solid :(" << endl;
+             invalidItem ii;
+             ii.errorCode = 999;
+             ii.polyhedraNum = -1;
+             invalidItems.push_back(ii);
+          }
        }
     }
     return;

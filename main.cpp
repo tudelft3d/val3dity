@@ -43,21 +43,57 @@ int main(int argc, char* const argv[])
     cout << "You have to give at least one input POLY file." << endl;
     cout << endl << "Usage: <program> ./src/data/cube.poly ./src/data/py1.poly" << endl;
     cout << "This example would validate a solid with the outer polyhedra from cube.poly and one inner void from py1.poly" << endl;
-    return(0);
+    return(1);
   }
 
   vector<polyhedraShell*> polyhedraShells;
   readAllPolyhedraShells((argc-1), argv, polyhedraShells);
 
-  bool isValid(true);
-  validatePolyHedra(polyhedraShells, isValid);
-  if (isValid == false)
+  vector<invalidItem> invalidItems;
+  validatePolyHedra(polyhedraShells, invalidItems);
+  if (invalidItems.size() > 0)
   {
-     cout << "polyhedra are not valid." << endl;
-     exit(1);
+     cout << "Invalid solid :(" << endl << endl;
+     for(unsigned int i(0); i<invalidItems.size(); i++)
+     {
+        cout << "Error #" << i << ":  errorCode=" << invalidItems[i].errorCode
+             << "     Polyhedra #" << invalidItems[i].polyhedraNum << "       ";
+        switch(invalidItems[i].errorCode)
+        {
+           // Ring level
+        case 100   : cout << "2+ consecutive points"; break;
+        case 110   : cout << "ring is not closed (first-last point are not the same)"; break;
+           // Surface level
+        case 200   : cout << "oring and irings have same orientation"; break;
+        case 210   : cout << "surface is not planar"; break;
+        case 220   : cout << "surface is not valid in 2D (it's projection)"; break;
+        case   221 : cout << "iring intersect oring"; break;
+        case   222 : cout << "iring outside oring"; break;
+        case   223 : cout << "oring and iring(s) intersect"; break;
+        case   224 : cout << "interior not connected"; break;
+           // Shell level
+        case 300   : cout << "is not a 2-manifold"; break;
+        case   301 : cout << "surface is not closed"; break;
+        case   302 : cout << "dangling faces (more than 2 surface incident to an edge)"; break;
+        case   303 : cout << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
+        case   304 : cout << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
+        case   305 : cout << "surface self-intersect"; break;
+        case 310   : cout << "normales not pointing in correct direction (oshell=outwards; ishell=inwards)"; break;
+           // Solid level
+        case 400   : cout << "shells are face adjacent"; break;
+        case 410   : cout << "interior of shells intersect"; break;
+        case 420   : cout << "ishell outside the oshell"; break;
+        case 430   : cout << "interior not connected"; break;
+        default    : cout << "unknown reason"; break;
+        }
+        cout << endl;
+     }
+     return(1);
   }
-
-
-  return(0);
+  else
+  {
+     cout << "Valid solid. Hourrraaa!" << endl;
+     return(0);
+  }
 }
 
