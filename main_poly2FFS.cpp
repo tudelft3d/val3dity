@@ -56,6 +56,10 @@ int main(int argc, char* const argv[])
    if (argc < 2)
    {
       cout << "You have to give at least one input POLY file." << endl;
+      cout << endl << "Usage: <program> ./src/data1/cube.poly ./src/data2/py1.poly" << endl;
+      cout << "   This example would write out an FFS file in the directory of the last input file" << endl;
+      cout << "   with a name that combines all input file names (./src/data2/cube_py1.ffs)." << endl;
+      cout << "   This output file will contain a single feature that is a solid with the outer polyhedra from cube.poly and one inner void from py1.poly" << endl;
       return(0);
    }
 
