@@ -49,7 +49,7 @@ typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
 typedef CGAL::Polyhedron_3<K>       Polyhedron;
-typedef CGAL::Polyhedron_3<Ke>       PolyhedronExact;
+typedef CGAL::Polyhedron_3<Ke>      PolyhedronExact;
 typedef CGAL::Nef_polyhedron_3<Ke>  Nef_polyhedron;
 
 typedef struct triangulatedPolyhedraShell_tag {
@@ -75,7 +75,7 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
 
 //--------------------------------------------------------------
 
-void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems)
+void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems)
 {
    vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
 

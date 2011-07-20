@@ -38,11 +38,12 @@ using namespace std;
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
 //
-typedef K::Point_2  Point2;
-typedef K::Point_3  Point3;
-typedef K::Vector_3 Vector;
-typedef K::Triangle_3 Triangle;
-typedef K::Tetrahedron_3 Tetrahedron;
+typedef K::Point_2        Point2;
+typedef K::Point_3        Point3;
+typedef K::Vector_3       Vector;
+typedef K::Triangle_3     Triangle;
+typedef K::Tetrahedron_3  Tetrahedron;
+
 
 // convenience structure
 //-- the vector of faces, each which has a vector of rings, 
@@ -68,6 +69,6 @@ typedef struct invalidItem_tag {
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validatePolyHedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems);
+void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems);
 
 #endif

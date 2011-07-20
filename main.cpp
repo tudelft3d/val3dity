@@ -36,8 +36,8 @@ int main(int argc, char* const argv[])
   if (argc < 2)
   {
     cout << "You have to give at least one input POLY file." << endl;
-    cout << endl << "Usage: <program> ./src/data/cube.poly ./src/data/py1.poly" << endl;
-    cout << "This example would validate a solid with the outer polyhedra from cube.poly and one inner void from py1.poly" << endl;
+    cout << endl << "Usage: val3dity ./src/data/cube.poly ./src/data/py1.poly" << endl;
+    cout << "This example would validate a solid with the outer shell from cube.poly and one inner shell from py1.poly" << endl;
     return(1);
   }
 
@@ -45,7 +45,7 @@ int main(int argc, char* const argv[])
   readAllPolyhedraShells((argc-1), argv, polyhedraShells);
 
   vector<invalidItem> invalidItems;
-  validatePolyHedra(polyhedraShells, invalidItems);
+  validatePolyhedra(polyhedraShells, invalidItems);
   if (invalidItems.size() > 0)
   {
      cout << "Invalid solid :(" << endl << endl;
