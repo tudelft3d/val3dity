@@ -18,7 +18,7 @@ main.o: main.cpp
 	$(CC) $(CFLAGS) -c $^
 
 main:  input.o validate.o main.o
-	$(CC) $(LDFLAGS) $^ -o val3dity
+	$(CC) $(LDFLAGS) $^ -o val3dity 
 
 clean:
 	rm -rf *.o main
