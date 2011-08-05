@@ -54,21 +54,17 @@ typedef struct fullPolyhedraShell_tag {
 } polyhedraShell;
 
 
-// This will hold the return invalidities values.
-// (I don't think we'll need to know right down to the vertex 
-// number, but maybe the facet is good.)
-// 
-typedef struct invalidItem_tag {
-   int errorCode;
-   int polyhedraNum; // -1 means unknown
-   int facetNum;     // -1 means unknown
-   int ringNum;      // -1 means unknown
-   int vertexNum;    // -1 means unknown
-} invalidItem;
+// This callback function will be used to both report progress
+// as well as any validity problems that are encountered.
+typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
+                     int polyhedraNum, // -1 means unused
+                     int facetNum,     // -1 means unused
+                     std::string messageStr); // optional
+
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, vector<invalidItem>& invalidItems);
+void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb);
 
 #endif
