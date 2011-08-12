@@ -24,21 +24,25 @@
 */
 
 #include "input.h"
-
-// STL library
 #include <fstream>
 
 void readShell(ifstream& infile, polyhedraShell &allShells);
 
-void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells)
-{
-   cout << "Processing " << numShells << " file(s)." << endl << endl;
 
-   cout << "Reading outer shell: " << filenames[1] << endl;
+
+void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells, cbf cb)
+{
+   std::stringstream st;
+   st << "Reading " << numShells << " file(s)." << endl;
+   (*cb)(0, -1, -1, st.str());
+
+   st.str(""); //-- clear what's in st
+   st << "Reading outer shell: " << filenames[1] << endl;
+   (*cb)(0, -1, -1, st.str());
    ifstream infile(filenames[1], ifstream::in);
    if (!infile)
    {
-      cout << "Error. File not there." << endl;
+      (*cb)(999, -1, -1, "Input file doesn't exist.");
       exit(1);
    }
 
@@ -50,11 +54,12 @@ void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyh
    fshell = NULL; // don't own this anymore
    for (int is=1; is<numShells; is++)
    {
-      cout << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
+      st << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
+      (*cb)(0, -1, -1, st.str());
       ifstream infile2(filenames[(is+1)], ifstream::in);
       if (!infile2)
       {
-         cout << "Error. File not there." << endl;
+         (*cb)(999, -1, -1, "Input file doesn't exist.");
          exit(1);
       }
 

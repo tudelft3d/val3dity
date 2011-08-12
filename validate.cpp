@@ -60,145 +60,138 @@ typedef struct triangulatedPolyhedraShell_tag {
 // misc
 #define PI 3.14159265
 
-bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance = 1);
-bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts);
-bool check2manifoldness(Polyhedron* p);
-CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p);
+//-- a global variable to keep track of what shell we're working on
+int gCurShell = 0;
+
+
+
+bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
+bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cbf cb);
+bool check2manifoldness(Polyhedron* p, cbf cb);
+CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb);
+bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb);
+Polyhedron* validateTriangulatedPolyhedraShell(triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb);
+bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells, cbf cb);
+bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyhedraShell& tshell, cbf cb);
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
-bool isPolyhedronGeometricallyConsistent(Polyhedron* p);
-Polyhedron* validateTriangulatedPolyhedraShell(triangulatedPolyhedraShell& tshell, bool isOutershell);
-bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells);
-bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tshell);
 int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
 
+
+
 //--------------------------------------------------------------
 
 void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
-{
-   bool foundError(false);
+  {
+  bool foundError(false);
 
-   vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
+  vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
 
-   if (! triangulatePolyhedraShells(polyhedraShells, triangulatedPolyhedraShells))
-   {
-      (*cb)(999, -1, -1, "polyhedra are not valid enough to be triangulated.");
-      return;
-   }
-
-   if (triangulatedPolyhedraShells.size() < 1)
-   {
-      (*cb)(999, 0, -1, "You have to give at least one input polyhedron.");
-      return;
-   }
-
-   std::stringstream st;
-   st << "Validating " << triangulatedPolyhedraShells.size() << " shell(s).\n\n";
-   (*cb)(0, -1, -1, st.str());
-
-   // First, let's do a quick validation of the outer shell
-   (*cb)(0, -1, -1, "Validating outer shell: 0");
-
-   Polyhedron* p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[0]), true);  
-   if (p != NULL)
-   {
-      (*cb)(0, -1, -1, "Outer shell valid.\n");
-   }
-   else
-   {
-      (*cb)(999, 0, -1, "Outer shell invalid.\n");
-      foundError = true;
-   }
-
-    vector<Polyhedron*> polyhedra;
-    polyhedra.push_back(p);  
-
-    for (unsigned int i=1; i<triangulatedPolyhedraShells.size(); i++)
-    {
-       st.clear();
-       st << "Validating inner shell #" << (i-1);
-       (*cb)(0, -1, -1, st.str());
-
-       p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[i]), false);  
-       if (p != NULL)
-       {
-          (*cb)(0, -1, -1, "Inner shell valid.\n");
-       }
-       else
-       {
-          (*cb)(999, i, -1, "Inner shell invalid.\n");
-          foundError = true;
-       }
-       polyhedra.push_back(p);
-    }
-
-    //-- if all the shells are valid, then put them in a Nef_polyhedron type
-    vector<Polyhedron*>::iterator polyhedraIt = polyhedra.begin();
-    for ( ; polyhedraIt != polyhedra.end(); polyhedraIt++)
-    {
-       if (*polyhedraIt == NULL)
-       {
-          (*cb)(999, 0, -1, "");
-          foundError = true;
-          break;
-       }
-    }
-    if (!foundError)
-    {
-       if (polyhedra.size() == 1)
-       {
-          (*cb)(0, -1, -1, "Solid is valid.");
-       }
-       else
-       {
-          (*cb)(0, -1, -1, "Calculating interactions between the shells.");
-          vector<Nef_polyhedron> nefs;
-          for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
-          {
-             stringstream offrep (stringstream::in | stringstream::out);
-             offrep << **polyhedraIt;
-             PolyhedronExact pe;
-             offrep >> pe;
-             Nef_polyhedron onef(pe);
-             nefs.push_back(onef);
-          }
-          vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
-          Nef_polyhedron solid = *nefsIt;
-          nefsIt++;
-          for ( ; nefsIt != nefs.end(); nefsIt++) 
-             solid -= *nefsIt;
-          if (solid.number_of_volumes() == (polyhedra.size()+1))
-          {
-             (*cb)(0, -1, -1, "Valid solid. Hourrraaa!");
-          }
-          else
-          {
-             (*cb)(999, -1, -1, "Invalid solid :(");
-          }
-       }
-    }
+  if (! triangulatePolyhedraShells(polyhedraShells, triangulatedPolyhedraShells, cb))
+  {
+    (*cb)(999, -1, -1, "Input polyhedra are not valid enough to be triangulated.");
     return;
+  }
 
+  //-- Outer shell first
+  (*cb)(0, -1, -1, "Validating outer shell");
+  Polyhedron* p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[0]), true, cb);  
+  if (p != NULL)
+  {
+    (*cb)(0, -1, -1, "Outer shell valid.\n");
+  }
+  else
+  {
+    (*cb)(300, 0, -1, "Outer shell invalid.\n");
+    foundError = true;
+  }
+  vector<Polyhedron*> polyhedra;
+  polyhedra.push_back(p);  
+  gCurShell++;
+  
+  //-- then the inner shells, if any
+  for (unsigned int i=1; i<triangulatedPolyhedraShells.size(); i++)
+  {
+    std::stringstream st;
+    st << "Validating inner shell #" << (i-1);
+    (*cb)(0, -1, -1, st.str());
+
+    p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[i]), false, cb);  
+    if (p != NULL)
+    {
+      (*cb)(0, -1, -1, "Inner shell valid.\n");
+    }
+    else
+    {
+      (*cb)(300, i, -1, "Inner shell invalid.\n");
+      foundError = true;
+    }
+    polyhedra.push_back(p);
+    gCurShell++;
+  }
+
+  //-- if all the shells are valid, then put them in a Nef_polyhedron type
+  vector<Polyhedron*>::iterator polyhedraIt = polyhedra.begin();
+  for ( ; polyhedraIt != polyhedra.end(); polyhedraIt++)
+  {
+     if (*polyhedraIt == NULL)
+     {
+        foundError = true;
+        break;
+     }
+  }
+  if (!foundError)
+  {
+     if (polyhedra.size() > 1)
+     {
+        (*cb)(0, -1, -1, "Inspecting interactions between the shells.");
+        vector<Nef_polyhedron> nefs;
+        for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
+        {
+           stringstream offrep (stringstream::in | stringstream::out);
+           offrep << **polyhedraIt;
+           PolyhedronExact pe;
+           offrep >> pe;
+           Nef_polyhedron onef(pe);
+           nefs.push_back(onef);
+        }
+        vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
+        Nef_polyhedron solid = *nefsIt;
+        nefsIt++;
+        for ( ; nefsIt != nefs.end(); nefsIt++) 
+           solid -= *nefsIt;
+        if (solid.number_of_volumes() != (polyhedra.size()+1))
+        {
+           (*cb)(000, -1, -1, "Invalid solid :(");
+        }
+     }
+  }
+  return;
 }
 
 
-bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells)
+bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells, cbf cb)
 {
-   cout << "Triangulating " << polyhedraShells.size() << " shell(s)." << endl << endl;
-
-   cout << "Triangulating outer shell." << endl;
+   std::stringstream st;
+   st << "Triangulating " << polyhedraShells.size() << " shell(s)." << endl;
+   (*cb)(0, -1, -1, st.str());
+  
    if (polyhedraShells.size() < 1)
    {
-      cout << "Error. No outer shell." << endl;
+      st << "No outer shell." << endl;
+      (*cb)(999, -1, -1, st.str());
       return false;
    }
 
    // Now let's triangulate the outer shell from the input.
+   st.str("");
+   st << "Triangulating outer shell." << endl;
+   (*cb)(0, -1, -1, st.str());
    triangulatedPolyhedraShell* tshell = new triangulatedPolyhedraShell;
-   if (! triangulateOneShell(*(polyhedraShells[0]), *tshell))
+   if (! triangulateOneShell(*(polyhedraShells[0]), 0, *tshell, cb))
    {
-      cout << "Could not triangulate in the outer shell." << endl;
+      (*cb)(0, -1, -1, "Could not triangulate in the outer shell.");
       return false;
    }
 
@@ -206,24 +199,20 @@ bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector
    tshell = NULL; // don't own this anymore
    for (unsigned int is=1; is<polyhedraShells.size(); is++)
    {
-      cout << "Triangulating inner shell #" << (is-1) << endl;
-
       // Now let's triangulate the inner shell from the input.
       tshell = new triangulatedPolyhedraShell;
-      if (!triangulateOneShell(*(polyhedraShells[is]), *tshell))
+      if (!triangulateOneShell(*(polyhedraShells[is]), is, *tshell, cb))
       {
-         cout << "Could not triangulate in the inner shell #" << (is-1) << endl;
+         (*cb)(300, is, -1, "Could not triangulate in the shell.");
          return false;
       }
-
       triangulatedPolyhedraShells.push_back(tshell);
       tshell = NULL; // don't own this anymore
    }
-
    return true;
 }
 
-bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tshell)
+bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyhedraShell& tshell, cbf cb)
 {
    //-- read the facets
    int num = pshell.shells.size();
@@ -236,7 +225,7 @@ bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tsh
       //-- read oring (there's always one and only one)
       if (numf < 1)
       {
-         cout << "facet does not have an outer boundary." << endl;
+         (*cb)(220, shellNum, -1, "facet does not have an outer boundary.");
          return false;
       }
       vector<int> &ids = pshell.shells[i][0]; // helpful alias for the outer boundary
@@ -258,7 +247,6 @@ bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tsh
       for (int j = 1; j < numf; j++)
       {
          vector<int> &ids2 = pshell.shells[i][j]; // helpful alias for the inner boundary
-
          //-- get projected Polygon
          Polygon pgn;
          create_polygon(pshell.lsPts, ids2, pgn);
@@ -270,7 +258,7 @@ bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tsh
       vector<int*> oneface;
       if (construct_ct(pshell.lsPts, pgnids, lsRings, oneface, i) == false)
       {
-         cout << "cannot triangulate polyhedra face #" << i << endl;
+         (*cb)(220, shellNum, i, "face does not have an outer boundary.");
          return false;
       }
 
@@ -309,7 +297,6 @@ bool triangulateOneShell(polyhedraShell& pshell, triangulatedPolyhedraShell& tsh
       }
       tshell.shell.push_back(oneface);
    }
-
    //-- here are the points: 
    tshell.lsPts = pshell.lsPts;
    return true;
@@ -453,38 +440,38 @@ int projection_plane(Point3 p0, Point3 p1, Point3 p2)
 }
 
 
-bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts)
+bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cbf cb)
 {
   vector< vector<int*> >::iterator faceIt = shell.begin();
   int i = 0;
   bool isValid = true;
   for ( ; faceIt != shell.end(); faceIt++)
   {
-    if (is_face_planar(*faceIt, lsPts) == false)
+    if (is_face_planar(*faceIt, lsPts, 1, cb) == false)
     {
-      cout << "\tFace #" << i << " not planar" << endl;
-      isValid = false;
+       (*cb)(210, gCurShell, i, "");
+       isValid = false;
     }
     i++;
   }
   return isValid;
 }  
   
-Polyhedron* validateTriangulatedPolyhedraShell( triangulatedPolyhedraShell& tshell, bool isOutershell )
+Polyhedron* validateTriangulatedPolyhedraShell( triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb)
 {
    bool isValid = true;
-   if (checkPlanarityFaces(tshell.shell, tshell.lsPts) == true)
+   if (checkPlanarityFaces(tshell.shell, tshell.lsPts, cb) == true)
    {
       Polyhedron* p = getPolyhedronDS(tshell.shell, tshell.lsPts);
       //-- check if polyhedron is 2-manifold (includes intersection tests)
-      bool isValid = check2manifoldness(p);
+      bool isValid = check2manifoldness(p, cb);
       //-- check if orientation of the normales is outwards or inwards
       if (isValid == true)
       {
-         CGAL::Orientation orient = checkGlobalOrientationNormales(p);
+         CGAL::Orientation orient = checkGlobalOrientationNormales(p, cb);
          if ( ((isOutershell == true) && (orient != CGAL::CLOCKWISE)) || ((isOutershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
          {
-            cout << "\tNormales all pointing in wrong direction." << endl;
+            (*cb)(310, gCurShell, -1, "");
             isValid = false;
          }
       }
@@ -502,7 +489,7 @@ Polyhedron* validateTriangulatedPolyhedraShell( triangulatedPolyhedraShell& tshe
   
   
 
-CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p)
+CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb)
 {
   //-- get a 'convex corner', sorting order is x-y-z
   Polyhedron::Vertex_iterator vIt;
@@ -528,7 +515,7 @@ CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p)
 //  cout << "CONVEX CORNER IS: " << cc->point() << endl;
 
   Polyhedron::Halfedge_handle curhe = cc->halfedge();
-  Polyhedron::Halfedge_handle otherhe;
+    Polyhedron::Halfedge_handle otherhe;
   otherhe = curhe->opposite()->next();
   CGAL::Orientation orient = orientation( curhe->vertex()->point(),
                                           curhe->next()->vertex()->point(),
@@ -547,27 +534,26 @@ CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p)
 }
 
 
-bool check2manifoldness(Polyhedron* p)
+bool check2manifoldness(Polyhedron* p, cbf cb)
 {
   bool isValid = true;
 //-- 1. check combinatorial consistency ---
   if (p->empty() == true)
   {
-    std::cout << "\tOne/several of the faces have wrong orientation, or dangling faces." << std::endl;
+    (*cb)(300, gCurShell, -1, "One/several of the faces have wrong orientation, or dangling faces.");
     isValid = false;
   }
   else
   {
     if (p->is_closed() == false)
     {
-      cout << "\tOne or more faces are missing, 2-manifold not closed." << endl;
-      // TODO: find the missing faces and report
+      (*cb)(301, gCurShell, -1, "");
       isValid = false;
     }
     else
     {
 // 2. check geometrical consistency (aka intersection tests between faces) ---
-      isValid = isPolyhedronGeometricallyConsistent(p);
+      isValid = isPolyhedronGeometricallyConsistent(p, cb);
     }
   }
   return isValid;
@@ -582,7 +568,7 @@ bool check2manifoldness(Polyhedron* p)
 
 
 
-bool isPolyhedronGeometricallyConsistent(Polyhedron* p)
+bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb)
 {
   bool isValid = true;
   Polyhedron::Facet_iterator curF, otherF;
@@ -626,22 +612,19 @@ bool isPolyhedronGeometricallyConsistent(Polyhedron* p)
           count++;
         else if (assign(apoint, re) && (incidentFaces.count(otherF) == 0) )
         {
-          cout << "\tSelf-intersection of type POINT." << endl;
+          (*cb)(305, gCurShell, -1, "Self-intersection of type POINT.");
           isValid = false;
         }
       }
     }
     if (count > 3)
     {
-      cout << "\tSelf-intersection of type SEGMENT." << endl;
+      (*cb)(305, gCurShell, -1, "Self-intersection of type SEGMENT.");
       isValid = false;
     }
   }
   return isValid;
 }
-
-
-
 
 
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts)
@@ -672,7 +655,7 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
   return P;
 }
 
-bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
+bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb)
 {
    vector<int*>::const_iterator ittr = trs.begin();
    int* a = *ittr;

@@ -29,11 +29,21 @@
 // We are currently only including this to get the definition of polyhedraShell.
 #include "validate.h"
 
+
+
+// This callback function will be used to both report progress
+// as well as any validity problems that are encountered.
+typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
+                     int shellNum, // -1 means unused
+                     int facetNum,     // -1 means unused
+                     std::string messageStr); // optional
+
+
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
 // Ignore the first value in the array filenames for now...
-void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells);
+void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells, cbf cb);
 
 
 #endif
