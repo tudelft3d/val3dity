@@ -70,7 +70,7 @@ bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cb
 bool check2manifoldness(Polyhedron* p, cbf cb);
 CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb);
 bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb);
-Polyhedron* validateTriangulatedPolyhedraShell(triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb);
+Polyhedron* validateTriangulatedShell(triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb);
 bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells, cbf cb);
 bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyhedraShell& tshell, cbf cb);
 Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
@@ -83,7 +83,7 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
 //--------------------------------------------------------------
 
 void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
-  {
+{
   bool foundError(false);
 
   vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
@@ -96,7 +96,7 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
 
   //-- Outer shell first
   (*cb)(0, -1, -1, "Validating outer shell");
-  Polyhedron* p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[0]), true, cb);  
+  Polyhedron* p = validateTriangulatedShell(*(triangulatedPolyhedraShells[0]), true, cb);  
   if (p != NULL)
   {
     (*cb)(0, -1, -1, "Outer shell valid.\n");
@@ -117,7 +117,7 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
     st << "Validating inner shell #" << (i-1);
     (*cb)(0, -1, -1, st.str());
 
-    p = validateTriangulatedPolyhedraShell(*(triangulatedPolyhedraShells[i]), false, cb);  
+    p = validateTriangulatedShell(*(triangulatedPolyhedraShells[i]), false, cb);  
     if (p != NULL)
     {
       (*cb)(0, -1, -1, "Inner shell valid.\n");
@@ -143,6 +143,7 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
   }
   if (!foundError)
   {
+     //cout << "----------------" << endl << **(polyhedra.begin());
      if (polyhedra.size() > 1)
      {
         (*cb)(0, -1, -1, "Inspecting interactions between the shells.");
@@ -163,7 +164,8 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
            solid -= *nefsIt;
         if (solid.number_of_volumes() != (polyhedra.size()+1))
         {
-           (*cb)(000, -1, -1, "Invalid solid :(");
+           (*cb)(401, -1, -1, "Shells do not interact according to the rules.");
+           //TODO: add the exact errors here...
         }
      }
   }
@@ -174,18 +176,7 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
 bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells, cbf cb)
 {
    std::stringstream st;
-   st << "Triangulating " << polyhedraShells.size() << " shell(s)." << endl;
-   (*cb)(0, -1, -1, st.str());
-  
-   if (polyhedraShells.size() < 1)
-   {
-      st << "No outer shell." << endl;
-      (*cb)(999, -1, -1, st.str());
-      return false;
-   }
-
    // Now let's triangulate the outer shell from the input.
-   st.str("");
    st << "Triangulating outer shell." << endl;
    (*cb)(0, -1, -1, st.str());
    triangulatedPolyhedraShell* tshell = new triangulatedPolyhedraShell;
@@ -203,7 +194,7 @@ bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector
       tshell = new triangulatedPolyhedraShell;
       if (!triangulateOneShell(*(polyhedraShells[is]), is, *tshell, cb))
       {
-         (*cb)(300, is, -1, "Could not triangulate in the shell.");
+         (*cb)(300, is, -1, "Could not triangulate the shell.");
          return false;
       }
       triangulatedPolyhedraShells.push_back(tshell);
@@ -457,7 +448,7 @@ bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cb
   return isValid;
 }  
   
-Polyhedron* validateTriangulatedPolyhedraShell( triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb)
+Polyhedron* validateTriangulatedShell( triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb)
 {
    bool isValid = true;
    if (checkPlanarityFaces(tshell.shell, tshell.lsPts, cb) == true)
