@@ -26,11 +26,11 @@
 #include "input.h"
 #include <fstream>
 
-void readShell(ifstream& infile, polyhedraShell &allShells);
+void readShell(ifstream& infile, Shell &allShells);
 
 
 
-void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells, cbf cb)
+void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb)
 {
    std::stringstream st;
    st << "Reading " << numShells << " file(s)." << endl;
@@ -46,12 +46,12 @@ void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyh
       exit(1);
    }
 
-   // Now let's read in the outer shell from the file.
-   polyhedraShell* fshell = new polyhedraShell;
-   readShell(infile, *fshell);
+   // Now let's read in the outer shell (the first input file)
+   Shell* oneshell = new Shell;
+   readShell(infile, *oneshell);
 
-   polyhedraShells.push_back(fshell);
-   fshell = NULL; // don't own this anymore
+   shells.push_back(oneshell);
+   oneshell = NULL; // don't own this anymore
    for (int is=1; is<numShells; is++)
    {
       st << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
@@ -64,17 +64,17 @@ void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyh
       }
 
       // Now let's read in the inner shell from the file.
-      fshell = new polyhedraShell;
+      oneshell = new Shell;
       bool isValid = true;
-      readShell(infile2, *fshell);
+      readShell(infile2, *oneshell);
 
-      polyhedraShells.push_back(fshell);
-      fshell = NULL; // don't own this anymore
+      shells.push_back(oneshell);
+      oneshell = NULL; // don't own this anymore
    }
 }
 
 
-void readShell(ifstream& infile, polyhedraShell &allShells)
+void readShell(ifstream& infile, Shell &oneshell)
 {
   //-- read the points
   int num, tmpint;
@@ -85,7 +85,7 @@ void readShell(ifstream& infile, polyhedraShell &allShells)
   {
     Point3 p;
     infile >> tmpint >> p;
-    allShells.lsPts.push_back(p);
+    oneshell.lsPts.push_back(p);
   }
 
   //-- read the facets
@@ -118,6 +118,6 @@ void readShell(ifstream& infile, polyhedraShell &allShells)
     if (numf > 1)
       infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
 
-    allShells.shells.push_back(pgnids);
+    oneshell.faces.push_back(pgnids);
   }
 }

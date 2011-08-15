@@ -32,8 +32,8 @@ static bool callbackWasCalledWithError = false;
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
 void callback_cout(int errorCode,    // 0 means status message, -1 means unknown error
-                   int shellNum, // -1 means unused
-                   int facetNum,     // -1 means unused
+                   int shellNum, // -1 means unused; 0-based
+                   int facetNum,     // -1 means unused; 0-based
                    std::string messageStr) // optional
 {
    if (0 == errorCode)
@@ -93,16 +93,15 @@ int main(int argc, char* const argv[])
 
   if (argc < 2)
   {
-    cout << "You have to give at least one input POLY file." << endl;
+    cout << "You have to give at least one input POLY file (a shell)." << endl;
     cout << endl << "Usage: val3dity ./src/data/cube.poly ./src/data/py1.poly" << endl;
     cout << "This example would validate a solid with the outer shell from cube.poly and one inner shell from py1.poly" << endl;
     return(1);
   }
 
-  vector<polyhedraShell*> polyhedraShells;
-  readAllPolyhedraShells((argc-1), argv, polyhedraShells, callback_cout);
-
-  validatePolyhedra(polyhedraShells, callback_cout);
+  vector<Shell*> shells;
+  readAllInputShells((argc-1), argv, shells, callback_cout);
+  validate_solid(shells, callback_cout);
 
   if (callbackWasCalledWithError)
   {

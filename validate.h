@@ -30,6 +30,8 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
+
+
 // STL library
 #include <vector>
 using namespace std;
@@ -37,6 +39,8 @@ using namespace std;
 // CGAL typedefs
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
+
+
 //
 typedef K::Point_2        Point2;
 typedef K::Point_3        Point3;
@@ -50,8 +54,8 @@ typedef K::Tetrahedron_3  Tetrahedron;
 //-- which is a vector of IDs from vertex pool lsPts
 typedef struct fullPolyhedraShell_tag {
    vector< Point3 > lsPts;
-   vector< vector< vector<int> > > shells;
-} polyhedraShell;
+   vector< vector< vector<int> > > faces;
+} Shell;
 
 
 // This callback function will be used to both report progress
@@ -65,6 +69,6 @@ typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unkno
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb);
+void validate_solid(vector<Shell*> &shells, cbf cb);
 
 #endif

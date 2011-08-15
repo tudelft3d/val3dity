@@ -43,7 +43,7 @@ typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unkno
 // Usage documentation for this method goes here.
 //
 // Ignore the first value in the array filenames for now...
-void readAllPolyhedraShells(int numShells, char* const filenames[], vector<polyhedraShell*> &polyhedraShells, cbf cb);
+void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb);
 
 
 #endif

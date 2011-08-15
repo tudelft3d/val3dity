@@ -48,14 +48,17 @@ typedef CGAL::Constrained_triangulation_2<K, TDS, Itag>           CTa;
 typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
-typedef CGAL::Polyhedron_3<K>       Polyhedron;
+typedef CGAL::Polyhedron_3<K>       CgalPolyhedron;
 typedef CGAL::Polyhedron_3<Ke>      PolyhedronExact;
 typedef CGAL::Nef_polyhedron_3<Ke>  Nef_polyhedron;
 
-typedef struct triangulatedPolyhedraShell_tag {
+
+
+
+typedef struct triangulatedShell_tag {
    vector< Point3 > lsPts;
-   vector< vector<int*> > shell;
-} triangulatedPolyhedraShell;
+   vector< vector<int*> > faces;
+} TrShell;
 
 // misc
 #define PI 3.14159265
@@ -63,17 +66,16 @@ typedef struct triangulatedPolyhedraShell_tag {
 //-- a global variable to keep track of what shell we're working on
 int gCurShell = 0;
 
-
-
+CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 bool is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
-bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cbf cb);
-bool check2manifoldness(Polyhedron* p, cbf cb);
-CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb);
-bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb);
-Polyhedron* validateTriangulatedShell(triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb);
-bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells, cbf cb);
-bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyhedraShell& tshell, cbf cb);
-Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
+bool check_planarity_faces(vector< vector<int*> >&face, vector<Point3>& lsPts, cbf cb);
+bool check_manifoldness(CgalPolyhedron* p, cbf cb);
+CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb);
+bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, cbf cb);
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, bool isOutershell, cbf cb);
+
+bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, cbf cb);
+bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb);
 int projection_plane(Point3 p0, Point3 p1, Point3 p2);
 bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
@@ -82,21 +84,24 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
 
 //--------------------------------------------------------------
 
-void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
+void validate_solid(vector<Shell*> &shells, cbf cb)
 {
   bool foundError(false);
 
-  vector<triangulatedPolyhedraShell*> triangulatedPolyhedraShells;
-
-  if (! triangulatePolyhedraShells(polyhedraShells, triangulatedPolyhedraShells, cb))
+  //-- First: triangulate every shell 
+  vector<TrShell*> trShells;
+  if (! triangulate_all_shells(shells, trShells, cb))
   {
     (*cb)(999, -1, -1, "Input polyhedra are not valid enough to be triangulated.");
     return;
   }
 
+  //-- Second: validate each shell, one by one
+  
+  
   //-- Outer shell first
   (*cb)(0, -1, -1, "Validating outer shell");
-  Polyhedron* p = validateTriangulatedShell(*(triangulatedPolyhedraShells[0]), true, cb);  
+  CgalPolyhedron* p = validate_triangulated_shell(*(trShells[0]), true, cb);  
   if (p != NULL)
   {
     (*cb)(0, -1, -1, "Outer shell valid.\n");
@@ -106,18 +111,18 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
     (*cb)(300, 0, -1, "Outer shell invalid.\n");
     foundError = true;
   }
-  vector<Polyhedron*> polyhedra;
+  vector<CgalPolyhedron*> polyhedra;
   polyhedra.push_back(p);  
   gCurShell++;
   
   //-- then the inner shells, if any
-  for (unsigned int i=1; i<triangulatedPolyhedraShells.size(); i++)
+  for (unsigned int i = 1; i < trShells.size(); i++)
   {
     std::stringstream st;
     st << "Validating inner shell #" << (i-1);
     (*cb)(0, -1, -1, st.str());
 
-    p = validateTriangulatedShell(*(triangulatedPolyhedraShells[i]), false, cb);  
+    p = validate_triangulated_shell(*(trShells[i]), false, cb);  
     if (p != NULL)
     {
       (*cb)(0, -1, -1, "Inner shell valid.\n");
@@ -131,8 +136,11 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
     gCurShell++;
   }
 
+  //-- Third: if they are all individually valid, construct a Nef Polyhedron
+  //-- with the shells, and analyse how they interact
+
   //-- if all the shells are valid, then put them in a Nef_polyhedron type
-  vector<Polyhedron*>::iterator polyhedraIt = polyhedra.begin();
+  vector<CgalPolyhedron*>::iterator polyhedraIt = polyhedra.begin();
   for ( ; polyhedraIt != polyhedra.end(); polyhedraIt++)
   {
      if (*polyhedraIt == NULL)
@@ -173,63 +181,63 @@ void validatePolyhedra(vector<polyhedraShell*> &polyhedraShells, cbf cb)
 }
 
 
-bool triangulatePolyhedraShells(vector<polyhedraShell*> &polyhedraShells, vector<triangulatedPolyhedraShell*> &triangulatedPolyhedraShells, cbf cb)
+bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, cbf cb)
 {
    std::stringstream st;
    // Now let's triangulate the outer shell from the input.
    st << "Triangulating outer shell." << endl;
    (*cb)(0, -1, -1, st.str());
-   triangulatedPolyhedraShell* tshell = new triangulatedPolyhedraShell;
-   if (! triangulateOneShell(*(polyhedraShells[0]), 0, *tshell, cb))
+   TrShell* tshell = new TrShell;
+   if (! triangulate_one_shell(*(shells[0]), 0, *tshell, cb))
    {
       (*cb)(0, -1, -1, "Could not triangulate in the outer shell.");
       return false;
    }
 
-   triangulatedPolyhedraShells.push_back(tshell);
+   trShells.push_back(tshell);
    tshell = NULL; // don't own this anymore
-   for (unsigned int is=1; is<polyhedraShells.size(); is++)
+   for (unsigned int is=1; is<shells.size(); is++)
    {
       // Now let's triangulate the inner shell from the input.
-      tshell = new triangulatedPolyhedraShell;
-      if (!triangulateOneShell(*(polyhedraShells[is]), is, *tshell, cb))
+      tshell = new TrShell;
+      if (!triangulate_one_shell(*(shells[is]), is, *tshell, cb))
       {
          (*cb)(300, is, -1, "Could not triangulate the shell.");
          return false;
       }
-      triangulatedPolyhedraShells.push_back(tshell);
+      trShells.push_back(tshell);
       tshell = NULL; // don't own this anymore
    }
    return true;
 }
 
-bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyhedraShell& tshell, cbf cb)
+bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 {
    //-- read the facets
-   int num = pshell.shells.size();
+   int num = shell.faces.size();
    for (int i = 0; i < num; i++)
    {
       //    cout << "---- face ---- " << i << endl;
       
       // These are the number of rings on this facet
-      int numf = pshell.shells[i].size();
+      int numf = shell.faces[i].size();
       //-- read oring (there's always one and only one)
       if (numf < 1)
       {
          (*cb)(220, shellNum, -1, "facet does not have an outer boundary.");
          return false;
       }
-      vector<int> &ids = pshell.shells[i][0]; // helpful alias for the outer boundary
+      vector<int> &ids = shell.faces[i][0]; // helpful alias for the outer boundary
 
       //-- We're going to use the outer shell as the reference plane for this entire face.
-      int proj = projection_plane(pshell.lsPts[ids[0]], pshell.lsPts[ids[1]], pshell.lsPts[ids[2]]);
-      Vector v0 = unit_normal( pshell.lsPts[ids[0]], pshell.lsPts[ids[1]], pshell.lsPts[ids[2]] );
+      int proj = projection_plane(shell.lsPts[ids[0]], shell.lsPts[ids[1]], shell.lsPts[ids[2]]);
+      Vector v0 = unit_normal( shell.lsPts[ids[0]], shell.lsPts[ids[1]], shell.lsPts[ids[2]] );
 
       //-- get projected Polygon
       //    cout << "proj :" << proj << endl;
       Polygon pgn;
       vector<Polygon> lsRings;
-      create_polygon(pshell.lsPts, ids, pgn);
+      create_polygon(shell.lsPts, ids, pgn);
       lsRings.push_back(pgn);
       vector< vector<int> > pgnids;
       pgnids.push_back(ids);
@@ -237,17 +245,17 @@ bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyh
       //-- check for irings
       for (int j = 1; j < numf; j++)
       {
-         vector<int> &ids2 = pshell.shells[i][j]; // helpful alias for the inner boundary
+         vector<int> &ids2 = shell.faces[i][j]; // helpful alias for the inner boundary
          //-- get projected Polygon
          Polygon pgn;
-         create_polygon(pshell.lsPts, ids2, pgn);
+         create_polygon(shell.lsPts, ids2, pgn);
          lsRings.push_back(pgn);
          pgnids.push_back(ids2);
       }
 
       //-- get projected CT
       vector<int*> oneface;
-      if (construct_ct(pshell.lsPts, pgnids, lsRings, oneface, i) == false)
+      if (construct_ct(shell.lsPts, pgnids, lsRings, oneface, i) == false)
       {
          (*cb)(220, shellNum, i, "face does not have an outer boundary.");
          return false;
@@ -286,10 +294,10 @@ bool triangulateOneShell(polyhedraShell& pshell, int shellNum, triangulatedPolyh
             id[1] = tmp;
          }
       }
-      tshell.shell.push_back(oneface);
+      tshell.faces.push_back(oneface);
    }
    //-- here are the points: 
-   tshell.lsPts = pshell.lsPts;
+   tshell.lsPts = shell.lsPts;
    return true;
 }
 
@@ -431,12 +439,12 @@ int projection_plane(Point3 p0, Point3 p1, Point3 p2)
 }
 
 
-bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cbf cb)
+bool check_planarity_faces(vector< vector<int*> >&face, vector<Point3>& lsPts, cbf cb)
 {
-  vector< vector<int*> >::iterator faceIt = shell.begin();
+  vector< vector<int*> >::iterator faceIt = face.begin();
   int i = 0;
   bool isValid = true;
-  for ( ; faceIt != shell.end(); faceIt++)
+  for ( ; faceIt != face.end(); faceIt++)
   {
     if (is_face_planar(*faceIt, lsPts, 1, cb) == false)
     {
@@ -448,18 +456,18 @@ bool checkPlanarityFaces(vector< vector<int*> >&shell, vector<Point3>& lsPts, cb
   return isValid;
 }  
   
-Polyhedron* validateTriangulatedShell( triangulatedPolyhedraShell& tshell, bool isOutershell, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, bool isOutershell, cbf cb)
 {
    bool isValid = true;
-   if (checkPlanarityFaces(tshell.shell, tshell.lsPts, cb) == true)
+   if (check_planarity_faces(tshell.faces, tshell.lsPts, cb) == true)
    {
-      Polyhedron* p = getPolyhedronDS(tshell.shell, tshell.lsPts);
+      CgalPolyhedron* p = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
       //-- check if polyhedron is 2-manifold (includes intersection tests)
-      bool isValid = check2manifoldness(p, cb);
+      bool isValid = check_manifoldness(p, cb);
       //-- check if orientation of the normales is outwards or inwards
       if (isValid == true)
       {
-         CGAL::Orientation orient = checkGlobalOrientationNormales(p, cb);
+         CGAL::Orientation orient = check_global_orientation_normales(p, cb);
          if ( ((isOutershell == true) && (orient != CGAL::CLOCKWISE)) || ((isOutershell == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
          {
             (*cb)(310, gCurShell, -1, "");
@@ -480,12 +488,12 @@ Polyhedron* validateTriangulatedShell( triangulatedPolyhedraShell& tshell, bool 
   
   
 
-CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb)
+CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb)
 {
   //-- get a 'convex corner', sorting order is x-y-z
-  Polyhedron::Vertex_iterator vIt;
+  CgalPolyhedron::Vertex_iterator vIt;
   vIt = p->vertices_begin();
-  Polyhedron::Vertex_handle cc = vIt;
+  CgalPolyhedron::Vertex_handle cc = vIt;
   vIt++;
 
   for ( ; vIt != p->vertices_end(); vIt++)
@@ -505,8 +513,8 @@ CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb)
   }
 //  cout << "CONVEX CORNER IS: " << cc->point() << endl;
 
-  Polyhedron::Halfedge_handle curhe = cc->halfedge();
-    Polyhedron::Halfedge_handle otherhe;
+  CgalPolyhedron::Halfedge_handle curhe = cc->halfedge();
+  CgalPolyhedron::Halfedge_handle otherhe;
   otherhe = curhe->opposite()->next();
   CGAL::Orientation orient = orientation( curhe->vertex()->point(),
                                           curhe->next()->vertex()->point(),
@@ -525,7 +533,7 @@ CGAL::Orientation checkGlobalOrientationNormales(Polyhedron* p, cbf cb)
 }
 
 
-bool check2manifoldness(Polyhedron* p, cbf cb)
+bool check_manifoldness(CgalPolyhedron* p, cbf cb)
 {
   bool isValid = true;
 //-- 1. check combinatorial consistency ---
@@ -544,7 +552,7 @@ bool check2manifoldness(Polyhedron* p, cbf cb)
     else
     {
 // 2. check geometrical consistency (aka intersection tests between faces) ---
-      isValid = isPolyhedronGeometricallyConsistent(p, cb);
+      isValid = is_polyhedron_geometrically_consistent(p, cb);
     }
   }
   return isValid;
@@ -559,24 +567,24 @@ bool check2manifoldness(Polyhedron* p, cbf cb)
 
 
 
-bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb)
+bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, cbf cb)
 {
   bool isValid = true;
-  Polyhedron::Facet_iterator curF, otherF;
+  CgalPolyhedron::Facet_iterator curF, otherF;
   curF = p->facets_begin();
   for ( ; curF != p->facets_end(); curF++)
   {
-    Polyhedron::Halfedge_handle heH;
+    CgalPolyhedron::Halfedge_handle heH;
     heH = curF->halfedge();
-    Polyhedron::Vertex_handle vh[3];
+    CgalPolyhedron::Vertex_handle vh[3];
     vh[0] = heH->vertex();
     vh[1] = heH->next()->vertex();
     vh[2] = heH->next()->next()->vertex();
 
     //-- check all the incident faces to the 3
-    set<Polyhedron::Facet_handle> incidentFaces;
-    set<Polyhedron::Facet_handle>::iterator itFh;
-    Polyhedron::Halfedge_around_vertex_circulator circ;
+    set<CgalPolyhedron::Facet_handle> incidentFaces;
+    set<CgalPolyhedron::Facet_handle>::iterator itFh;
+    CgalPolyhedron::Halfedge_around_vertex_circulator circ;
     for (int i=0; i<3; i++)
     {
       circ = vh[i]->vertex_begin();
@@ -593,7 +601,7 @@ bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb)
     {
       if (otherF != curF)
       {
-        Polyhedron::Halfedge_handle heoH = otherF->halfedge();
+        CgalPolyhedron::Halfedge_handle heoH = otherF->halfedge();
         Triangle t2( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
         
         CGAL::Object re = intersection(t1, t2);
@@ -618,13 +626,13 @@ bool isPolyhedronGeometricallyConsistent(Polyhedron* p, cbf cb)
 }
 
 
-Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts)
+CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&face, const vector<Point3>& lsPts)
 {
   //-- construct the 2-manifold, using the "batch" way
   stringstream offrep (stringstream::in | stringstream::out);
-  vector< vector<int*> >::const_iterator it = shell.begin();
+  vector< vector<int*> >::const_iterator it = face.begin();
   int noFaces = 0;
-  for ( ; it != shell.end(); it++)
+  for ( ; it != face.end(); it++)
     noFaces += it->size();
   offrep << "OFF" << endl << lsPts.size() << " " << noFaces << " 0" << endl;
 
@@ -632,7 +640,7 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
   for ( ; itPt != lsPts.end(); itPt++)
     offrep << *itPt << endl;
 
-  for (it = shell.begin(); it != shell.end(); it++)
+  for (it = face.begin(); it != face.end(); it++)
   {
     vector<int*>::const_iterator it2 = it->begin();
     for ( ; it2 != it->end(); it2++)
@@ -641,7 +649,7 @@ Polyhedron* getPolyhedronDS(const vector< vector<int*> >&shell, const vector<Poi
       offrep << "3 " << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
     }
   }
-  Polyhedron* P = new Polyhedron();
+  CgalPolyhedron* P = new CgalPolyhedron();
   offrep >> *P;
   return P;
 }
