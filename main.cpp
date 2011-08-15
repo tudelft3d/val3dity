@@ -101,7 +101,7 @@ int main(int argc, char* const argv[])
 
   vector<Shell*> shells;
   readAllInputShells((argc-1), argv, shells, callback_cout);
-  validate_solid(shells, callback_cout);
+  validate(shells, callback_cout);
 
   if (callbackWasCalledWithError)
   {

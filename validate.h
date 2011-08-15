@@ -29,7 +29,8 @@
 // CGAL kernel
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-
+#include <CGAL/Polyhedron_3.h>
+#include <CGAL/basic.h>
 
 
 // STL library
@@ -38,24 +39,28 @@ using namespace std;
 
 // CGAL typedefs
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
-
 
 //
-typedef K::Point_2        Point2;
-typedef K::Point_3        Point3;
-typedef K::Vector_3       Vector;
-typedef K::Triangle_3     Triangle;
-typedef K::Tetrahedron_3  Tetrahedron;
+typedef K::Point_2                  Point2;
+typedef K::Point_3                  Point3;
+typedef K::Vector_3                 Vector;
+typedef K::Triangle_3               Triangle;
+typedef K::Tetrahedron_3            Tetrahedron;
+typedef CGAL::Polyhedron_3<K>       CgalPolyhedron;
 
 
-// convenience structure
+// convenience structures:
 //-- the vector of faces, each which has a vector of rings, 
 //-- which is a vector of IDs from vertex pool lsPts
 typedef struct fullPolyhedraShell_tag {
    vector< Point3 > lsPts;
    vector< vector< vector<int> > > faces;
 } Shell;
+
+typedef struct triangulatedShell_tag {
+   vector< Point3 > lsPts;
+   vector< vector<int*> > faces;
+} TrShell;
 
 
 // This callback function will be used to both report progress
@@ -69,6 +74,6 @@ typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unkno
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-void validate_solid(vector<Shell*> &shells, cbf cb);
+bool validate(vector<Shell*> &shells, cbf cb);
 
 #endif

@@ -54,6 +54,7 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
    oneshell = NULL; // don't own this anymore
    for (int is=1; is<numShells; is++)
    {
+      st.str("");
       st << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
       (*cb)(0, -1, -1, st.str());
       ifstream infile2(filenames[(is+1)], ifstream::in);
