@@ -74,6 +74,6 @@ typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unkno
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool validate(vector<Shell*> &shells, cbf cb);
+bool validate(vector<Shell*> &shells, bool bRepair, cbf cb);
 
 #endif

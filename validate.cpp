@@ -58,7 +58,7 @@ void  create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Poly
 
 //--------------------------------------------------------------
 
-bool validate(vector<Shell*> &shells, cbf cb)
+bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
 {
   bool foundError(false);
 
@@ -76,7 +76,7 @@ bool validate(vector<Shell*> &shells, cbf cb)
   CgalPolyhedron* p = NULL;
   for (unsigned int i = 0; i < trShells.size(); i++)
   {
-    p = validate_triangulated_shell(*(trShells[i]), i, cb);  
+    p = validate_triangulated_shell(*(trShells[i]), i, bRepair, cb);  
     std::stringstream st;
     st << "\tShell #" << (i);
     if (p != NULL)
@@ -88,13 +88,13 @@ bool validate(vector<Shell*> &shells, cbf cb)
     else
     {
       st << " invalid";
-      (*cb)(300, 0, -1, st.str());
+      //(*cb)(300, 0, -1, st.str());
       foundError = true;
     }
   }
   
 //-- Third: put all the valid shells in a Nef_polyhedron and check their configuration  
-  bool isValid = validate_solid_with_nef(polyhedra, cb);
+  bool isValid = validate_solid_with_nef(polyhedra, bRepair, cb);
   return isValid;
 }
 

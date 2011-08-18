@@ -33,4 +33,4 @@ typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
 typedef CGAL::Polyhedron_3<Ke>                              PolyhedronExact;
 typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
 
-bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb);
+bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, cbf cb);

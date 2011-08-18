@@ -40,7 +40,7 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
    {
       // This is just a status message.
       if ( (shellNum == -1) && (facetNum == -1) )
-        cout << "Status: " << messageStr << endl;
+        cout << messageStr << endl;
       else
       cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
    }
@@ -64,10 +64,10 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
       case 300   : cout << "Error 300: " << "is not a 2-manifold"; break;
       case   301 : cout << "Error 301: " << "surface is not closed"; break;
       case   302 : cout << "Error 302: " << "dangling faces (more than 2 surface incident to an edge)"; break;
-      case   303 : cout << "Error 303: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
-      case   304 : cout << "Error 304: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
+      case   303 : cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
+      case   304 : cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
       case   305 : cout << "Error 305: " << "surface self-intersect"; break;
-      case 310   : cout << "Error 310: " << "normales not pointing in correct direction (oshell=outwards; ishell=inwards)"; break;
+      case 310   : cout << "Error 310: " << "normales pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
         // Solid level
       case 400   : cout << "Error 400: " << "shells are face adjacent"; break;
       case 410   : cout << "Error 410: " << "interior of shells intersect"; break;
@@ -79,10 +79,9 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
       default    : cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
       }
       cout << endl;
+      cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
       if (messageStr.size() > 0)
-      {
-         cout << "\t" << messageStr << endl;
-      }
+        cout << "\t" << messageStr << endl;
       callbackWasCalledWithError = true;
    }
 }
@@ -93,6 +92,7 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
 //
 int main(int argc, char* const argv[])
 {
+  bool bRepair = true;
 
   if (argc < 2)
   {
@@ -104,16 +104,16 @@ int main(int argc, char* const argv[])
 
   vector<Shell*> shells;
   readAllInputShells((argc-1), argv, shells, callback_cout);
-  validate(shells, callback_cout);
+  validate(shells, bRepair, callback_cout);
 
   if (callbackWasCalledWithError)
   {
-     cout << "Invalid solid :(" << endl << endl;
+     cout << "\nInvalid solid :(" << endl << endl;
      return(1);
   }
   else
   {
-     cout << "Valid solid. Hourrraaa!" << endl;
+     cout << "\nValid solid. Hourrraaa!" << endl;
      return(0);
   }
 }

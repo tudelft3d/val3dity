@@ -46,10 +46,12 @@ class ConstructShell : public CGAL::Modifier_base<HDS> {
   vector< vector<int*> > *faces;
   vector<Point3> *lsPts;
   int shellID;
+  int bRepair;
   cbf cb;
 public:
-  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, cbf cb)
-    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb)
+  bool isValid;
+  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, bool bRepair, cbf cb)
+    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true)
   {
   }
   void operator()( HDS& hds) {
@@ -85,18 +87,28 @@ public:
     faceids[0] = i0;
     faceids[1] = i1;
     faceids[2] = i2;
-    (*cb)(0, shellID, faceID, "bla bla bla");
     if (B.test_facet(faceids.begin(), faceids.end()))
         B.add_facet(faceids.begin(), faceids.end());
     else
-    { //-- reverse orientation
+    { //-- reverse the face and test if it would be possible to insert it
       faceids[0] = i0;
       faceids[1] = i2;
       faceids[2] = i1;
       if (B.test_facet(faceids.begin(), faceids.end()))
       {
-        std::cout << "*** Reversed orientation of the face" << std::endl;
-        B.add_facet(faceids.begin(), faceids.end());
+        //std::cout << "*** Reversed orientation of the face" << std::endl;
+        (*cb)(303, shellID, faceID, "");
+        isValid = false;
+        if (bRepair)
+        {
+          std::cout << "Fixin' it: flipped a face..." << std::endl;
+          B.add_facet(faceids.begin(), faceids.end());
+        }
+      }
+      else
+      {
+        (*cb)(302, shellID, faceID, "");
+        isValid = false;
       }
     }
     return ;
@@ -110,16 +122,17 @@ CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, cons
 CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
 bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
 bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
-CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb);
+bool              check_global_orientation_normales(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb);
 
 
 //------------------------------------------
 
-CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool bRepair, cbf cb)
 {
   bool isValid = true;
-  CgalPolyhedron* p = NULL;
+  //CgalPolyhedron P;
+  CgalPolyhedron *P = new CgalPolyhedron;
 
 //-- 1. Planarity of faces   
   if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
@@ -129,60 +142,75 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
   if (isValid == true)
   {
     //-- get the CgalPolyhedron, batch-mode construction
-    CgalPolyhedron P;
-    ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, cb);
-    P.delegate(s);
-//    p = construct_CgalPolyhedron(tshell.faces, tshell.lsPts, cb);
-
-/*    vector< vector<int*> >::const_iterator itF = (tshell.faces).begin();
-    for ( ; itF != (tshell.faces).end(); itF++)
+    ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, bRepair, cb);
+    P->delegate(s);
+    isValid = s.isValid;
+    
+    if ( (isValid == true) || (bRepair == true) )
     {
-      std::cout << itF->size() << std::endl;
-    }
-*/
-
-    isValid = false;
-/*    p = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
-    if (p->empty() == true)
-    {
-      (*cb)(300, shellID, -1, "One/several of the faces have wrong orientation, or dangling faces.");
-      isValid = false;
-    }
-    else
-    {
-      if (p->is_closed() == false)
+      if (P->is_valid() == true) //-- combinatorially valid that is
       {
-        (*cb)(301, shellID, -1, "");
-        isValid = false;
+        if (P->is_closed() == false)
+        {
+          P->normalize_border();
+          //-- check for unconnected faces
+          if (P->keep_largest_connected_components(1) > 0)
+          {
+            //TODO: how to report what face is not connected? a bitch of a problem...
+            (*cb)(304, shellID, -1, "");
+            isValid = false;
+          }
+          else
+          {
+            //-- check is there are holes in the surface
+            if (P->size_of_border_halfedges() > 0)
+            {
+              (*cb)(301, shellID, -1, "");
+              //TODO: how to report where the hole is? report one of the edge? centre of the hole?
+              isValid = false;
+            }
+          }
+        }
+      }
+      else 
+      {
+        (*cb)(300, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
+        isValid =  false;
       }
     }
-*/
   }
 
 //-- 3. Geometrical consistency (aka intersection tests between faces)
   if (isValid == true)
   {
-    isValid = is_polyhedron_geometrically_consistent(p, shellID, cb);
+    isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
   }
   
 //-- 4. orientation of the normales is outwards or inwards
   if (isValid == true)
   {
-    CGAL::Orientation orient = check_global_orientation_normales(p, cb);
-    if ( ((shellID == 0) && (orient != CGAL::CLOCKWISE)) || ((shellID != 0) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+    bool bOuter = true;
+    if (shellID > 0)
+      bool bOuter = false;
+    isValid = check_global_orientation_normales(P, bOuter, cb);
+    if (isValid == false)
     {
       (*cb)(310, shellID, -1, "");
-      isValid = false;
+    }
+    if (bRepair)
+    {
+      P->inside_out();
+      std::cout << "Repaired orientation? " << check_global_orientation_normales(P, bOuter, cb) << std::endl;
     }
   }
   
 //-- Return CgalPolyhedron if valid, NULL otherwise  
   if (isValid == false)
   {
-    delete p;
-    p = NULL;
+    delete P;
+    P = NULL;
   }
-  return p;
+  return P;
 }
 
 
@@ -201,7 +229,8 @@ CgalPolyhedron* construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Po
 }
 
 
-CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb)
+
+bool check_global_orientation_normales(CgalPolyhedron *p, bool bOuter, cbf cb)
 {
   //-- get a 'convex corner', sorting order is x-y-z
   CgalPolyhedron::Vertex_iterator vIt;
@@ -242,11 +271,14 @@ CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb)
                           curhe->next()->next()->vertex()->point(),
                           otherhe->vertex()->point() );
   }
-  return orient;
+  if ( ((bOuter == true) && (orient != CGAL::CLOCKWISE)) || ((bOuter == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+    return false;
+  else
+    return true;
 }
 
 
-bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
+bool is_polyhedron_geometrically_consistent(CgalPolyhedron *p, int shellID, cbf cb)
 {
   bool isValid = true;
   CgalPolyhedron::Facet_iterator curF, otherF;
