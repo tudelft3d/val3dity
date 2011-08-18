@@ -30,17 +30,86 @@
 #include <CGAL/intersections.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/intersections.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
 
 #include<set>
 
-// misc
+//-- misc
 #define PI 3.14159265
 
+//-- CGAL stuff
+typedef CgalPolyhedron::HalfedgeDS HalfedgeDS;
 
+
+template <class HDS>
+class ConstructShell : public CGAL::Modifier_base<HDS> {
+  vector< vector<int*> > *faces;
+  vector<Point3> *lsPts;
+  int shellID;
+  cbf cb;
+public:
+  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, cbf cb)
+    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb)
+  {
+  }
+  void operator()( HDS& hds) {
+    typedef typename HDS::Vertex          Vertex;
+    typedef typename Vertex::Point        Point;
+    typedef typename HDS::Face_handle     FaceH;
+    typedef typename HDS::Halfedge_handle heH;
+    CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
+    B.begin_surface((*lsPts).size(), (*faces).size());
+    vector<Point3>::const_iterator itPt = lsPts->begin();
+    for ( ; itPt != lsPts->end(); itPt++)
+    { 
+      B.add_vertex( Point(itPt->x(), itPt->y(), itPt->z()));
+    }
+    vector< vector<int*> >::const_iterator itF = faces->begin();
+    int faceID = 0;
+    for ( ; itF != faces->end(); itF++)
+    {
+      vector<int*>::const_iterator itF2 = itF->begin();
+      for ( ; itF2 != itF->end(); itF2++)
+      {
+        int* a = *itF2;
+        addface(B, a[0], a[1], a[2], faceID, cb);
+      }
+      faceID++;
+    }
+    B.end_surface();
+  }
+  
+  void addface(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb)
+  {
+    std::vector< std::size_t> faceids(3);        
+    faceids[0] = i0;
+    faceids[1] = i1;
+    faceids[2] = i2;
+    (*cb)(0, shellID, faceID, "bla bla bla");
+    if (B.test_facet(faceids.begin(), faceids.end()))
+        B.add_facet(faceids.begin(), faceids.end());
+    else
+    { //-- reverse orientation
+      faceids[0] = i0;
+      faceids[1] = i2;
+      faceids[2] = i1;
+      if (B.test_facet(faceids.begin(), faceids.end()))
+      {
+        std::cout << "*** Reversed orientation of the face" << std::endl;
+        B.add_facet(faceids.begin(), faceids.end());
+      }
+    }
+    return ;
+  } 
+};
+
+
+
+//-- function prototypes
 CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
+CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
 bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
 bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
-bool              check_manifoldness(CgalPolyhedron* p, int shellID, cbf cb);
 CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb);
 bool              is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb);
 
@@ -56,14 +125,47 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
   if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
     isValid = false;
   
-//-- 2. 2-manifoldness (combinatorial+geometrical consistency)
+//-- 2. Combinatorial consistency
   if (isValid == true)
   {
-    p = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
-    isValid = check_manifoldness(p, shellID, cb);
+    //-- get the CgalPolyhedron, batch-mode construction
+    CgalPolyhedron P;
+    ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, cb);
+    P.delegate(s);
+//    p = construct_CgalPolyhedron(tshell.faces, tshell.lsPts, cb);
+
+/*    vector< vector<int*> >::const_iterator itF = (tshell.faces).begin();
+    for ( ; itF != (tshell.faces).end(); itF++)
+    {
+      std::cout << itF->size() << std::endl;
+    }
+*/
+
+    isValid = false;
+/*    p = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+    if (p->empty() == true)
+    {
+      (*cb)(300, shellID, -1, "One/several of the faces have wrong orientation, or dangling faces.");
+      isValid = false;
+    }
+    else
+    {
+      if (p->is_closed() == false)
+      {
+        (*cb)(301, shellID, -1, "");
+        isValid = false;
+      }
+    }
+*/
+  }
+
+//-- 3. Geometrical consistency (aka intersection tests between faces)
+  if (isValid == true)
+  {
+    isValid = is_polyhedron_geometrically_consistent(p, shellID, cb);
   }
   
-//-- 3. orientation of the normales is outwards or inwards
+//-- 4. orientation of the normales is outwards or inwards
   if (isValid == true)
   {
     CGAL::Orientation orient = check_global_orientation_normales(p, cb);
@@ -73,7 +175,8 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
       isValid = false;
     }
   }
-//-- 4. return CgalPolyhedron if valid, NULL otherwise  
+  
+//-- Return CgalPolyhedron if valid, NULL otherwise  
   if (isValid == false)
   {
     delete p;
@@ -81,8 +184,22 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
   }
   return p;
 }
-  
-  
+
+
+CgalPolyhedron* construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb)
+{
+/*  CgalPolyhedron P;
+  ConstructShell<HalfedgeDS> s(&faces, &lsPts, cb);
+  P.delegate(s);
+  std::cout << "***valid? " << P.is_valid() << std::endl;
+  std::cout << "closed? " << P.is_closed() << std::endl;
+  std::cout << "# facets: "   << P.size_of_facets() << std::endl;
+  std::cout << "# halfedges: "    << P.size_of_halfedges() << std::endl;
+  std::cout << "# vertices "  << P.size_of_vertices() << std::endl;
+*/  
+  return NULL;
+}
+
 
 CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb)
 {
@@ -127,33 +244,6 @@ CGAL::Orientation check_global_orientation_normales(CgalPolyhedron* p, cbf cb)
   }
   return orient;
 }
-
-
-bool check_manifoldness(CgalPolyhedron* p, int shellID, cbf cb)
-{
-  bool isValid = true;
-//-- 1. check combinatorial consistency ---
-  if (p->empty() == true)
-  {
-    (*cb)(300, shellID, -1, "One/several of the faces have wrong orientation, or dangling faces.");
-    isValid = false;
-  }
-  else
-  {
-    if (p->is_closed() == false)
-    {
-      (*cb)(301, shellID, -1, "");
-      isValid = false;
-    }
-    else
-    {
-// 2. check geometrical consistency (aka intersection tests between faces) ---
-      isValid = is_polyhedron_geometrically_consistent(p, shellID, cb);
-    }
-  }
-  return isValid;
-}
-
 
 
 bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
@@ -215,13 +305,13 @@ bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf 
 }
 
 
-CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&face, const vector<Point3>& lsPts)
+CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const vector<Point3>& lsPts)
 {
   //-- construct the 2-manifold, using the "batch" way
   stringstream offrep (stringstream::in | stringstream::out);
-  vector< vector<int*> >::const_iterator it = face.begin();
+  vector< vector<int*> >::const_iterator it = faces.begin();
   int noFaces = 0;
-  for ( ; it != face.end(); it++)
+  for ( ; it != faces.end(); it++)
     noFaces += it->size();
   offrep << "OFF" << endl << lsPts.size() << " " << noFaces << " 0" << endl;
 
@@ -229,7 +319,7 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&face, const v
   for ( ; itPt != lsPts.end(); itPt++)
     offrep << *itPt << endl;
 
-  for (it = face.begin(); it != face.end(); it++)
+  for (it = faces.begin(); it != faces.end(); it++)
   {
     vector<int*>::const_iterator it2 = it->begin();
     for ( ; it2 != it->end(); it2++)
@@ -246,10 +336,10 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&face, const v
 
 bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb)
 {
-  vector< vector<int*> >::iterator faceIt = face.begin();
+  vector< vector<int*> >::iterator faceIt = faces.begin();
   int i = 0;
   bool isValid = true;
-  for ( ; faceIt != face.end(); faceIt++)
+  for ( ; faceIt != faces.end(); faceIt++)
   {
     if (is_face_planar(*faceIt, lsPts, 1, cb) == false)
     {

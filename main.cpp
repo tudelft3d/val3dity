@@ -39,7 +39,10 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
    if (0 == errorCode)
    {
       // This is just a status message.
-      cout << messageStr << endl;
+      if ( (shellNum == -1) && (facetNum == -1) )
+        cout << "Status: " << messageStr << endl;
+      else
+      cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
    }
    else
    {

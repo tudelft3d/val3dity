@@ -32,7 +32,7 @@
 
 bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
 {
-  if (polyhedra.size() == 1)
+  if (polyhedra.size() <= 1)
     return true;
     
   bool isValid = true;
