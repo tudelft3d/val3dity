@@ -63,7 +63,7 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
         // Shell level
       case 300   : cout << "Error 300: " << "is not a 2-manifold"; break;
       case   301 : cout << "Error 301: " << "surface is not closed"; break;
-      case   302 : cout << "Error 302: " << "dangling faces (more than 2 surface incident to an edge)"; break;
+      case   302 : cout << "Error 302: " << "dangling faces (more than 2 surfaces incident to an edge)"; break;
       case   303 : cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
       case   304 : cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
       case   305 : cout << "Error 305: " << "surface self-intersect"; break;
