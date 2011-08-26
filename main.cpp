@@ -92,7 +92,7 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
 //
 int main(int argc, char* const argv[])
 {
-  bool bRepair = true;
+  bool bRepair = false;
 
   if (argc < 2)
   {

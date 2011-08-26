@@ -48,11 +48,12 @@ class ConstructShell : public CGAL::Modifier_base<HDS> {
   vector<Point3> *lsPts;
   int shellID;
   int bRepair;
+  int _width;
   cbf cb;
 public:
   bool isValid;
   ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, bool bRepair, cbf cb)
-    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true)
+    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true), _width(lsPts->size())
   {
   }
   void operator()( HDS& hds) 
@@ -71,7 +72,6 @@ public:
     if (bRepair == false)
       construct_faces_order_given(B, cb);
     else
-      //construct_faces_ensure_adjacency(B, cb);
       construct_faces_ensure_adjacency(B, cb);
     B.end_surface();
   }
@@ -91,17 +91,18 @@ public:
       faceID++;
     }
   }
-  
+
+  int m2a(int m, int n)
+  {
+    return (m+(n*_width));
+  }
+
   void construct_faces_ensure_adjacency(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
   {
-    std::cout << "ensuer adjacency" << std::endl;
     int size = (*lsPts).size();
-    bool halfedges[size][size];
-    for (int i = 0; i < size; i++)
-    {
-      for (int j = 0; j < size; j++)
-        halfedges[i][j] = false;
-    }
+    bool halfedges[size*size];
+    for (int i = 0; i <= (size*size); i++)
+      halfedges[i] = false;
     
     //-- build one flat list of the triangular faces, for convenience
     list<int*> trFaces;
@@ -123,34 +124,29 @@ public:
     faceids[1] = a[1];
     faceids[2] = a[2];
     B.add_facet(faceids.begin(), faceids.end());
-    halfedges[a[0]][a[1]] = true;
-    halfedges[a[1]][a[2]] = true;
-    halfedges[a[2]][a[0]] = true;
+
+    halfedges[m2a(a[0], a[1])] = true;
+    halfedges[m2a(a[1], a[2])] = true;
+    halfedges[m2a(a[2], a[0])] = true;
+
     trFaces.pop_front();
-    
-    std::cout << "trface size :" << trFaces.size() << endl;
     while (trFaces.size() > 0)
     {
-      if (try_to_add_face(B, trFaces, &halfedges[0][0], size) == false)
+      if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
       {
-        //-- insert the first one, which is probably dangling...
-        a = trFaces.front();
-        faceids[0] = a[0];
-        faceids[1] = a[1];
-        faceids[2] = a[2];
-        if (B.test_facet(faceids.begin(), faceids.end()) == true)
+        //-- add first face possible, will be dangling by definition
+        //cout << "had problems..." << endl;
+        if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
         {
-          B.add_facet(faceids.begin(), faceids.end());
-          halfedges[a[0]][a[1]] = true;
-          halfedges[a[1]][a[2]] = true;
-          halfedges[a[2]][a[0]] = true;
-          trFaces.pop_front();
+          //-- cannot repair. non-manifold situations.
+          trFaces.clear();
         }
+             
       }
     }
   }
-  
-  bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, int width)
+
+  bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected)
   {
     bool success = false;
     for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
@@ -161,22 +157,47 @@ public:
       faceids[1] = a[1];
       faceids[2] = a[2];
       bool test = B.test_facet(faceids.begin(), faceids.end());
-      if ( ( (halfedges[a[0]+(a[1]*width)] == false) && (halfedges[a[1]+(a[0]*width)] == true) && (test == true) ) ||
-           ( (halfedges[a[1]+(a[2]*width)] == false) && (halfedges[a[2]+(a[1]*width)] == true) && (test == true) ) ||
-           ( (halfedges[a[2]+(a[0]*width)] == false) && (halfedges[a[0]+(a[2]*width)] == true) && (test == true) ) )
+      if (test == true)
       {
-        B.add_facet(faceids.begin(), faceids.end());
-        halfedges[a[0]+(a[1]*width)] = true;
-        halfedges[a[1]+(a[2]*width)] = true;
-        halfedges[a[2]+(a[0]*width)] = true;
-        trFaces.erase(it1);
-        success = true;
-        std::cout << "foudn" << std::endl;
-        break;
+        if ( (bMustBeConnected == false) || (is_connected(a, halfedges) == true) )
+        {
+          B.add_facet(faceids.begin(), faceids.end());
+          halfedges[m2a(a[0],a[1])] = true;
+          halfedges[m2a(a[1],a[2])] = true;
+          halfedges[m2a(a[2],a[0])] = true;
+          trFaces.erase(it1);
+          success = true;
+          break;
+        }
+      }
+      else //-- face conflicts with one, try to flip it and insert if possible
+      {
+        faceids[1] = a[2];
+        faceids[2] = a[1];
+        if (B.test_facet(faceids.begin(), faceids.end()))
+        {
+          B.add_facet(faceids.begin(), faceids.end());
+          halfedges[m2a(a[0],a[1])] = true;
+          halfedges[m2a(a[1],a[2])] = true;
+          halfedges[m2a(a[2],a[0])] = true;
+          trFaces.erase(it1);
+          success = true;
+          break;
+        }
       }
     }
-    cout << "succes: " << success << endl;
     return success;
+  }
+  
+  
+  bool is_connected(int* tr, bool* halfedges)
+  {
+    if ( (halfedges[m2a(tr[1],tr[0])] == true) ||
+         (halfedges[m2a(tr[2],tr[1])] == true) ||
+         (halfedges[m2a(tr[0],tr[2])] == true) )
+      return true;
+    else 
+      return false;
   }
   
   void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb)
