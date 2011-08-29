@@ -100,7 +100,7 @@ public:
   void construct_faces_ensure_adjacency(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
   {
     int size = (*lsPts).size();
-    bool halfedges[size*size];
+    bool *halfedges = new bool[size*size];
     for (int i = 0; i <= (size*size); i++)
       halfedges[i] = false;
     
@@ -132,11 +132,11 @@ public:
     trFaces.pop_front();
     while (trFaces.size() > 0)
     {
-      if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
+      if (try_to_add_face(B, trFaces, halfedges, true) == false)
       {
         //-- add first face possible, will be dangling by definition
         //cout << "had problems..." << endl;
-        if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
+        if (try_to_add_face(B, trFaces, halfedges, false) == false)
         {
           //-- cannot repair. non-manifold situations.
           trFaces.clear();
@@ -144,6 +144,7 @@ public:
              
       }
     }
+    delete [] halfedges; halfedges = NULL;
   }
 
   bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected)
