@@ -40,6 +40,16 @@
 
 #include <iwriter.h>
 
+
+
+void callback_cout_only(int errorCode,    // 0 means status message, -1 means unknown error
+   int shellNum, // -1 means unused; 0-based
+   int facetNum,     // -1 means unused; 0-based
+   std::string messageStr) // optional
+{
+   cout << "Message: " << messageStr << endl;
+}
+
 void parseFilename( const std::string &inputFilename, std::string &outputpath, std::string &outputbasename );
 
 // -----------------------------------------------------------
@@ -64,22 +74,22 @@ int main(int argc, char* const argv[])
   IFMEGeometryTools* gt = session->getGeometryTools();
 
   // Use the val3dity code to read in the .poly file
-  vector<polyhedraShell*> polyhedraShells;
-  readAllPolyhedraShells((argc-1), argv, polyhedraShells);
+  vector<Shell*> polyhedraShells;
+  readAllInputShells((argc-1), argv, polyhedraShells, callback_cout_only);
 
   // Let's loop through all the polyhedraShells we read in (one from each file)
   IFMEBRepSolid* polyhedraSolid = NULL;
   for(unsigned int phs(0); phs<polyhedraShells.size(); phs++)
   {
-     polyhedraShell* thisPolyhedra = polyhedraShells[phs]; // helpful alias
+     Shell* thisPolyhedra = polyhedraShells[phs]; // helpful alias
      vector<Point3>& thislsPts = thisPolyhedra->lsPts; // helpful alias
 
      // Read in all the faces.
      IFMECompositeSurface* compositeSurface = gt->createCompositeSurface();
-     for (unsigned int j(0); j< thisPolyhedra->shells.size(); j++)
+     for (unsigned int j(0); j< thisPolyhedra->faces.size(); j++)
      {
         // Add all the shells for this face.  The first one is the outer one.
-        vector< vector<int> >& thisShell = thisPolyhedra->shells[j]; // helpful alias
+        vector< vector<int> >& thisShell = thisPolyhedra->faces[j]; // helpful alias
         IFMESimpleArea* outerBoundary = NULL;
         IFMEDonut* boundary = NULL;
         for (unsigned int k(0); k < thisShell.size(); k++)
