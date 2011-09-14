@@ -33,11 +33,11 @@ void readShell(ifstream& infile, Shell &allShells);
 void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb)
 {
    std::stringstream st;
-   st << "Reading " << numShells << " file(s)." << endl;
+   st << "Reading " << numShells << " file(s).";
    (*cb)(0, -1, -1, st.str());
 
    st.str(""); //-- clear what's in st
-   st << "Reading outer shell: " << filenames[1] << endl;
+   st << "Reading outer shell:\t" << filenames[1];
    (*cb)(0, -1, -1, st.str());
    ifstream infile(filenames[1], ifstream::in);
    if (!infile)
@@ -55,7 +55,7 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
    for (int is=1; is<numShells; is++)
    {
       st.str("");
-      st << "Reading inner shell #" << (is-1) << filenames[(is+1)] << endl;
+      st << "Reading inner shell #" << (is-1) << ":\t" << filenames[(is+1)];
       (*cb)(0, -1, -1, st.str());
       ifstream infile2(filenames[(is+1)], ifstream::in);
       if (!infile2)
@@ -72,6 +72,7 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
       shells.push_back(oneshell);
       oneshell = NULL; // don't own this anymore
    }
+   (*cb)(0, -1, -1, "");
 }
 
 

@@ -36,7 +36,9 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
     return true;
     
   bool isValid = true;
-  (*cb)(0, -1, -1, "Inspecting interactions between the shells.");
+  std::stringstream st;
+  st << "Inspecting interactions between the " << polyhedra.size() << " shells";
+  (*cb)(0, -1, -1, st.str());
   vector<Nef_polyhedron> nefs;
   vector<CgalPolyhedron*>::const_iterator polyhedraIt;
   for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
@@ -49,10 +51,50 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
      nefs.push_back(onef);
   }
   vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
-  Nef_polyhedron solid = *nefsIt;
+
+  Nef_polyhedron solid;
+  solid += (*nefsIt);
   nefsIt++;
+  int numvol = 2;
+  bool success = true;
   for ( ; nefsIt != nefs.end(); nefsIt++) 
-     solid -= *nefsIt;
+  {
+    solid -= *nefsIt;
+    numvol++;
+    if (solid.number_of_volumes() != numvol)
+    {
+      cout << "!!!WRONG SOLID!!!" << endl;
+      success = false;
+      break;
+    }
+  }
+  
+  if (success == false) //-- the Nef is not valid, pairwise testing to see what's wrong
+  {
+    //-- start with oshell<-->ishells
+    nefsIt = nefs.begin();
+    nefsIt++;
+    int no = 1;
+    for ( ; nefsIt != nefs.end(); nefsIt++) 
+    {
+      solid.clear();
+      solid += *(nefs.begin());
+      solid -= *nefsIt;
+      if (solid.number_of_volumes() != 3)
+      {
+        cout << "%%%ERROR: oshell/ishell #" << no << endl;
+        if (solid.number_of_volumes() < 3)
+      }
+      no++;
+    }
+    
+    
+  }
+  
+  
+  cout << "# of volumes: " << solid.number_of_volumes() << endl;
+  
+  
   if (solid.number_of_volumes() != (polyhedra.size()+1))
   {
      (*cb)(401, -1, -1, "Shells do not interact according to the rules.");

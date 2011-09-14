@@ -92,6 +92,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
       foundError = true;
     }
   }
+  (*cb)(0, -1, -1, "");
   
 //-- Third: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, bRepair, cb);
@@ -103,7 +104,7 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
 {
    std::stringstream st;
    // Now let's triangulate the outer shell from the input.
-   st << "Triangulating outer shell." << endl;
+   st << "Triangulating outer shell";
    (*cb)(0, -1, -1, st.str());
    TrShell* tshell = new TrShell;
    if (! triangulate_one_shell(*(shells[0]), 0, *tshell, cb))
@@ -118,6 +119,9 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
    {
       // Now let's triangulate the inner shell from the input.
       tshell = new TrShell;
+      st.str("");
+      st << "Triangulating inner shell #" << (is-1);
+      (*cb)(0, -1, -1, st.str());
       if (!triangulate_one_shell(*(shells[is]), is, *tshell, cb))
       {
          (*cb)(300, is, -1, "Could not triangulate the shell.");
@@ -126,6 +130,7 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
       trShells.push_back(tshell);
       tshell = NULL; // don't own this anymore
    }
+   (*cb)(0, -1, -1, "");
    return true;
 }
 
