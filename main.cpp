@@ -79,7 +79,10 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
       default    : cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
       }
       cout << endl;
-      cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
+      if ( (errorCode >= 400) || (errorCode < 500) )
+        cout << "\t" << "[shell: #" << shellNum << "; shell: #" << facetNum << "]" << endl;
+      else
+        cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
       if (messageStr.size() > 0)
         cout << "\t" << messageStr << endl;
       callbackWasCalledWithError = true;

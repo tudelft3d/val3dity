@@ -86,9 +86,12 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
         {
           //-- check if ishell is a subset of oshell
           if ((*nefsIt <= nefs[0]) == true)
-            (*cb)(430, -1, -1, "ishell creates unconnected interior");
+            (*cb)(430, 0, no, "");
           else
-            (*cb)(410, -1, -1, "ishell totally intersect oshell and beyond");
+          {
+            (*cb)(410, 0, no, "");
+            (*cb)(430, 0, no, "");
+          }
         }
         else //-- solid.number_of_volumes() < 3
         {
@@ -101,39 +104,43 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
           else
           {
             if ((*nefsIt <= nefs[0]) == true)
-              (*cb)(400, -1, -1, "");
+              (*cb)(400, 0, no, "");
             else
             {
               solid.clear();
               solid = nefs[0].intersection(nefsIt->interior());
               if (solid.is_empty() == true)
               {
-                (*cb)(400, -1, -1, "");
-                (*cb)(420, -1, -1, "");
+                (*cb)(400, 0, no, "");
+                (*cb)(420, 0, no, "");
               }
               else
-                (*cb)(410, -1, -1, "");
+                (*cb)(410, 0, no, "");
             }
           }
         }
       }
-      no++;
+    no++;
     }
+
 //-- then check ishell<-->ishell interactions
     nefsIt = nefs.begin();
     nefsIt++;
     vector<Nef_polyhedron>::iterator nefsIt2;
+    no = 1;
+    int no2;
     for ( ; nefsIt != nefs.end(); nefsIt++)
     {
       nefsIt2 = nefsIt;
       nefsIt2++;
+      no2 = no + 1;
       for ( ; nefsIt2 != nefs.end(); nefsIt2++)
       {
         solid.clear();
         solid += *nefsIt;
         solid += *nefsIt2;
         if (solid.number_of_volumes() > 3)
-          (*cb)(410, -1, -1, "Both shells completely overlap");
+          (*cb)(410, no, no2, "Both shells completely overlap");
         else if (solid.number_of_volumes() < 3)
         {
           //-- either they are face adjacent or overlap
@@ -141,27 +148,15 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
           solid = nefsIt->interior();
           solid = solid.intersection(nefsIt2->interior());
           if (solid.is_empty() == true)
-            (*cb)(400, -1, -1, "");
+            (*cb)(400, no, no2, "");
           else
-            (*cb)(410, -1, -1, "");
-        }        
+            (*cb)(410, no, no2, "");
+        }
+        no2++;
       }
+      no++;
     }
-  
-  
-  
   }
-  
-  
-//  cout << "# of volumes: " << solid.number_of_volumes() << endl;
-  
-//  
-//  if (solid.number_of_volumes() != (polyhedra.size()+1))
-//  {
-//     (*cb)(401, -1, -1, "Shells do not interact according to the rules.");
-//     isValid = false;
-//     //TODO: add the exact errors here...
-//  }
   return isValid;
 }
 
