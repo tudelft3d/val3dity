@@ -113,12 +113,12 @@ int main(int argc, char* const argv[])
   if (callbackWasCalledWithError)
   {
      cout << "\nInvalid solid :(" << endl << endl;
-     return(1);
+     return(0);
   }
   else
   {
      cout << "\nValid solid. Hourrraaa!" << endl;
-     return(0);
+     return(1);
   }
 }
 
