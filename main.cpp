@@ -79,7 +79,7 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
       default    : cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
       }
       cout << endl;
-      if ( (errorCode >= 400) || (errorCode < 500) )
+      if ( (errorCode >= 400) && (errorCode < 500) )
         cout << "\t" << "[shell: #" << shellNum << "; shell: #" << facetNum << "]" << endl;
       else
         cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
@@ -96,6 +96,7 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
 int main(int argc, char* const argv[])
 {
   bool bRepair = false;
+//  bool bRepair = true;
 
   if (argc < 2)
   {

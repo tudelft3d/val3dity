@@ -78,7 +78,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
   {
     p = validate_triangulated_shell(*(trShells[i]), i, bRepair, cb);  
     std::stringstream st;
-    st << "\tShell #" << (i);
+    st << "Shell #" << (i);
     if (p != NULL)
     {
       st << " valid";
@@ -113,6 +113,7 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
       return false;
    }
 
+
    trShells.push_back(tshell);
    tshell = NULL; // don't own this anymore
    for (unsigned int is=1; is<shells.size(); is++)
@@ -140,7 +141,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
    int num = shell.faces.size();
    for (int i = 0; i < num; i++)
    {
-      //    cout << "---- face ---- " << i << endl;
+      //cout << "---- face ---- " << i << endl;
       
       // These are the number of rings on this facet
       int numf = shell.faces[i].size();

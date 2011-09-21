@@ -100,7 +100,8 @@ public:
   void construct_faces_ensure_adjacency(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
   {
     int size = (*lsPts).size();
-    bool *halfedges = new bool[size*size];
+//    bool *halfedges = new bool[size*size];
+    bool halfedges[size*size];
     for (int i = 0; i <= (size*size); i++)
       halfedges[i] = false;
     
@@ -132,11 +133,13 @@ public:
     trFaces.pop_front();
     while (trFaces.size() > 0)
     {
-      if (try_to_add_face(B, trFaces, halfedges, true) == false)
+//      if (try_to_add_face(B, trFaces, halfedges, true) == false)
+      if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
       {
         //-- add first face possible, will be dangling by definition
         //cout << "had problems..." << endl;
-        if (try_to_add_face(B, trFaces, halfedges, false) == false)
+//        if (try_to_add_face(B, trFaces, halfedges, false) == false)
+        if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
         {
           //-- cannot repair. non-manifold situations.
           trFaces.clear();
@@ -144,7 +147,7 @@ public:
              
       }
     }
-    delete [] halfedges; halfedges = NULL;
+//    delete [] halfedges; halfedges = NULL;
   }
 
   bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected)
@@ -254,13 +257,21 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
 //-- ***** VALIDATION ONLY *****
   if (bRepair == false)
   {
-//-- 1. Planarity of faces   
+//-- 1. Planarity of faces
+    (*cb)(0, -1, -1, "-----Planarity");
     if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
+    {
       isValid = false;
+      //(*cb)(0, -1, -1, "\tno");
+    }
+    else
+      (*cb)(0, -1, -1, "\tyes");
+      
     
   //-- 2. Combinatorial consistency
     if (isValid == true)
     {
+      (*cb)(0, -1, -1, "-----Combinatorial consistency");
       //-- construct the CgalPolyhedron incrementally
       ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
       P->delegate(s);
@@ -304,26 +315,30 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
   //-- 3. Geometrical consistency (aka intersection tests between faces)
     if (isValid == true)
     {
+      (*cb)(0, -1, -1, "\tyes");
+      (*cb)(0, -1, -1, "-----Geometrical consistency");
       isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
     }
     
   //-- 4. orientation of the normales is outwards or inwards
     if (isValid == true)
     {
+      (*cb)(0, -1, -1, "\tyes");
+      (*cb)(0, -1, -1, "-----Orientation of normales");
       bool bOuter = true;
       if (shellID > 0)
         bOuter = false;
       isValid = check_global_orientation_normales(P, bOuter, cb);
       if (isValid == false)
-      {
         (*cb)(310, shellID, -1, "");
-      }
+      else
+        (*cb)(0, -1, -1, "\tyes");
     }
   }
 //-- ***** REPAIRING IS ATTEMPTED *****
   else
   {
-//-- 1. Planarity of faces   
+//-- 1. Planarity of faces
     if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
       isValid = false;
     
