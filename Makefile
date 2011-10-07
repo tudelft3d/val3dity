@@ -1,5 +1,5 @@
 # Options
-CC=c++
+CC=c++-4.2
 IPATH=/usr/include/gdal
 LPATH=/usr/local/lib
 

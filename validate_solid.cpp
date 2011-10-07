@@ -59,7 +59,7 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
   bool success = true;
   for ( ; nefsIt != nefs.end(); nefsIt++) 
   {
-    solid -= *nefsIt;
+    solid -= (*nefsIt);
     numvol++;
     if (solid.number_of_volumes() != numvol)
     {
@@ -67,7 +67,6 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
       break;
     }
   }
-  
   if (success == false) //-- the Nef is not valid, pairwise testing to see what's wrong
   {
     isValid = false;
