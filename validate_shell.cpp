@@ -100,8 +100,11 @@ public:
   void construct_faces_ensure_adjacency(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
   {
     int size = (*lsPts).size();
-//    bool *halfedges = new bool[size*size];
+#ifdef WIN32
+    bool *halfedges = new bool[size*size];
+#else
     bool halfedges[size*size];
+#endif
     for (int i = 0; i <= (size*size); i++)
       halfedges[i] = false;
     
@@ -133,13 +136,19 @@ public:
     trFaces.pop_front();
     while (trFaces.size() > 0)
     {
-//      if (try_to_add_face(B, trFaces, halfedges, true) == false)
-      if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
+#ifdef WIN32
+       if (try_to_add_face(B, trFaces, halfedges, true) == false)
+#else
+       if (try_to_add_face(B, trFaces, &halfedges, true) == false)
+#endif
       {
         //-- add first face possible, will be dangling by definition
         //cout << "had problems..." << endl;
-//        if (try_to_add_face(B, trFaces, halfedges, false) == false)
-        if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
+#ifdef WIN32
+         if (try_to_add_face(B, trFaces, halfedges, false) == false)
+#else
+         if (try_to_add_face(B, trFaces, &halfedges, false) == false)
+#endif
         {
           //-- cannot repair. non-manifold situations.
           trFaces.clear();
@@ -147,7 +156,9 @@ public:
              
       }
     }
-//    delete [] halfedges; halfedges = NULL;
+#ifdef WIN32
+    delete [] halfedges; halfedges = NULL;
+#endif
   }
 
   bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected)
@@ -221,7 +232,7 @@ public:
       if (B.test_facet(faceids.begin(), faceids.end()))
       {
         //std::cout << "*** Reversed orientation of the face" << std::endl;
-        (*cb)(303, shellID, faceID, ""); //-- face was wrongly oriented, locally at least
+        (*cb)(FACE_ORIENTATION_INCORRECT_EDGE_USAGE, shellID, faceID, ""); //-- face was wrongly oriented, locally at least
 /*        if (bRepair)
         {
           std::cout << "Fixin' it: flipped a face..." << std::endl;
@@ -229,7 +240,7 @@ public:
         }
 */    }
       else
-        (*cb)(302, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
+        (*cb)(DANGLING_FACES, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
     }
     return ;
   } 
@@ -242,7 +253,7 @@ CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, cons
 CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
 bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
 bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
-bool              check_global_orientation_normales(CgalPolyhedron* p, bool bOuter, cbf cb);
+bool check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb);
 
 
@@ -258,20 +269,20 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
   if (bRepair == false)
   {
 //-- 1. Planarity of faces
-    (*cb)(0, -1, -1, "-----Planarity");
+    (*cb)(STATUS_OK, -1, -1, "-----Planarity");
     if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
     {
       isValid = false;
       //(*cb)(0, -1, -1, "\tno");
     }
     else
-      (*cb)(0, -1, -1, "\tyes");
+      (*cb)(STATUS_OK, -1, -1, "\tyes");
       
     
   //-- 2. Combinatorial consistency
     if (isValid == true)
     {
-      (*cb)(0, -1, -1, "-----Combinatorial consistency");
+      (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
       //-- construct the CgalPolyhedron incrementally
       ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
       P->delegate(s);
@@ -289,7 +300,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
             if (P->keep_largest_connected_components(1) > 0)
             {
               //TODO: how to report what face is not connected? a bitch of a problem...
-              (*cb)(304, shellID, -1, "");
+              (*cb)(FREE_FACES, shellID, -1, "");
               isValid = false;
             }
             else
@@ -297,7 +308,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
               //-- check if there are holes in the surface
               if (P->size_of_border_halfedges() > 0)
               {
-                (*cb)(301, shellID, -1, "");
+                (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
                 //TODO: how to report where the hole is? report one of the edge? centre of the hole?
                 isValid = false;
               }
@@ -306,7 +317,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
         }
         else 
         {
-          (*cb)(300, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
+          (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
           isValid =  false;
         }
       }
@@ -315,24 +326,24 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
   //-- 3. Geometrical consistency (aka intersection tests between faces)
     if (isValid == true)
     {
-      (*cb)(0, -1, -1, "\tyes");
-      (*cb)(0, -1, -1, "-----Geometrical consistency");
+      (*cb)(STATUS_OK, -1, -1, "\tyes");
+      (*cb)(STATUS_OK, -1, -1, "-----Geometrical consistency");
       isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
     }
     
-  //-- 4. orientation of the normales is outwards or inwards
+  //-- 4. orientation of the normals is outwards or inwards
     if (isValid == true)
     {
-      (*cb)(0, -1, -1, "\tyes");
-      (*cb)(0, -1, -1, "-----Orientation of normales");
+      (*cb)(STATUS_OK, -1, -1, "\tyes");
+      (*cb)(STATUS_OK, -1, -1, "-----Orientation of normals");
       bool bOuter = true;
       if (shellID > 0)
         bOuter = false;
-      isValid = check_global_orientation_normales(P, bOuter, cb);
+      isValid = check_global_orientation_normals(P, bOuter, cb);
       if (isValid == false)
-        (*cb)(310, shellID, -1, "");
+        (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "");
       else
-        (*cb)(0, -1, -1, "\tyes");
+        (*cb)(STATUS_OK, -1, -1, "\tyes");
     }
   }
 //-- ***** REPAIRING IS ATTEMPTED *****
@@ -361,14 +372,14 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
             if (P->keep_largest_connected_components(1) > 0)
             {
               //TODO: how to report what face is not connected? a bitch of a problem...
-              (*cb)(304, shellID, -1, "REPAIR: unconnected faces were deleted.");
+              (*cb)(FREE_FACES, shellID, -1, "REPAIR: unconnected faces were deleted.");
             }
             else
             {
               //-- check is there are holes in the surface
               if (P->size_of_border_halfedges() > 0)
               {
-                (*cb)(301, shellID, -1, "");
+                (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
                 //TODO: how to report where the hole is? report one of the edge? centre of the hole?
                 isValid = false;
               }
@@ -378,17 +389,17 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
           if ( (P->is_valid()) && (P->is_closed()) )
           {
             isValid = true;
-            (*cb)(0, -1, -1, "Topology of the shell was successfully repaired.");
+            (*cb)(STATUS_OK, -1, -1, "Topology of the shell was successfully repaired.");
           }
           else
           {
             isValid = false;
-            (*cb)(0, -1, -1, "Could not repair topology of the shell.");
+            (*cb)(STATUS_OK, -1, -1, "Could not repair topology of the shell.");
           }
         }
         else 
         {
-          (*cb)(300, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
+          (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
           isValid =  false;
         }
       }
@@ -406,10 +417,10 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
       bool bOuter = true;
       if (shellID > 0)
         bool bOuter = false;
-      isValid = check_global_orientation_normales(P, bOuter, cb);
+      isValid = check_global_orientation_normals(P, bOuter, cb);
       if (isValid == false)
       {
-        (*cb)(310, shellID, -1, "Normales are flipped.");
+        (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "Normales are flipped.");
         P->inside_out();
         isValid = true;
       }
@@ -417,7 +428,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
 //-- were the repair operations successfull?
     if (isValid == true)
     {
-      (*cb)(0, -1, -1, "Shell is valid.");
+      (*cb)(STATUS_OK, -1, -1, "Shell is valid.");
       
     }    
   }  
@@ -448,7 +459,7 @@ CgalPolyhedron* construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Po
 
 
 
-bool check_global_orientation_normales(CgalPolyhedron *p, bool bOuter, cbf cb)
+bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
 {
   //-- get a 'convex corner', sorting order is x-y-z
   CgalPolyhedron::Vertex_iterator vIt;
@@ -540,14 +551,14 @@ bool is_polyhedron_geometrically_consistent(CgalPolyhedron *p, int shellID, cbf 
           count++;
         else if (assign(apoint, re) && (incidentFaces.count(otherF) == 0) )
         { //TODO: report which faces are involved.
-          (*cb)(305, shellID, -1, "Self-intersection of type POINT.");
+          (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, "Self-intersection of type POINT.");
           isValid = false;
         }
       }
     }
     if (count > 3)
     {
-      (*cb)(305, shellID, -1, "Self-intersection of type SEGMENT.");
+      (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, "Self-intersection of type SEGMENT.");
       isValid = false;
     }
   }
@@ -593,7 +604,7 @@ bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, 
   {
     if (is_face_planar(*faceIt, lsPts, 1, cb) == false)
     {
-       (*cb)(210, shellID, i, "");
+       (*cb)(NON_PLANAR_SURFACE, shellID, i, "");
        isValid = false;
     }
     i++;

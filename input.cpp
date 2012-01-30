@@ -34,15 +34,15 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
 {
    std::stringstream st;
    st << "Reading " << numShells << " file(s).";
-   (*cb)(0, -1, -1, st.str());
+   (*cb)(STATUS_OK, -1, -1, st.str());
 
    st.str(""); //-- clear what's in st
    st << "Reading outer shell:\t" << filenames[1];
-   (*cb)(0, -1, -1, st.str());
+   (*cb)(STATUS_OK, -1, -1, st.str());
    ifstream infile(filenames[1], ifstream::in);
    if (!infile)
    {
-      (*cb)(999, -1, -1, "Input file doesn't exist.");
+      (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
       exit(1);
    }
 
@@ -56,11 +56,11 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
    {
       st.str("");
       st << "Reading inner shell #" << (is-1) << ":\t" << filenames[(is+1)];
-      (*cb)(0, -1, -1, st.str());
+      (*cb)(STATUS_OK, -1, -1, st.str());
       ifstream infile2(filenames[(is+1)], ifstream::in);
       if (!infile2)
       {
-         (*cb)(999, -1, -1, "Input file doesn't exist.");
+         (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
          exit(1);
       }
 
@@ -72,7 +72,7 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
       shells.push_back(oneshell);
       oneshell = NULL; // don't own this anymore
    }
-   (*cb)(0, -1, -1, "");
+   (*cb)(STATUS_OK, -1, -1, "");
 }
 
 

@@ -32,6 +32,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/basic.h>
 
+#include "errorcodes.h"
 
 // STL library
 #include <vector>
@@ -65,7 +66,7 @@ typedef struct triangulatedShell_tag {
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
+typedef void (* cbf)(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
                      int shellNum, // -1 means unused
                      int facetNum,     // -1 means unused
                      std::string messageStr); // optional

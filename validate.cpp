@@ -66,12 +66,12 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(999, -1, -1, "Input polyhedra are not valid enough to be triangulated.");
+    (*cb)(INVALID_INPUT_FILE, -1, -1, "Input polyhedra are not valid enough to be triangulated.");
     return false;
   }
 
 //-- Second: validate each (triangulated) shell, one by one
-  (*cb)(0, -1, -1, "Validating the shell(s)");
+  (*cb)(STATUS_OK, -1, -1, "Validating the shell(s)");
   vector<CgalPolyhedron*> polyhedra;
   CgalPolyhedron* p = NULL;
   for (unsigned int i = 0; i < trShells.size(); i++)
@@ -82,7 +82,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
     if (p != NULL)
     {
       st << " valid";
-      (*cb)(0, -1, -1, st.str());
+      (*cb)(STATUS_OK, -1, -1, st.str());
       polyhedra.push_back(p);  
     }
     else
@@ -92,7 +92,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
       foundError = true;
     }
   }
-  (*cb)(0, -1, -1, "");
+  (*cb)(STATUS_OK, -1, -1, "");
   
 //-- Third: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, bRepair, cb);
@@ -105,11 +105,11 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
    std::stringstream st;
    // Now let's triangulate the outer shell from the input.
    st << "Triangulating outer shell";
-   (*cb)(0, -1, -1, st.str());
+   (*cb)(STATUS_OK, -1, -1, st.str());
    TrShell* tshell = new TrShell;
    if (! triangulate_one_shell(*(shells[0]), 0, *tshell, cb))
    {
-      (*cb)(0, -1, -1, "Could not triangulate in the outer shell.");
+      (*cb)(STATUS_OK, -1, -1, "Could not triangulate in the outer shell.");
       return false;
    }
 
@@ -122,16 +122,16 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
       tshell = new TrShell;
       st.str("");
       st << "Triangulating inner shell #" << (is-1);
-      (*cb)(0, -1, -1, st.str());
+      (*cb)(STATUS_OK, -1, -1, st.str());
       if (!triangulate_one_shell(*(shells[is]), is, *tshell, cb))
       {
-         (*cb)(300, is, -1, "Could not triangulate the shell.");
+         (*cb)(NOT_VALID_2_MANIFOLD, is, -1, "Could not triangulate the shell.");
          return false;
       }
       trShells.push_back(tshell);
       tshell = NULL; // don't own this anymore
    }
-   (*cb)(0, -1, -1, "");
+   (*cb)(STATUS_OK, -1, -1, "");
    return true;
 }
 
@@ -148,7 +148,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
       //-- read oring (there's always one and only one)
       if (numf < 1)
       {
-         (*cb)(220, shellNum, -1, "facet does not have an outer boundary.");
+         (*cb)(SURFACE_PROJECTION_INVALID, shellNum, -1, "facet does not have an outer boundary.");
          return false;
       }
       vector<int> &ids = shell.faces[i][0]; // helpful alias for the outer boundary
@@ -181,7 +181,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
       vector<int*> oneface;
       if (construct_ct(shell.lsPts, pgnids, lsRings, oneface, i) == false)
       {
-         (*cb)(220, shellNum, i, "face does not have an outer boundary.");
+         (*cb)(SURFACE_PROJECTION_INVALID, shellNum, i, "face does not have an outer boundary.");
          return false;
       }
 

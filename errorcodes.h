@@ -1,5 +1,5 @@
-#ifndef VAL3DITY_INPUT_DEFINITIONS_H
-#define VAL3DITY_INPUT_DEFINITIONS_H
+#ifndef VAL3DITY_ERROR_CODES_H
+#define VAL3DITY_ERROR_CODES_H
 
 /*
  val3dity - Copyright (c) 2011, Hugo Ledoux.  All rights reserved.
@@ -26,24 +26,35 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-// We are currently only including this to get the definition of polyhedraShell.
-#include "validate.h"
-
-
-
-// This callback function will be used to both report progress
-// as well as any validity problems that are encountered.
-typedef void (* cbf)(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
-                     int shellNum, // -1 means unused
-                     int facetNum,     // -1 means unused
-                     std::string messageStr); // optional
-
-
-// -----------------------------------------------------------
-// Usage documentation for this method goes here.
-//
-// Ignore the first value in the array filenames for now...
-void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb);
-
+typedef enum
+{
+   STATUS_OK                              = 0,
+   // Ring level
+   DUPLICATE_POINTS                       = 100,
+   RING_NOT_CLOSED                        = 110,
+   // Surface level
+   INNER_RING_WRONG_ORIENTATION           = 200,
+   NON_PLANAR_SURFACE                     = 210,
+   SURFACE_PROJECTION_INVALID             = 220,
+   INNER_RING_INTERSECTS_OUTER            = 221,
+   INNER_RING_OUTSIDE_OUTER               = 222,
+   //INNER_OUTER_RINGS_INTERSECT          = 223,
+   INTERIOR_OF_RING_NOT_CONNECTED         = 224,
+   // Shell level
+   NOT_VALID_2_MANIFOLD                   = 300,
+   SURFACE_NOT_CLOSED                     = 301,
+   DANGLING_FACES                         = 302,
+   FACE_ORIENTATION_INCORRECT_EDGE_USAGE  = 303,
+   FREE_FACES                             = 304,
+   SURFACE_SELF_INTERSECTS                = 305,
+   SURFACE_NORMALS_BAD_ORIENTATION        = 310,
+   // Solid level
+   SHELLS_FACE_ADJACENT                   = 400,
+   SHELL_INTERIOR_INTERSECT               = 410,
+   INNER_SHELL_OUTSIDE_OUTER              = 420,
+   INTERIOR_OF_SHELL_NOT_CONNECTED        = 430,
+   // Processing problem
+   INVALID_INPUT_FILE                     = 999
+} Val3dity_ErrorCode;
 
 #endif

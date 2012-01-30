@@ -31,7 +31,7 @@ static bool callbackWasCalledWithError = false;
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-void callback_cout(int errorCode,    // 0 means status message, -1 means unknown error
+void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
                    int shellNum, // -1 means unused; 0-based
                    int facetNum,     // -1 means unused; 0-based
                    std::string messageStr) // optional
@@ -47,34 +47,35 @@ void callback_cout(int errorCode,    // 0 means status message, -1 means unknown
    else
    {
       // cout << ":  errorCode=" << errorCode << "     Polyhedra #" << polyhedraNum << "       ";
+      
       switch(errorCode)
       {
         // Ring level
-      case 100   : cout << "Error 100: " << "2+ consecutive points"; break;
-      case 110   : cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
+      case DUPLICATE_POINTS:                       cout << "Error 100: " << "2+ consecutive points"; break;
+      case RING_NOT_CLOSED:                        cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
         // Surface level
-      case 200   : cout << "Error 200: " << "oring and irings have same orientation"; break;
-      case 210   : cout << "Error 210: " << "surface is not planar"; break;
-      case 220   : cout << "Error 220: " << "surface is not valid in 2D (it's projection)"; break;
-      case   221 : cout << "Error 221: " << "iring intersect oring"; break;
-      case   222 : cout << "Error 222: " << "iring outside oring"; break;
-      case   223 : cout << "Error 223: " << "oring and iring(s) intersect"; break;
-      case   224 : cout << "Error 224: " << "interior not connected"; break;
+      case INNER_RING_WRONG_ORIENTATION:           cout << "Error 200: " << "oring and irings have same orientation"; break;
+      case NON_PLANAR_SURFACE:                     cout << "Error 210: " << "surface is not planar"; break;
+      case SURFACE_PROJECTION_INVALID:             cout << "Error 220: " << "surface is not valid in 2D (it's projection)"; break;
+      case INNER_RING_INTERSECTS_OUTER:            cout << "Error 221: " << "iring intersect oring"; break;
+      case INNER_RING_OUTSIDE_OUTER:               cout << "Error 222: " << "iring outside oring"; break;
+      //case INNER_OUTER_RINGS_INTERSECT:          cout << "Error 223: " << "oring and iring(s) intersect"; break;
+      case INTERIOR_OF_RING_NOT_CONNECTED:         cout << "Error 224: " << "interior not connected"; break;
         // Shell level
-      case 300   : cout << "Error 300: " << "is not a 2-manifold"; break;
-      case   301 : cout << "Error 301: " << "surface is not closed"; break;
-      case   302 : cout << "Error 302: " << "dangling faces (more than 2 surfaces incident to an edge)"; break;
-      case   303 : cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
-      case   304 : cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
-      case   305 : cout << "Error 305: " << "surface self-intersect"; break;
-      case 310   : cout << "Error 310: " << "normales pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
+      case NOT_VALID_2_MANIFOLD:                   cout << "Error 300: " << "is not a 2-manifold"; break;
+      case SURFACE_NOT_CLOSED:                     cout << "Error 301: " << "surface is not closed"; break;
+      case DANGLING_FACES:                         cout << "Error 302: " << "dangling faces (more than 2 surfaces incident to an edge)"; break;
+      case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
+      case FREE_FACES:                             cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
+      case SURFACE_SELF_INTERSECTS:                cout << "Error 305: " << "surface self-intersect"; break;
+      case SURFACE_NORMALS_BAD_ORIENTATION:        cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
         // Solid level
-      case 400   : cout << "Error 400: " << "shells are face adjacent"; break;
-      case 410   : cout << "Error 410: " << "interior of shells intersect"; break;
-      case 420   : cout << "Error 420: " << "ishell outside the oshell"; break;
-      case 430   : cout << "Error 430: " << "interior not connected"; break;
+      case SHELLS_FACE_ADJACENT:                   cout << "Error 400: " << "shells are face adjacent"; break;
+      case SHELL_INTERIOR_INTERSECT:               cout << "Error 410: " << "interior of shells intersect"; break;
+      case INNER_SHELL_OUTSIDE_OUTER:              cout << "Error 420: " << "ishell outside the oshell"; break;
+      case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << "Error 430: " << "interior not connected"; break;
         // Input problem
-      case 999   : cout << "Error 999: " << "input file is not valid"; break;
+      case INVALID_INPUT_FILE:                     cout << "Error 999: " << "input file is not valid"; break;
          // Other reasons
       default    : cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
       }
