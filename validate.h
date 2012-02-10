@@ -32,7 +32,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/basic.h>
 
-#include "errorcodes.h"
+#include "val3dity_errorcodes.h"
 
 // STL library
 #include <vector>
