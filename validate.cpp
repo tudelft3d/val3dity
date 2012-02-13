@@ -139,7 +139,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 {
    //-- read the facets
    size_t num = shell.faces.size();
-   for (int i = 0; i < num; i++)
+   for (int i = 0; i < static_cast<int>(num); i++)
    {
       //cout << "---- face ---- " << i << endl;
       
@@ -167,7 +167,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
       pgnids.push_back(ids);
 
       //-- check for irings
-      for (int j = 1; j < numf; j++)
+      for (int j = 1; j < static_cast<int>(numf); j++)
       {
          vector<int> &ids2 = shell.faces[i][j]; // helpful alias for the inner boundary
          //-- get projected Polygon
