@@ -138,13 +138,13 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
 bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 {
    //-- read the facets
-   int num = shell.faces.size();
+   size_t num = shell.faces.size();
    for (int i = 0; i < num; i++)
    {
       //cout << "---- face ---- " << i << endl;
       
       // These are the number of rings on this facet
-      int numf = shell.faces[i].size();
+      size_t numf = shell.faces[i].size();
       //-- read oring (there's always one and only one)
       if (numf < 1)
       {
@@ -253,7 +253,7 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
    CT ct;
    vector< vector<int> >::const_iterator it = pgnids.begin();
 
-   unsigned int numpts = 0;
+   size_t numpts = 0;
    for ( ; it != pgnids.end(); it++)
    {
       numpts += it->size();

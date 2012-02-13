@@ -53,7 +53,7 @@ class ConstructShell : public CGAL::Modifier_base<HDS> {
 public:
   bool isValid;
   ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, bool bRepair, cbf cb)
-    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true), _width(lsPts->size())
+    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true), _width(static_cast<int>(lsPts->size()))
   {
   }
   void operator()( HDS& hds) 
@@ -99,7 +99,7 @@ public:
 
   void construct_faces_ensure_adjacency(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
   {
-    int size = (*lsPts).size();
+    int size = static_cast<int>((*lsPts).size());
 #ifdef WIN32
     bool *halfedges = new bool[size*size];
 #else
@@ -571,7 +571,7 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
   //-- construct the 2-manifold, using the "batch" way
   stringstream offrep (stringstream::in | stringstream::out);
   vector< vector<int*> >::const_iterator it = faces.begin();
-  int noFaces = 0;
+  size_t noFaces = 0;
   for ( ; it != faces.end(); it++)
     noFaces += it->size();
   offrep << "OFF" << endl << lsPts.size() << " " << noFaces << " 0" << endl;
