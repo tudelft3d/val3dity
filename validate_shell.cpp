@@ -139,7 +139,7 @@ public:
 #ifdef WIN32
        if (try_to_add_face(B, trFaces, halfedges, true) == false)
 #else
-       if (try_to_add_face(B, trFaces, &halfedges, true) == false)
+       if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
 #endif
       {
         //-- add first face possible, will be dangling by definition
@@ -147,7 +147,7 @@ public:
 #ifdef WIN32
          if (try_to_add_face(B, trFaces, halfedges, false) == false)
 #else
-         if (try_to_add_face(B, trFaces, &halfedges, false) == false)
+         if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
 #endif
         {
           //-- cannot repair. non-manifold situations.

@@ -1,13 +1,10 @@
 # Options
-CC=c++-4.2
-IPATH=/usr/include/gdal
-LPATH=/usr/local/lib
-
+CC=c++
+IPATH=/usr/local/include/
+LPATH=/usr/local/lib/
 CFLAGS=-frounding-math -fno-strict-aliasing -O3 -DNDEBUG -I$(IPATH) -L$(LPATH)
-
-LIBS=/usr/local/lib/libCGAL_Core.dylib /usr/local/lib/libCGAL.dylib /usr/local/lib/libmpfr.dylib /usr/local/lib/libgmp.dylib /usr/local/lib/libboost_thread.dylib
-
-LDFLAGS=-frounding-math -fno-strict-aliasing -O3 -DNDEBUG -Wl,-search_paths_first -headerpad_max_install_names  -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib -L$(LPATH) $(LIBS)
+LIBS=-lCGAL_Core -lCGAL -lmpfr -lgmp -lboost_thread-mt
+LDFLAGS=-frounding-math -fno-strict-aliasing -O3 -DNDEBUG -Wl -lGL -L$(LPATH) $(LIBS)
 
 all: main
 
