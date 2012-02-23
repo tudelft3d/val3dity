@@ -66,7 +66,7 @@ void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &
 
       // Now let's read in the inner shell from the file.
       oneshell = new Shell;
-      bool isValid = true;
+      //bool isValid = true;
       readShell(infile2, *oneshell);
 
       shells.push_back(oneshell);
