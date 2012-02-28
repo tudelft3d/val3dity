@@ -29,8 +29,13 @@
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 
+#ifdef VAL3DITY_USE_EPECSQRT
+typedef CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt Ke;
+#else
 typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
 typedef CGAL::Polyhedron_3<Ke>                              PolyhedronExact;
+#endif
+
 typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
 
 bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, cbf cb);

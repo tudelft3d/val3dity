@@ -29,6 +29,7 @@
 // CGAL kernel
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/basic.h>
 
@@ -39,7 +40,12 @@
 using namespace std;
 
 // CGAL typedefs
+
+#ifdef VAL3DITY_USE_EPECSQRT
+typedef CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt K;
+#else
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+#endif
 
 //
 typedef K::Point_2                  Point2;

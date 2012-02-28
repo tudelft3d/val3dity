@@ -43,11 +43,17 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
   vector<CgalPolyhedron*>::const_iterator polyhedraIt;
   for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
   {
+
+#ifdef VAL3DITY_USE_EPECSQRT
+     Nef_polyhedron onef(**polyhedraIt);
+#else
      std::stringstream offrep (stringstream::in | stringstream::out);
      offrep << **polyhedraIt;
      PolyhedronExact pe;
      offrep >> pe;
      Nef_polyhedron onef(pe);
+#endif
+
      nefs.push_back(onef);
   }
   vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
