@@ -507,7 +507,8 @@ bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
 }
 
 
-bool is_polyhedron_geometrically_consistent(CgalPolyhedron *p, int shellID, cbf cb)
+bool
+is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
 {
   bool isValid = true;
   CgalPolyhedron::Facet_iterator curF, otherF;
@@ -521,7 +522,7 @@ bool is_polyhedron_geometrically_consistent(CgalPolyhedron *p, int shellID, cbf 
     vh[1] = heH->next()->vertex();
     vh[2] = heH->next()->next()->vertex();
 
-    //-- check all the incident faces to the 3
+    //-- store in a set all the incident faces to the 3 vertices
     set<CgalPolyhedron::Facet_handle> incidentFaces;
     set<CgalPolyhedron::Facet_handle>::iterator itFh;
     CgalPolyhedron::Halfedge_around_vertex_circulator circ;
@@ -533,33 +534,23 @@ bool is_polyhedron_geometrically_consistent(CgalPolyhedron *p, int shellID, cbf 
         incidentFaces.insert(circ->facet());
       } while ( ++circ != vh[i]->vertex_begin() );
     }
-    
+      
+    Triangle t0( vh[0]->point(), vh[1]->point(), vh[2]->point() );
     otherF = p->facets_begin();
-    Triangle t1( vh[0]->point(), vh[1]->point(), vh[2]->point() );
-    int count = 0;
     for ( ; otherF != p->facets_end(); otherF++)
     {
-      if (otherF != curF)
+      if ( (otherF != curF) && (incidentFaces.count(otherF) == 0) )
       {
         CgalPolyhedron::Halfedge_handle heoH = otherF->halfedge();
-        Triangle t2( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
+        Triangle t1( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
         
-        CGAL::Object re = intersection(t1, t2);
-        K::Point_3 apoint;
-        K::Segment_3 asegment;
-        if (assign(asegment, re))
-          count++;
-        else if (assign(apoint, re) && (incidentFaces.count(otherF) == 0) )
-        { //TODO: report which faces are involved.
-          (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, "Self-intersection of type POINT.");
+        if (do_intersect(t0, t1))
+        {
           isValid = false;
+          (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, "Self-intersection of the surface.");
+          break;
         }
       }
-    }
-    if (count > 3)
-    {
-      (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, "Self-intersection of type SEGMENT.");
-      isValid = false;
     }
   }
   return isValid;
