@@ -83,7 +83,18 @@ void readShell(ifstream& infile, Shell &oneshell)
   float tmpfloat;
   infile >> num >> tmpint >> tmpint >> tmpint;
   vector< Point3 >::iterator iPoint3;
-  for (int i = 0; i < num; i++)
+  //-- read first line to decide if 0- or 1-based indexing
+  bool zerobased = true;
+  Point3 p;
+  infile >> tmpint >> p;
+  oneshell.lsPts.push_back(p);
+  if (tmpint == 1)
+  {
+    zerobased = false;
+    cout << "1-based indexing file!" << endl;
+  }
+  //-- process other vertices
+  for (int i = 1; i < num; i++)
   {
     Point3 p;
     infile >> tmpint >> p;
@@ -100,8 +111,14 @@ void readShell(ifstream& infile, Shell &oneshell)
     //-- read oring (there's always one and only one)
     infile >> numpt;
     vector<int> ids(numpt);
+    cout << "number pts " << ids.size() << endl;
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
+    if (zerobased == false)
+    {
+      for (int k = 0; k < numpt; k++)
+        ids[k] = (ids[k] - 1);      
+    }
 
     vector< vector<int> > pgnids;
     pgnids.push_back(ids);
@@ -113,6 +130,11 @@ void readShell(ifstream& infile, Shell &oneshell)
       vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
         infile >> ids[l];
+      if (zerobased == false)
+      {
+        for (int k = 0; k < numpt; k++)
+          ids[k] = (ids[k] - 1);      
+      }
 
       pgnids.push_back(ids);
     }
@@ -122,4 +144,5 @@ void readShell(ifstream& infile, Shell &oneshell)
 
     oneshell.faces.push_back(pgnids);
   }
+  std::cout << oneshell.faces.size() << std::endl;
 }
