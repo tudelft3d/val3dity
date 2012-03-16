@@ -104,14 +104,15 @@ void readShell(ifstream& infile, Shell &oneshell)
   //-- read the facets
   infile >> num >> tmpint;
   int numf, numpt;
+  string s;
   for (int i = 0; i < num; i++)
   {
 //    cout << "---- face ---- " << i << endl;
-    infile >> numf >> tmpint;
+    infile >> numf >> tmpint;// >> s;
+//    cout << s << endl;
     //-- read oring (there's always one and only one)
     infile >> numpt;
     vector<int> ids(numpt);
-    cout << "number pts " << ids.size() << endl;
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
     if (zerobased == false)
@@ -144,5 +145,4 @@ void readShell(ifstream& infile, Shell &oneshell)
 
     oneshell.faces.push_back(pgnids);
   }
-  std::cout << oneshell.faces.size() << std::endl;
 }

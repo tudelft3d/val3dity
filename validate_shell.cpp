@@ -513,8 +513,19 @@ is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
   bool isValid = true;
   CgalPolyhedron::Facet_iterator curF, otherF;
   curF = p->facets_begin();
+  
+  //-- warn user that intersection takes (a lot) of time for large datasets...
+  int totalface = 1;  
   for ( ; curF != p->facets_end(); curF++)
   {
+    if (totalface % 100 == 0)
+    {
+      std::stringstream st;
+      st << "Processing face #" << totalface;
+      (*cb)(STATUS_OK, -1, -1, st.str());
+    }
+    totalface++;
+    
     CgalPolyhedron::Halfedge_handle heH;
     heH = curF->halfedge();
     CgalPolyhedron::Vertex_handle vh[3];
