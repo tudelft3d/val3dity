@@ -42,8 +42,6 @@
 
 //-- CGAL stuff
 typedef CgalPolyhedron::HalfedgeDS              HalfedgeDS;
-
-//-- from CGAL examples
 typedef CGAL::Bbox_3                            Bbox;
 typedef K::Segment_3                            Segment;
 typedef CgalPolyhedron::Halfedge_const_handle   Halfedge_const_handle;
@@ -265,9 +263,8 @@ bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Poi
 bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb);
-bool              is_polyhedron_geometrically_consistent_fast(CgalPolyhedron* p, int shellID, cbf cb);
 
-std::vector<Triangle> triangles;
+std::vector<Triangle> gTriangles;
 
 struct Intersect_facets {
   void operator()( const Box* b, const Box* c) const {
@@ -321,13 +318,13 @@ struct Intersect_facets {
       if ( CGAL::do_intersect( t1, s2)) {
         //cerr << "Triangles intersect (t1,s2):\n    T1: " << t1
         //     << "\n    T2 :" << t2 << endl;
-        triangles.push_back(t1);
-        triangles.push_back(t2);
+        gTriangles.push_back(t1);
+        gTriangles.push_back(t2);
       } else if ( CGAL::do_intersect( t2, s1)) {
         //cerr << "Triangles intersect (t2,s1):\n    T1: " << t1
         //     << "\n    T2 :" << t2 << endl;
-        triangles.push_back(t1);
-        triangles.push_back(t2);
+        gTriangles.push_back(t1);
+        gTriangles.push_back(t2);
       }
       return;
     }
@@ -341,8 +338,8 @@ struct Intersect_facets {
     if ( CGAL::do_intersect( t1, t2)) {
       //cerr << "Triangles intersect:\n    T1: " << t1 << "\n    T2 :"
       //     << t2 << endl;
-      triangles.push_back(t1);
-      triangles.push_back(t2);
+      gTriangles.push_back(t1);
+      gTriangles.push_back(t2);
     }
   }
 };
@@ -419,7 +416,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
       (*cb)(STATUS_OK, -1, -1, "\tyes");
       (*cb)(STATUS_OK, -1, -1, "-----Geometrical consistency");
 //      isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
-      isValid = is_polyhedron_geometrically_consistent_fast(P, shellID, cb);
+      isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
     }
     
   //-- 4. orientation of the normals is outwards or inwards
@@ -599,7 +596,7 @@ bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
 
 
 bool
-is_polyhedron_geometrically_consistent_fast(CgalPolyhedron* p, int shellID, cbf cb)
+is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
 {
   std::vector<Box> boxes;
   boxes.reserve(p->size_of_facets());
@@ -619,74 +616,23 @@ is_polyhedron_geometrically_consistent_fast(CgalPolyhedron* p, int shellID, cbf 
   CGAL::box_self_intersection_d( box_ptr.begin(), box_ptr.end(),
                                 Intersect_facets(), std::ptrdiff_t(2000));
   
-  if (triangles.empty())
+  if (gTriangles.empty())
     return true;
-  else {
-    cout << "NUMBER OF INTERSECTING TRIANGLES: " << triangles.size() << endl;
+  else 
+  {
+    std::stringstream st;
+//    CGAL::Object re = intersection(gTriangles[0], gTriangles[1]);
+//    K::Point_3 apoint;
+//    K::Segment_3 asegment;
+//    if (assign(asegment, re))
+//      cout << "Segment intersection: " << asegment[0].x() << endl;
+//    else if (assign(apoint, re))
+//      cout << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
+//    st << "At least at location: (" << gTriangles[0][0].x() << ", " << gTriangles[0][0].y() << ", " << gTriangles[0][0].z() << ")"; 
+    (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, st.str());
     return false;
   }
 }
-
-bool
-is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
-{
-  bool isValid = true;
-  CgalPolyhedron::Facet_iterator curF, otherF;
-  curF = p->facets_begin();
-  
-  //-- warn user that intersection takes (a lot) of time for large datasets...
-  int totalface = 1;  
-  for ( ; curF != p->facets_end(); curF++)
-  {
-    if (totalface % 100 == 0)
-    {
-      std::stringstream st;
-      st << "Processing face #" << totalface;
-      (*cb)(STATUS_OK, -1, -1, st.str());
-    }
-    totalface++;
-    
-    CgalPolyhedron::Halfedge_handle heH;
-    heH = curF->halfedge();
-    CgalPolyhedron::Vertex_handle vh[3];
-    vh[0] = heH->vertex();
-    vh[1] = heH->next()->vertex();
-    vh[2] = heH->next()->next()->vertex();
-
-    //-- store in a set all the incident faces to the 3 vertices
-    set<CgalPolyhedron::Facet_handle> incidentFaces;
-    set<CgalPolyhedron::Facet_handle>::iterator itFh;
-    CgalPolyhedron::Halfedge_around_vertex_circulator circ;
-    for (int i=0; i<3; i++)
-    {
-      circ = vh[i]->vertex_begin();
-      do 
-      {
-        incidentFaces.insert(circ->facet());
-      } while ( ++circ != vh[i]->vertex_begin() );
-    }
-      
-    Triangle t0( vh[0]->point(), vh[1]->point(), vh[2]->point() );
-    otherF = p->facets_begin();
-    for ( ; otherF != p->facets_end(); otherF++)
-    {
-      if ( (otherF != curF) && (incidentFaces.count(otherF) == 0) )
-      {
-        CgalPolyhedron::Halfedge_handle heoH = otherF->halfedge();
-        Triangle t1( heoH->vertex()->point(), heoH->next()->vertex()->point(), heoH->next()->next()->vertex()->point() );
-        
-        if (do_intersect(t0, t1))
-        {
-          isValid = false;
-          (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, "Self-intersection of the surface.");
-          break;
-        }
-      }
-    }
-  }
-  return isValid;
-}
-
 
 CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const vector<Point3>& lsPts)
 {
