@@ -1,5 +1,5 @@
-#ifndef VAL3DITY_VALIDATE_DEFINITIONS_H
-#define VAL3DITY_VALIDATE_DEFINITIONS_H
+#ifndef VAL3DITY_VALIDATE_2D_H
+#define VAL3DITY_VALIDATE_2D_H
 
 /*
  val3dity - Copyright (c) 2011, Hugo Ledoux.  All rights reserved.
@@ -26,19 +26,12 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "val3dity_errorcodes.h"
+// CGAL kernel
 #include "val3dity_defs.h"
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool validate(vector<Shell*> &shells, bool bRepair, cbf cb);
-
-// -----------------------------------------------------------
-// Used for both triangulation of the shell and 2D validation
-//
-int   projection_plane(Point3 p0, Point3 p1, Point3 p2);
-void  create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
-
+bool  validate_2D(vector<Shell*> &shells, cbf cb);
 
 #endif

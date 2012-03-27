@@ -14,6 +14,9 @@ input.o: input.cpp
 validate.o: validate.cpp
 	$(CC) $(CFLAGS) -c $^
 
+validate_2d.o: validate_2d.cpp
+	$(CC) $(CFLAGS) -c $^
+
 validate_shell.o: validate_shell.cpp
 	$(CC) $(CFLAGS) -c $^
 
@@ -23,7 +26,7 @@ validate_solid.o: validate_solid.cpp
 main.o: main.cpp
 	$(CC) $(CFLAGS) -c $^
 
-main:  input.o validate.o validate_shell.o validate_solid.o main.o
+main:  input.o validate.o validate_shell.o validate_2d.o validate_solid.o main.o
 	$(CC) $(LDFLAGS) $^ -o val3dity 
 
 clean:
