@@ -23,10 +23,13 @@ validate_shell.o: validate_shell.cpp
 validate_solid.o: validate_solid.cpp
 	$(CC) $(CFLAGS) -c $^
 
+validate_shell_intersection.o: validate_shell_intersection.cpp
+	$(CC) $(CFLAGS) -c $^
+
 main.o: main.cpp
 	$(CC) $(CFLAGS) -c $^
 
-main:  input.o validate.o validate_shell.o validate_2d.o validate_solid.o main.o
+main:  input.o validate.o validate_shell.o validate_2d.o validate_solid.o validate_shell_intersection.o main.o
 	$(CC) $(LDFLAGS) $^ -o val3dity 
 
 clean:
