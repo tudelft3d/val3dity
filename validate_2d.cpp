@@ -61,6 +61,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       
       //-- check 2D validity of the surface by (1) projecting them; (2) use GEOS IsValid()
       stringstream wkt;
+      wkt << setprecision(15);
       wkt << "POLYGON(";
       vector<Polygon>::iterator it = lsRings.begin();
       //-- oring
@@ -91,6 +92,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       
       char *wktcstr = (char *)malloc((wkt.str().size())*sizeof(char *));    
       strcpy(wktcstr, wkt.str().c_str());
+//      std::cout << wkt.str() << endl;
       OGRGeometry *geometry;
       OGRGeometryFactory::createFromWkt(&wktcstr, NULL, &geometry);
       if (geometry->IsValid() != 1)
