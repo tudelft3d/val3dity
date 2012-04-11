@@ -26,6 +26,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
+#include <string>
 #include "val3dity_errorcodes.h"
 #include "val3dity_defs.h"
 

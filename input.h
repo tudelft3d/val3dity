@@ -44,6 +44,6 @@ typedef void (* cbf)(Val3dity_ErrorCode errorCode,    // 0 means status message,
 //
 // Ignore the first value in the array filenames for now...
 void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb);
-
+void readAllInputShells_withIDs(int numShells, char* const filenames[], vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb);
 
 #endif

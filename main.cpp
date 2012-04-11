@@ -29,6 +29,12 @@
 
 static bool callbackWasCalledWithError = false;
 
+//-- global lists to keep track of IDs for shells and faces
+vector<string> idShells;
+vector< vector<string> > idFaces;
+//bool bUsingIDs = false;
+bool bUsingIDs = true;
+
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
 void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
@@ -36,20 +42,20 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
                    int facetNum,     // -1 means unused; 0-based
                    std::string messageStr) // optional
 {
-   if (0 == errorCode)
-   {
-      // This is just a status message.
-      if ( (shellNum == -1) && (facetNum == -1) )
-        cout << messageStr << endl;
-      else
+  if (0 == errorCode)
+  {
+    // This is just a status message.
+    if ( (shellNum == -1) && (facetNum == -1) )
+      cout << messageStr << endl;
+    else
       cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
-   }
-   else
-   {
-      // cout << ":  errorCode=" << errorCode << "     Polyhedra #" << polyhedraNum << "       ";
-      
-      switch(errorCode)
-      {
+  }
+  else
+  {
+    // cout << ":  errorCode=" << errorCode << "     Polyhedra #" << polyhedraNum << "       ";
+    
+    switch(errorCode)
+    {
         // Ring level
       case DUPLICATE_POINTS:                       cout << "Error 100: " << "2+ consecutive points"; break;
       case RING_NOT_CLOSED:                        cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
@@ -59,7 +65,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case SURFACE_PROJECTION_INVALID:             cout << "Error 220: " << "surface is not valid in 2D (its projection)"; break;
       case INNER_RING_INTERSECTS_OUTER:            cout << "Error 221: " << "iring intersect oring"; break;
       case INNER_RING_OUTSIDE_OUTER:               cout << "Error 222: " << "iring outside oring"; break;
-      //case INNER_OUTER_RINGS_INTERSECT:          cout << "Error 223: " << "oring and iring(s) intersect"; break;
+        //case INNER_OUTER_RINGS_INTERSECT:          cout << "Error 223: " << "oring and iring(s) intersect"; break;
       case INTERIOR_OF_RING_NOT_CONNECTED:         cout << "Error 224: " << "interior not connected"; break;
         // Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << "Error 300: " << "is not a 2-manifold"; break;
@@ -76,35 +82,48 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << "Error 430: " << "interior not connected"; break;
         // Input problem
       case INVALID_INPUT_FILE:                     cout << "Error 999: " << "input file is not valid"; break;
-         // Other reasons
+        // Other reasons
       default    : cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
-      }
-      cout << endl;
-      if ( (errorCode >= 400) && (errorCode < 500) )
-        cout << "\t" << "[shell: #" << shellNum << "; shell: #" << facetNum << "]" << endl;
-      else
-        cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
-      if (messageStr.size() > 0)
-        cout << "\t" << messageStr << endl;
-      callbackWasCalledWithError = true;
-   }
+    }
+    cout << endl;
+    
+    if (bUsingIDs == false)
+      cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
+    else
+      cout << "\t" << "[shell: #" << idShells[shellNum] << "; face: #" << idFaces[shellNum][facetNum] << "]" << endl;    
+
+    if (messageStr.size() > 0)
+      cout << "\t" << messageStr << endl;
+    callbackWasCalledWithError = true;
+  }
 }
 
 
 void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
-                   int shellNum, // -1 means unused; 0-based
-                   int facetNum,     // -1 means unused; 0-based
-                   std::string messageStr) // optional
+                  int shellNum, // -1 means unused; 0-based
+                  int facetNum,     // -1 means unused; 0-based
+                  std::string messageStr) // optional
 {
   if (0 != errorCode)
   {
+    cout << "\t<ValidatorMessage>" << endl;
     cout << "\t\t<type>ERROR</type>" << endl;
     cout << "\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
+    if (bUsingIDs == true) {
+      cout << "\t\t<shell>" << idShells[shellNum] << "</shell>" << endl;
+      cout << "\t\t<face>" << idFaces[shellNum][facetNum] << "</face>" << endl;
+    }
+    else {
+      cout << "\t\t<shell>" << shellNum << "</shell>" << endl;
+      cout << "\t\t<face>" << facetNum << "</face>" << endl;
+    }
     if (messageStr.empty() == false)
-      cout << "\t\t<message>" << messageStr << "</errorCode>" << endl;
-    callbackWasCalledWithError = true;
+      cout << "\t\t<message>" << messageStr << "</errorCode>" << endl;  
+    cout << "\t</ValidatorMessage>" << endl;
   }
+  callbackWasCalledWithError = true;
 }
+
 
 
 // -----------------------------------------------------------
@@ -113,9 +132,8 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
 int main(int argc, char* const argv[])
 {
   bool bRepair = false;
-//  bool bRepair = true;
   bool xmloutput = true;
-
+  
   if (argc < 2)
   {
     cout << "You have to give at least one input POLY file (a shell)." << endl;
@@ -126,14 +144,23 @@ int main(int argc, char* const argv[])
 
   vector<Shell*> shells;
   if (xmloutput == false) {
-    readAllInputShells((argc-1), argv, shells, callback_cout);
+    if (bUsingIDs == true) {
+      readAllInputShells_withIDs((argc-1), argv, shells, idShells, idFaces, callback_cout);
+    }
+    else {
+      readAllInputShells((argc-1), argv, shells, callback_cout);
+    }
     validate(shells, bRepair, callback_cout);
   }
   else {
-    cout << "\t<ValidatorMessage>" << endl;
-    readAllInputShells((argc-1), argv, shells, callback_xml);
+
+    if (bUsingIDs == true) {
+      readAllInputShells_withIDs((argc-1), argv, shells, idShells, idFaces, callback_xml);
+    }
+    else {
+      readAllInputShells((argc-1), argv, shells, callback_xml);
+    }
     validate(shells, bRepair, callback_xml);
-    cout << "\t</ValidatorMessage>" << endl;
   }
     
 

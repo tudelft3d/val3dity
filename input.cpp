@@ -25,10 +25,56 @@
 
 #include "input.h"
 #include <fstream>
+#include <string>
 
 void readShell(ifstream& infile, Shell &allShells);
+void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
 
 
+void readAllInputShells_withIDs(int numShells, char* const filenames[], vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb)
+{
+  std::stringstream st;
+  st << "Reading " << numShells << " file(s).";
+  (*cb)(STATUS_OK, -1, -1, st.str());
+  
+  st.str(""); //-- clear what's in st
+  st << "Reading outer shell:\t" << filenames[1];
+  (*cb)(STATUS_OK, -1, -1, st.str());
+  ifstream infile(filenames[1], ifstream::in);
+  if (!infile)
+  {
+    (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+    exit(1);
+  }
+  
+  // Now let's read in the outer shell (the first input file)
+  Shell* oneshell = new Shell;
+  readShell_withIDs(infile, *oneshell, idShells, idFaces);
+  
+  shells.push_back(oneshell);
+  oneshell = NULL; // don't own this anymore
+  for (int is=1; is<numShells; is++)
+  {
+    st.str("");
+    st << "Reading inner shell #" << (is-1) << ":\t" << filenames[(is+1)];
+    (*cb)(STATUS_OK, -1, -1, st.str());
+    ifstream infile2(filenames[(is+1)], ifstream::in);
+    if (!infile2)
+    {
+      (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+      exit(1);
+    }
+    
+    // Now let's read in the inner shell from the file.
+    oneshell = new Shell;
+    //bool isValid = true;
+    readShell_withIDs(infile2, *oneshell, idShells, idFaces);
+    
+    shells.push_back(oneshell);
+    oneshell = NULL; // don't own this anymore
+  }
+  (*cb)(STATUS_OK, -1, -1, "");
+}
 
 void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb)
 {
@@ -145,4 +191,84 @@ void readShell(ifstream& infile, Shell &oneshell)
 
     oneshell.faces.push_back(pgnids);
   }
+}
+
+
+void readShell_withIDs(ifstream& infile, Shell &oneshell, vector<string> &idShells, vector< vector<string> > &idFaces)
+{
+  //-- read the id of the shell
+  char dash;
+  string sID;
+  infile >> dash >> sID;
+  idShells.push_back(sID);
+  vector<string> tempIDs;
+  //-- read the points
+  int num, tmpint;
+  float tmpfloat;
+  infile >> num >> tmpint >> tmpint >> tmpint;
+  vector< Point3 >::iterator iPoint3;
+  //-- read first line to decide if 0- or 1-based indexing
+  bool zerobased = true;
+  Point3 p;
+  infile >> tmpint >> p;
+  oneshell.lsPts.push_back(p);
+  if (tmpint == 1)
+  {
+    zerobased = false;
+    cout << "1-based indexing file!" << endl;
+  }
+  //-- process other vertices
+  for (int i = 1; i < num; i++)
+  {
+    Point3 p;
+    infile >> tmpint >> p;
+    oneshell.lsPts.push_back(p);
+  }
+  
+  //-- read the facets
+  infile >> num >> tmpint;
+  int numf, numpt;
+  string s;
+  for (int i = 0; i < num; i++)
+  {
+    //    cout << "---- face ---- " << i << endl;
+    infile >> numf >> tmpint >> dash >> sID;
+    tempIDs.push_back(sID);
+//    cout << sID << endl;
+    //-- read oring (there's always one and only one)
+    infile >> numpt;
+    vector<int> ids(numpt);
+    for (int k = 0; k < numpt; k++)
+      infile >> ids[k];
+    if (zerobased == false)
+    {
+      for (int k = 0; k < numpt; k++)
+        ids[k] = (ids[k] - 1);      
+    }
+    
+    vector< vector<int> > pgnids;
+    pgnids.push_back(ids);
+    
+    //-- check for irings
+    for (int j = 1; j < numf; j++)
+    {
+      infile >> numpt;
+      vector<int> ids(numpt);
+      for (int l = 0; l < numpt; l++)
+        infile >> ids[l];
+      if (zerobased == false)
+      {
+        for (int k = 0; k < numpt; k++)
+          ids[k] = (ids[k] - 1);      
+      }
+      
+      pgnids.push_back(ids);
+    }
+    //-- skip the line about point defining the hole (mandatory in a POLY file)
+    if (numf > 1)
+      infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
+    
+    oneshell.faces.push_back(pgnids);
+  }
+  idFaces.push_back(tempIDs);
 }

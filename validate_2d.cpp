@@ -28,6 +28,11 @@
 
 // OGR-- to use GEOS's IsValid() function easily to valide the faces in 2D
 #include <gdal/ogrsf_frmts.h>
+//#include "ogr_geos.h"
+#include <geos/geos_c.h>
+//#include "gdal/ogr_api.h"
+//#include "gdal/ogr_p.h"
+
 
 
 bool validate_2D(vector<Shell*> &shells, cbf cb)
@@ -92,9 +97,21 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       
       char *wktcstr = (char *)malloc((wkt.str().size())*sizeof(char *));    
       strcpy(wktcstr, wkt.str().c_str());
-//      std::cout << wkt.str() << endl;
       OGRGeometry *geometry;
       OGRGeometryFactory::createFromWkt(&wktcstr, NULL, &geometry);
+    
+//      GEOSGeom hThisGeosGeom = NULL;
+//      OGRBoolean bResult = FALSE;
+//      hThisGeosGeom = geometry->exportToGEOS();
+//      
+////      std::cout << hThisGeosGeom->getNumPoints() << std::endl;
+//      if( hThisGeosGeom != NULL  )
+//      {
+//        bResult = GEOSisValid( hThisGeosGeom );
+//        std::cout << "Results: " << bResult << std::endl;
+//        GEOSGeom_destroy( hThisGeosGeom );
+//      }
+      
       if (geometry->IsValid() != 1)
       {
         isvalid = false;
