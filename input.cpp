@@ -31,16 +31,16 @@ void readShell(ifstream& infile, Shell &allShells);
 void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
 
 
-void readAllInputShells_withIDs(int numShells, char* const filenames[], vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb)
+void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb)
 {
   std::stringstream st;
-  st << "Reading " << numShells << " file(s).";
+  st << "Reading " << arguments.size() << " file(s).";
   (*cb)(STATUS_OK, -1, -1, st.str());
   
   st.str(""); //-- clear what's in st
-  st << "Reading outer shell:\t" << filenames[1];
+  st << "Reading outer shell:\t" << arguments[0];
   (*cb)(STATUS_OK, -1, -1, st.str());
-  ifstream infile(filenames[1], ifstream::in);
+  ifstream infile(arguments[0].c_str(), ifstream::in);
   if (!infile)
   {
     (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
@@ -53,12 +53,17 @@ void readAllInputShells_withIDs(int numShells, char* const filenames[], vector<S
   
   shells.push_back(oneshell);
   oneshell = NULL; // don't own this anymore
-  for (int is=1; is<numShells; is++)
+  
+  vector<string>::const_iterator it = arguments.begin();
+  it++;
+  int i = 0;
+  for ( ; it < arguments.end(); it++)
   {
     st.str("");
-    st << "Reading inner shell #" << (is-1) << ":\t" << filenames[(is+1)];
+    st << "Reading inner shell #" << i << ":\t" << *it;
+    i++;
     (*cb)(STATUS_OK, -1, -1, st.str());
-    ifstream infile2(filenames[(is+1)], ifstream::in);
+    ifstream infile2(it->c_str(), ifstream::in);
     if (!infile2)
     {
       (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
@@ -76,51 +81,57 @@ void readAllInputShells_withIDs(int numShells, char* const filenames[], vector<S
   (*cb)(STATUS_OK, -1, -1, "");
 }
 
-void readAllInputShells(int numShells, char* const filenames[], vector<Shell*> &shells, cbf cb)
+void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf cb)
 {
-   std::stringstream st;
-   st << "Reading " << numShells << " file(s).";
-   (*cb)(STATUS_OK, -1, -1, st.str());
-
-   st.str(""); //-- clear what's in st
-   st << "Reading outer shell:\t" << filenames[1];
-   (*cb)(STATUS_OK, -1, -1, st.str());
-   ifstream infile(filenames[1], ifstream::in);
-   if (!infile)
-   {
+  std::stringstream st;
+  st << "Reading " << arguments.size() << " file(s).";
+  (*cb)(STATUS_OK, -1, -1, st.str());
+  
+  st.str(""); //-- clear what's in st
+  st << "Reading outer shell:\t" << arguments[0];
+  (*cb)(STATUS_OK, -1, -1, st.str());
+  ifstream infile(arguments[0].c_str(), ifstream::in);
+  if (!infile)
+  {
+    (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+    exit(1);
+  }
+  
+  // Now let's read in the outer shell (the first input file)
+  Shell* oneshell = new Shell;
+  readShell(infile, *oneshell);
+  
+  shells.push_back(oneshell);
+  oneshell = NULL; // don't own this anymore
+  
+  vector<string>::const_iterator it = arguments.begin();
+  it++;
+  int i = 0;
+  for ( ; it < arguments.end(); it++)
+  {
+    st.str("");
+    st << "Reading inner shell #" << i << ":\t" << *it;
+    i++;
+    (*cb)(STATUS_OK, -1, -1, st.str());
+    ifstream infile2(it->c_str(), ifstream::in);
+    if (!infile2)
+    {
       (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
       exit(1);
-   }
-
-   // Now let's read in the outer shell (the first input file)
-   Shell* oneshell = new Shell;
-   readShell(infile, *oneshell);
-
-   shells.push_back(oneshell);
-   oneshell = NULL; // don't own this anymore
-   for (int is=1; is<numShells; is++)
-   {
-      st.str("");
-      st << "Reading inner shell #" << (is-1) << ":\t" << filenames[(is+1)];
-      (*cb)(STATUS_OK, -1, -1, st.str());
-      ifstream infile2(filenames[(is+1)], ifstream::in);
-      if (!infile2)
-      {
-         (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
-         exit(1);
-      }
-
-      // Now let's read in the inner shell from the file.
-      oneshell = new Shell;
-      //bool isValid = true;
-      readShell(infile2, *oneshell);
-
-      shells.push_back(oneshell);
-      oneshell = NULL; // don't own this anymore
-   }
-   (*cb)(STATUS_OK, -1, -1, "");
+    }
+    
+    // Now let's read in the inner shell from the file.
+    oneshell = new Shell;
+    //bool isValid = true;
+    readShell(infile2, *oneshell);
+    
+    shells.push_back(oneshell);
+    oneshell = NULL; // don't own this anymore
+  }
+  (*cb)(STATUS_OK, -1, -1, "");
 }
-
+  
+ 
 
 void readShell(ifstream& infile, Shell &oneshell)
 {

@@ -32,8 +32,8 @@ static bool callbackWasCalledWithError = false;
 //-- global lists to keep track of IDs for shells and faces
 vector<string> idShells;
 vector< vector<string> > idFaces;
-//bool bUsingIDs = false;
 bool bUsingIDs = false;
+bool xmloutput = false;
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
@@ -106,6 +106,7 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
 {
   if (0 != errorCode)
   {
+    callbackWasCalledWithError = true;
     cout << "\t<ValidatorMessage>" << endl;
     cout << "\t\t<type>ERROR</type>" << endl;
     cout << "\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
@@ -121,7 +122,7 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
       cout << "\t\t<message>" << messageStr << "</errorCode>" << endl;  
     cout << "\t</ValidatorMessage>" << endl;
   }
-  callbackWasCalledWithError = true;
+  
 }
 
 
@@ -132,7 +133,7 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
 int main(int argc, char* const argv[])
 {
   bool bRepair = false;
-  bool xmloutput = false;
+
   
   if (argc < 2)
   {
@@ -142,23 +143,34 @@ int main(int argc, char* const argv[])
     return(1);
   }
 
+  vector<string> arguments;
+  for (int argNum = 1; argNum < argc; ++argNum) {
+    if (strcmp(argv[argNum], "-xml") == 0)
+      xmloutput = true;
+    else if (strcmp(argv[argNum], "-withids") == 0)
+      bUsingIDs = true;
+    else {
+      arguments.push_back(string(argv[argNum]));
+    }
+  }
+
   vector<Shell*> shells;
   if (xmloutput == false) {
     if (bUsingIDs == true) {
-      readAllInputShells_withIDs((argc-1), argv, shells, idShells, idFaces, callback_cout);
+      readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_cout);
     }
     else {
-      readAllInputShells((argc-1), argv, shells, callback_cout);
+      readAllInputShells(arguments, shells, callback_cout);
     }
     validate(shells, bRepair, callback_cout);
   }
   else {
 
     if (bUsingIDs == true) {
-      readAllInputShells_withIDs((argc-1), argv, shells, idShells, idFaces, callback_xml);
+      readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_xml);
     }
     else {
-      readAllInputShells((argc-1), argv, shells, callback_xml);
+      readAllInputShells(arguments, shells, callback_xml);
     }
     validate(shells, bRepair, callback_xml);
   }
