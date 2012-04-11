@@ -91,6 +91,22 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
 }
 
 
+void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
+                   int shellNum, // -1 means unused; 0-based
+                   int facetNum,     // -1 means unused; 0-based
+                   std::string messageStr) // optional
+{
+  if (0 != errorCode)
+  {
+    cout << "\t\t<type>ERROR</type>" << endl;
+    cout << "\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
+    if (messageStr.empty() == false)
+      cout << "\t\t<message>" << messageStr << "</errorCode>" << endl;
+    callbackWasCalledWithError = true;
+  }
+}
+
+
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
@@ -98,6 +114,7 @@ int main(int argc, char* const argv[])
 {
   bool bRepair = false;
 //  bool bRepair = true;
+  bool xmloutput = true;
 
   if (argc < 2)
   {
@@ -108,8 +125,17 @@ int main(int argc, char* const argv[])
   }
 
   vector<Shell*> shells;
-  readAllInputShells((argc-1), argv, shells, callback_cout);
-  validate(shells, bRepair, callback_cout);
+  if (xmloutput == false) {
+    readAllInputShells((argc-1), argv, shells, callback_cout);
+    validate(shells, bRepair, callback_cout);
+  }
+  else {
+    cout << "\t<ValidatorMessage>" << endl;
+    readAllInputShells((argc-1), argv, shells, callback_xml);
+    validate(shells, bRepair, callback_xml);
+    cout << "\t</ValidatorMessage>" << endl;
+  }
+    
 
   if (callbackWasCalledWithError)
   {
