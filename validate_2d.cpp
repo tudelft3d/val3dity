@@ -102,11 +102,13 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
     
 //      GEOSGeom hThisGeosGeom = NULL;
 //      OGRBoolean bResult = FALSE;
+////#define HAVE_GEOS
 //      hThisGeosGeom = geometry->exportToGEOS();
 //      
 ////      std::cout << hThisGeosGeom->getNumPoints() << std::endl;
 //      if( hThisGeosGeom != NULL  )
 //      {
+//        std::cout << "GEOS not NULL!" << std::endl;
 //        bResult = GEOSisValid( hThisGeosGeom );
 //        std::cout << "Results: " << bResult << std::endl;
 //        GEOSGeom_destroy( hThisGeosGeom );

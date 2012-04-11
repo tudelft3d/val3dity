@@ -33,7 +33,7 @@ static bool callbackWasCalledWithError = false;
 vector<string> idShells;
 vector< vector<string> > idFaces;
 //bool bUsingIDs = false;
-bool bUsingIDs = true;
+bool bUsingIDs = false;
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
@@ -132,7 +132,7 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
 int main(int argc, char* const argv[])
 {
   bool bRepair = false;
-  bool xmloutput = true;
+  bool xmloutput = false;
   
   if (argc < 2)
   {
