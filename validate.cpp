@@ -133,21 +133,22 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     //-- read oring (there's always one and only one)
     if (numf < 1)
     {
-      (*cb)(SURFACE_PROJECTION_INVALID, shellNum, -1, "facet does not have an outer boundary.");
+      (*cb)(SURFACE_PROJECTION_INVALID, shellNum, -1, "surface does not have an outer boundary.");
       return false;
     }
-    vector<int> &ids = shell.faces[i][0]; // helpful alias for the outer boundary
+    vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
     
-    int proj = projection_plane(shell.lsPts[ids[0]], shell.lsPts[ids[1]], shell.lsPts[ids[2]]);
-    Vector v0 = unit_normal( shell.lsPts[ids[0]], shell.lsPts[ids[1]], shell.lsPts[ids[2]] );
+    int proj = projection_plane(shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]]);
+    proj = projection_plane_range(shell.lsPts, idsob);
+    Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
     
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
-    create_polygon(shell.lsPts, ids, pgn);
+    create_polygon(shell.lsPts, idsob, pgn);
     lsRings.push_back(pgn);
     vector< vector<int> > pgnids;
-    pgnids.push_back(ids);
+    pgnids.push_back(idsob);
     
     //-- check for irings
     for (int j = 1; j < static_cast<int>(numf); j++)
@@ -344,3 +345,55 @@ int projection_plane(Point3 p0, Point3 p1, Point3 p2)
   }
   return proj;
 }
+
+int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids)
+{
+
+//  int proj = projection_plane(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]);
+  //-- build projected polygon
+  
+  
+//  vector<double> range(4, 0.0);
+//  find_range(0, lsPts, ids, range);
+//  
+//  
+//  for ( ; it != ids.end(); it++)
+//  {
+//    Point3 p = lsPts[*it];
+//    if (proj == 2)
+//      pgn.push_back(Point2(p.x(), p.y()));
+//    else if (proj == 1)
+//      pgn.push_back(Point2(p.x(), p.z()));
+//    else
+//      pgn.push_back(Point2(p.y(), p.z()));
+//  }
+//  
+//  
+  
+  return 2;
+}
+
+void find_range(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids, vector<double> &range) 
+{
+  vector<int>::const_iterator it = ids.begin();
+  range[0] = lsPts[*it].x();
+  range[1] = lsPts[*it].y();
+  range[2] = lsPts[*it].x();
+  range[3] = lsPts[*it].y();
+  
+  for ( ; it != ids.end(); it++)
+  {
+    if (ignored == 2) {
+      if (lsPts[*it].x() < range[0])
+        range[0] = lsPts[*it].x();
+      if (lsPts[*it].y() < range[1])
+        range[1] = lsPts[*it].y();
+      if (lsPts[*it].x() > range[2])
+        range[2] = lsPts[*it].x();
+      if (lsPts[*it].y() > range[3])
+        range[3] = lsPts[*it].y();
+    }
+  }
+}
+    
+ 
