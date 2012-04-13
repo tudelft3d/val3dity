@@ -38,7 +38,6 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb);
 // -----------------------------------------------------------
 // Used for both triangulation of the shell and 2D validation
 //
-int   projection_plane(Point3 p0, Point3 p1, Point3 p2);
 int   projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids);
 void  create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
 
