@@ -100,25 +100,18 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       OGRGeometry *geometry;
       OGRGeometryFactory::createFromWkt(&wktcstr, NULL, &geometry);
     
-//      GEOSGeom hThisGeosGeom = NULL;
-//      OGRBoolean bResult = FALSE;
-////#define HAVE_GEOS
-//      hThisGeosGeom = geometry->exportToGEOS();
-//      
-////      std::cout << hThisGeosGeom->getNumPoints() << std::endl;
-//      if( hThisGeosGeom != NULL  )
-//      {
-//        std::cout << "GEOS not NULL!" << std::endl;
-//        bResult = GEOSisValid( hThisGeosGeom );
-//        std::cout << "Results: " << bResult << std::endl;
-//        GEOSGeom_destroy( hThisGeosGeom );
-//      }
-      
-      if (geometry->IsValid() != 1)
+      //-- get a GEOSGeometry to have access to the reason of the validation error
+      //-- and to prevent GEOS from writing to std output
+      GEOSGeom hThisGeosGeom = NULL;
+      hThisGeosGeom = geometry->exportToGEOS();
+      char *reason = (char *)malloc(1000*sizeof(char *));    
+      reason = GEOSisValidReason(hThisGeosGeom);
+      if (strcmp(reason, "Valid Geometry") != 0) 
       {
         isvalid = false;
-        (*cb)(SURFACE_PROJECTION_INVALID, is, i, "GEOS says not valid!");
+        (*cb)(SURFACE_PROJECTION_INVALID, is, i, reason);
       }
+      GEOSGeom_destroy( hThisGeosGeom );
     }
   }
   return isvalid;
