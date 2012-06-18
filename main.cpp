@@ -107,20 +107,20 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
   if (0 != errorCode)
   {
     callbackWasCalledWithError = true;
-    cout << "\t<ValidatorMessage>" << endl;
-    cout << "\t\t<type>ERROR</type>" << endl;
-    cout << "\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
+    cout << "\t\t<ValidatorMessage>" << endl;
+    cout << "\t\t\t<type>ERROR</type>" << endl;
+    cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
     if (bUsingIDs == true) {
-      cout << "\t\t<shell>" << idShells[shellNum] << "</shell>" << endl;
-      cout << "\t\t<face>" << idFaces[shellNum][facetNum] << "</face>" << endl;
+      cout << "\t\t\t<shell>" << idShells[shellNum] << "</shell>" << endl;
+      cout << "\t\t\t<face>" << idFaces[shellNum][facetNum] << "</face>" << endl;
     }
     else {
-      cout << "\t\t<shell>" << shellNum << "</shell>" << endl;
-      cout << "\t\t<face>" << facetNum << "</face>" << endl;
+      cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
+      cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
     }
     if (messageStr.empty() == false)
-      cout << "\t\t<message>" << messageStr << "</errorCode>" << endl;  
-    cout << "\t</ValidatorMessage>" << endl;
+      cout << "\t\t\t<message>" << messageStr << "</errorCode>" << endl;  
+    cout << "\t\t</ValidatorMessage>" << endl;
   }
   
 }
@@ -175,16 +175,17 @@ int main(int argc, char* const argv[])
     validate(shells, bRepair, callback_xml);
   }
     
-
-  if (callbackWasCalledWithError)
-  {
-     cout << "\nInvalid solid :(" << endl << endl;
-     return(0);
-  }
-  else
-  {
-     cout << "\nValid solid. Hourrraaa!" << endl;
-     return(1);
+  if (xmloutput == false) {
+    if (callbackWasCalledWithError)
+    {
+       cout << "\nInvalid solid :(" << endl << endl;
+       return(0);
+    }
+    else
+    {
+       cout << "\nValid solid. Hourrraaa!" << endl;
+       return(1);
+    }
   }
 }
 
