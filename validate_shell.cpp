@@ -68,7 +68,7 @@ public:
     typedef typename Vertex::Point        Point;
     typedef typename HDS::Face_handle     FaceH;
     typedef typename HDS::Halfedge_handle heH;
-    CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, true);
+    CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, false);
     B.begin_surface((*lsPts).size(), (*faces).size());
     vector<Point3>::const_iterator itPt = lsPts->begin();
     for ( ; itPt != lsPts->end(); itPt++)
@@ -79,6 +79,10 @@ public:
       construct_faces_order_given(B, cb);
     else
       construct_faces_ensure_adjacency(B, cb);
+    if (B.check_unconnected_vertices() == true) {
+      (*cb)(VERTICES_NOT_USED, shellID, -1, "");
+//      B.remove_unconnected_vertices();
+    }
     B.end_surface();
   }
   
@@ -265,8 +269,8 @@ bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOute
 CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool bRepair, cbf cb)
 {
   bool isValid = true;
-  //CgalPolyhedron P;
   CgalPolyhedron *P = new CgalPolyhedron;
+//  CgalPolyhedron *p2 = NULL;
 
 //-- ***** VALIDATION ONLY *****
   if (bRepair == false)
@@ -286,11 +290,16 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     if (isValid == true)
     {
       (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
+      //-- construct the CgalPolyhedron with batch operator (not used anymore)
+//      p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+
       //-- construct the CgalPolyhedron incrementally
       ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
       P->delegate(s);
       isValid = s.isValid;
-      
+//      std::cout << "s.isValid: " << s.isValid << std::endl;
+//      std::cout << "P->is_valid(): " << P->is_valid() << std::endl;
+//      std::cout << "sizes:" << P->size_of_vertices() << ":" << p2->size_of_facets() << std::endl;
       
       if (isValid == true)
       {

@@ -74,6 +74,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
       case FREE_FACES:                             cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
       case SURFACE_SELF_INTERSECTS:                cout << "Error 305: " << "surface self-intersect"; break;
+      case VERTICES_NOT_USED:                      cout << "Error 306: " << "some vertices are not referenced by faces"; break;
       case SURFACE_NORMALS_BAD_ORIENTATION:        cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
         // Solid level
       case SHELLS_FACE_ADJACENT:                   cout << "Error 400: " << "shells are face adjacent"; break;

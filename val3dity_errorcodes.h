@@ -47,6 +47,7 @@ typedef enum
    FACE_ORIENTATION_INCORRECT_EDGE_USAGE  = 303,
    FREE_FACES                             = 304,
    SURFACE_SELF_INTERSECTS                = 305,
+   VERTICES_NOT_USED                      = 306,
    SURFACE_NORMALS_BAD_ORIENTATION        = 310,
    // Solid level
    SHELLS_FACE_ADJACENT                   = 400,
