@@ -81,7 +81,8 @@ public:
       construct_faces_ensure_adjacency(B, cb);
     if (B.check_unconnected_vertices() == true) {
       (*cb)(VERTICES_NOT_USED, shellID, -1, "");
-//      B.remove_unconnected_vertices();
+//      isValid = false;
+      B.remove_unconnected_vertices();
     }
     B.end_surface();
   }
@@ -291,15 +292,12 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     {
       (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
       //-- construct the CgalPolyhedron with batch operator (not used anymore)
-//      p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+      // p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
 
       //-- construct the CgalPolyhedron incrementally
       ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
       P->delegate(s);
       isValid = s.isValid;
-//      std::cout << "s.isValid: " << s.isValid << std::endl;
-//      std::cout << "P->is_valid(): " << P->is_valid() << std::endl;
-//      std::cout << "sizes:" << P->size_of_vertices() << ":" << p2->size_of_facets() << std::endl;
       
       if (isValid == true)
       {
@@ -318,10 +316,18 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
             else
             {
               //-- check if there are holes in the surface
-              if (P->size_of_border_halfedges() > 0)
+              if (P->is_closed() == false)
               {
-                (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
-                //TODO: how to report where the hole is? report one of the edge? centre of the hole?
+                std::stringstream st;
+                P->normalize_border();
+                while (P->size_of_border_edges() > 0) {
+                  CgalPolyhedron::Halfedge_handle he = ++(P->border_halfedges_begin());
+                  st << "Location hole: " << he->vertex()->point();
+                  (*cb)(SURFACE_NOT_CLOSED, shellID, -1, st.str());
+                  st.str("");
+                  P->fill_hole(he);
+                  P->normalize_border();
+                }
                 isValid = false;
               }
             }

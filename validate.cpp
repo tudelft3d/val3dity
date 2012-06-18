@@ -55,15 +55,20 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
     (*cb)(INVALID_INPUT_FILE, -1, -1, "Input polyhedra are not valid enough to be triangulated.");
     return false;
   }
+  else
+    (*cb)(STATUS_OK, -1, -1, "-----done");
   
   //-- THIRD: validate each (triangulated) shell, one by one
-  (*cb)(STATUS_OK, -1, -1, "Validating the shell(s)");
+//  (*cb)(STATUS_OK, -1, -1, "Validating the shell(s)");
   vector<CgalPolyhedron*> polyhedra;
   CgalPolyhedron* p = NULL;
   for (unsigned int i = 0; i < trShells.size(); i++)
   {
-    p  = validate_triangulated_shell(*(trShells[i]), i, bRepair, cb);  
     std::stringstream st;
+    st << endl << "Validating shell #" << i;
+    (*cb)(STATUS_OK, -1, -1, st.str());
+    p  = validate_triangulated_shell(*(trShells[i]), i, bRepair, cb);  
+    st.str("");
     st << "Shell #" << (i);
     if (p != NULL)
     {
@@ -115,7 +120,7 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
     trShells.push_back(tshell);
     tshell = NULL; // don't own this anymore
   }
-  (*cb)(STATUS_OK, -1, -1, "");
+//  (*cb)(STATUS_OK, -1, -1, "");
   return true;
 }
 
