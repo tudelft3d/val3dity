@@ -52,6 +52,7 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, bool bRepair, c
      PolyhedronExact pe;
      offrep >> pe;
      Nef_polyhedron onef(pe);
+//    std::cout << "convertion to exact polyhedron done." << std::endl;
 #endif
 
      nefs.push_back(onef);

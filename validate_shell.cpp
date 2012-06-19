@@ -346,7 +346,6 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     {
       (*cb)(STATUS_OK, -1, -1, "\tyes");
       (*cb)(STATUS_OK, -1, -1, "-----Geometrical consistency");
-//      isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
       isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
     }
     
@@ -365,10 +364,13 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
         (*cb)(STATUS_OK, -1, -1, "\tyes");
     }
   }
+  
 //-- ***** REPAIRING IS ATTEMPTED *****
+  
   else
   {
 //-- 1. Planarity of faces
+    //TODO: triangulate non-planar faces? tja, tough...
     if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
       isValid = false;
     
@@ -379,8 +381,9 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
       ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, true, cb);
       P->delegate(s);
       isValid = s.isValid;
+      //TODO: here the extra vertices are removed automatically (eg for Stanford bunny)
       
-      if  (isValid == true)
+      if (isValid == true)
       {
         if (P->is_valid() == true) //-- combinatorially valid that is
         {

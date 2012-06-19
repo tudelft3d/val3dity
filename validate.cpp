@@ -42,13 +42,16 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
 {
   bool foundError(false);
   
-  //-- FIRST: use GEOS to test is (projected) surface are valid in 2D
+  if (bRepair == true)
+    (*cb)(STATUS_OK, -1, -1, "Automatic repair will be attempted. Watch out.");
+  
+//-- FIRST: use GEOS to test is (projected) surface are valid in 2D
   if (! validate_2D(shells, cb))
     return false;
   else
     (*cb)(STATUS_OK, -1, -1, "-----all valid");
   
-  //-- SECOND: triangulate every shell 
+//-- SECOND: triangulate every shell 
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
@@ -58,8 +61,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
   else
     (*cb)(STATUS_OK, -1, -1, "-----done");
   
-  //-- THIRD: validate each (triangulated) shell, one by one
-//  (*cb)(STATUS_OK, -1, -1, "Validating the shell(s)");
+//-- THIRD: validate each (triangulated) shell, one by one
   vector<CgalPolyhedron*> polyhedra;
   CgalPolyhedron* p = NULL;
   for (unsigned int i = 0; i < trShells.size(); i++)
@@ -85,7 +87,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
   }
   (*cb)(STATUS_OK, -1, -1, "");
   
-  //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
+//-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, bRepair, cb);
   return isValid;
 }

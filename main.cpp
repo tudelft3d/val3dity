@@ -134,7 +134,6 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
 int main(int argc, char* const argv[])
 {
   bool bRepair = false;
-
   
   if (argc < 2)
   {
@@ -150,6 +149,8 @@ int main(int argc, char* const argv[])
       xmloutput = true;
     else if (strcmp(argv[argNum], "-withids") == 0)
       bUsingIDs = true;
+    else if (strcmp(argv[argNum], "-repair") == 0)
+      bRepair = true;
     else {
       arguments.push_back(string(argv[argNum]));
     }
