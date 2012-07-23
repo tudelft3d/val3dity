@@ -77,8 +77,9 @@ public:
     }
     if (bRepair == false)
       construct_faces_order_given(B, cb);
+//      construct_faces_keep_adjcent(B, cb);
     else
-      construct_faces_ensure_adjacency(B, cb);
+      construct_faces_flip_when_possible(B, cb);
     if (B.check_unconnected_vertices() == true) {
       (*cb)(VERTICES_NOT_USED, shellID, -1, "");
 //      isValid = false;
@@ -102,13 +103,97 @@ public:
       faceID++;
     }
   }
+  
+//  void construct_faces_keep_adjcent(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+//  {
+//    //-- build a 2D-matrix of usage for each edge
+//    int size = static_cast<int>((*lsPts).size());
+//    bool halfedges[size*size];
+//    for (int i = 0; i <= (size*size); i++)
+//      halfedges[i] = false;
+//    
+//    //-- start with the first face (not only 1st triangle, first original face)
+//    vector< vector<int*> >::const_iterator itF = faces->begin();
+//    vector<int*>::const_iterator itF2 = itF->begin();
+//    for ( ; itF2 != itF->end(); itF2++)
+//    {
+//      int* a = *itF2;
+//      std::vector< std::size_t> faceids(3);        
+//      faceids[0] = a[0];
+//      faceids[1] = a[1];
+//      faceids[2] = a[2];
+//      B.add_facet(faceids.begin(), faceids.end());
+//      halfedges[m2a(a[0], a[1])] = true;
+//      halfedges[m2a(a[1], a[2])] = true;
+//      halfedges[m2a(a[2], a[0])] = true;
+//    }
+//    itF++;
+//
+//    //-- process the other faces
+//    int faceID = 0;
+//    for ( ; itF != faces->end(); itF++)
+//    {
+//      itF2 = itF->begin();
+//      for ( ; itF2 != itF->end(); itF2++)
+//      {
+//        int* a = *itF2;
+//        std::vector< std::size_t> faceids(3);        
+//        faceids[0] = a[0];
+//        faceids[1] = a[1];
+//        faceids[2] = a[2];
+//        if ( (B.test_facet(faceids.begin(), faceids.end()) ==  true) && (is_connected(a, halfedges) == true) )
+//        {
+//          B.add_facet(faceids.begin(), faceids.end());
+//          halfedges[m2a(a[0], a[1])] = true;
+//          halfedges[m2a(a[1], a[2])] = true;
+//          halfedges[m2a(a[2], a[0])] = true;
+//        }
+//      }
+//      faceID++;
+//    }
+//    
+//    /////////////////////////////////////////////////
+//    
+//
+//    while (trFaces.size() > 0)
+//    {
+//      bool success = false;
+//      for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
+//      {
+//        int* a = *it1;
+//        std::vector< std::size_t> faceids(3);        
+//        faceids[0] = a[0];
+//        faceids[1] = a[1];
+//        faceids[2] = a[2];
+////        cout << B.test_facet(faceids.begin(), faceids.end()) << endl;
+////        cout << is_connected(a, halfedges) << endl;
+//        if ( (B.test_facet(faceids.begin(), faceids.end()) ==  true) && (is_connected(a, halfedges) == true) )
+//        {
+//          B.add_facet(faceids.begin(), faceids.end());
+//          cout << "face added\n";
+//          halfedges[m2a(a[0],a[1])] = true;
+//          halfedges[m2a(a[1],a[2])] = true;
+//          halfedges[m2a(a[2],a[0])] = true;
+//          trFaces.erase(it1);
+//          success = true;
+//          break;
+//        }
+//      }
+//      if (success == false)
+//      {
+//        (*cb)(DANGLING_FACES, shellID, 0, "");       
+//      }
+//    }
+//  }
+
 
   int m2a(int m, int n)
   {
     return (m+(n*_width));
   }
+  
 
-  void construct_faces_ensure_adjacency(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+  void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
   {
     int size = static_cast<int>((*lsPts).size());
 #ifdef WIN32
@@ -243,13 +328,8 @@ public:
       if (B.test_facet(faceids.begin(), faceids.end()))
       {
         //std::cout << "*** Reversed orientation of the face" << std::endl;
-        (*cb)(FACE_ORIENTATION_INCORRECT_EDGE_USAGE, shellID, faceID, ""); //-- face was wrongly oriented, locally at least
-/*        if (bRepair)
-        {
-          std::cout << "Fixin' it: flipped a face..." << std::endl;
-          B.add_facet(faceids.begin(), faceids.end());
-        }
-*/    }
+        (*cb)(FACE_ORIENTATION_INCORRECT_EDGE_USAGE, shellID, faceID, ""); 
+   }
       else
         (*cb)(DANGLING_FACES, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
     }
