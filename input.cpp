@@ -210,11 +210,12 @@ void readShell_withIDs(ifstream& infile, Shell &oneshell, vector<string> &idShel
   //-- read the id of the shell
   char dash;
   string sID;
+  int num, tmpint;
   infile >> dash >> sID;
   idShells.push_back(sID);
+  infile >> dash >> tmpint;
   vector<string> tempIDs;
   //-- read the points
-  int num, tmpint;
   float tmpfloat;
   infile >> num >> tmpint >> tmpint >> tmpint;
   vector< Point3 >::iterator iPoint3;
