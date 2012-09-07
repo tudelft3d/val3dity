@@ -478,7 +478,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
             }
             else
             {
-              //-- check is there are holes in the surface
+              //-- check if there are holes in the surface
               if (P->size_of_border_halfedges() > 0)
               {
                 (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
@@ -522,7 +522,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
       isValid = check_global_orientation_normals(P, bOuter, cb);
       if (isValid == false)
       {
-        (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "Normales are flipped.");
+        (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
         P->inside_out();
         isValid = true;
       }

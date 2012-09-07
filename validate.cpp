@@ -55,7 +55,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(INVALID_INPUT_FILE, -1, -1, "Input polyhedra are not valid enough to be triangulated.");
+    (*cb)(INVALID_INPUT_FILE, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
     return false;
   }
   else
@@ -296,10 +296,7 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
   {
     cout << "\tIntersection(s) between rings of the face #" << faceNum << "." << endl;
     isValid = false;
-  } 
-  //TODO: deal with degenerate case here, ie holes completely outside the oring
-  
-  
+  }  
   
   //-- fetch all the triangles forming the polygon (with holes)
   CT::Finite_faces_iterator fi = ct.finite_faces_begin();

@@ -135,6 +135,14 @@ int main(int argc, char* const argv[])
 {
   bool bRepair = false;
   
+  bool repairF = true; //-- flipping orientation of faces
+  bool repairD = true; //-- dangling pieces will be removed
+  bool repairH = true; //-- holes will be filled
+  bool repairI = true; //-- interactions between shells fixed with Boolean ops
+  bool repairV = true; //-- unused vertices will be removed (eg for the Stanford Bunny)
+  bool repairP = true; //-- non-planar faces are triangulated
+
+  
   if (argc < 2)
   {
     cout << "You have to give at least one input POLY file (a shell)." << endl;
