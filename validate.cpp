@@ -145,7 +145,8 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     }
     vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
     
-    int proj = projection_plane_range(shell.lsPts, idsob);
+    //int proj = projection_plane_range(shell.lsPts, idsob);
+	int proj = projection_plane_range_2(shell.lsPts, idsob);
     Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
     
     //-- get projected Polygon
@@ -217,7 +218,8 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 
 void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
 {
-  int proj = projection_plane_range(lsPts, ids);
+  //int proj = projection_plane_range(lsPts, ids);
+  int proj = projection_plane_range_2(lsPts, ids);
   //-- build projected polygon
   vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
@@ -238,7 +240,8 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 {
   bool isValid = true;
   vector<int> ids = pgnids[0];
-  int proj = projection_plane_range(lsPts, ids);
+  //int proj = projection_plane_range(lsPts, ids);
+  int proj = projection_plane_range_2(lsPts, ids);
   
   CT ct;
   vector< vector<int> >::const_iterator it = pgnids.begin();
@@ -349,8 +352,43 @@ int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids
   return ignoredplane;
 }
   
-    
+//cal normals and output the best of xy xz yz
+int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &ids)
+{
+	vector<int>::const_iterator it = ids.begin();
+	//Newell normal 
+	Point3 vert (lsPts[*(ids.end()-1)]);
+	Vector pnormal(0.0, 0.0, 0.0);
+	for (;it!=ids.end();it++)
+	{
+		Vector next ((vert.z() + lsPts[*it].z()) * (vert.y() - lsPts[*it].y()),
+					 (vert.x()+ lsPts[*it].x()) * (vert.z() - lsPts[*it].z()),
+					 (vert.y()+ lsPts[*it].y()) * (vert.x() - lsPts[*it].x()));
+		pnormal = pnormal + next;
+		vert = lsPts[*it];
+	}
 
+	pnormal = pnormal/sqrt(pnormal.squared_length());
+
+	//compare cos
+	double a = abs(pnormal * Vector(1.0, 0.0, 0.0));//yz
+	double b = abs(pnormal * Vector(0.0, 1.0, 0.0));//xz
+	double c = abs(pnormal * Vector(0.0, 0.0, 1.0));//xy
+
+	double m = max(max(a, b), c);
+
+	if (CGAL::compare(a, m) == CGAL::EQUAL)
+	{
+		return 0;//yz
+	}
+	else if (CGAL::compare(b, m) == CGAL::EQUAL)
+	{
+		return 1;//xz
+	}
+	else
+		return 2;//xy
+
+}
 
 double find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids)
 {
