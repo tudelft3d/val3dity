@@ -658,24 +658,23 @@ bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, 
 
 bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb)
 {
-   vector<int*>::const_iterator ittr = trs.begin();
-   int* a = *ittr;
-   Vector v0 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
-   ittr++;
-   bool isPlanar = true;
-   for ( ; ittr != trs.end(); ittr++)
-   {
-      a = *ittr;
-      Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
-//     std::cout << acos(CGAL::to_double(v0*v1))*180/PI << std::endl;
-      if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
-      {
-         //      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
-         isPlanar = false;
-         break;
-      }
-   }
-   return isPlanar;
+  vector<int*>::const_iterator ittr = trs.begin();
+  int* a = *ittr;
+  Vector v0 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
+  ittr++;
+  bool isPlanar = true;
+  for ( ; ittr != trs.end(); ittr++)
+  {
+    a = *ittr;
+    Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
+    if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
+    {
+//      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
+      isPlanar = false;
+      break;
+    }
+  }
+  return isPlanar;
 }
   
 
