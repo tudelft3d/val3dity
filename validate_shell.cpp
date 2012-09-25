@@ -641,11 +641,12 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
 bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb)
 {
   vector< vector<int*> >::iterator faceIt = faces.begin();
+  double ANGLETOLERANCE = 1.0;
   int i = 0;
   bool isValid = true;
   for ( ; faceIt != faces.end(); faceIt++)
   {
-    if (is_face_planar(*faceIt, lsPts, 1, cb) == false)
+    if (is_face_planar(*faceIt, lsPts, ANGLETOLERANCE, cb) == false)
     {
        (*cb)(NON_PLANAR_SURFACE, shellID, i, "");
        isValid = false;
@@ -666,6 +667,7 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
    {
       a = *ittr;
       Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
+//     std::cout << acos(CGAL::to_double(v0*v1))*180/PI << std::endl;
       if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
       {
          //      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
