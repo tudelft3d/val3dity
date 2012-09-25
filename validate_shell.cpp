@@ -98,6 +98,7 @@ public:
       for ( ; itF2 != itF->end(); itF2++)
       {
         int* a = *itF2;
+//        std::cout << a[0] << " - " << a[1] << " - " << a[2] << std::endl;
         add_one_face(B, a[0], a[1], a[2], faceID, cb);
       }
       faceID++;
