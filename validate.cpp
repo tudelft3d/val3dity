@@ -374,9 +374,9 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
   normal = normal + pnormal;
 
 	//compare cos
-	double a = abs(pnormal * Vector(1.0, 0.0, 0.0));//yz
-	double b = abs(pnormal * Vector(0.0, 1.0, 0.0));//xz
-	double c = abs(pnormal * Vector(0.0, 0.0, 1.0));//xy
+	double a = abs(pnormal * Vector(1.0, 0.0, 0.0)).doubleValue();//yz
+	double b = abs(pnormal * Vector(0.0, 1.0, 0.0)).doubleValue();//xz
+	double c = abs(pnormal * Vector(0.0, 0.0, 1.0)).doubleValue();//xy
 
 	double m = max(max(a, b), c);
 
@@ -395,7 +395,7 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
 double find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids)
 {
   vector<int>::const_iterator it = ids.begin();
-  vector<double> range;
+  vector<CORE::Expr> range;
   if (ignored == 2) {
     range.push_back(lsPts[*it].x());
     range.push_back(lsPts[*it].y());
@@ -448,7 +448,7 @@ double find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<
         range[3] = lsPts[*it].z();
     }
   }
-  return ( (range[2]-range[0]) * (range[3]-range[1]) );
+  return ( (range[2]-range[0]) * (range[3]-range[1]) ).doubleValue();
 }
     
  
