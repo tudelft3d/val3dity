@@ -33,7 +33,9 @@
 bool    triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, cbf cb);
 bool    triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb);
 bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
-double  find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids);
+
+// need to use K::FT instead of double to ensure compilation under core level 4
+K::FT   find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids); 
 
 
 //--------------------------------------------------------------
@@ -342,7 +344,7 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 
 int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
-  double rangearea = find_range_area(2, lsPts, ids);
+  K::FT rangearea = find_range_area(2, lsPts, ids);
   int ignoredplane = 2;
   if (find_range_area(1, lsPts, ids) > rangearea) {
     rangearea = find_range_area(1, lsPts, ids);
@@ -352,7 +354,7 @@ int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids
     ignoredplane = 0;
   return ignoredplane;
 }
-  
+
 
 int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &ids, Vector& normal)
 {
@@ -374,11 +376,12 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
   normal = normal + pnormal;
 
 	//compare cos
-	double a = abs(pnormal * Vector(1.0, 0.0, 0.0)).doubleValue();//yz
-	double b = abs(pnormal * Vector(0.0, 1.0, 0.0)).doubleValue();//xz
-	double c = abs(pnormal * Vector(0.0, 0.0, 1.0)).doubleValue();//xy
+   // need to use K::FT instead of double to ensure compilation under core level 4
+	K::FT a = abs(pnormal * Vector(1.0, 0.0, 0.0));//yz
+	K::FT b = abs(pnormal * Vector(0.0, 1.0, 0.0));//xz
+	K::FT c = abs(pnormal * Vector(0.0, 0.0, 1.0));//xy
 
-	double m = max(max(a, b), c);
+	K::FT m = max(max(a, b), c);
 
 	if (CGAL::compare(a, m) == CGAL::EQUAL)
 	{
@@ -392,10 +395,10 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
 		return 2;//xy
 }
 
-double find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids)
+K::FT find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids)
 {
   vector<int>::const_iterator it = ids.begin();
-  vector<CORE::Expr> range;
+  vector<K::FT> range;
   if (ignored == 2) {
     range.push_back(lsPts[*it].x());
     range.push_back(lsPts[*it].y());
@@ -448,7 +451,7 @@ double find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<
         range[3] = lsPts[*it].z();
     }
   }
-  return ( (range[2]-range[0]) * (range[3]-range[1]) ).doubleValue();
+  return ( (range[2]-range[0]) * (range[3]-range[1]) );
 }
     
  
