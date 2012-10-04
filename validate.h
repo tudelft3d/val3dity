@@ -33,7 +33,8 @@
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool validate(vector<Shell*> &shells, bool bRepair, cbf cb);
+bool validate(vector<Shell*> &shells, cbf cb);
+bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb);
 
 // -----------------------------------------------------------
 // Used for both triangulation of the shell and 2D validation

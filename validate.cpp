@@ -40,14 +40,11 @@ K::FT   find_range_area(int ignored, const vector< Point3 > &lsPts, const vector
 
 //--------------------------------------------------------------
 
-bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
+bool validate(vector<Shell*> &shells, cbf cb)
 {
   bool foundError(false);
   
-  if (bRepair == true)
-    (*cb)(STATUS_OK, -1, -1, "Automatic repair will be attempted. Watch out.");
-  
-//-- FIRST: use GEOS to test is (projected) surface are valid in 2D
+//-- FIRST: use GEOS to test if (projected) surface are valid in 2D
   if (! validate_2D(shells, cb))
     return false;
   else
@@ -71,7 +68,7 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
     std::stringstream st;
     st << endl << "Validating shell #" << i;
     (*cb)(STATUS_OK, -1, -1, st.str());
-    p  = validate_triangulated_shell(*(trShells[i]), i, bRepair, cb);  
+    p  = validate_triangulated_shell(*(trShells[i]), i, cb);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)
@@ -90,8 +87,62 @@ bool validate(vector<Shell*> &shells, bool bRepair, cbf cb)
   (*cb)(STATUS_OK, -1, -1, "");
   
 //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
-  bool isValid = validate_solid_with_nef(polyhedra, bRepair, cb);
+  bool isValid = validate_solid_with_nef(polyhedra, cb);
   return isValid;
+}
+
+
+bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb)
+{
+  bool foundError(false);
+  
+  //-- REQUIREMENT #1: 2D faces are valid
+  //TODO: implement alternative way to perform planarity, so that I can catch cases *before* triangulating?
+  if (! validate_2D(shells, cb))
+    return false;
+  else
+    (*cb)(STATUS_OK, -1, -1, "-----all valid");
+  
+  //-- triangulate every shell
+  vector<TrShell*> trShells;
+  if (! triangulate_all_shells(shells, trShells, cb))
+  {
+    (*cb)(INVALID_INPUT_FILE, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
+    return false;
+  }
+  else
+    (*cb)(STATUS_OK, -1, -1, "-----done");
+  
+  //-- validate each (triangulated) shell, one by one
+  vector<CgalPolyhedron*> polyhedra;
+  CgalPolyhedron* p = NULL;
+  for (unsigned int i = 0; i < trShells.size(); i++)
+  {
+    std::stringstream st;
+    st << endl << "Validating shell #" << i;
+    (*cb)(STATUS_OK, -1, -1, st.str());
+    p  = repair_triangulated_shell(*(trShells[i]), repairs, i, cb);
+    st.str("");
+    st << "Shell #" << (i);
+    if (p != NULL)
+    {
+      st << " valid";
+      (*cb)(STATUS_OK, -1, -1, st.str());
+      polyhedra.push_back(p);
+    }
+    else
+    {
+      st << " invalid";
+      //(*cb)(300, 0, -1, st.str());
+      foundError = true;
+    }
+  }
+  (*cb)(STATUS_OK, -1, -1, "");
+  
+  //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration
+  bool isValid = validate_solid_with_nef(polyhedra, cb);
+  return isValid;
+  
 }
 
 bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, cbf cb)

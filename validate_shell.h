@@ -27,4 +27,5 @@
 #include "validate.h"
 
 
-CgalPolyhedron*   validate_triangulated_shell(TrShell& tshell, int shellID, bool bRepair, cbf cb);
+CgalPolyhedron*   validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb);
+CgalPolyhedron*   repair_triangulated_shell(TrShell& tshell, const vector<bool> &repairs, int shellID, cbf cb);

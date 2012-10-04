@@ -142,6 +142,14 @@ int main(int argc, char* const argv[])
   bool repairV = true; //-- unused vertices will be removed (eg for the Stanford Bunny)
   bool repairP = true; //-- non-planar faces are triangulated
 
+  vector<bool> repairs;
+  repairs.push_back(repairF);
+  repairs.push_back(repairD);
+  repairs.push_back(repairH);
+  repairs.push_back(repairI);
+  repairs.push_back(repairV);
+  repairs.push_back(repairP);
+
   
   if (argc < 2)
   {
@@ -172,7 +180,10 @@ int main(int argc, char* const argv[])
     else {
       readAllInputShells(arguments, shells, callback_cout);
     }
-    validate(shells, bRepair, callback_cout);
+    if (bRepair == false)
+      validate(shells, callback_cout);
+    else
+      repair(shells, repairs, callback_cout);
   }
   else {
 
@@ -182,7 +193,10 @@ int main(int argc, char* const argv[])
     else {
       readAllInputShells(arguments, shells, callback_xml);
     }
-    validate(shells, bRepair, callback_xml);
+    if (bRepair == false)
+      validate(shells, callback_cout);
+    else
+      repair(shells, repairs, callback_cout);
   }
     
   if (xmloutput == false) {

@@ -80,6 +80,7 @@ public:
 //      construct_faces_keep_adjcent(B, cb);
     else
       construct_faces_flip_when_possible(B, cb);
+    
     if (B.check_unconnected_vertices() == true) {
       (*cb)(VERTICES_NOT_USED, shellID, -1, "");
 //      isValid = false;
@@ -348,195 +349,101 @@ bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOute
 
 //------------------------------------------
 
-CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool bRepair, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb)
 {
   bool isValid = true;
   CgalPolyhedron *P = new CgalPolyhedron;
 //  CgalPolyhedron *p2 = NULL;
 
-//-- ***** VALIDATION ONLY *****
-  if (bRepair == false)
-  {
 //-- 1. Planarity of faces
-    (*cb)(STATUS_OK, -1, -1, "-----Planarity");
-    if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
-    {
-      isValid = false;
-      //(*cb)(0, -1, -1, "\tno");
-    }
-    else
-      (*cb)(STATUS_OK, -1, -1, "\tyes");
-      
-    
-  //-- 2. Combinatorial consistency
-    if (isValid == true)
-    {
-      (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
-      //-- construct the CgalPolyhedron with batch operator (not used anymore)
-      // p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
-
-      //-- construct the CgalPolyhedron incrementally
-      ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
-      P->delegate(s);
-      isValid = s.isValid;
-      
-      if (isValid == true)
-      {
-        if (P->is_valid() == true) //-- combinatorially valid that is
-        {
-          if (P->is_closed() == false)
-          {
-            P->normalize_border();
-            //-- check for unconnected faces
-            if (P->keep_largest_connected_components(1) > 0)
-            {
-              //TODO: how to report what face is not connected? a bitch of a problem...
-              (*cb)(FREE_FACES, shellID, -1, "");
-              isValid = false;
-            }
-            else
-            {
-              //-- check if there are holes in the surface
-              if (P->is_closed() == false)
-              {
-                std::stringstream st;
-                P->normalize_border();
-                while (P->size_of_border_edges() > 0) {
-                  CgalPolyhedron::Halfedge_handle he = ++(P->border_halfedges_begin());
-                  st << "Location hole: " << he->vertex()->point();
-                  (*cb)(SURFACE_NOT_CLOSED, shellID, -1, st.str());
-                  st.str("");
-                  P->fill_hole(he);
-                  P->normalize_border();
-                }
-                isValid = false;
-              }
-            }
-          }
-        }
-        else 
-        {
-          (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
-          isValid =  false;
-        }
-      }
-    }
-
-  //-- 3. Geometrical consistency (aka intersection tests between faces)
-    if (isValid == true)
-    {
-      (*cb)(STATUS_OK, -1, -1, "\tyes");
-      (*cb)(STATUS_OK, -1, -1, "-----Geometrical consistency");
-      isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
-    }
-    
-  //-- 4. orientation of the normals is outwards or inwards
-    if (isValid == true)
-    {
-      (*cb)(STATUS_OK, -1, -1, "\tyes");
-      (*cb)(STATUS_OK, -1, -1, "-----Orientation of normals");
-      bool bOuter = true;
-      if (shellID > 0)
-        bOuter = false;
-      isValid = check_global_orientation_normals(P, bOuter, cb);
-      if (isValid == false)
-        (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "");
-      else
-        (*cb)(STATUS_OK, -1, -1, "\tyes");
-    }
+  (*cb)(STATUS_OK, -1, -1, "-----Planarity");
+  if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
+  {
+    isValid = false;
+    //(*cb)(0, -1, -1, "\tno");
   }
-  
-//-- ***** REPAIRING IS ATTEMPTED *****
-  
   else
-  {
-//-- 1. Planarity of faces
-    //TODO: triangulate non-planar faces? tja, tough...
-    if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
-      isValid = false;
+    (*cb)(STATUS_OK, -1, -1, "\tyes");
     
+  
 //-- 2. Combinatorial consistency
+  if (isValid == true)
+  {
+    (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
+    //-- construct the CgalPolyhedron with batch operator (not used anymore)
+    // p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+
+    //-- construct the CgalPolyhedron incrementally
+    ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
+    P->delegate(s);
+    isValid = s.isValid;
+    
     if (isValid == true)
     {
-      //-- construct the CgalPolyhedron incrementally
-      ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, true, cb);
-      P->delegate(s);
-      isValid = s.isValid;
-      //TODO: here the extra vertices are removed automatically (eg for Stanford bunny)
-      
-      if (isValid == true)
+      if (P->is_valid() == true) //-- combinatorially valid that is
       {
-        if (P->is_valid() == true) //-- combinatorially valid that is
+        if (P->is_closed() == false)
         {
-          if (P->is_closed() == false)
+          P->normalize_border();
+          //-- check for unconnected faces
+          if (P->keep_largest_connected_components(1) > 0)
           {
-            P->normalize_border();
-            //-- check for unconnected faces
-            if (P->keep_largest_connected_components(1) > 0)
-            {
-              //TODO: how to report what face is not connected? a bitch of a problem...
-              (*cb)(FREE_FACES, shellID, -1, "REPAIR: unconnected faces were deleted.");
-            }
-            else
-            {
-              //-- check if there are holes in the surface
-              if (P->size_of_border_halfedges() > 0)
-              {
-                (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
-                //TODO: how to report where the hole is? report one of the edge? centre of the hole?
-                isValid = false;
-              }
-            }
-          }
-          //-- test if the repair operation(s) worked
-          if ( (P->is_valid()) && (P->is_closed()) )
-          {
-            isValid = true;
-            (*cb)(STATUS_OK, -1, -1, "Topology of the shell was successfully repaired.");
+            //TODO: how to report what face is not connected? a bitch of a problem...
+            (*cb)(FREE_FACES, shellID, -1, "");
+            isValid = false;
           }
           else
           {
-            isValid = false;
-            (*cb)(STATUS_OK, -1, -1, "Could not repair topology of the shell.");
+            //-- check if there are holes in the surface
+            if (P->is_closed() == false)
+            {
+              std::stringstream st;
+              P->normalize_border();
+              while (P->size_of_border_edges() > 0) {
+                CgalPolyhedron::Halfedge_handle he = ++(P->border_halfedges_begin());
+                st << "Location hole: " << he->vertex()->point();
+                (*cb)(SURFACE_NOT_CLOSED, shellID, -1, st.str());
+                st.str("");
+                P->fill_hole(he);
+                P->normalize_border();
+              }
+              isValid = false;
+            }
           }
         }
-        else 
-        {
-          (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
-          isValid =  false;
-        }
+      }
+      else 
+      {
+        (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
+        isValid =  false;
       }
     }
+  }
 
 //-- 3. Geometrical consistency (aka intersection tests between faces)
-    if (isValid == true)
-    {
-      isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
-    }
-    
-//-- 4. orientation of the normales is outwards or inwards
-    if (isValid == true)
-    {
-      bool bOuter = true;
-      if (shellID > 0)
-        bOuter = false;
-      isValid = check_global_orientation_normals(P, bOuter, cb);
-      if (isValid == false)
-      {
-        (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
-        P->inside_out();
-        isValid = true;
-      }
-    }
-//-- were the repair operations successfull?
-    if (isValid == true)
-    {
-      (*cb)(STATUS_OK, -1, -1, "Shell is valid.");
-      
-    }    
-  }  
+  if (isValid == true)
+  {
+    (*cb)(STATUS_OK, -1, -1, "\tyes");
+    (*cb)(STATUS_OK, -1, -1, "-----Geometrical consistency");
+    isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
+  }
   
-//-- Return CgalPolyhedron if valid, NULL otherwise  
+//-- 4. orientation of the normals is outwards or inwards
+  if (isValid == true)
+  {
+    (*cb)(STATUS_OK, -1, -1, "\tyes");
+    (*cb)(STATUS_OK, -1, -1, "-----Orientation of normals");
+    bool bOuter = true;
+    if (shellID > 0)
+      bOuter = false;
+    isValid = check_global_orientation_normals(P, bOuter, cb);
+    if (isValid == false)
+      (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "");
+    else
+      (*cb)(STATUS_OK, -1, -1, "\tyes");
+  }
+  
+//-- Return CgalPolyhedron if valid, NULL otherwise
   if (isValid == false)
   {
     delete P;
@@ -545,6 +452,108 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
   return P;
 }
 
+
+
+CgalPolyhedron* repair_triangulated_shell(TrShell& tshell, const vector<bool> &repairs, int shellID, cbf cb)
+{
+  bool isValid = true;
+  CgalPolyhedron *P = new CgalPolyhedron;
+  
+  //-- 1. Planarity of faces
+  //TODO: triangulate non-planar faces? tja, tough...
+  if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
+    isValid = false;
+  
+  //-- 2. Combinatorial consistency
+  if (isValid == true)
+  {
+    //-- construct the CgalPolyhedron incrementally
+    ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, true, cb);
+    P->delegate(s);
+    isValid = s.isValid;
+    //TODO: here the extra vertices are removed automatically (eg for Stanford bunny)
+    
+    if (isValid == true)
+    {
+      if (P->is_valid() == true) //-- combinatorially valid that is
+      {
+        if (P->is_closed() == false)
+        {
+          P->normalize_border();
+          //-- check for unconnected faces
+          if (P->keep_largest_connected_components(1) > 0)
+          {
+            //TODO: how to report what face is not connected? a bitch of a problem...
+            (*cb)(FREE_FACES, shellID, -1, "REPAIR: unconnected faces were deleted.");
+          }
+          else
+          {
+            //-- check if there are holes in the surface
+            if (P->size_of_border_halfedges() > 0)
+            {
+              (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
+              //TODO: how to report where the hole is? report one of the edge? centre of the hole?
+              isValid = false;
+            }
+          }
+        }
+        //-- test if the repair operation(s) worked
+        if ( (P->is_valid()) && (P->is_closed()) )
+        {
+          isValid = true;
+          (*cb)(STATUS_OK, -1, -1, "Topology of the shell was successfully repaired.");
+        }
+        else
+        {
+          isValid = false;
+          (*cb)(STATUS_OK, -1, -1, "Could not repair topology of the shell.");
+        }
+      }
+      else
+      {
+        (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "Something weird went wrong during construction of the shell, not sure what...");
+        isValid =  false;
+      }
+    }
+  }
+  
+  //-- 3. Geometrical consistency (aka intersection tests between faces)
+  if (isValid == true)
+  {
+    isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
+  }
+  
+  //-- 4. orientation of the normales is outwards or inwards
+  if (isValid == true)
+  {
+    bool bOuter = true;
+    if (shellID > 0)
+      bOuter = false;
+    isValid = check_global_orientation_normals(P, bOuter, cb);
+    if (isValid == false)
+    {
+      (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
+      P->inside_out();
+      isValid = true;
+    }
+  }
+  //-- were the repair operations successfull?
+  if (isValid == true)
+  {
+    (*cb)(STATUS_OK, -1, -1, "Shell is valid.");
+    
+  }
+  //-- Return CgalPolyhedron if valid, NULL otherwise
+  if (isValid == false)
+  {
+    delete P;
+    P = NULL;
+  }
+  return P;
+}
+
+  
+  
 
 CgalPolyhedron* construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb)
 {
