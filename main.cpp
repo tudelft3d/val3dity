@@ -62,6 +62,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
         // Surface level
       case INNER_RING_WRONG_ORIENTATION:           cout << "Error 200: " << "oring and irings have same orientation"; break;
       case NON_PLANAR_SURFACE:                     cout << "Error 210: " << "surface is not planar"; break;
+	  case DEGENERATE_SURFACE:                     cout << "Error 211: " << "degenerate surface"; break;
       case SURFACE_PROJECTION_INVALID:             cout << "Error 220: " << "surface is not valid in 2D (its projection)"; break;
       case INNER_RING_INTERSECTS_OUTER:            cout << "Error 221: " << "iring intersect oring"; break;
       case INNER_RING_OUTSIDE_OUTER:               cout << "Error 222: " << "iring outside oring"; break;
@@ -72,7 +73,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case SURFACE_NOT_CLOSED:                     cout << "Error 301: " << "surface is not closed"; break;
       case DANGLING_FACES:                         cout << "Error 302: " << "dangling faces (more than 2 surfaces incident to an edge)"; break;
       case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
-      case FREE_FACES:                             cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air)"; break;
+      case FREE_FACES:                             cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air) or duplicate faces"; break;
       case SURFACE_SELF_INTERSECTS:                cout << "Error 305: " << "surface self-intersect"; break;
       case VERTICES_NOT_USED:                      cout << "Error 306: " << "some vertices are not referenced by faces"; break;
       case SURFACE_NORMALS_BAD_ORIENTATION:        cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
@@ -91,7 +92,20 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
     if (bUsingIDs == false)
       cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
     else
-      cout << "\t" << "[shell: #" << idShells[shellNum] << "; face: #" << idFaces[shellNum][facetNum] << "]" << endl;    
+	{
+		//add by John to prevent warning
+		//-1 means unused
+		string shelloutput = "-1";
+		string faceoutput = "-1";
+
+		if (shellNum >= 0)
+			shelloutput = idShells[shellNum];
+
+		if (facetNum >= 0&&shellNum >= 0)
+			faceoutput = idFaces[shellNum][facetNum];
+		cout << "\t" << "[shell: #" << shelloutput << "; face: #" << faceoutput << "]" << endl;    
+      //cout << "\t" << "[shell: #" << idShells[shellNum] << "; face: #" << idFaces[shellNum][facetNum] << "]" << endl;    
+	}
 
     if (messageStr.size() > 0)
       cout << "\t" << messageStr << endl;
@@ -112,8 +126,22 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
     cout << "\t\t\t<type>ERROR</type>" << endl;
     cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
     if (bUsingIDs == true) {
-      cout << "\t\t\t<shell>" << idShells[shellNum] << "</shell>" << endl;
-      cout << "\t\t\t<face>" << idFaces[shellNum][facetNum] << "</face>" << endl;
+
+		//add by John to prevent warning
+		//-1 means unused
+		string shelloutput = "-1";
+		string faceoutput = "-1";
+
+		if (shellNum >= 0)
+			shelloutput = idShells[shellNum];
+
+		if (facetNum >= 0&&shellNum >= 0)
+			faceoutput = idFaces[shellNum][facetNum];
+
+		cout << "\t\t\t<shell>" << shelloutput << "</shell>" << endl;
+		cout << "\t\t\t<face>" << faceoutput << "</face>" << endl;
+		//cout << "\t\t\t<shell>" << idShells[shellNum] << "</shell>" << endl;
+		//cout << "\t\t\t<face>" << idFaces[shellNum][facetNum] << "</face>" << endl;
     }
     else {
       cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;

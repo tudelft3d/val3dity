@@ -35,6 +35,7 @@ typedef enum
    // Surface level
    INNER_RING_WRONG_ORIENTATION           = 200,
    NON_PLANAR_SURFACE                     = 210,
+   DEGENERATE_SURFACE				      = 211,
    SURFACE_PROJECTION_INVALID             = 220,
    INNER_RING_INTERSECTS_OUTER            = 221,
    INNER_RING_OUTSIDE_OUTER               = 222,

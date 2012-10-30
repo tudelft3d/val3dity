@@ -49,6 +49,33 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       // These are the number of rings on this facet
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
+	  //-- check for degeneration add by John
+	  bool isfacevalid = true;
+	  vector<int>::iterator it_chk = ids.begin();
+	  for (; it_chk != ids.end()-1; it_chk++)
+	  {
+		  vector<int>::iterator it_chk2 = it_chk + 1;
+		  for (; it_chk2 != ids.end(); it_chk2++)
+		  {
+			  if (*it_chk == *it_chk2)
+			  {
+				  //degeneration
+				  isfacevalid = false;
+				  isvalid = false;
+				  (*cb)(DEGENERATE_SURFACE, is, i, "Duplicate vertices");
+				  break;
+			  }
+		  }
+		  if (!isfacevalid)
+		  {
+			  break;
+		  }
+	  }
+	  if (!isfacevalid)
+	  {
+		  //in order to output all the degenerations
+		  continue;
+	  }
       //-- get projected Polygon
       Polygon pgn;
       vector<Polygon> lsRings;
