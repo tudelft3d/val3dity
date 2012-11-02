@@ -88,6 +88,28 @@ bool validate(vector<Shell*> &shells, cbf cb)
   
 //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, cb);
+
+  // Safe Software Inc.
+  // SECTION_START: Fix memory leaks.
+  for (size_t i=0; i < polyhedra.size(); ++i)
+  {
+     delete polyhedra[i]; polyhedra[i] = NULL;
+  }
+  for (size_t i=0; i < trShells.size(); ++i)
+  {
+    TrShell*& shell = trShells[i];
+    for (size_t j=0; j < shell->faces.size(); ++j)
+    {
+      vector<int*>& faces = shell->faces[j];
+      for (size_t k=0; k < faces.size(); ++k)
+      {
+        delete [] faces[k]; faces[k] = NULL;
+      }
+    }
+    delete shell; shell = NULL;
+  }
+  // SECTION_END: Fix memory leaks.
+
   return isValid;
 }
 
@@ -141,6 +163,28 @@ bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb)
   
   //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration
   bool isValid = validate_solid_with_nef(polyhedra, cb);
+
+  // Safe Software Inc.
+  // SECTION_START: Fix memory leaks.
+  for (size_t i=0; i < polyhedra.size(); ++i)
+  {
+    delete polyhedra[i]; polyhedra[i] = NULL;
+  }
+  for (size_t i=0; i < trShells.size(); ++i)
+  {
+    TrShell*& shell = trShells[i];
+    for (size_t j=0; j < shell->faces.size(); ++j)
+    {
+      vector<int*>& faces = shell->faces[j];
+      for (size_t k=0; k < faces.size(); ++k)
+      {
+        delete [] faces[k]; faces[k] = NULL;
+      }
+    }
+    delete shell; shell = NULL;
+  }
+  // SECTION_END: Fix memory leaks.
+
   return isValid;
   
 }
