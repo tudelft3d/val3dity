@@ -34,6 +34,7 @@ vector<string> idShells;
 vector< vector<string> > idFaces;
 bool bUsingIDs = false;
 bool xmloutput = false;
+bool bIsPolyhedron = true;//modified to false to prevent closure check for LoD0
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
@@ -88,7 +89,6 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       default    : cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
     }
     cout << endl;
-    
     if (bUsingIDs == false)
       cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
     else
@@ -195,11 +195,12 @@ int main(int argc, char* const argv[])
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
       bRepair = true;
+	else if (strcmp(argv[argNum], "-open") == 0)
+	  bIsPolyhedron = false;
     else {
       arguments.push_back(string(argv[argNum]));
     }
   }
-
   vector<Shell*> shells;
   if (xmloutput == false) {
     if (bUsingIDs == true) {
@@ -209,7 +210,7 @@ int main(int argc, char* const argv[])
       readAllInputShells(arguments, shells, callback_cout);
     }
     if (bRepair == false)
-      validate(shells, callback_cout);
+      validate(shells, bIsPolyhedron, callback_cout);
     else
       repair(shells, repairs, callback_cout);
   }
@@ -221,12 +222,13 @@ int main(int argc, char* const argv[])
     else {
       readAllInputShells(arguments, shells, callback_xml);
     }
+
     if (bRepair == false)
-      validate(shells, callback_cout);
+      validate(shells, bIsPolyhedron, callback_cout);
     else
       repair(shells, repairs, callback_cout);
   }
-    
+
   if (xmloutput == false) {
     if (callbackWasCalledWithError)
     {

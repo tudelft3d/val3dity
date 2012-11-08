@@ -40,7 +40,7 @@ K::FT   find_range_area(int ignored, const vector< Point3 > &lsPts, const vector
 
 //--------------------------------------------------------------
 
-bool validate(vector<Shell*> &shells, cbf cb)
+bool validate(vector<Shell*> &shells, bool bIsPolyhedron, cbf cb)
 {
   bool foundError(false);
   
@@ -68,7 +68,7 @@ bool validate(vector<Shell*> &shells, cbf cb)
     std::stringstream st;
     st << endl << "Validating shell #" << i;
     (*cb)(STATUS_OK, -1, -1, st.str());
-    p  = validate_triangulated_shell(*(trShells[i]), i, cb);
+    p  = validate_triangulated_shell(*(trShells[i]), i, bIsPolyhedron, cb);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)
@@ -85,7 +85,6 @@ bool validate(vector<Shell*> &shells, cbf cb)
     }
   }
   (*cb)(STATUS_OK, -1, -1, "");
-  
 //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, cb);
 
@@ -460,18 +459,18 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
 	for (;it!=ids.end();it++)
 	{
 		Vector next ((vert.z() + lsPts[*it].z()) * (vert.y() - lsPts[*it].y()),
-					 (vert.x()+ lsPts[*it].x()) * (vert.z() - lsPts[*it].z()),
-					 (vert.y()+ lsPts[*it].y()) * (vert.x() - lsPts[*it].x()));
+			(vert.x()+ lsPts[*it].x()) * (vert.z() - lsPts[*it].z()),
+			(vert.y()+ lsPts[*it].y()) * (vert.x() - lsPts[*it].x()));
 		pnormal = pnormal + next;
 		vert = lsPts[*it];
 	}
 
 	pnormal = pnormal / sqrt(pnormal.squared_length());
-  //-- return the normal passed by reference, useful for some functions
-  normal = normal + pnormal;
+	//-- return the normal passed by reference, useful for some functions
+	normal = normal + pnormal;
 
 	//compare cos
-   // need to use K::FT instead of double to ensure compilation under core level 4
+	// need to use K::FT instead of double to ensure compilation under core level 4
 	K::FT a = abs(pnormal * Vector(1.0, 0.0, 0.0));//yz
 	K::FT b = abs(pnormal * Vector(0.0, 1.0, 0.0));//xz
 	K::FT c = abs(pnormal * Vector(0.0, 0.0, 1.0));//xy

@@ -31,6 +31,9 @@
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/intersections.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/AABB_polyhedron_triangle_primitive.h>
 
 #include<set>
 #include<list>
@@ -80,13 +83,16 @@ public:
 //      construct_faces_keep_adjcent(B, cb);
     else
       construct_faces_flip_when_possible(B, cb);
-    
-    if (B.check_unconnected_vertices() == true) {
-      (*cb)(VERTICES_NOT_USED, shellID, -1, "");
-//      isValid = false;
-      B.remove_unconnected_vertices();
-    }
-    B.end_surface();
+
+	//
+	if (isValid)
+	{
+		if (B.check_unconnected_vertices() == true) {
+			(*cb)(VERTICES_NOT_USED, shellID, -1, "");
+			B.remove_unconnected_vertices();
+		}
+	}
+	B.end_surface();
   }
   
   void construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
@@ -100,6 +106,7 @@ public:
       {
         int* a = *itF2;
 //        std::cout << a[0] << " - " << a[1] << " - " << a[2] << std::endl;
+
         add_one_face(B, a[0], a[1], a[2], faceID, cb);
       }
       faceID++;
@@ -346,10 +353,11 @@ CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<
 bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
 bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
+bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
 
 //------------------------------------------
 
-CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool bIsPolyhedron, cbf cb)
 {
   bool isValid = true;
   CgalPolyhedron *P = new CgalPolyhedron;
@@ -377,7 +385,6 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
     ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
     P->delegate(s);
     isValid = s.isValid;
-    
     if (isValid == true)
     {
       if (P->is_valid() == true) //-- combinatorially valid that is
@@ -395,7 +402,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
           else
           {
             //-- check if there are holes in the surface
-            if (P->is_closed() == false)
+            if (bIsPolyhedron && P->is_closed() == false)
             {
               std::stringstream st;
               P->normalize_border();
@@ -419,7 +426,6 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
       }
     }
   }
-
 //-- 3. Geometrical consistency (aka intersection tests between faces)
   if (isValid == true)
   {
@@ -427,28 +433,31 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
     (*cb)(STATUS_OK, -1, -1, "-----Geometrical consistency");
     isValid = is_polyhedron_geometrically_consistent(P, shellID, cb);
   }
-  
-//-- 4. orientation of the normals is outwards or inwards
-  if (isValid == true)
+  if (isValid)
   {
-    (*cb)(STATUS_OK, -1, -1, "\tyes");
+	(*cb)(STATUS_OK, -1, -1, "\tyes");
+  }
+//-- 4. orientation of the normals is outwards or inwards
+  if (bIsPolyhedron && isValid == true)
+  {
     (*cb)(STATUS_OK, -1, -1, "-----Orientation of normals");
     bool bOuter = true;
     if (shellID > 0)
       bOuter = false;
-    isValid = check_global_orientation_normals(P, bOuter, cb);
+	//should be careful!! still have contradict cases but low probability
+    isValid = check_global_orientation_normals_rev(P, bOuter, cb);
     if (isValid == false)
       (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "");
     else
       (*cb)(STATUS_OK, -1, -1, "\tyes");
   }
-  
 //-- Return CgalPolyhedron if valid, NULL otherwise
   if (isValid == false)
   {
     delete P;
     P = NULL;
   }
+
   return P;
 }
 
@@ -569,53 +578,249 @@ CgalPolyhedron* construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Po
   return NULL;
 }
 
+//revised version of check_global_orientation_normals
+//should be careful!! still have contradict cases but low probability
+bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf cb )
+{
+	/*calculation the AABB tree for select an exterior point outside the bounding box
+	and calculate intersections for the ray. selected the closest intersection point and comparing the normal*/
+	
+	//definitions
+	typedef K::Ray_3 Ray;
+	typedef K::Triangle_3 Triangle;
+	typedef list<Triangle>::iterator Iterator;
+	typedef CGAL::AABB_polyhedron_triangle_primitive<K, CgalPolyhedron> Primitive;
+	typedef CGAL::AABB_traits<K, Primitive> Traits;
+	typedef CGAL::AABB_tree<Traits> AABBTree;
 
+	//build the aabbtree for polyhedron
+	AABBTree myTree(p->facets_begin(), p->facets_end());
+	if (myTree.empty())
+	{
+		cout<<"Unable to construct AABB tree"<<endl;;
+		return false;
+	}
+	myTree.accelerate_distance_queries();
 
+	//calculate the exterior point (corner of bbox and shift a bit)
+	AABBTree::Bounding_box bbox = myTree.bbox();
+
+	//find the first valid result from the triangle
+	float fShift = 100.0;// shift the coordinate of the projected points
+	CgalPolyhedron::Facet_iterator fItr = p->facets_begin();
+	while (fItr != p->facets_end())
+	{
+		CgalPolyhedron::Facet_handle fHandle = fItr;
+		CgalPolyhedron::Halfedge_handle h = fHandle->halfedge();
+
+		//project the face to one of the axis aligned plane
+		Vector vecNormal = CGAL::cross_product(h->next()->vertex()->point() - h->vertex()->point(),
+			h->next()->next()->vertex()->point() - h->next()->vertex()->point());
+		
+		//select the projection plane
+		K::FT a = abs(vecNormal * Vector(1.0, 0.0, 0.0));//yz
+		K::FT b = abs(vecNormal * Vector(0.0, 1.0, 0.0));//xz
+		K::FT c = abs(vecNormal * Vector(0.0, 0.0, 1.0));//xy
+
+		K::FT m = max(max(a, b), c);
+
+		//construct the ray based on the projection
+		Ray queryRay;
+		Point3 stPt;
+		if (CGAL::compare(a, m) == CGAL::EQUAL)
+		{
+			//yz
+			stPt = Point3(bbox.xmax() + fShift, 
+				(h->vertex()->point().y() + h->next()->vertex()->point().y() + h->next()->next()->vertex()->point().y())/3, 
+				(h->vertex()->point().z() + h->next()->vertex()->point().z() + h->next()->next()->vertex()->point().z())/3);
+			Vector vecInwards (-1.0, 0.0, 0.0);
+			queryRay = Ray(stPt, vecInwards);
+		}
+		else if (CGAL::compare(b, m) == CGAL::EQUAL)
+		{
+			//xz
+			stPt = Point3((h->vertex()->point().x() + h->next()->vertex()->point().x() + h->next()->next()->vertex()->point().x())/3,
+				bbox.ymax() + fShift, 
+				(h->vertex()->point().z() + h->next()->vertex()->point().z() + h->next()->next()->vertex()->point().z())/3);
+			Vector vecInwards (0.0, -1.0, 0.0);
+			queryRay = Ray(stPt, vecInwards);
+		}
+		else
+		{
+			//xy
+			stPt = Point3((h->vertex()->point().x() + h->next()->vertex()->point().x() + h->next()->next()->vertex()->point().x())/3,
+				(h->vertex()->point().y() + h->next()->vertex()->point().y() + h->next()->next()->vertex()->point().y())/3,
+				bbox.zmax() + fShift);
+			Vector vecInwards (0.0, 0.0, -1.0);
+			queryRay = Ray(stPt, vecInwards);
+		}
+
+		//shoot the ray and extract the closed intersection (point and its face)
+		list<AABBTree::Object_and_primitive_id> intersections;
+		myTree.all_intersections(queryRay, std::back_inserter(intersections));
+		//
+		float fDistance;
+		AABBTree::Object_and_primitive_id Hit;
+		//
+		list<AABBTree::Object_and_primitive_id>::iterator listItr = intersections.begin();
+		CGAL::Object tmpObj = listItr->first;
+		Point3 tmpPt;
+		if (CGAL::assign(tmpPt, tmpObj))
+		{
+			fDistance = (tmpPt - stPt).squared_length();
+			Hit = *listItr;
+		}
+		else
+		{
+			cout<<"Unbeliveable!!"<<endl;
+			break;
+		}
+		//
+		while(listItr != intersections.end())
+		{
+			AABBTree::Object_and_primitive_id op = *listItr;
+			CGAL::Object obj = op.first;
+			CgalPolyhedron::Face_handle face = op.second;
+			Point3 pt;
+			if (CGAL::assign(pt, obj))
+			{
+				//calculate the distance
+				float dist = (pt - stPt).squared_length();
+				if (fDistance > dist)
+				{
+					fDistance = dist;
+					Hit = *listItr;
+					//cout<<fDistance<<endl;
+				}
+			}
+			else
+			{
+				cout<<"Unbeliveable!!"<<endl;
+				break;
+			}
+			++listItr;
+		}
+		
+		//make sure the point is not one of the vertices
+		bool bBadLuck = false;
+		CgalPolyhedron::Vertex_iterator vItr = p->vertices_begin();
+		for (; vItr != p->vertices_end(); vItr++)
+		{
+			Point3 pt;
+			CGAL::assign(pt, Hit.first);
+			if (pt == vItr->point())
+			{
+				bBadLuck = true;
+				break;
+			}
+		}
+
+		//get the answer by comparing the normal
+		if (!bBadLuck)
+		{
+			//calculate the normal of the face
+			CgalPolyhedron::Halfedge_handle h = Hit.second->halfedge();
+			//cout<<h->vertex()->point()<<" "<<h->next()->vertex()->point()<<" "<<h->next()->next()->vertex()->point()<<endl;
+			Vector faceNormal = CGAL::cross_product(h->next()->vertex()->point() - h->vertex()->point(),
+				h->next()->next()->vertex()->point() - h->next()->vertex()->point());
+			//compare
+			K::FT result = faceNormal * queryRay.to_vector();
+			if (CGAL::compare(result, 0.0) == CGAL::LARGER)
+			{
+				return false;
+			}
+			else if(CGAL::compare(result, 0.0) == CGAL::SMALLER)
+				return true;
+		}
+		++fItr;
+	}
+	return false;
+}
+
+//problematic
 bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
 {
-  //-- get a 'convex corner', sorting order is x-y-z
-  CgalPolyhedron::Vertex_iterator vIt;
-  vIt = p->vertices_begin();
-  CgalPolyhedron::Vertex_handle cc = vIt;
-  vIt++;
+	//-- get a 'convex corner', sorting order is x-y-z
+	CgalPolyhedron::Vertex_iterator vIt;
+	vIt = p->vertices_begin();
+	CgalPolyhedron::Vertex_handle cc = vIt;
+	vIt++;
 
-  for ( ; vIt != p->vertices_end(); vIt++)
-  {
-    if (vIt->point().x() > cc->point().x())
-      cc = vIt;
-    else if (vIt->point().x() == cc->point().x())
-    {
-      if (vIt->point().y() > cc->point().y())
-        cc = vIt;
-      else if (vIt->point().y() == cc->point().y())
-      {
-        if (vIt->point().z() > cc->point().z())
-          cc = vIt;
-      }
-    }
-  }
-//  cout << "CONVEX CORNER IS: " << cc->point() << endl;
+	for ( ; vIt != p->vertices_end(); vIt++)
+	{
+		if (vIt->point().x() > cc->point().x())
+			cc = vIt;
+		else if (vIt->point().x() == cc->point().x())
+		{
+			if (vIt->point().y() > cc->point().y())
+				cc = vIt;
+			else if (vIt->point().y() == cc->point().y())
+			{
+				if (vIt->point().z() > cc->point().z())
+					cc = vIt;
+			}
+		}
+	}
+	//  cout << "CONVEX CORNER IS: " << cc->point() << endl;
+	CgalPolyhedron::Halfedge_handle curhe = cc->halfedge();
+	CgalPolyhedron::Halfedge_handle otherhe;
+	otherhe = curhe->opposite()->next();
+	CGAL::Orientation orient = orientation( curhe->vertex()->point(),
+	                                        curhe->next()->vertex()->point(),
+	                                        curhe->next()->next()->vertex()->point(),
+	                                        otherhe->vertex()->point() );
+	while (orient == CGAL::COPLANAR)
+	 {
+	   otherhe = otherhe->next()->opposite()->next();
+	if (otherhe->next() == curhe->next()->opposite())
+	{
+		//finished the traverse
+		break;
+	}
+	   orient = orientation( curhe->vertex()->point(),
+	                         curhe->next()->vertex()->point(),
+	                         curhe->next()->next()->vertex()->point(),
+	                         otherhe->vertex()->point() );
+	/*cout<<curhe->vertex()->point()<<
+		curhe->next()->vertex()->point()<<
+		curhe->next()->next()->vertex()->point()<<
+		otherhe->vertex()->point()<<endl;*/
+	 }
+	if ( ((bOuter == true) && (orient != CGAL::CLOCKWISE)) || ((bOuter == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
+		  return false;
+	else
+		  return true;
 
-  CgalPolyhedron::Halfedge_handle curhe = cc->halfedge();
-  CgalPolyhedron::Halfedge_handle otherhe;
-  otherhe = curhe->opposite()->next();
-  CGAL::Orientation orient = orientation( curhe->vertex()->point(),
-                                          curhe->next()->vertex()->point(),
-                                          curhe->next()->next()->vertex()->point(),
-                                          otherhe->vertex()->point() );
-  
-  while (orient == CGAL::COPLANAR)
-  {
-    otherhe = otherhe->next()->opposite()->next();
-    orient = orientation( curhe->vertex()->point(),
-                          curhe->next()->vertex()->point(),
-                          curhe->next()->next()->vertex()->point(),
-                          otherhe->vertex()->point() );
-  }
-  if ( ((bOuter == true) && (orient != CGAL::CLOCKWISE)) || ((bOuter == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
-    return false;
-  else
-    return true;
+	//revised by John to check whether the normals of the star of the vertex point to the "peak" direction
+	/*bool bOrient = true;
+	CgalPolyhedron::Halfedge_around_vertex_circulator hcir = curhe->vertex()->vertex_begin();
+	int iNum = CGAL::circulator_size(hcir);
+	Vector x_direction(1.0, 1.0, 1.0);
+
+	for(int i = 0 ; i < iNum; ++i)
+	{
+	CgalPolyhedron::Plane_3 plane = CgalPolyhedron::Plane_3(hcir->vertex()->point(),
+	hcir->next()->vertex()->point(),
+	hcir->next()->next()->vertex()->point());
+
+	cout<<x_direction * plane.orthogonal_vector()<<endl;
+	cout<<hcir->vertex()->point()<<", "<<
+	hcir->next()->vertex()->point()<<", "<<
+	hcir->next()->next()->vertex()->point()<<endl;
+
+	if (CGAL::compare(x_direction * plane.orthogonal_vector(), 0.0) == CGAL::SMALLER)
+	{
+	bOrient  = false;
+	break;
+	}
+
+	++hcir;
+	}
+
+	if ( ((bOuter == true) && (bOrient)) || ((bOuter == false) && (!bOrient)) ) 
+	return true;
+	else
+	return false;*/
 }
 
 CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const vector<Point3>& lsPts)
