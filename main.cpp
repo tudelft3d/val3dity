@@ -224,9 +224,9 @@ int main(int argc, char* const argv[])
     }
 
     if (bRepair == false)
-      validate(shells, bIsPolyhedron, callback_cout);
-    else
-      repair(shells, repairs, callback_cout);
+		  validate(shells, bIsPolyhedron, callback_xml);
+	  else
+		  repair(shells, repairs, callback_xml);
   }
 
   if (xmloutput == false) {
