@@ -31,7 +31,6 @@
 
 
 bool    triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, cbf cb);
-bool    triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb);
 bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 
 // need to use K::FT instead of double to ensure compilation under core level 4

@@ -45,4 +45,8 @@ bool  create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Poly
 bool  check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids);
 bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids);
 
+// -----------------------------------------------------------
+// Safe Software Inc. 
+bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb);
+
 #endif
