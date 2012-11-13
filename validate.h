@@ -41,7 +41,8 @@ bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb);
 //
 int   projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids);
 int   projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &ids, Vector& v0);//
-void  create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
-
+bool  create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &p);
+bool  check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids);
+bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids);
 
 #endif

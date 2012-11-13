@@ -25,7 +25,7 @@
 
 #include "validate_2d.h"
 #include "validate.h"
-
+#include "cgal/squared_distance_3.h"
 // OGR-- to use GEOS's IsValid() function easily to valide the faces in 2D
 #include <gdal/ogrsf_frmts.h>
 //#include "ogr_geos.h"
@@ -50,36 +50,22 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
 	  //-- check for degeneration add by John
-	  bool isfacevalid = true;
-	  vector<int>::iterator it_chk = ids.begin();
-	  for (; it_chk != ids.end()-1; it_chk++)
+	  if (!check_degenerate_face(shell->lsPts, ids))
 	  {
-		  vector<int>::iterator it_chk2 = it_chk + 1;
-		  for (; it_chk2 != ids.end(); it_chk2++)
-		  {
-			  if (*it_chk == *it_chk2)
-			  {
-				  //degeneration
-				  isfacevalid = false;
-				  isvalid = false;
-				  (*cb)(DEGENERATE_SURFACE, is, i, "Duplicate vertices");
-				  break;
-			  }
-		  }
-		  if (!isfacevalid)
-		  {
-			  break;
-		  }
-	  }
-	  if (!isfacevalid)
-	  {
-		  //in order to output all the degenerations
+		  (*cb)(DEGENERATE_SURFACE, is, i, "Degenerated face");
+		  isvalid = false;
 		  continue;
 	  }
       //-- get projected Polygon
       Polygon pgn;
       vector<Polygon> lsRings;
-      create_polygon(shell->lsPts, ids, pgn);
+	  //
+      if (false == create_polygon(shell->lsPts, ids, pgn))
+	  {
+		  (*cb)(NON_SIMPLE_SURFACE, is, i, "The polygon is not simple!");
+		  isvalid = false;
+		  continue;
+	  }
       lsRings.push_back(pgn);
       //-- check for irings
       for (int j = 1; j < static_cast<int>(numf); j++)
@@ -142,4 +128,57 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
     }
   }
   return isvalid;
+}
+
+//check whether the face is degenerated
+bool check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids)
+{
+	//vertex number
+	if (ids.size() < 3)
+	{
+		//degeneration
+		return false;
+	}
+	//indices check
+	vector<int>::const_iterator it_chk = ids.begin();
+	for (; it_chk != ids.end()-1; it_chk++)
+	{
+		vector<int>::const_iterator it_chk2 = it_chk + 1;
+		for (; it_chk2 != ids.end(); it_chk2++)
+		{
+			if (*it_chk == *it_chk2)
+			{
+				//degeneration
+				return false;
+			}
+		}
+	}
+	//collinear check
+	return check_collinear(lsPts, ids);
+}
+
+bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids)
+{
+	//used to check the collinearity of vertices
+	float Tol_check = 1.0e-6;
+	//
+	if (lsPts.size () < 2 || ids.size() < 2)
+	{
+		return false;
+	}
+	vector< int >::const_iterator pt_itr = ids.begin();
+	Point3 pt1 = lsPts[*pt_itr++];
+	Point3 pt2 = lsPts[*pt_itr++];
+	for (; pt_itr != ids.end(); pt_itr++)
+	{
+		Point3 ckpt = lsPts[*pt_itr];
+		typedef K::Line_3 Line;
+		Line ckline (pt1, pt2);
+		if (CGAL::compare (squared_distance(ckline, ckpt), Tol_check) == CGAL::LARGER)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

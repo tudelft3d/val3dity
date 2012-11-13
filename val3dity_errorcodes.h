@@ -41,6 +41,7 @@ typedef enum
    INNER_RING_OUTSIDE_OUTER               = 222,
    //INNER_OUTER_RINGS_INTERSECT          = 223,
    INTERIOR_OF_RING_NOT_CONNECTED         = 224,
+   NON_SIMPLE_SURFACE					  = 230,
    // Shell level
    NOT_VALID_2_MANIFOLD                   = 300,
    SURFACE_NOT_CLOSED                     = 301,

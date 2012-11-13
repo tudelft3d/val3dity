@@ -311,7 +311,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
   return true;
 }
 
-void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
+bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
 {
   //int proj = projection_plane_range(lsPts, ids);
   Vector v0;
@@ -328,8 +328,15 @@ void create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
     else
       pgn.push_back(Point2(p.y(), p.z()));
   }
+  //
+  if (!pgn.is_simple())
+  {
+	  return false;
+  }
+  //
   if (pgn.is_counterclockwise_oriented() == false)
     pgn.reverse_orientation();
+  return true;
 }
 
 bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum)
