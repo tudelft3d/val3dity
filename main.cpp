@@ -148,11 +148,11 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
       cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
       cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
     }
-    if (messageStr.empty() == false)
-      cout << "\t\t\t<message>" << messageStr << "</errorCode>" << endl;  
-    cout << "\t\t</ValidatorMessage>" << endl;
+	if (messageStr.empty() == false)
+		cout << "\t\t\t<message>" << messageStr << "</message>" << endl;  
+	cout << "\t\t</ValidatorMessage>" << endl;
   }
-  
+
 }
 
 
