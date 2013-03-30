@@ -153,32 +153,38 @@ bool check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids
 			}
 		}
 	}
-	//collinear check
-	return check_collinear(lsPts, ids);
-}
-
-bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids)
-{
-	//used to check the collinearity of vertices
-	float Tol_check = 1.0e-6;
-	//
-	if (lsPts.size () < 2 || ids.size() < 2)
+	//check point normal
+	Vector v0 (0.0,0.0,0.0);
+	int proj = projection_plane_range_2(lsPts, ids, v0);
+	if (CGAL::compare (v0.squared_length(), 0.0) == CGAL::LARGER)
 	{
+		return true;
+	}
+	else
 		return false;
-	}
-	vector< int >::const_iterator pt_itr = ids.begin();
-	Point3 pt1 = lsPts[*pt_itr++];
-	Point3 pt2 = lsPts[*pt_itr++];
-	for (; pt_itr != ids.end(); pt_itr++)
-	{
-		Point3 ckpt = lsPts[*pt_itr];
-		typedef K::Line_3 Line;
-		Line ckline (pt1, pt2);
-		if (CGAL::compare (squared_distance(ckline, ckpt), Tol_check) == CGAL::LARGER)
-		{
-			return true;
-		}
-	}
-
-	return false;
+	//return check_collinear(lsPts, ids);
 }
+
+// bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids)
+// {
+// 	//
+// 	if (lsPts.size () < 2 || ids.size() < 2)
+// 	{
+// 		return false;
+// 	}
+// 	vector< int >::const_iterator pt_itr = ids.begin();
+// 	Point3 pt1 = lsPts[*pt_itr++];
+// 	Point3 pt2 = lsPts[*pt_itr++];
+// 	for (; pt_itr != ids.end(); pt_itr++)
+// 	{
+// 		Point3 ckpt = lsPts[*pt_itr];
+// 		typedef K::Line_3 Line;
+// 		Line ckline (pt1, pt2);
+// 		if (CGAL::compare (squared_distance(ckline, ckpt), 0.0) == CGAL::LARGER)
+// 		{
+// 			return true;
+// 		}
+// 	}
+// 
+// 	return false;
+// }
