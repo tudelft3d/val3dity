@@ -241,6 +241,12 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 //    int proj = projection_plane_range(shell.lsPts, idsob);
     Vector v0 (0,0,0);
     int proj = projection_plane_range_2(shell.lsPts, idsob, v0);
+	if (proj == -1)
+	{
+		(*cb)(DEGENERATE_SURFACE, shellNum, -1, "Degenerated face");
+		return false;
+	}
+	
 //    Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
     
     //-- get projected Polygon
@@ -284,12 +290,14 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
       if ( (v0*n) > 0)
         invert = true;
     }
-    else
+    else if(proj == 0)
     {
       Vector n(1, 0, 0);
       if ( (v0*n) < 0)
         invert = true;
     }
+	
+
     if ( invert == true ) //-- invert
     {
       vector<int*>::iterator it3 = oneface.begin();
@@ -315,6 +323,12 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
   //int proj = projection_plane_range(lsPts, ids);
   Vector v0;
   int proj = projection_plane_range_2(lsPts, ids, v0);
+  if (proj == -1)
+  {
+	  //(*cb)(DEGENERATE_SURFACE, shellNum, i, "Degenerated face");
+	  return false;
+  }
+  
   //-- build projected polygon
   vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
@@ -324,7 +338,7 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
       pgn.push_back(Point2(p.x(), p.y()));
     else if (proj == 1)
       pgn.push_back(Point2(p.x(), p.z()));
-    else
+    else if (proj == 0)
       pgn.push_back(Point2(p.y(), p.z()));
   }
   //
@@ -345,6 +359,10 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 //  int proj = projection_plane_range(lsPts, ids);
   Vector v0;
   int proj = projection_plane_range_2(lsPts, ids, v0);
+  if (proj == -1)
+  {
+	  return false;
+  }
   
   CT ct;
   vector< vector<int> >::const_iterator it = pgnids.begin();
@@ -458,23 +476,44 @@ int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids
 
 int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &ids, Vector& normal)
 {
+	//translate all the points to the origin to enhance the stability
+	Vector centPt(0.0, 0.0, 0.0);
+	vector<Point3>::const_iterator it_pt = lsPts.begin();
+	for (; it_pt != lsPts.end(); it_pt++)
+	{
+		centPt = centPt + ((*it_pt)-CGAL::ORIGIN);
+	}
+	centPt = centPt/lsPts.size();
+	//
+	vector<Point3> newPts;
+	it_pt = lsPts.begin();
+	for (; it_pt != lsPts.end(); it_pt++)
+	{
+		newPts.push_back(*it_pt-centPt);
+	}
+	//
 	vector<int>::const_iterator it = ids.begin();
 	//Newell normal 
-	Point3 vert (lsPts[*(ids.end()-1)]);
+	Point3 vert (newPts[*(ids.end()-1)]);
 	Vector pnormal(0.0, 0.0, 0.0);
 	for (;it!=ids.end();it++)
 	{
-		Vector next ((vert.z() + lsPts[*it].z()) * (vert.y() - lsPts[*it].y()),
-			(vert.x()+ lsPts[*it].x()) * (vert.z() - lsPts[*it].z()),
-			(vert.y()+ lsPts[*it].y()) * (vert.x() - lsPts[*it].x()));
+		Vector next ((vert.z() + newPts[*it].z()) * (vert.y() - newPts[*it].y()),
+			(vert.x()+ newPts[*it].x()) * (vert.z() - newPts[*it].z()),
+			(vert.y()+ newPts[*it].y()) * (vert.x() - newPts[*it].x()));
 		pnormal = pnormal + next;
-		vert = lsPts[*it];
+		vert = newPts[*it];
 	}
-
+	//Introduce a tolerance
+	K::FT TOL(0.0);
+	if (CGAL::compare(sqrt(pnormal.squared_length()), TOL) != CGAL::LARGER)
+	{
+		return -1;//degenerated
+	}
+	//
 	pnormal = pnormal / sqrt(pnormal.squared_length());
 	//-- return the normal passed by reference, useful for some functions
 	normal = normal + pnormal;
-
 	//compare cos
 	// need to use K::FT instead of double to ensure compilation under core level 4
 	K::FT a = abs(pnormal * Vector(1.0, 0.0, 0.0));//yz

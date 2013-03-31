@@ -156,7 +156,7 @@ bool check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids
 	//check point normal
 	Vector v0 (0.0,0.0,0.0);
 	int proj = projection_plane_range_2(lsPts, ids, v0);
-	if (CGAL::compare (v0.squared_length(), 0.0) == CGAL::LARGER)
+	if (proj != -1)
 	{
 		return true;
 	}
