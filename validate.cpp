@@ -505,7 +505,7 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
 		vert = newPts[*it];
 	}
 	//Introduce a tolerance
-	K::FT TOL(0.0);
+	K::FT TOL(1e-8);
 	if (CGAL::compare(sqrt(pnormal.squared_length()), TOL) != CGAL::LARGER)
 	{
 		return -1;//degenerated
