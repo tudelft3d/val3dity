@@ -11,6 +11,11 @@ cube
 cube with 6 faces
 valid
 
+cube2
+-----
+cube with a hole in top face located outside
+invalid (2D validation problems also)
+
 cube3
 -----
 cube with a hole in the top face
@@ -35,7 +40,7 @@ cube8
 -----
 cube with an extra vertex on an edge. Only one of the 2 incident faces has
 it explicitly. 
-Is it valid? No idea... topology vs geometry. Oracle says 'valid'.
+Geometrically valid, but topologically invalid. Thus: invalid. Oracle says 'valid' though
 
 cube9
 ---------
@@ -51,7 +56,7 @@ invalid
 
 cube11
 ------
-cube with one extra face in the middle, splitting the cube  in two parts
+cube with one extra face in the middle, splitting the cube in two parts
 invalid
 (oracle=54502)
 
