@@ -17,7 +17,3 @@ To compile val3dity, you first need to install the free libraries [CGAL](http://
     $ make
     $ ./val3dity inputfile.poly
 
-You can get all the options simply by running val3dity with no arguments
-    
-    $ ./val3dity
-
