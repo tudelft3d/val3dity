@@ -26,17 +26,13 @@
 #include "validate_2d.h"
 #include "validate.h"
 #include "cgal/squared_distance_3.h"
-// OGR-- to use GEOS's IsValid() function easily to valide the faces in 2D
-#include <gdal/ogrsf_frmts.h>
-//#include "ogr_geos.h"
 #include <geos/geos_c.h>
-//#include "gdal/ogr_api.h"
-//#include "gdal/ogr_p.h"
 
 
 
 bool validate_2D(vector<Shell*> &shells, cbf cb)
 {
+  initGEOS(NULL, NULL);
   (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D with GEOS (their projection)");
   bool isvalid = true;
   for (unsigned int is=0; is<shells.size(); is++)
@@ -108,25 +104,21 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       }
       wkt << ")";
       
-      char *wktcstr = (char *)malloc((wkt.str().size())*sizeof(char *));    
-      strcpy(wktcstr, wkt.str().c_str());
-      OGRGeometry *geometry;
-      OGRGeometryFactory::createFromWkt(&wktcstr, NULL, &geometry);
-    
-      //-- get a GEOSGeometry to have access to the reason of the validation error
-      //-- and to prevent GEOS from writing to std output
-      GEOSGeom hThisGeosGeom = NULL;
-      hThisGeosGeom = geometry->exportToGEOS();
+      GEOSWKTReader* r;
+      r = GEOSWKTReader_create();
+      GEOSGeometry* mygeom;
+      mygeom = GEOSWKTReader_read(r, wkt.str().c_str());
       char *reason = (char *)malloc(1000*sizeof(char *));    
-      reason = GEOSisValidReason(hThisGeosGeom);
+      reason = GEOSisValidReason(mygeom);
       if (strcmp(reason, "Valid Geometry") != 0) 
       {
         isvalid = false;
         (*cb)(SURFACE_PROJECTION_INVALID, is, i, reason);
       }
-      GEOSGeom_destroy( hThisGeosGeom );
+      GEOSGeom_destroy( mygeom );
     }
   }
+  finishGEOS();
   return isvalid;
 }
 
