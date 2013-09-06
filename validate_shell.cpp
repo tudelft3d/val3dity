@@ -673,7 +673,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 		}
 		else
 		{
-			cout<<"Unbeliveable!!"<<endl;
+			cout<<"Unbelievable!!"<<endl;
 			break;
 		}
 		//
@@ -696,7 +696,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 			}
 			else
 			{
-				cout<<"Unbeliveable!!"<<endl;
+				cout<<"Unbelievable!!"<<endl;
 				break;
 			}
 			++listItr;
@@ -716,7 +716,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 			}
 		}
 
-		//get the answer by comparing the normal
+		//get the answer by comparing the normals
 		if (!bBadLuck)
 		{
 			//calculate the normal of the face
@@ -728,10 +728,10 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 			K::FT result = faceNormal * queryRay.to_vector();
 			if (CGAL::compare(result, 0.0) == CGAL::LARGER)
 			{
-				return false;
+				return (bOuter == false);
 			}
 			else if(CGAL::compare(result, 0.0) == CGAL::SMALLER)
-				return true;
+				return (bOuter == true);
 		}
 		++fItr;
 	}
