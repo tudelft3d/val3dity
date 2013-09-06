@@ -13,3 +13,7 @@ val3dity
 
 # xcode project
 *.xcodeproj
+
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
