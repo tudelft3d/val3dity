@@ -445,7 +445,8 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     if (shellID > 0)
       bOuter = false;
 	//should be careful!! still have contradict cases but low probability
-    isValid = check_global_orientation_normals_rev(P, bOuter, cb);
+    // isValid = check_global_orientation_normals_rev(P, bOuter, cb);
+    isValid = check_global_orientation_normals(P, bOuter, cb);
     if (isValid == false)
       (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "");
     else
@@ -770,22 +771,18 @@ bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
 	                                        curhe->next()->next()->vertex()->point(),
 	                                        otherhe->vertex()->point() );
 	while (orient == CGAL::COPLANAR)
-	 {
-	   otherhe = otherhe->next()->opposite()->next();
-	if (otherhe->next() == curhe->next()->opposite())
 	{
-		//finished the traverse
-		break;
-	}
+	   otherhe = otherhe->next()->opposite()->next();
+	   if (otherhe->next() == curhe->next()->opposite())
+	   {
+		    //finished the traverse
+		   break;
+	   }
 	   orient = orientation( curhe->vertex()->point(),
 	                         curhe->next()->vertex()->point(),
 	                         curhe->next()->next()->vertex()->point(),
 	                         otherhe->vertex()->point() );
-	/*cout<<curhe->vertex()->point()<<
-		curhe->next()->vertex()->point()<<
-		curhe->next()->next()->vertex()->point()<<
-		otherhe->vertex()->point()<<endl;*/
-	 }
+  }
 	if ( ((bOuter == true) && (orient != CGAL::CLOCKWISE)) || ((bOuter == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
 		  return false;
 	else
