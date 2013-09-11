@@ -106,3 +106,32 @@ Error 400: shells are face adjacent
 
 Invalid solid :(
 ```
+
+# Error reported 
+
+## Surface level
+
+  * 200   : exterior ring and interior rings have same orientation
+  * 210   : surface is not planar
+  * 220   : surface is not valid in 2D (its projection)
+    * 221 : interior ring intersect exterior ring
+    * 222 : interior ring outside exterior ring
+    * 223 : interior rings intersect
+    * 224 : interior not connected
+
+## Shell level
+
+  * 300   : is not a 2-manifold
+    * 301 : surface is not closed
+    * 302 : dangling faces 
+    * 303 : one(several) face(s) not connected to the 2-manifold 
+    * 304 : orientation of one/several face(s) not correct 
+    * 305 : surface self-intersect
+  * 310   : normals not pointing in correct direction (all of them)
+
+## Solid level
+
+  * 400   : shells are face adjacent
+  * 410   : interior of shells intersect
+  * 420   : interior shell completely outside the exterior shell
+  * 430   : interior not connected
