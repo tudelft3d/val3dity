@@ -1,107 +1,81 @@
-===============================================
-
-All the datasets are stored in the POLY format: 
-http://tetgen.berlios.de/fformats.poly.html
-
-===============================================
 
 
-cube
-----
-cube with 6 faces
-valid
+All the datasets are stored in the [POLY](http://tetgen.berlios.de/fformats.poly.html) format: 
 
-cube2
------
-cube with a hole in top face located outside
-invalid (2D validation problems also)
 
-cube3
------
-cube with a hole in the top face
-invalid: the inner ring isn't filled by another face, so not watertight
+# cube
+  * unit cube with 6 faces
+  * valid
 
-cube4
------
-one extra inner rings in another face
-invalid: not watertight either
+# cube2
+  * unit cube with a hole in top face located outside
+  * invalid (in 2D the top face is not acc. to SFS)
 
-cube5
------
-cube3 where there are faces that fill the hole on top face
-valid
+# cube3
+  * unit cube with a hole (inner ring) in the top face
+  * invalid (the inner ring isn't filled by another face, so not watertight)
 
-cube6
------
-cube5 where hole is touching.
-valid
+# cube4
+  * unit cube with one extra inner rings in another face
+  * invalid (not watertight either)
 
-cube8
------
-cube with an extra vertex on an edge. Only one of the 2 incident faces has
+# cube5
+  * cube3 where there are extra faces that fill the hole on top face
+  * valid
+
+# cube6
+  * cube5 where hole (inner ring) is touching the outer ring of a face
+  * valid
+
+# cube8
+  * unit cube with an extra vertex on an edge. Only one of the 2 incident faces has
 it explicitly. 
-Geometrically valid, but topologically invalid. Thus: invalid. Oracle says 'valid' though
+  * invalid (geometrically valid, but topologically invalid. Thus: invalid) 
+  * note: Oracle Spatial reports valid 
 
-cube9
----------
-cube with one face (face #0) with opposite orientation.
-invalid
-(oracle=54502)
+# cube9
+  * unit cube with one face (face #0) with opposite orientation
+  * invalid
 
-cube10
-------
-cube with one face (bottom one) missing.
-invalid
-(oracle=54502)
+# cube10
+  * unit cube with one face missing (bottom one)
+  * invalid
 
-cube11
-------
-cube with one extra face in the middle, splitting the cube in two parts
-invalid
-(oracle=54502)
+# cube11
+  * unit cube with one extra face in the middle, splitting the cube in two parts
+  * invalid
 
-cube12
-------
-cube with one dangling face touching at one point only
-the dangling face is the last in the list
-invalid
-(oracle=54502)
+# cube12
+  * unit cube with one dangling face touching the cube at one point only; the dangling face is the last in the list
+  * invalid
 
-cube13
--------
-cube with top face not planar
-invalid
+# cube13
+  * unit cube with top face not planar
+  * invalid
 
-cube14
-------
-cube with normal pointing inwards
-invalid
+# cube14
+  * cube with normals all pointing inwards
+  * invalid
 
-cube15
-------
-cube with one dangling face, touching only at one point.
-the dangling face is the 1st in the list
-invalid
+# cube15
+  * cube with one dangling face, touching only at one point; the dangling face is the 1st in the list
+  * invalid
 
-cube16
-------
-cube with one extra face floating in the air, not touching
-invalid
+# cube16
+  * cube with one extra face "floating" in the air, not touching
+  * invalid
 
-concave
-------
-cube but with concave top/bottom faces
-valid
+# concave
+  * concave shape; top and bottom faces are concave polygons
+  * valid
 
-torus
------
-a "squared donut"
-valid
+# torus
+  * a "squared donut", genus of the shell is 1
+  * valid
 
-torus2
-------
-torus where the hole touches the outside.
-invalid.
+# torus2
+  * torus where the hole in the top/bottom faces touches the side surfaces
+  * invalid: it becomes non-manifold
 
 house
 -----
