@@ -45,34 +45,29 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       // These are the number of rings on this facet
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
-	  /*
-	   TODO : is that necessary?!?
-	  */
-	  //-- check for degeneration add by John
-	  if (!check_degenerate_face(shell->lsPts, ids))
-	  {
-		  (*cb)(DEGENERATE_SURFACE, is, i, "Degenerated face");
-		  isvalid = false;
-		  continue;
-	  }
-      //-- get projected Polygon
+
+      //-- get projected oring
       Polygon pgn;
       vector<Polygon> lsRings;
-	  //
       if (false == create_polygon(shell->lsPts, ids, pgn))
-	  {
-		  (*cb)(NON_SIMPLE_SURFACE, is, i, "The polygon is not simple!");
-		  isvalid = false;
-		  continue;
-	  }
+	    {
+		    (*cb)(NON_SIMPLE_SURFACE, is, i, "The ring of a polygon is not simple!");
+		    isvalid = false;
+		    continue;
+	    }
       lsRings.push_back(pgn);
       //-- check for irings
       for (int j = 1; j < static_cast<int>(numf); j++)
       {
         vector<int> &ids2 = shell->faces[i][j]; // helpful alias for the inner boundary
-        //-- get projected Polygon
+        //-- get projected iring
         Polygon pgn;
-        create_polygon(shell->lsPts, ids2, pgn);
+        if (false == create_polygon(shell->lsPts, ids2, pgn))
+  	    {
+  		    (*cb)(NON_SIMPLE_SURFACE, is, i, "The ring of a polygon is not simple!");
+  		    isvalid = false;
+  		    continue;
+  	    }
         lsRings.push_back(pgn);
       }
       

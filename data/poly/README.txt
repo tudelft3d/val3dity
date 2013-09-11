@@ -65,6 +65,10 @@ it explicitly.
   * cube with one extra face "floating" in the air, not touching
   * invalid
 
+# cube17
+  * cube3 where inner ring is collapsed to a line
+  * invalid
+
 # concave
   * concave shape; top and bottom faces are concave polygons
   * valid
