@@ -63,11 +63,11 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
         // Surface level
       case INNER_RING_WRONG_ORIENTATION:           cout << "Error 200: " << "oring and irings have same orientation"; break;
       case NON_PLANAR_SURFACE:                     cout << "Error 210: " << "surface is not planar"; break;
-	  case DEGENERATE_SURFACE:                     cout << "Error 211: " << "degenerate surface"; break;
+	    case DEGENERATE_SURFACE:                     cout << "Error 211: " << "degenerate surface"; break;
       case SURFACE_PROJECTION_INVALID:             cout << "Error 220: " << "surface is not valid in 2D (its projection)"; break;
       case INNER_RING_INTERSECTS_OUTER:            cout << "Error 221: " << "iring intersect oring"; break;
       case INNER_RING_OUTSIDE_OUTER:               cout << "Error 222: " << "iring outside oring"; break;
-	  case NON_SIMPLE_SURFACE:					   cout << "Error 230: " << "the surface is not simple";break;
+	    case NON_SIMPLE_SURFACE:					   cout << "Error 230: " << "the surface is not simple";break;
         //case INNER_OUTER_RINGS_INTERSECT:          cout << "Error 223: " << "oring and iring(s) intersect"; break;
       case INTERIOR_OF_RING_NOT_CONNECTED:         cout << "Error 224: " << "interior not connected"; break;
         // Shell level

@@ -45,6 +45,9 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       // These are the number of rings on this facet
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
+	  /*
+	   TODO : is that necessary?!?
+	  */
 	  //-- check for degeneration add by John
 	  if (!check_degenerate_face(shell->lsPts, ids))
 	  {
