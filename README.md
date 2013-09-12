@@ -2,17 +2,12 @@
 
 Validation of solids according to the international standard ISO 19107.
 
-## I'm interested in the details of how the validation is performed ##
-
-The validation is performed hierarchically, ie first every surface are validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc.), and finally the interactions between the shells are analysed.
-
-Most details about the implementation are available in this [scientific article](http://homepage.tudelft.nl/23t4p/pdfs/_13cacaie.pdf).
 
 ## How do I use val3dity?
 
 It is a command-line program, which we provide as source code, together with makefiles for Mac and Linux. We plan on offering binaries (including for Windows) in the future.
 
-To compile val3dity, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org). Afterwards run:
+To compile val3dity, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org)--under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
 
     $ cmake .
     $ make
@@ -23,7 +18,7 @@ To execute val3dity:
     
 Each shell of the solid must be modelled with a [POLY](http://tetgen.berlios.de/fformats.poly.html) file, the first argument is always the outer shell, and the others are inner shells.
 There can be 0 or an infinity of inner shells, their order is not important.
-For instance, to validate a solid having only outer shell (it's a unit cube):
+For instance, to validate a solid having only one outer shell (it's a unit cube):
 
 ```  
 $ ./val3dity data/poly/cube.poly
@@ -107,6 +102,7 @@ Error 400: shells are face adjacent
 Invalid solid :(
 ```
 
+
 # Error reported 
 
 ## Surface level
@@ -135,3 +131,10 @@ Invalid solid :(
   * 410   : interior of shells intersect
   * 420   : interior shell completely outside the exterior shell
   * 430   : interior not connected
+
+
+## I'm interested in the details of how the validation is performed ##
+
+The validation is performed hierarchically, ie first every surface are validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc.), and finally the interactions between the shells are analysed.
+
+Most details about the implementation are available in this [scientific article](http://homepage.tudelft.nl/23t4p/pdfs/_13cacaie.pdf).
