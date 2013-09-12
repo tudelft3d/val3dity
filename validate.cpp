@@ -323,6 +323,7 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
   //int proj = projection_plane_range(lsPts, ids);
   Vector v0;
   int proj = projection_plane_range_2(lsPts, ids, v0);
+  std::cout << proj << std::endl;
   if (proj == -1)
   {
 	  //(*cb)(DEGENERATE_SURFACE, shellNum, i, "Degenerated face");
@@ -342,10 +343,10 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
       pgn.push_back(Point2(p.y(), p.z()));
   }
   //
-  if (!pgn.is_simple())
-  {
-	  return false;
-  }
+  // if (!pgn.is_simple())
+  // {
+  //    return false;
+  // }
   //
   if (pgn.is_counterclockwise_oriented() == false)
     pgn.reverse_orientation();

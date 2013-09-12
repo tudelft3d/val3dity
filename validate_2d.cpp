@@ -51,7 +51,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       vector<Polygon> lsRings;
       if (false == create_polygon(shell->lsPts, ids, pgn))
 	    {
-		    (*cb)(NON_SIMPLE_SURFACE, is, i, "The ring of a polygon is not simple!");
+		    (*cb)(NON_SIMPLE_SURFACE, is, i, "Outer ring is collapsed to a point/line.");
 		    isvalid = false;
 		    continue;
 	    }
@@ -64,7 +64,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
         Polygon pgn;
         if (false == create_polygon(shell->lsPts, ids2, pgn))
   	    {
-  		    (*cb)(NON_SIMPLE_SURFACE, is, i, "The ring of a polygon is not simple!");
+  		    (*cb)(NON_SIMPLE_SURFACE, is, i, "Inner ring is collapsed to a point/line.");
   		    isvalid = false;
   		    continue;
   	    }

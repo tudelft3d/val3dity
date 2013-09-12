@@ -69,9 +69,13 @@ it explicitly.
   * cube3 where inner ring is collapsed to a line
   * invalid
 
+# cube18
+  * cube1 where top face has a bow tie orientation 
+  * invalid
+
 # concave
-  * concave shape; top and bottom faces are concave polygons
-  * valid
+* concave shape; top and bottom faces are concave polygons
+* valid
 
 # torus
   * a "squared donut", genus of the shell is 1
