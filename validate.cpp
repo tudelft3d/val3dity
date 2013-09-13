@@ -238,16 +238,16 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     }
     vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
     
-//    int proj = projection_plane_range(shell.lsPts, idsob);
-    Vector v0 (0,0,0);
-    int proj = projection_plane_range_2(shell.lsPts, idsob, v0);
-	if (proj == -1)
-	{
-		(*cb)(DEGENERATE_SURFACE, shellNum, -1, "Degenerated face");
-		return false;
-	}
+    int proj = projection_plane_range(shell.lsPts, idsob);
+//    Vector v0 (0,0,0);
+//    int proj = projection_plane_range_2(shell.lsPts, idsob, v0);
+//	if (proj == -1)
+//	{
+//		(*cb)(DEGENERATE_SURFACE, shellNum, -1, "Degenerated face");
+//		return false;
+//	}
 	
-//    Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
+    Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
     
     //-- get projected Polygon
     Polygon pgn;
@@ -363,13 +363,13 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 {
   bool isValid = true;
   vector<int> ids = pgnids[0];
-//  int proj = projection_plane_range(lsPts, ids);
-  Vector v0;
-  int proj = projection_plane_range_2(lsPts, ids, v0);
-  if (proj == -1)
-  {
-	  return false;
-  }
+  int proj = projection_plane_range(lsPts, ids);
+//  Vector v0;
+//  int proj = projection_plane_range_2(lsPts, ids, v0);
+//  if (proj == -1)
+//  {
+//	  return false;
+//  }
   
   CT ct;
   vector< vector<int> >::const_iterator it = pgnids.begin();
