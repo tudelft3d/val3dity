@@ -472,10 +472,13 @@ int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids
 {
   //-- find the impossible planes (proj creates either line or point)
   vector<bool> possibles(3,true);
-  Vector v = normal(lsPts[0], lsPts[1], lsPts[2]);
-  if (v.x() == 0.0) possibles[0] = false;
-  if (v.y() == 0.0) possibles[1] = false;
-  if (v.z() == 0.0) possibles[2] = false;
+  if ( (ids.size() > 2) && (CGAL::collinear(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]) == false) )
+  {
+    Vector v = normal(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]);
+    if (v.x() == 0.0) possibles[0] = false;
+    if (v.y() == 0.0) possibles[1] = false;
+    if (v.z() == 0.0) possibles[2] = false;
+  }
   
   K::FT rangearea = -1.0;
   int ignoredplane = -1;
