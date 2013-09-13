@@ -320,17 +320,16 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 
 bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
 {
-  //int proj = projection_plane_range(lsPts, ids);
-  Vector v0;
-  int proj = projection_plane_range_2(lsPts, ids, v0);
-  std::cout << proj << std::endl;
-  if (proj == -1)
-  {
-	  //(*cb)(DEGENERATE_SURFACE, shellNum, i, "Degenerated face");
-	  return false;
-  }
-  
-  //-- build projected polygon
+//  Vector v0;
+//  int proj = projection_plane_range_2(lsPts, ids, v0);
+//  std::cout << proj << std::endl;
+//  if (proj == -1)
+//  {
+////	  (*cb)(DEGENERATE_SURFACE, shellNum, i, "YYYYDegenerated face");
+//	  return false;
+//  }
+ 
+  int proj = projection_plane_range(lsPts, ids);
   vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
   {
@@ -342,12 +341,19 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
     else if (proj == 0)
       pgn.push_back(Point2(p.y(), p.z()));
   }
-  //
-  // if (!pgn.is_simple())
-  // {
-  //    return false;
-  // }
-  //
+  
+  if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
+  {
+    std::cout << "Ring self-intersect" << std::endl;
+    return false;
+  }
+  
+  if (pgn.orientation() == CGAL::COLLINEAR)
+  {
+    std::cout << "not a polygon" << std::endl;
+    return false;    
+  }
+
   if (pgn.is_counterclockwise_oriented() == false)
     pgn.reverse_orientation();
   return true;
@@ -461,16 +467,27 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 
 
 
+
 int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
-  K::FT rangearea = find_range_area(2, lsPts, ids);
-  int ignoredplane = 2;
-  if (find_range_area(1, lsPts, ids) > rangearea) {
-    rangearea = find_range_area(1, lsPts, ids);
-    ignoredplane = 1;
+  //-- find the impossible planes (proj creates either line or point)
+  vector<bool> possibles(3,true);
+  Vector v = normal(lsPts[0], lsPts[1], lsPts[2]);
+  if (v.x() == 0.0) possibles[0] = false;
+  if (v.y() == 0.0) possibles[1] = false;
+  if (v.z() == 0.0) possibles[2] = false;
+  
+  K::FT rangearea = -1.0;
+  int ignoredplane = -1;
+  
+  for (int i = 0; i < 3; i++)
+  {
+    if (possibles[i] == true)
+    {
+      rangearea = find_range_area(i, lsPts, ids);
+      ignoredplane = i;
+    }
   }
-  if (find_range_area(0, lsPts, ids) > rangearea) 
-    ignoredplane = 0;
   return ignoredplane;
 }
 
@@ -510,6 +527,7 @@ int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &i
 	if (CGAL::compare(sqrt(pnormal.squared_length()), TOL) != CGAL::LARGER)
 	{
 		return -1;//degenerated
+    // TODO: what is degenerate? if a polygon is in fact a line, then it can surely be projected somewhere. it's easier!
 	}
 	//
 	pnormal = pnormal / sqrt(pnormal.squared_length());
