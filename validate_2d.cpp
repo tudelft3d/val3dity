@@ -45,34 +45,29 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       // These are the number of rings on this facet
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
-	  /*
-	   TODO : is that necessary?!?
-	  */
-	  //-- check for degeneration add by John
-	  if (!check_degenerate_face(shell->lsPts, ids))
-	  {
-		  (*cb)(DEGENERATE_SURFACE, is, i, "Degenerated face");
-		  isvalid = false;
-		  continue;
-	  }
-      //-- get projected Polygon
+
+      //-- get projected oring
       Polygon pgn;
       vector<Polygon> lsRings;
-	  //
       if (false == create_polygon(shell->lsPts, ids, pgn))
-	  {
-		  (*cb)(NON_SIMPLE_SURFACE, is, i, "The polygon is not simple!");
-		  isvalid = false;
-		  continue;
-	  }
+	    {
+		    (*cb)(NON_SIMPLE_SURFACE, is, i, "Outer ring is collapsed to a point/line.");
+		    isvalid = false;
+		    continue;
+	    }
       lsRings.push_back(pgn);
       //-- check for irings
       for (int j = 1; j < static_cast<int>(numf); j++)
       {
         vector<int> &ids2 = shell->faces[i][j]; // helpful alias for the inner boundary
-        //-- get projected Polygon
+        //-- get projected iring
         Polygon pgn;
-        create_polygon(shell->lsPts, ids2, pgn);
+        if (false == create_polygon(shell->lsPts, ids2, pgn))
+  	    {
+  		    (*cb)(NON_SIMPLE_SURFACE, is, i, "Inner ring is collapsed to a point/line.");
+  		    isvalid = false;
+  		    continue;
+  	    }
         lsRings.push_back(pgn);
       }
       
@@ -125,40 +120,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
   return isvalid;
 }
 
-//check whether the face is degenerated
-bool check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids)
-{
-	//vertex number
-	if (ids.size() < 3)
-	{
-		//degeneration
-		return false;
-	}
-	//indices check
-	vector<int>::const_iterator it_chk = ids.begin();
-	for (; it_chk != ids.end()-1; it_chk++)
-	{
-		vector<int>::const_iterator it_chk2 = it_chk + 1;
-		for (; it_chk2 != ids.end(); it_chk2++)
-		{
-			if (*it_chk == *it_chk2)
-			{
-				//degeneration
-				return false;
-			}
-		}
-	}
-	//check point normal
-	Vector v0 (0.0,0.0,0.0);
-	int proj = projection_plane_range_2(lsPts, ids, v0);
-	if (proj != -1)
-	{
-		return true;
-	}
-	else
-		return false;
-	//return check_collinear(lsPts, ids);
-}
+
 
 // bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids)
 // {
