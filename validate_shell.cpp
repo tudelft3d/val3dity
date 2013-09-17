@@ -444,7 +444,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     bool bOuter = true;
     if (shellID > 0)
       bOuter = false;
-	//should be careful!! still have contradict cases but low probability
+    // TODO: fix that once and for all!
     // isValid = check_global_orientation_normals_rev(P, bOuter, cb);
     isValid = check_global_orientation_normals(P, bOuter, cb);
     if (isValid == false)

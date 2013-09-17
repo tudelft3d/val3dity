@@ -83,103 +83,83 @@ it explicitly.
 
 # torus2
   * torus where the hole in the top/bottom faces touches the side surfaces
-  * invalid: it becomes non-manifold
+  * invalid
 
-house
------
-cube with a pyramidal roof
-valid
+# house
+  * cube with a pyramidal roof
+  * valid
 
-house2
-------
-house with tip below the ground
-invalid: self-intersection
+# house2
+  * house with tip below the ground
+  * invalid
 
-house3
-------
-house with tip touching the bottom faces
-invalid: self-intersection
+# house3
+  * house with tip touching the bottom faces
+  * invalid
 
-house4
-------
-house with a flat roof (4 triangular faces)
-valid
+# house4
+  * house with a flat roof (4 triangular faces)
+  * valid
 
+# py1
+  * invalid as outer shell (all normals pointing inwards)
+  * a pyramid used as inner shell for cube
+  * cube + py1 = valid
 
-py1
----
-a pyramid used as inner shell for cube
-py1 = valid (although orientation of faces are wrong)
-cube + py1 = valid
+# py2
+  * invalid as outer shell (all normals pointing inwards)
+  * pyramid touching top face one point. 
+  * cube + py2 = valid
+  * (Oracle is wrong on that one: oracle=54513)
 
-py2
----
-pyramid touching top face one point. 
-py2 = valid (although orientation of faces are wrong)
-cube + py2 = valid
-(Oracle is wrong on that one: oracle=54513)
+# py3
+  * invalid as outer shell (all normals pointing inwards)
+  * pyramid intersecting the cube (tip goes through the top face)
+  * cube + py3 = invalid
+  * (Oracle agrees: oracle=54512)
 
-py3
----
-pyramid intersecting the cube (tip goes through the top face)
-py3 = valid (although orientation of faces are wrong)
-cube + py3 = invalid
-Oracle agrees: oracle=54512
+# py4
+  * invalid as outer shell (all normals pointing inwards)
+  * bottom face is shared with bottom face of the cube
+  * cube + py4 = invalid
 
-py4
----
-bottom face is shared with bottom face of the cube
-py4 = valid (although orientation of faces are wrong)
-cube + py4 = invalid
+# py5
+  * invalid as outer shell (all normals pointing inwards)
+  * touching py1 at one point
+  * cube + py1 + py5 = valid
 
-py5
----
-touching py1 at one point
-cube + py1 + py5 = valid
+# py6
+  * invalid as outer shell (all normals pointing inwards)
+  * touching py1 along an edge
+  * cube + py1 + py6 = valid
 
+# py7 
+  * invalid as outer shell (all normals pointing inwards)
+  * sharing a face with py1 (face connected)
+  * cube + py1 + py7 = invalid (2 holes face touching)
 
-py6
----
-touching py1 along an edge
-cube + py1 + py6 = valid
+# py8
+  * invalid as outer shell (all normals pointing inwards)
+  * sharing *partly* a face with py1 
+  * cube + py1 + py8 = invalid (2 holes face touching)
 
-py7
----
-sharing a face with py1 (face connected)
-cube + py1 + py7 = invalid (2 holes face touching)
+# py9
+  * invalid as outer shell (all normals pointing inwards)
+  * pyramid complete outside the outer shell of cube
+  * cube + py9 = invalid
 
-py8
----
-sharing *partly* a face with py1 
-cube + py1 + py8 = invalid (2 holes face touching)
+# py10
+  * invalid as outer shell (all normals pointing inwards)
+  * pyramid outside the outer shell of cube, but face adjacent
+  * cube + py10 = invalid
 
-py9
----
-pyramid complete outside the outer shell of cube
-py9 = valid (although orientation of faces are wrong)
-cube + py9 = invalid
+# py11
+  * invalid as outer shell (all normals pointing inwards)
+  * pyramid encloses the whole cube
+  * cube + py11 = invalid
 
-py10
-----
-pyramid outside the outer shell of cube, but face adjacent
-py10 = valid (although orientation of faces are wrong)
-cube + py10 = invalid
-
-
-py11
-----
-pyramid encloses the whole cube
-py11 = valid (although orientation of faces are wrong)
-cube + py11 = invalid
-
-blocker1
---------
-kinda pyramid that splits the interior of cube into 2 non-connected parts
-blocker1 = valid (although orientation of faces are wrong)
-cube + blocker1 = invalid
-
-
-
-
-
+# blocker1
+  * invalid as outer shell (all normals pointing inwards)
+  * kinda pyramid that splits the interior of cube into 2 non-connected parts
+  * cube + blocker1 = invalid
 
