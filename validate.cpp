@@ -33,9 +33,6 @@
 bool    triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, cbf cb);
 bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 
-// need to use K::FT instead of double to ensure compilation under core level 4
-K::FT   find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids); 
-
 
 //--------------------------------------------------------------
 
@@ -238,15 +235,8 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     }
     vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
     
-    int proj = projection_plane_range(shell.lsPts, idsob);
-//    Vector v0 (0,0,0);
-//    int proj = projection_plane_range_2(shell.lsPts, idsob, v0);
-//	if (proj == -1)
-//	{
-//		(*cb)(DEGENERATE_SURFACE, shellNum, -1, "Degenerated face");
-//		return false;
-//	}
-	
+    int proj = projection_plane(shell.lsPts, idsob);
+
     Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
     
     //-- get projected Polygon
@@ -320,16 +310,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 
 bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
 {
-//  Vector v0;
-//  int proj = projection_plane_range_2(lsPts, ids, v0);
-//  std::cout << proj << std::endl;
-//  if (proj == -1)
-//  {
-////	  (*cb)(DEGENERATE_SURFACE, shellNum, i, "YYYYDegenerated face");
-//	  return false;
-//  }
- 
-  int proj = projection_plane_range(lsPts, ids);
+  int proj = projection_plane(lsPts, ids);
   vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
   {
@@ -363,13 +344,7 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 {
   bool isValid = true;
   vector<int> ids = pgnids[0];
-  int proj = projection_plane_range(lsPts, ids);
-//  Vector v0;
-//  int proj = projection_plane_range_2(lsPts, ids, v0);
-//  if (proj == -1)
-//  {
-//	  return false;
-//  }
+  int proj = projection_plane(lsPts, ids);
   
   CT ct;
   vector< vector<int> >::const_iterator it = pgnids.begin();
@@ -466,153 +441,35 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 }
 
 
-
-
-int projection_plane_range(const vector< Point3 > &lsPts, const vector<int> &ids)
+int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
-  //-- find the impossible planes (proj creates either line or point)
-  vector<bool> possibles(3,true);
-  if ( (ids.size() > 2) && (CGAL::collinear(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]) == false) )
-  {
-    Vector v = normal(lsPts[ids[0]], lsPts[ids[1]], lsPts[ids[2]]);
-    if (v.x() == 0.0) possibles[0] = false;
-    if (v.y() == 0.0) possibles[1] = false;
-    if (v.z() == 0.0) possibles[2] = false;
-  }
+  if (ids.size() < 3)
+    return 0; //-- any plane will do for a degenerated plane
   
-  K::FT rangearea = -1.0;
-  int ignoredplane = -1;
+  //-- picking the first Point + 2 others no consecutive, to avoid collinearity
+  Point3 p1 = lsPts[ids[int(ids.size()/3)]];
+  Point3 p2 = lsPts[ids[int(ids.size()*2/3)]];
   
-  for (int i = 0; i < 3; i++)
+  if (CGAL::collinear(lsPts[ids[0]], p1, p2) == true)
+    return 0; //-- any plane will do for a degenerated plane
+
+  //-- take the plane whose normal is furthest from 1/-1
+  Vector v = unit_normal(lsPts[ids[0]], p1, p2);
+  double maxcomp = abs(v.x());
+  int proj = 0;
+  if (abs(v.y()) > maxcomp)
   {
-    if (possibles[i] == true)
-    {
-      rangearea = find_range_area(i, lsPts, ids);
-      ignoredplane = i;
-    }
+    maxcomp = abs(v.y());
+    proj = 1;
   }
-  return ignoredplane;
-}
-
-
-int projection_plane_range_2(const vector< Point3 > &lsPts, const vector<int> &ids, Vector& normal)
-{
-	//translate all the points to the origin to enhance the stability
-	Vector centPt(0.0, 0.0, 0.0);
-	vector<Point3>::const_iterator it_pt = lsPts.begin();
-	for (; it_pt != lsPts.end(); it_pt++)
-	{
-		centPt = centPt + ((*it_pt)-CGAL::ORIGIN);
-	}
-	centPt = centPt/lsPts.size();
-	//
-	vector<Point3> newPts;
-	it_pt = lsPts.begin();
-	for (; it_pt != lsPts.end(); it_pt++)
-	{
-		newPts.push_back(*it_pt-centPt);
-	}
-	//
-	vector<int>::const_iterator it = ids.begin();
-	//Newell normal 
-	Point3 vert (newPts[*(ids.end()-1)]);
-	Vector pnormal(0.0, 0.0, 0.0);
-	for (;it!=ids.end();it++)
-	{
-		Vector next ((vert.z() + newPts[*it].z()) * (vert.y() - newPts[*it].y()),
-			(vert.x()+ newPts[*it].x()) * (vert.z() - newPts[*it].z()),
-			(vert.y()+ newPts[*it].y()) * (vert.x() - newPts[*it].x()));
-		pnormal = pnormal + next;
-		vert = newPts[*it];
-	}
-	//Introduce a tolerance
-	K::FT TOL(1e-8);
-	if (CGAL::compare(sqrt(pnormal.squared_length()), TOL) != CGAL::LARGER)
-	{
-		return -1;//degenerated
-    // TODO: what is degenerate? if a polygon is in fact a line, then it can surely be projected somewhere. it's easier!
-	}
-	//
-	pnormal = pnormal / sqrt(pnormal.squared_length());
-	//-- return the normal passed by reference, useful for some functions
-	normal = normal + pnormal;
-	//compare cos
-	// need to use K::FT instead of double to ensure compilation under core level 4
-	K::FT a = abs(pnormal * Vector(1.0, 0.0, 0.0));//yz
-	K::FT b = abs(pnormal * Vector(0.0, 1.0, 0.0));//xz
-	K::FT c = abs(pnormal * Vector(0.0, 0.0, 1.0));//xy
-
-	K::FT m = max(max(a, b), c);
-
-	if (CGAL::compare(a, m) == CGAL::EQUAL)
-	{
-		return 0;//yz
-	}
-	else if (CGAL::compare(b, m) == CGAL::EQUAL)
-	{
-		return 1;//xz
-	}
-	else
-		return 2;//xy
-}
-
-K::FT find_range_area(int ignored, const vector< Point3 > &lsPts, const vector<int> &ids)
-{
-  vector<int>::const_iterator it = ids.begin();
-  vector<K::FT> range;
-  if (ignored == 2) {
-    range.push_back(lsPts[*it].x());
-    range.push_back(lsPts[*it].y());
-    range.push_back(lsPts[*it].x());
-    range.push_back(lsPts[*it].y());
-  }
-  if (ignored == 1) {
-    range.push_back(lsPts[*it].x());
-    range.push_back(lsPts[*it].z());
-    range.push_back(lsPts[*it].x());
-    range.push_back(lsPts[*it].z());
-  }
-  if (ignored == 0) {
-    range.push_back(lsPts[*it].y());
-    range.push_back(lsPts[*it].z());
-    range.push_back(lsPts[*it].y());
-    range.push_back(lsPts[*it].z());
-  }
-
-  for ( ; it != ids.end(); it++)
+  if (abs(v.z()) > maxcomp)
   {
-    if (ignored == 2) {
-      if (lsPts[*it].x() < range[0])
-        range[0] = lsPts[*it].x();
-      if (lsPts[*it].y() < range[1])
-        range[1] = lsPts[*it].y();
-      if (lsPts[*it].x() > range[2])
-        range[2] = lsPts[*it].x();
-      if (lsPts[*it].y() > range[3])
-        range[3] = lsPts[*it].y();
-    }
-    if (ignored == 1) {
-      if (lsPts[*it].x() < range[0])
-        range[0] = lsPts[*it].x();
-      if (lsPts[*it].z() < range[1])
-        range[1] = lsPts[*it].z();
-      if (lsPts[*it].x() > range[2])
-        range[2] = lsPts[*it].x();
-      if (lsPts[*it].z() > range[3])
-        range[3] = lsPts[*it].z();
-    }
-    if (ignored == 0) {
-      if (lsPts[*it].y() < range[0])
-        range[0] = lsPts[*it].y();
-      if (lsPts[*it].z() < range[1])
-        range[1] = lsPts[*it].z();
-      if (lsPts[*it].y() > range[2])
-        range[2] = lsPts[*it].y();
-      if (lsPts[*it].z() > range[3])
-        range[3] = lsPts[*it].z();
-    }
+    maxcomp = abs(v.z());
+    proj = 2;
   }
-  return ( (range[2]-range[0]) * (range[3]-range[1]) );
+
+  return proj;
 }
-    
+
+
  

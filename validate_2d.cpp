@@ -120,40 +120,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
   return isvalid;
 }
 
-//check whether the face is degenerated
-bool check_degenerate_face(const vector< Point3 > &lsPts, const vector<int>& ids)
-{
-	//vertex number
-	if (ids.size() < 3)
-	{
-		//degeneration
-		return false;
-	}
-	//indices check
-	vector<int>::const_iterator it_chk = ids.begin();
-	for (; it_chk != ids.end()-1; it_chk++)
-	{
-		vector<int>::const_iterator it_chk2 = it_chk + 1;
-		for (; it_chk2 != ids.end(); it_chk2++)
-		{
-			if (*it_chk == *it_chk2)
-			{
-				//degeneration
-				return false;
-			}
-		}
-	}
-	//check point normal
-	Vector v0 (0.0,0.0,0.0);
-	int proj = projection_plane_range_2(lsPts, ids, v0);
-	if (proj != -1)
-	{
-		return true;
-	}
-	else
-		return false;
-	//return check_collinear(lsPts, ids);
-}
+
 
 // bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids)
 // {
