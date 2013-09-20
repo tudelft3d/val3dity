@@ -57,10 +57,10 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
     
     switch(errorCode)
     {
-        // Ring level
+//-- Ring level
       case DUPLICATE_POINTS:                       cout << "Error 100: " << "2+ consecutive points"; break;
       case RING_NOT_CLOSED:                        cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
-        // Surface level
+//-- Surface level
       case INNER_RING_WRONG_ORIENTATION:           cout << "Error 200: " << "oring and irings have same orientation"; break;
       case NON_PLANAR_SURFACE:                     cout << "Error 210: " << "surface is not planar"; break;
 	    case DEGENERATE_SURFACE:                     cout << "Error 211: " << "degenerate surface"; break;
@@ -79,7 +79,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case SURFACE_SELF_INTERSECTS:                cout << "Error 305: " << "surface self-intersect"; break;
       case VERTICES_NOT_USED:                      cout << "Error 306: " << "some vertices are not referenced by faces"; break;
       case SURFACE_NORMALS_BAD_ORIENTATION:        cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
-        // Solid level
+//-- Solid level
       case SHELLS_FACE_ADJACENT:                   cout << "Error 400: " << "shells are face adjacent"; break;
       case SHELL_INTERIOR_INTERSECT:               cout << "Error 410: " << "interior of shells intersect"; break;
       case INNER_SHELL_OUTSIDE_OUTER:              cout << "Error 420: " << "ishell outside the oshell"; break;
