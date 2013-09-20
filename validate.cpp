@@ -311,6 +311,11 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
 bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
 {
   int proj = projection_plane(lsPts, ids);
+
+  if (proj == -1) //-- polygon self-intersects or is collapsed to a point or a polyline
+  {
+    return false;
+  }
   vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
   {
@@ -325,16 +330,12 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
   
   if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
   {
-    std::cout << "Ring self-intersect" << std::endl;
     return false;
   }
-  
   if (pgn.orientation() == CGAL::COLLINEAR)
   {
-    std::cout << "not a polygon" << std::endl;
-    return false;    
+    return false;
   }
-
   if (pgn.is_counterclockwise_oriented() == false)
     pgn.reverse_orientation();
   return true;
@@ -443,33 +444,65 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 
 int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
-  if (ids.size() < 3)
-    return 0; //-- any plane will do for a degenerated plane
-  
-  //-- picking the first Point + 2 others no consecutive, to avoid collinearity
-  Point3 p1 = lsPts[ids[int(ids.size()/3)]];
-  Point3 p2 = lsPts[ids[int(ids.size()*2/3)]];
-  
-  if (CGAL::collinear(lsPts[ids[0]], p1, p2) == true)
-    return 0; //-- any plane will do for a degenerated plane
-
-  //-- take the plane whose normal is furthest from 1/-1
-  Vector v = unit_normal(lsPts[ids[0]], p1, p2);
-  double maxcomp = abs(v.x());
-  int proj = 0;
-  if (abs(v.y()) > maxcomp)
-  {
-    maxcomp = abs(v.y());
-    proj = 1;
-  }
-  if (abs(v.z()) > maxcomp)
-  {
-    maxcomp = abs(v.z());
-    proj = 2;
-  }
-
-  return proj;
+  Vector* pnormal = polygon_normal(lsPts, ids);
+	K::FT TOL(1e-8); //-- tolerance 
+	if (CGAL::compare(sqrt(pnormal->squared_length()), TOL) != CGAL::LARGER)
+	{
+		return -1;
+	}
+	//-- normalise the normal
+	*pnormal = *pnormal / sqrt(pnormal->squared_length());
+	// need to use K::FT instead of double to ensure compilation under core level 4
+	K::FT a = abs(*pnormal * Vector(1.0, 0.0, 0.0));//yz
+	K::FT b = abs(*pnormal * Vector(0.0, 1.0, 0.0));//xz
+	K::FT c = abs(*pnormal * Vector(0.0, 0.0, 1.0));//xy
+	K::FT m = max(max(a, b), c);
+  delete pnormal;
+	if (CGAL::compare(a, m) == CGAL::EQUAL)
+	{
+		return 0;//yz
+	}
+	else if (CGAL::compare(b, m) == CGAL::EQUAL)
+	{
+		return 1;//xz
+	}
+	else
+		return 2;//xy
 }
+
+Vector* polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids)
+{
+  //-- Newell' method
+	//translate all the points to the origin to enhance the stability
+	Vector centPt(0.0, 0.0, 0.0);
+	vector<Point3>::const_iterator it_pt = lsPts.begin();
+	for (; it_pt != lsPts.end(); it_pt++)
+	{
+		centPt = centPt + ((*it_pt)-CGAL::ORIGIN);
+	}
+	centPt = centPt/lsPts.size();
+	//
+	vector<Point3> newPts;
+	it_pt = lsPts.begin();
+	for (; it_pt != lsPts.end(); it_pt++)
+	{
+		newPts.push_back(*it_pt-centPt);
+	}
+	//
+	vector<int>::const_iterator it = ids.begin();
+	Point3 vert (newPts[*(ids.end()-1)]);
+  Vector* pnormal = new Vector(0.0, 0.0, 0.0);
+	for (;it!=ids.end();it++)
+	{
+		Vector next ((vert.z() + newPts[*it].z()) * (vert.y() - newPts[*it].y()),
+                 (vert.x() + newPts[*it].x()) * (vert.z() - newPts[*it].z()),
+                 (vert.y() + newPts[*it].y()) * (vert.x() - newPts[*it].x()));
+		*pnormal = *pnormal + next;
+		vert = newPts[*it];
+	}
+  return pnormal;
+}
+
 
 
  
