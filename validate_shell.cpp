@@ -354,6 +354,7 @@ bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Poi
 bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
+bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
 
 //------------------------------------------
 
@@ -445,8 +446,8 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     if (shellID > 0)
       bOuter = false;
     // TODO: fix that once and for all!
-    // isValid = check_global_orientation_normals_rev(P, bOuter, cb);
-    isValid = check_global_orientation_normals(P, bOuter, cb);
+    isValid = check_global_orientation_normals_rev2(P, bOuter, cb);
+
     if (isValid == false)
       (*cb)(SURFACE_NORMALS_WRONG_ORIENTATION, shellID, -1, "");
     else
@@ -728,14 +729,108 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 			K::FT result = faceNormal * queryRay.to_vector();
 			if (CGAL::compare(result, 0.0) == CGAL::LARGER)
 			{
-				return (bOuter == false);
+				return !bOuter;
 			}
 			else if(CGAL::compare(result, 0.0) == CGAL::SMALLER)
-				return (bOuter == true);
+				return bOuter;
 		}
 		++fItr;
 	}
 	return false;
+}
+
+//using local method proposed by Sjors Donkers
+//Requirments: The input polyhedron should be valid without intersections or degeneracies.
+bool check_global_orientation_normals_rev2( CgalPolyhedron* p, bool bOuter, cbf cb )
+{
+	//-- get a 'convex corner' along x
+	CgalPolyhedron::Vertex_iterator vIt;
+	vIt = p->vertices_begin();
+	CgalPolyhedron::Vertex_handle cc = vIt;
+	vIt++;
+
+	for ( ; vIt != p->vertices_end(); vIt++)
+	{
+		if (vIt->point().x() > cc->point().x())
+			cc = vIt;
+	}
+	//-- crop the convex corner using plane yz (x = cc->point().x() - TOL) and get the cropped 2D polygon 
+	K::FT TOL(1e-8);
+	CgalPolyhedron::Halfedge_around_vertex_circulator hCirc = cc->vertex_begin();//clockwise
+	int iNum = CGAL::circulator_size(hCirc);
+	Polygon lPgn;
+	for (int i = 0; i < iNum; i++)
+	{
+		//calculate the intersection
+		Vector vecR(hCirc->vertex()->point(), hCirc->opposite()->vertex()->point());
+		vecR = vecR / std::sqrt(vecR.squared_length());
+		if (CGAL::compare(vecR.x(), 0.0) != CGAL::EQUAL)
+		{
+			K::FT para = -TOL/vecR.x(); // (cc->point().x() - TOL - cc->point().x()) / vecR.x()
+			K::FT y_2d = para * vecR.y() + cc->point().y();
+			K::FT z_2d = para * vecR.z() + cc->point().z();
+			lPgn.push_back(Polygon::Point_2(y_2d, z_2d));
+		}
+		else
+		{
+			//use the parallel edge (convex edge) to decide the orientation
+			//The same as 2D method
+			CGAL::Orientation orient = orientation( hCirc->vertex()->point(),
+				hCirc->next()->vertex()->point(),
+				hCirc->next()->next()->vertex()->point(),
+				hCirc->opposite()->next()->vertex()->point() );
+			if (orient == CGAL::NEGATIVE)
+			{
+				return bOuter;
+			}
+			else if (orient == CGAL::POSITIVE)
+			{
+				return !bOuter;
+			}
+			else
+			{
+				//coplanar facets
+				Vector vecX (1.0, 0.0, 0.0);
+				CgalPolyhedron::Plane_3 plane (hCirc->vertex()->point(),
+					hCirc->next()->vertex()->point(),
+					hCirc->next()->next()->vertex()->point());
+				if (!plane.is_degenerate())
+				{
+					if (plane.orthogonal_vector()*vecX > 0)
+					{
+						return bOuter;
+					}
+					else
+					{
+						return !bOuter;
+					}
+				}
+			}
+		}
+		hCirc++;
+	}
+
+	//-- check the orientation 
+	if (lPgn.is_simple())
+	{
+		if(lPgn.orientation() == CGAL::CLOCKWISE)
+		{
+			//equal to the order of circulator
+			return bOuter;
+		}
+		else if(lPgn.orientation() == CGAL::COUNTERCLOCKWISE)
+		{
+			//unequal to the order of circulator
+			return !bOuter;
+		}
+		else//collinear
+			return check_global_orientation_normals_rev(p, bOuter, cb );
+	}
+	else
+	{
+		//do ray shooting
+		return check_global_orientation_normals_rev(p, bOuter, cb );
+	}
 }
 
 //problematic
