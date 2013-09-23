@@ -51,7 +51,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       vector<Polygon> lsRings;
       if (false == create_polygon(shell->lsPts, ids, pgn))
 	    {
-		    (*cb)(NON_SIMPLE_SURFACE, is, i, "Outer ring is collapsed to a point/line.");
+		    (*cb)(RING_SELF_INTERSECT, is, i, "for the outer ring");
 		    isvalid = false;
 		    continue;
 	    }
@@ -64,7 +64,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
         Polygon pgn;
         if (false == create_polygon(shell->lsPts, ids2, pgn))
   	    {
-  		    (*cb)(NON_SIMPLE_SURFACE, is, i, "Inner ring is collapsed to a point/line.");
+  		    (*cb)(RING_SELF_INTERSECT, is, i, "for an inner ring");
   		    isvalid = false;
   		    continue;
   	    }
@@ -106,12 +106,21 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       r = GEOSWKTReader_create();
       GEOSGeometry* mygeom;
       mygeom = GEOSWKTReader_read(r, wkt.str().c_str());
-      char *reason = (char *)malloc(1000*sizeof(char *));    
-      reason = GEOSisValidReason(mygeom);
-      if (strcmp(reason, "Valid Geometry") != 0) 
+      string reason = (string)GEOSisValidReason(mygeom);
+
+      if (reason.find("Valid Geometry") == string::npos)
       {
         isvalid = false;
-        (*cb)(SURFACE_PROJECTION_INVALID, is, i, reason);
+        if (reason.find("Self-intersection") != string::npos)
+          (*cb)(SELF_INTERSECTION, is, i, reason.c_str());
+        else if (reason.find("Interior is disconnected") != string::npos)
+          (*cb)(INTERIOR_DISCONNECTED, is, i, reason.c_str());
+        else if (reason.find("Hole lies outside shell") != string::npos)
+          (*cb)(HOLE_OUTSIDE, is, i, reason.c_str());
+        else if (reason.find("Holes are nested") != string::npos)
+          (*cb)(HOLES_ARE_NESTED, is, i, reason.c_str());
+        else
+          (*cb)(UNKNOWN_ERROR, is, i, reason.c_str());
       }
       GEOSGeom_destroy( mygeom );
     }
@@ -120,28 +129,3 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
   return isvalid;
 }
 
-
-
-// bool check_collinear(const vector< Point3 > &lsPts, const vector<int>& ids)
-// {
-// 	//
-// 	if (lsPts.size () < 2 || ids.size() < 2)
-// 	{
-// 		return false;
-// 	}
-// 	vector< int >::const_iterator pt_itr = ids.begin();
-// 	Point3 pt1 = lsPts[*pt_itr++];
-// 	Point3 pt2 = lsPts[*pt_itr++];
-// 	for (; pt_itr != ids.end(); pt_itr++)
-// 	{
-// 		Point3 ckpt = lsPts[*pt_itr];
-// 		typedef K::Line_3 Line;
-// 		Line ckline (pt1, pt2);
-// 		if (CGAL::compare (squared_distance(ckline, ckpt), 0.0) == CGAL::LARGER)
-// 		{
-// 			return true;
-// 		}
-// 	}
-// 
-// 	return false;
-// }

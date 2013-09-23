@@ -448,7 +448,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
     // isValid = check_global_orientation_normals_rev(P, bOuter, cb);
     isValid = check_global_orientation_normals(P, bOuter, cb);
     if (isValid == false)
-      (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "");
+      (*cb)(SURFACE_NORMALS_WRONG_ORIENTATION, shellID, -1, "");
     else
       (*cb)(STATUS_OK, -1, -1, "\tyes");
   }
@@ -542,7 +542,7 @@ CgalPolyhedron* repair_triangulated_shell(TrShell& tshell, const vector<bool> &r
     isValid = check_global_orientation_normals(P, bOuter, cb);
     if (isValid == false)
     {
-      (*cb)(SURFACE_NORMALS_BAD_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
+      (*cb)(SURFACE_NORMALS_WRONG_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
       P->inside_out();
       isValid = true;
     }

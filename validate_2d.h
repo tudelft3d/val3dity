@@ -29,6 +29,7 @@
 // CGAL kernel
 #include "val3dity_defs.h"
 
+
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //

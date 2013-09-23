@@ -16,8 +16,8 @@ All the datasets are stored in the [POLY](http://tetgen.berlios.de/fformats.poly
   * invalid (the inner ring isn't filled by another face, so not watertight)
 
 # cube4
-  * unit cube with one extra inner rings in another face
-  * invalid (not watertight either)
+  * unit cube with one extra face inside another face
+  * invalid 
 
 # cube5
   * cube3 where there are extra faces that fill the hole on top face
