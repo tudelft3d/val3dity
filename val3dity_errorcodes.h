@@ -54,9 +54,9 @@ typedef enum
    INNER_SHELL_OUTSIDE_OUTER              = 420,
    INTERIOR_OF_SHELL_NOT_CONNECTED        = 430,
 //-- Processing problem
-   INVALID_INPUT_FILE                     = 999,
+   INVALID_INPUT_FILE                     = 901,
 //-- Unknown eeror
-   UNKNOWN_ERROR                          = 998,
+   UNKNOWN_ERROR                          = 999,
 } Val3dity_ErrorCode;
 
 #endif
