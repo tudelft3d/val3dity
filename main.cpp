@@ -58,19 +58,16 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
     switch(errorCode)
     {
 //-- Ring level
-      case DUPLICATE_POINTS:                       cout << "Error 100: " << "2+ consecutive points"; break;
+      case REPEATED_POINTS:                        cout << "Error 100: " << "2+ consecutive points"; break;
       case RING_NOT_CLOSED:                        cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
+      case RING_SELF_INTERSECT:                    cout << "Error 120: " << "ring self-intersects or is collapsed to a point or a line"; break;
 //-- Surface level
-      case INNER_RING_WRONG_ORIENTATION:           cout << "Error 200: " << "oring and irings have same orientation"; break;
+      case SELF_INTERSECTION:                      cout << "Error 200: " << "rings of the surface intersect"; break;
       case NON_PLANAR_SURFACE:                     cout << "Error 210: " << "surface is not planar"; break;
-	    case DEGENERATE_SURFACE:                     cout << "Error 211: " << "degenerate surface"; break;
-      case SURFACE_PROJECTION_INVALID:             cout << "Error 220: " << "surface is not valid in 2D (its projection)"; break;
-      case INNER_RING_INTERSECTS_OUTER:            cout << "Error 221: " << "iring intersect oring"; break;
-      case INNER_RING_OUTSIDE_OUTER:               cout << "Error 222: " << "iring outside oring"; break;
-	    case NON_SIMPLE_SURFACE:                     cout << "Error 230: " << "the surface is not simple";break;
-        //case INNER_OUTER_RINGS_INTERSECT:          cout << "Error 223: " << "oring and iring(s) intersect"; break;
-      case INTERIOR_OF_RING_NOT_CONNECTED:         cout << "Error 224: " << "interior not connected"; break;
-        // Shell level
+      case INTERIOR_DISCONNECTED:                  cout << "Error 220: " << "interior of surface is not connected"; break;
+      case HOLE_OUTSIDE:                           cout << "Error 230: " << "1 or more holes are located outside the exterior ring"; break;
+      case HOLES_ARE_NESTED:                       cout << "Error 240: " << "holes of the surface are nested inside each other"; break;
+//-- Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << "Error 300: " << "is not a 2-manifold"; break;
       case SURFACE_NOT_CLOSED:                     cout << "Error 301: " << "surface is not closed"; break;
       case DANGLING_FACES:                         cout << "Error 302: " << "dangling faces (more than 2 surfaces incident to an edge)"; break;
@@ -78,7 +75,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case FREE_FACES:                             cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air) or duplicate faces"; break;
       case SURFACE_SELF_INTERSECTS:                cout << "Error 305: " << "surface self-intersect"; break;
       case VERTICES_NOT_USED:                      cout << "Error 306: " << "some vertices are not referenced by faces"; break;
-      case SURFACE_NORMALS_BAD_ORIENTATION:        cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
+      case SURFACE_NORMALS_WRONG_ORIENTATION:        cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
 //-- Solid level
       case SHELLS_FACE_ADJACENT:                   cout << "Error 400: " << "shells are face adjacent"; break;
       case SHELL_INTERIOR_INTERSECT:               cout << "Error 410: " << "interior of shells intersect"; break;

@@ -29,20 +29,17 @@
 typedef enum
 {
    STATUS_OK                              = 0,
-   // Ring level
-   DUPLICATE_POINTS                       = 100,
+//-- Ring level
+   REPEATED_POINTS                        = 100,
    RING_NOT_CLOSED                        = 110,
-   // Surface level
-   INNER_RING_WRONG_ORIENTATION           = 200,
+   RING_SELF_INTERSECT                    = 120,
+//-- Surface level
+   SELF_INTERSECTION                      = 200,
    NON_PLANAR_SURFACE                     = 210,
-   DEGENERATE_SURFACE				      = 211,
-   SURFACE_PROJECTION_INVALID             = 220,
-   INNER_RING_INTERSECTS_OUTER            = 221,
-   INNER_RING_OUTSIDE_OUTER               = 222,
-   //INNER_OUTER_RINGS_INTERSECT          = 223,
-   INTERIOR_OF_RING_NOT_CONNECTED         = 224,
-   NON_SIMPLE_SURFACE					  = 230,
-   // Shell level
+   INTERIOR_DISCONNECTED                  = 220,
+   HOLE_OUTSIDE                           = 230,
+   HOLES_ARE_NESTED                       = 240,
+//-- Shell level
    NOT_VALID_2_MANIFOLD                   = 300,
    SURFACE_NOT_CLOSED                     = 301,
    DANGLING_FACES                         = 302,
@@ -50,14 +47,16 @@ typedef enum
    FREE_FACES                             = 304,
    SURFACE_SELF_INTERSECTS                = 305,
    VERTICES_NOT_USED                      = 306,
-   SURFACE_NORMALS_BAD_ORIENTATION        = 310,
-   // Solid level
+   SURFACE_NORMALS_WRONG_ORIENTATION      = 310,
+//-- Solid level
    SHELLS_FACE_ADJACENT                   = 400,
    SHELL_INTERIOR_INTERSECT               = 410,
    INNER_SHELL_OUTSIDE_OUTER              = 420,
    INTERIOR_OF_SHELL_NOT_CONNECTED        = 430,
-   // Processing problem
-   INVALID_INPUT_FILE                     = 999
+//-- Processing problem
+   INVALID_INPUT_FILE                     = 999,
+//-- Unknown eeror
+   UNKNOWN_ERROR                          = 998,
 } Val3dity_ErrorCode;
 
 #endif

@@ -50,7 +50,7 @@ bool validate(vector<Shell*> &shells, bool bIsPolyhedron, cbf cb)
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(INVALID_INPUT_FILE, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
+    (*cb)(UNKNOWN_ERROR, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
     return false;
   }
   else
@@ -230,7 +230,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     //-- read oring (there's always one and only one)
     if (numf < 1)
     {
-      (*cb)(SURFACE_PROJECTION_INVALID, shellNum, -1, "surface does not have an outer boundary.");
+      (*cb)(UNKNOWN_ERROR, shellNum, -1, "surface does not have an outer boundary.");
       return false;
     }
     vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
@@ -262,7 +262,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     vector<int*> oneface;
     if (construct_ct(shell.lsPts, pgnids, lsRings, oneface, i) == false)
     {
-      (*cb)(SURFACE_PROJECTION_INVALID, shellNum, i, "face does not have an outer boundary.");
+      (*cb)(UNKNOWN_ERROR, shellNum, i, "face does not have an outer boundary.");
       return false;
     }
     
