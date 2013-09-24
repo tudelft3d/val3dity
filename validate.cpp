@@ -242,7 +242,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
-    create_polygon(shell.lsPts, idsob, pgn);
+    create_polygon(shell.lsPts, idsob, pgn, true);
     lsRings.push_back(pgn);
     vector< vector<int> > pgnids;
     pgnids.push_back(idsob);
@@ -253,7 +253,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
       vector<int> &ids2 = shell.faces[i][j]; // helpful alias for the inner boundary
       //-- get projected Polygon
       Polygon pgn;
-      create_polygon(shell.lsPts, ids2, pgn);
+      create_polygon(shell.lsPts, ids2, pgn, true);
       lsRings.push_back(pgn);
       pgnids.push_back(ids2);
     }
@@ -308,7 +308,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
   return true;
 }
 
-bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn)
+bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient)
 {
   int proj = projection_plane(lsPts, ids);
 
@@ -336,10 +336,10 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
   {
     return false;
   }
-  if (pgn.is_counterclockwise_oriented() == false)
+  if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
   {
     pgn.reverse_orientation();
-//    std::cout << "-->orientation reversed." << std::endl;
+    std::cout << "-->orientation reversed." << std::endl;
   }
   return true;
 }
