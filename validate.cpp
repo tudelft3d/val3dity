@@ -337,7 +337,10 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
     return false;
   }
   if (pgn.is_counterclockwise_oriented() == false)
+  {
     pgn.reverse_orientation();
+//    std::cout << "-->orientation reversed." << std::endl;
+  }
   return true;
 }
 

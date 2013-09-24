@@ -39,6 +39,7 @@ typedef enum
    INTERIOR_DISCONNECTED                  = 220,
    HOLE_OUTSIDE                           = 230,
    HOLES_ARE_NESTED                       = 240,
+   ORIENTATION_RINGS_SAME                 = 250,
 //-- Shell level
    NOT_VALID_2_MANIFOLD                   = 300,
    SURFACE_NOT_CLOSED                     = 301,

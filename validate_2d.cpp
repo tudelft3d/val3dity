@@ -71,6 +71,29 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
         lsRings.push_back(pgn);
       }
       
+//      //-- check the orientation of the rings: oring != irings
+//      //-- we don't care about CCW or CW at this point, just opposite is important
+//      //-- GEOS doesn't do its job, so we have to do it here, sadly.
+//      bool vSurface = true;
+//      if (lsRings.size() > 1)
+//      {
+//        CGAL::Orientation ooring = lsRings[0].orientation();
+//        vector<Polygon>::iterator it = lsRings.begin();
+//        it++;
+//        for ( ; it != lsRings.end(); it++)
+//        {
+//          if (it->orientation() == ooring)
+//          {
+//            (*cb)(ORIENTATION_RINGS_SAME, is, i, "same orientation for outer and inner rings");
+//            isvalid = false;
+//            vSurface = false;
+//            break;
+//          }
+//        }
+//        if (vSurface == false)
+//          continue;
+//      }
+      
       //-- check 2D validity of the surface by (1) projecting them; (2) use GEOS IsValid()
       stringstream wkt;
       wkt << setprecision(15);

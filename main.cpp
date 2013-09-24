@@ -67,6 +67,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case INTERIOR_DISCONNECTED:                  cout << "Error 220: " << "interior of surface is not connected"; break;
       case HOLE_OUTSIDE:                           cout << "Error 230: " << "1 or more holes are located outside the exterior ring"; break;
       case HOLES_ARE_NESTED:                       cout << "Error 240: " << "holes of the surface are nested inside each other"; break;
+      case ORIENTATION_RINGS_SAME:                 cout << "Error 250: " << "rings have same orientation"; break;
 //-- Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << "Error 300: " << "is not a 2-manifold"; break;
       case SURFACE_NOT_CLOSED:                     cout << "Error 301: " << "surface is not closed"; break;

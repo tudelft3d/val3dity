@@ -73,9 +73,13 @@ it explicitly.
   * cube1 where top face has a bow tie orientation 
   * invalid
 
+# cube19
+  * unit cube with a hole (inner ring) in the top face having same orientation as outer ring
+  * invalid
+
 # concave
-* concave shape; top and bottom faces are concave polygons
-* valid
+  * concave shape; top and bottom faces are concave polygons
+  * valid
 
 # torus
   * a "squared donut", genus of the shell is 1
