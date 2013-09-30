@@ -237,8 +237,9 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     
     int proj = projection_plane(shell.lsPts, idsob);
 
-    Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
-    
+	//unit_normal only applys to triangles or convex polygons
+    //Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
+	Vector* v0 = polygon_normal(shell.lsPts, idsob);
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
@@ -271,22 +272,23 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     if (proj == 2)
     {
       Vector n(0, 0, 1);
-      if ( (v0*n) < 0)
+      if ( (*v0*n) < 0)
         invert = true;
     }
     else if (proj == 1)
     {
       Vector n(0, 1, 0);
-      if ( (v0*n) > 0)
+      if ( (*v0*n) > 0)
         invert = true;
     }
     else if(proj == 0)
     {
       Vector n(1, 0, 0);
-      if ( (v0*n) < 0)
+      if ( (*v0*n) < 0)
         invert = true;
     }
-	
+
+	delete v0;
 
     if ( invert == true ) //-- invert
     {
@@ -339,7 +341,7 @@ bool create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polyg
   if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
   {
     pgn.reverse_orientation();
-    std::cout << "-->orientation reversed." << std::endl;
+    //std::cout << "-->orientation reversed." << std::endl;
   }
   return true;
 }
