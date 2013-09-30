@@ -51,7 +51,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       vector<Polygon> lsRings;
       if (false == create_polygon(shell->lsPts, ids, pgn, false))
 	    {
-		    (*cb)(RING_SELF_INTERSECT, is, i, "for the outer ring");
+		    (*cb)(RING_SELF_INTERSECT, is, i, " outer ring self-intersects or is collapsed to a point or a line");
 		    isvalid = false;
 		    continue;
 	    }
@@ -64,7 +64,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
         Polygon pgn;
         if (false == create_polygon(shell->lsPts, ids2, pgn, false))
   	    {
-  		    (*cb)(RING_SELF_INTERSECT, is, i, "for an inner ring");
+  		    (*cb)(RING_SELF_INTERSECT, is, i, "Inner ring self-intersects or is collapsed to a point or a line");
   		    isvalid = false;
   		    continue;
   	    }
