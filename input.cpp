@@ -197,7 +197,7 @@ void readShell(ifstream& infile, Shell &oneshell)
       pgnids.push_back(ids);
     }
     //-- skip the line about point defining the hole (mandatory in a POLY file)
-    if (numf > 1)
+    for (int j = 1; j < numf; j++)
       infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
 
     oneshell.faces.push_back(pgnids);
@@ -276,8 +276,8 @@ void readShell_withIDs(ifstream& infile, Shell &oneshell, vector<string> &idShel
       
       pgnids.push_back(ids);
     }
-    //-- skip the line about point defining the hole (mandatory in a POLY file)
-    if (numf > 1)
+    //-- skip the lines about point defining the hole (mandatory in a POLY file)
+    for (int j = 1; j < numf; j++)
       infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
     
     oneshell.faces.push_back(pgnids);
