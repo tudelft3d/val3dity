@@ -5,9 +5,11 @@ Validation of solids according to the international standard ISO 19107.
 
 ## How do I use val3dity?
 
-It is a command-line program, which we provide as source code, together with makefiles for Mac and Linux. We plan on offering binaries (including for Windows) in the future.
+It is a command-line program, which we provide as source code, together with makefiles for Mac and Linux. 
 
-To compile val3dity, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org)--under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
+If you use Windows, you can download the following [binary](https://www.dropbox.com/s/aywlwz49ngeh80l/3dValidator1.10.zip). It has the latest val3dity, and [citygml2poly](https://github.com/tudelft-gist/citygml2poly) is used to parse CityGML files. Java and Python must be installed on the system.
+
+To compile val3dity yourself, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org)--under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
 
     $ cmake .
     $ make
@@ -16,7 +18,8 @@ To execute val3dity:
 
     $ ./val3dity outershell.poly innershell1.poly innershell2.poly
     
-Each shell of the solid must be modelled with a [POLY](http://tetgen.berlios.de/fformats.poly.html) file, the first argument is always the outer shell, and the others are inner shells.
+Each shell of the solid must be modelled with a [POLY](http://tetgen.berlios.de/fformats.poly.html) file, the first argument is always the outer shell, and the others are inner shells. If you want to read CityGML files as input, have a look at [citygml2poly](https://github.com/tudelft-gist/citygml2poly).
+
 There can be 0 or an infinity of inner shells, their order is not important.
 For instance, to validate a solid having only one outer shell (it's a unit cube):
 
