@@ -84,6 +84,14 @@ it explicitly.
   * unit cube with a hole (inner ring) in the top face having same orientation as outer ring
   * invalid
 
+# cube20
+  * flat cube, ie with volume of 0
+  * invalid
+
+# cube21
+  * 2 unit cubes not touching at all, one above the other separated by 1unit
+  * invalid
+
 # concave
   * concave shape; top and bottom faces are concave polygons
   * valid
