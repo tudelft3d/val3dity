@@ -25,7 +25,7 @@
 
 #include "validate_2d.h"
 #include "validate.h"
-#include "cgal/squared_distance_3.h"
+#include "CGAL/squared_distance_3.h"
 #include <geos_c.h>
 
 
