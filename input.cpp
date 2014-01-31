@@ -164,9 +164,16 @@ void readShell(ifstream& infile, Shell &oneshell)
   string s;
   for (int i = 0; i < num; i++)
   {
-//    cout << "---- face ---- " << i << endl;
-    infile >> numf >> tmpint;// >> s;
-//    cout << s << endl;
+    infile >> numf;
+    while(true) {
+      if (infile.peek() == '\n')
+        break;
+      else if (infile.peek() == ' ')
+        infile.ignore();
+      else
+        infile >> tmpint;
+    }
+
     //-- read oring (there's always one and only one)
     infile >> numpt;
     vector<int> ids(numpt);
