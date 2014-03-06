@@ -58,12 +58,13 @@ it explicitly.
   * invalid
   
 # cube14r
-  * axis-unaligned cube with normals all pointing inwards; 
+  * axis-UNaligned cube with normals all pointing inwards; 
   * invalid
  
 # cube14r2
-  * axis-unaligned cube with normals all pointing outwards; the first extreme point along x has a flat star
+  * axis-UNaligned cube with normals all pointing outwards; the first extreme point along x has a flat star
   * valid
+  
 # cube15
   * cube with one dangling face, touching only at one point; the dangling face is the 1st in the list
   * invalid
