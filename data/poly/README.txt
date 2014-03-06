@@ -77,7 +77,7 @@ it explicitly.
   * invalid
 
 # cube18
-  * cube1 where top face has a bow tie orientation 
+  * cube1 where top face has a bow tie 
   * invalid
 
 # cube19
@@ -91,6 +91,14 @@ it explicitly.
 # cube21
   * 2 unit cubes not touching at all, one above the other separated by 1unit
   * invalid
+
+# cube22
+  * unit cube with top face having 3 triangles forming the square
+  * valid
+
+# cube23
+  * unit cube with top face having a self-intersecting surface (2D invalid), 2 of the faces of cube22 are 'bundled' as one polygon (which self-intersects)
+  * invalid: 2D projected surface is not valid, but whole in 3D is
 
 # concave
   * concave shape; top and bottom faces are concave polygons
