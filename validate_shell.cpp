@@ -419,6 +419,14 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
             }
           }
         }
+        else //-- check if >1 connected components exist (both valid)
+        {
+          if (P->keep_largest_connected_components(1) > 0) 
+          {
+            (*cb)(NOT_VALID_2_MANIFOLD, shellID, -1, "More than one connected components.");
+            isValid = false;
+          }
+        }
       }
       else 
       {
