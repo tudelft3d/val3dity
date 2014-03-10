@@ -450,7 +450,8 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
 int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
   Vector* pnormal = polygon_normal(lsPts, ids);
-	K::FT TOL(1e-8); //-- tolerance 
+  K::FT TOL(1e-12); //-- tolerance 
+	// K::FT TOL(1e-8); //-- tolerance 
 	if (CGAL::compare(sqrt(pnormal->squared_length()), TOL) != CGAL::LARGER)
 	{
 		return -1;
