@@ -152,14 +152,14 @@ is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
   else 
   {
     std::stringstream st;
-   CGAL::Object re = intersection(gTriangles[0], gTriangles[1]);
-   K::Point_3 apoint;
-   K::Segment_3 asegment;
-   if (assign(asegment, re))
-     cout << "Segment intersection: " << asegment[0].x() << asegment.y() << asegment.z() << endl;
-   else if (assign(apoint, re))
-     cout << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
-//    st << "At least at location: (" << gTriangles[0][0].x() << ", " << gTriangles[0][0].y() << ", " << gTriangles[0][0].z() << ")"; 
+    CGAL::Object re = intersection(gTriangles[0], gTriangles[1]);
+    K::Point_3 apoint;
+    K::Segment_3 asegment;
+    if (assign(asegment, re))
+     st << "Segment intersection: " << asegment[0].x() << asegment[0].y() << asegment[0].z() << endl;
+    else if (assign(apoint, re))
+     st << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
+    //    st << "At least at location: (" << gTriangles[0][0].x() << ", " << gTriangles[0][0].y() << ", " << gTriangles[0][0].z() << ")"; 
     (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, st.str());
     return false;
   }
