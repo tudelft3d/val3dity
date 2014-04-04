@@ -150,7 +150,7 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
       case INVALID_INPUT_FILE:                    cout << "INVALID_INPUT_FILE"; break;  
       default:                                    cout << "UNKNOWN_ERROR"; break;                 
     }
-    cout << "</errorCode>" << endl;
+    cout << "</errorType>" << endl;
     
 
     if (bUsingIDs == true) 
