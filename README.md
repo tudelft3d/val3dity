@@ -131,8 +131,8 @@ Invalid solid :(
     * 303: FACE_ORIENTATION_INCORRECT_EDGE_USAGE  
     * 304: FREE_FACES                             
     * 305: SURFACE_SELF_INTERSECTS                
-  * 310: VERTICES_NOT_USED                      
-  * 320: SURFACE_NORMALS_WRONG_ORIENTATION      
+    * 306: VERTICES_NOT_USED                      
+  * 310: SURFACE_NORMALS_WRONG_ORIENTATION      
 
 ## Solid level
 
