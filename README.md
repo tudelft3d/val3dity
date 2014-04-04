@@ -7,7 +7,7 @@ Validation of solids according to the international standard ISO 19107.
 
 It is a command-line program, which we provide as source code, together with makefiles for Mac and Linux. 
 
-If you use Windows, you can download the following [binary](https://www.dropbox.com/s/aywlwz49ngeh80l/3dValidator1.10.zip). It has the latest val3dity, and [citygml2poly](https://github.com/tudelft-gist/citygml2poly) is used to parse CityGML files. Java and Python must be installed on the system.
+If you use Windows, you can download the following [binary](https://www.dropbox.com/s/zhfyowbbmp80y7n/3dValidator1.11.zip). It has the latest val3dity, and [citygml2poly](https://github.com/tudelft-gist/citygml2poly) is used to parse CityGML files. Java and Python must be installed on the system.
 
 To compile val3dity yourself, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org)--under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
 
