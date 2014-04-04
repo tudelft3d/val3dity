@@ -2,6 +2,12 @@
 
 Validation of solids according to the international standard ISO 19107.
 
+The validation of a solid is performed hierarchically, ie first every surface is validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc), and finally the interactions between the shells are analysed.
+
+Most of the details of the implementation are available in this scientific article:
+
+> Ledoux, Hugo (2013). On the validation of solids represented with the
+international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](http://homepage.tudelft.nl/23t4p/pdfs/_13cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
 
 ## How do I use val3dity?
 
@@ -141,10 +147,3 @@ Invalid solid :(
   * 420: INNER_SHELL_OUTSIDE_OUTER              
   * 430: INTERIOR_OF_SHELL_NOT_CONNECTED        
   
-
-
-## I'm interested in the details of how the validation is performed ##
-
-The validation is performed hierarchically, ie first every surface are validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc.), and finally the interactions between the shells are analysed.
-
-Most details about the implementation are available in this [scientific article](http://homepage.tudelft.nl/23t4p/pdfs/_13cacaie.pdf).
