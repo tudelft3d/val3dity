@@ -110,35 +110,36 @@ Invalid solid :(
 
 ## Ring level ##
 
-  * REPEATED_POINTS   
-  * RING_NOT_CLOSED   
-  * RING_SELF_INTERSECT
+  * 100: REPEATED_POINTS   
+  * 110: RING_NOT_CLOSED   
+  * 120: RING_SELF_INTERSECT
 
 ## Surface level ##
 
-  * SELF_INTERSECTION  
-  * NON_PLANAR_SURFACE                     
-  * INTERIOR_DISCONNECTED
-  * HOLE_OUTSIDE
-  * HOLES_ARE_NESTED                      
+  * 200: SELF_INTERSECTION  
+  * 210: NON_PLANAR_SURFACE                     
+  * 220: INTERIOR_DISCONNECTED
+  * 230: HOLE_OUTSIDE
+  * 240: HOLES_ARE_NESTED                      
+  * 250: ORIENTATION_RINGS_SAME
 
 ## Shell level ##
 
-  * NOT_VALID_2_MANIFOLD
-    * SURFACE_NOT_CLOSED                     
-    * DANGLING_FACES                         
-    * FACE_ORIENTATION_INCORRECT_EDGE_USAGE  
-    * FREE_FACES                             
-    * SURFACE_SELF_INTERSECTS                
-  * VERTICES_NOT_USED                      
-  * SURFACE_NORMALS_WRONG_ORIENTATION      
+  * 300: NOT_VALID_2_MANIFOLD
+    * 301: SURFACE_NOT_CLOSED                     
+    * 302: DANGLING_FACES                         
+    * 303: FACE_ORIENTATION_INCORRECT_EDGE_USAGE  
+    * 304: FREE_FACES                             
+    * 305: SURFACE_SELF_INTERSECTS                
+  * 310: VERTICES_NOT_USED                      
+  * 320: SURFACE_NORMALS_WRONG_ORIENTATION      
 
 ## Solid level
 
-  * SHELLS_FACE_ADJACENT                   
-  * SHELL_INTERIOR_INTERSECT               
-  * INNER_SHELL_OUTSIDE_OUTER              
-  * INTERIOR_OF_SHELL_NOT_CONNECTED        
+  * 400: SHELLS_FACE_ADJACENT                   
+  * 410: SHELL_INTERIOR_INTERSECT               
+  * 420: INNER_SHELL_OUTSIDE_OUTER              
+  * 430: INTERIOR_OF_SHELL_NOT_CONNECTED        
   
 
 
