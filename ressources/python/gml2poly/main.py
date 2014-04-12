@@ -93,15 +93,14 @@ def main():
     
     print "# surface in oshell", shells[0].number_of_surfaces()
     print "# points in oshell", shells[0].number_of_points()
-    
     #-- save in tetgen format
     write_shell_to_file_poly(args[0], oshell)
     write_shell_to_off_poly(args[0], oshell)
 
     #-- process interior shell(s), if any
     for i in solidnode.findall("{%s}interior" % ns['gml']):
-        s = Shell()
-        parse_gml_shell(i, s)
+        s = Shell(i, ns['gml'])
+        # parse_gml_shell(i, s)
         shells.append(s)
 
     try:

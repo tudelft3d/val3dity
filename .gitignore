@@ -17,3 +17,5 @@ val3dity
 CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
+
+*.pyc
