@@ -251,7 +251,7 @@ class Shell:
         lsNodes = []
         for s in gmlnode.findall(".//{%s}surfaceMember" % self.gmlns):
             for p in s.find(".//{%s}Polygon" % self.gmlns):
-                posList = gmlnode.find(".//{%s}posList" % self.gmlns)
+                posList = p.find(".//{%s}posList" % self.gmlns)
                 if posList != None:
                     coords = posList.text.split()
                     assert(len(coords) % 3 == 0)
@@ -261,13 +261,13 @@ class Shell:
                             lsNodes.append(temp)
                             temp.id = len(lsNodes) - 1
                 else: #-- a series of gml:pos
-                    posList = gmlnode.findall(".//{%s}pos" % self.gmlns)
+                    posList = p.findall(".//{%s}pos" % self.gmlns)
                     for i in posList:
                         coords = i.text.split()
                         temp = Point(coords[0], coords[1], coords[2])
                         if lsNodes.count(temp) == 0:
                             lsNodes.append(temp)
-                        temp.id = len(lsNodes) - 1
+                            temp.id = len(lsNodes) - 1
         return lsNodes
     def parse_gml_shell(self, shellnode):
         for i in shellnode.findall(".//{%s}surfaceMember" % self.gmlns):

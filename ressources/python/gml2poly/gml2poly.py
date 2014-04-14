@@ -4,6 +4,8 @@ from optparse import OptionParser
 import sys
 import string
 import StringIO
+import os
+import shutil
 from lxml import etree
 import subprocess
 from geomtools import Point, Vector
@@ -11,6 +13,7 @@ import geomtools
 from gmltypes import Ring, Surface, Shell
 
 
+TEMPFOLDER = "/Users/hugo/temp/tmpolys"
 #-- global variable for namespaces used in the input file
 ns = {}
 bVerbose = False
@@ -22,6 +25,12 @@ def main():
     global bVerbose
     bVerbose = options.verbose
 
+    if not os.path.exists(TEMPFOLDER):
+        os.mkdir(TEMPFOLDER)
+    else:
+        shutil.rmtree(TEMPFOLDER)
+        os.mkdir(TEMPFOLDER)
+
     fIn = args[0]
     parser = etree.XMLParser(ns_clean=True)
     tree = etree.parse(fIn, parser)
@@ -29,8 +38,6 @@ def main():
     for key in root.nsmap.keys():
         if root.nsmap[key].find('www.opengis.net/gml') != -1:
             ns['gml'] = "%s" % root.nsmap[key]
-        if root.nsmap[key].find('www.citygml.org') != -1:
-            ns['cgml'] = "%s" % root.nsmap[key]
 
     if ns['gml'] is None:
         print "The file doesn't have the GML namespace."
@@ -40,19 +47,17 @@ def main():
     for solid in root.findall(".//{%s}Solid" % ns['gml']):
         gmlid = solid.get("{%s}id" % ns['gml'])
         if gmlid == None:
-            gmlid = solidid
-            print "Solid <gml:id>:", gmlid
-            solidid += 1
-        else:
-            print "Solid <gml:id>:", gmlid
+            gmlid = str(solidid)
+        solidid += 1
 
         shells = [Shell(solid.find("{%s}exterior" % ns['gml']), ns['gml'])]
         for ishellnode in solid.findall("{%s}interior" % ns['gml']):
             shells.append(Shell(ishellnode, ns['gml']))
-        print "no of shells:", len(shells)
+
         for i, shell in enumerate(shells):
-            print shell.str_poly().getvalue()
-            write_shell_to_file_poly(fIn, shell, i)
+            # print shell.str_poly().getvalue()
+            write_shell_to_file_poly(gmlid, shell, i)
+    print "Number of solids:", solidid-1
     print "\ndone."
 
     # write_shell_to_file_poly('/tmp/s.poly', oshell)
@@ -70,15 +75,14 @@ def main():
     # print "\tvalid:", valid
     # print "\tinvalid", invalid
     # sys.exit()
-
     # solidnode = fetch_solid_node_from_gml_file(root, options)
 
 
 
 
-def write_shell_to_file_poly(fIn, shell, no = 0):
+def write_shell_to_file_poly(gmlid, shell, no = 0):
     try:
-        name = "".join([fIn[:fIn.rfind('.')], ".%d" % no, ".poly"])
+        name = TEMPFOLDER + "/%s.%d.poly" % (gmlid, no)
         fOut = open(name, 'w')
         fOut.write(shell.str_poly().getvalue())
         fOut.close()
