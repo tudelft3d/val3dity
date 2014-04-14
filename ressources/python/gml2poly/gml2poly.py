@@ -1,5 +1,4 @@
 
-
 from optparse import OptionParser
 import sys
 import string
@@ -12,26 +11,20 @@ from geomtools import Point, Vector
 import geomtools
 from gmltypes import Ring, Surface, Shell
 
-
-TEMPFOLDER = "/Users/hugo/temp/tmpolys"
-#-- global variable for namespaces used in the input file
 ns = {}
 bVerbose = False
-
-
+TEMPFOLDER = ""
 
 def main():
     options, args = parse_arguments()
     global bVerbose
+    global TEMPFOLDER
     bVerbose = options.verbose
 
-    if not os.path.exists(TEMPFOLDER):
-        os.mkdir(TEMPFOLDER)
-    else:
-        shutil.rmtree(TEMPFOLDER)
-        os.mkdir(TEMPFOLDER)
-
     fIn = args[0]
+    TEMPFOLDER = args[1]
+    print TEMPFOLDER
+
     parser = etree.XMLParser(ns_clean=True)
     tree = etree.parse(fIn, parser)
     root = tree.getroot()
@@ -49,40 +42,18 @@ def main():
         if gmlid == None:
             gmlid = str(solidid)
         solidid += 1
-
         shells = [Shell(solid.find("{%s}exterior" % ns['gml']), ns['gml'])]
         for ishellnode in solid.findall("{%s}interior" % ns['gml']):
             shells.append(Shell(ishellnode, ns['gml']))
-
         for i, shell in enumerate(shells):
-            # print shell.str_poly().getvalue()
             write_shell_to_file_poly(gmlid, shell, i)
     print "Number of solids:", solidid-1
     print "\ndone."
 
-    # write_shell_to_file_poly('/tmp/s.poly', oshell)
-    # args = '/Users/hugo/projects/val3dity/code/cpp/val3dity /tmp/s.sh0.poly'.split()
-    # p = subprocess.Popen(args,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-    # p.wait()
-    # if (p.returncode == 1):
-        # valid += 1
-    # else:
-        # invalid += 1
-    # total += 1
-#            if total == 5:
-#                break
-    # print "total:", total
-    # print "\tvalid:", valid
-    # print "\tinvalid", invalid
-    # sys.exit()
-    # solidnode = fetch_solid_node_from_gml_file(root, options)
-
-
-
 
 def write_shell_to_file_poly(gmlid, shell, no = 0):
     try:
-        name = TEMPFOLDER + "/%s.%d.poly" % (gmlid, no)
+        name = "%s/%s.%d.poly" % (TEMPFOLDER, gmlid, no)
         fOut = open(name, 'w')
         fOut.write(shell.str_poly().getvalue())
         fOut.close()
@@ -114,8 +85,8 @@ def parse_arguments():
                       action="store_false", dest="verbose", default=False)
     (options, args) = parser.parse_args()
 
-    if len(args) != 1:
-        parser.error("The input file (*.gml or *.xml) must be specified.")
+    if len(args) != 2:
+        parser.error("The input file (*.gml or *.xml) must be specified; and the folder for the POLYs.")
     fIn = args[0]
     if fIn[-3:] != "gml" and fIn[-3:] != "xml":
         parser.error("The input file must be a GML/XML file.")
