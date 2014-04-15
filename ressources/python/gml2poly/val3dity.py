@@ -37,8 +37,8 @@ dErrors = {
 
 def main():
   fin = open(sys.argv[1])
-  construct_polys(fin)
-  validate_polys(fin)
+  if construct_polys(fin):
+    validate_polys(fin)
   shutil.rmtree(TEMPFOLDER)
 
 def construct_polys(fin):
@@ -48,10 +48,8 @@ def construct_polys(fin):
   else:
     shutil.rmtree(TEMPFOLDER)
     os.mkdir(TEMPFOLDER)
-  gml2poly.process(fin, TEMPFOLDER) # TODO: snap tolerance?
-  print "done.\n"
-
-
+  re = gml2poly.process(fin, TEMPFOLDER) # TODO: snap tolerance?
+  return re
 
 
 def validate_polys(fin):

@@ -46,20 +46,25 @@ def process(fIn, tempfolder, snap_tolerance = 1e-3):
 
     if ns['gml'] is None:
         print "The file doesn't have the GML namespace."
-        sys.exit()
+        return 0
 
     solidid = 1
-    for solid in root.findall(".//{%s}Solid" % ns['gml']):
-        gmlid = solid.get("{%s}id" % ns['gml'])
-        if gmlid == None:
-            gmlid = str(solidid)
-        solidid += 1
-        shells = [Shell(solid.find("{%s}exterior" % ns['gml']), ns['gml'])]
-        for ishellnode in solid.findall("{%s}interior" % ns['gml']):
-            shells.append(Shell(ishellnode, ns['gml']))
-        for i, shell in enumerate(shells):
-            write_shell_to_file_poly(gmlid, shell, i)
-    print "Number of solids:", solidid-1
+    try:
+        for solid in root.findall(".//{%s}Solid" % ns['gml']):
+            gmlid = solid.get("{%s}id" % ns['gml'])
+            if gmlid == None:
+                gmlid = str(solidid)
+            solidid += 1
+            shells = [Shell(solid.find("{%s}exterior" % ns['gml']), ns['gml'])]
+            for ishellnode in solid.findall("{%s}interior" % ns['gml']):
+                shells.append(Shell(ishellnode, ns['gml']))
+            for i, shell in enumerate(shells):
+                write_shell_to_file_poly(gmlid, shell, i)
+        print "Number of POLY files created:", solidid-1
+    except:
+        print "ERROR: problems while parsing the XML file."
+        return 0
+    return 1
 
 
 def write_shell_to_file_poly(gmlid, shell, no = 0):
@@ -68,7 +73,7 @@ def write_shell_to_file_poly(gmlid, shell, no = 0):
         fOut = open(name, 'w')
         fOut.write(shell.str_poly().getvalue())
         fOut.close()
-        print "Output written to " + name
+        # print "Output written to " + name
     except IOError, (errno, strerror):
         print "I/O error(%s): %s" % (errno, strerror)
 
