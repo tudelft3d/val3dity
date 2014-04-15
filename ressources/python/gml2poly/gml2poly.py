@@ -17,13 +17,25 @@ TEMPFOLDER = ""
 
 def main():
     options, args = parse_arguments()
-    global bVerbose
-    global TEMPFOLDER
-    bVerbose = options.verbose
+    st = 1e-3
+    if options.snap_tolerance is not None:
+        st = options.snap_tolerance
+    process(args[0], args[1], st)
 
-    fIn = args[0]
-    TEMPFOLDER = args[1]
-    print TEMPFOLDER
+
+def process(fIn, tempfolder, snap_tolerance = 1e-3):
+    global TEMPFOLDER
+    TEMPFOLDER = tempfolder
+
+    try:
+        t = float(snap_tolerance)
+        if (t >= 0.0):
+            print "Using tolerance for snapping of", snap_tolerance
+            geomtools.TOLERANCE = float(snap_tolerance)
+        else:
+            print "snap tolerance can't be negative, using 1e-3."
+    except:
+        print "snap tolerance impossible, using 1e-3."
 
     parser = etree.XMLParser(ns_clean=True)
     tree = etree.parse(fIn, parser)
@@ -48,9 +60,7 @@ def main():
         for i, shell in enumerate(shells):
             write_shell_to_file_poly(gmlid, shell, i)
     print "Number of solids:", solidid-1
-    print "\ndone."
 
-def 
 
 def write_shell_to_file_poly(gmlid, shell, no = 0):
     try:
@@ -91,16 +101,6 @@ def parse_arguments():
     fIn = args[0]
     if fIn[-3:] != "gml" and fIn[-3:] != "xml":
         parser.error("The input file must be a GML/XML file.")
-    if options.snap_tolerance is not None:
-        try:
-            t = float(options.snap_tolerance)
-            if (t >= 0.0):
-                print "Using tolerance for snapping of", options.snap_tolerance
-                geomtools.TOLERANCE = float(options.snap_tolerance)
-            else:
-                print "snap tolerance can't be negative, using 1e-3."
-        except:
-            print "snap tolerance impossible, using 1e-3."
     return options, args
 
 
