@@ -50,6 +50,7 @@ def main():
     print "Number of solids:", solidid-1
     print "\ndone."
 
+def 
 
 def write_shell_to_file_poly(gmlid, shell, no = 0):
     try:
