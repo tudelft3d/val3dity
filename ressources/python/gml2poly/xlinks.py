@@ -31,20 +31,28 @@ print ns['xlink']
 # solids = root.findall(".//{%s}Solid" % ns['gml'])
 # print "# gml:Solids:", len(solids)
 
-r = root.findall(".//{%s}surfaceMember[@{%s}href]" % (ns['gml'], ns['xlink']))
-if r is not None:
-    print "sm", len(r)
+nodes = root.findall(".//{%s}surfaceMember[@{%s}href]" % (ns['gml'], ns['xlink']))
+if nodes is not None:
+    print "sm", len(nodes)
 d = {}
-for each in r:
-    x = each.attrib["{%s}href" % ns['xlink']]
+for node in nodes:
+    x = node.attrib["{%s}href" % ns['xlink']]
     for n in root.findall(".//{%s}Polygon[@{%s}id]" % (ns['gml'], ns['gml'])):
         if n.attrib["{%s}id" % ns['gml']] == x:
             d[x] = n
             # print n.tag
-            # each.append(x)
-            # etree.SubElement(each, n)
+            # node.append(x)
+            # etree.SubElement(node, n)
             break
 print len(d)
+
+
+
+nodes = root.findall(".//{%s}surfaceMember" % (ns['gml']))
+for n in nodes:
+    if ("{%s}href" % ns['xlinkY'] in n.attrib):
+        print d[n.attrib["{%s}href" % ns['xlink']]]
+sys.exit()
 
 #-- one test
 r = root.find(".//{%s}surfaceMember[@{%s}href]" % (ns['gml'], ns['xlink']))
@@ -52,8 +60,7 @@ a = r.attrib["{%s}href" % ns['xlink']]
 if a is not None:
     print a
     n = d[a]
-else:
-    n = etree.SubElement(r, '{%s}Polygon' % ns['gml'], nsmap=ns)    
+
 
 for x in n:
     print x

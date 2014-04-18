@@ -43,27 +43,50 @@ def process(fIn, tempfolder, snap_tolerance = 1e-3):
     for key in root.nsmap.keys():
         if root.nsmap[key].find('www.opengis.net/gml') != -1:
             ns['gml'] = "%s" % root.nsmap[key]
+        if root.nsmap[key].find('www.w3.org/1999/xlink') != -1:
+            ns['xlink'] = "%s" % root.nsmap[key]
 
     if ns['gml'] is None:
         print "The file doesn't have the GML namespace."
         return 0
 
+    #-- handling of (potential) xlinks
+    dxlinks = {}
+    if ns['xlink'] is not None:
+        print "Oh no, the file might contain xlinks :/"
+        print "Parsing whole file to find and store them."
+        nodes = root.findall(".//{%s}surfaceMember[@{%s}href]" % (ns['gml'], ns['xlink']))
+        if nodes is not None:
+            print "There are %d xlinks for gml:surfaceMember" % len(nodes)
+            for node in nodes:
+                x = node.attrib["{%s}href" % ns['xlink']]
+                if x[0] == '#':
+                    x = x[1:]
+                for n in root.findall(".//{%s}Polygon[@{%s}id]" % (ns['gml'], ns['gml'])):
+                    if n.attrib["{%s}id" % ns['gml']] == x:
+                        dxlinks[x] = n
+                        break
+        print "dico of xlinks", len(dxlinks)
+    else:
+        dxlinks = None
+
+
     solidid = 1
-    try:
-        for solid in root.findall(".//{%s}Solid" % ns['gml']):
-            gmlid = solid.get("{%s}id" % ns['gml'])
-            if gmlid == None:
-                gmlid = str(solidid)
-            solidid += 1
-            shells = [Shell(solid.find("{%s}exterior" % ns['gml']), ns['gml'])]
-            for ishellnode in solid.findall("{%s}interior" % ns['gml']):
-                shells.append(Shell(ishellnode, ns['gml']))
-            for i, shell in enumerate(shells):
-                write_shell_to_file_poly(gmlid, shell, i)
-        print "Number of POLY files created:", solidid-1
-    except:
-        print "ERROR: problems while parsing the XML file."
-        return 0
+    # try:
+    for solid in root.findall(".//{%s}Solid" % ns['gml']):
+        gmlid = solid.get("{%s}id" % ns['gml'])
+        if gmlid == None:
+            gmlid = str(solidid)
+        solidid += 1
+        shells = [Shell(solid.find("{%s}exterior" % ns['gml']), dxlinks, ns)]
+        for ishellnode in solid.findall("{%s}interior" % ns['gml']):
+            shells.append(Shell(ishellnode, ns['gml']))
+        for i, shell in enumerate(shells):
+            write_shell_to_file_poly(gmlid, shell, i)
+    print "Number of POLY files created:", solidid-1
+    # except:
+        # print "ERROR: problems while parsing the XML file."
+        # return 0
     return 1
 
 
