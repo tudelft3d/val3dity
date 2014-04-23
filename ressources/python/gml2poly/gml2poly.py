@@ -78,10 +78,8 @@ def process(fIn, tempfolder, snap_tolerance = '1e-3'):
                 gmlid = str(solidid)
             solidid += 1
             shells = [Shell(solid.find("{%s}exterior" % ns['gml']), dxlinks, ns)]
-            print shells
             for ishellnode in solid.findall("{%s}interior" % ns['gml']):
                 shells.append(Shell(ishellnode, dxlinks, ns))
-                print shells
             for i, shell in enumerate(shells):
                 write_shell_to_file_poly(gmlid, shell, i)
         print "Number of POLY files created:", solidid-1
