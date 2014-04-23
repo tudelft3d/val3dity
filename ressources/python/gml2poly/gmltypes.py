@@ -31,14 +31,6 @@ from lxml import etree
 
 
 
-class ValidationError(Exception):
-    def __init__(self, no, err):
-        self.no = no
-        self.err = err
-    def __str__(self):
-        return "ValidationError #" + str(self.no) +  ": " + self.err
-
-
 class Ring:
     def __init__(self, lsPts=None):
         self.cur = 0
@@ -243,9 +235,10 @@ class Surface:
 #####################################################################
 
 class Shell:
-    def __init__(self, gmlnode, gmlns):
-        self.gmlns = gmlns
-        self.lsNodes = self.fetch_all_unique_points_in_gml(gmlnode)
+    def __init__(self, gmlnode, dxlinks, ns):
+        self.ns = ns
+        self.dxlinks = dxlinks
+        self.lsNodes = self.fetch_all_unique_points_in_shell(gmlnode)
         self.s = []
         self.parse_gml_shell(gmlnode)
     def append(self, s1):
@@ -255,52 +248,59 @@ class Shell:
         return self.s[index]
     def __len__(self):
         return len(self.s)
-
-    def fetch_all_unique_points_in_gml(self, gmlnode):
+    def fetch_all_unique_points_in_shell(self, gmlnode):
         lsNodes = []
-        for s in gmlnode.findall(".//{%s}surfaceMember" % self.gmlns):
-            for p in s.find(".//{%s}Polygon" % self.gmlns):
-                posList = gmlnode.find(".//{%s}posList" % self.gmlns)
-                if posList != None:
-                    coords = posList.text.split()
-                    assert(len(coords) % 3 == 0)
-                    for i in range(0, len(coords), 3):
-                        temp = Point(coords[i], coords[i+1], coords[i+2])
-                        if lsNodes.count(temp) == 0:
-                            lsNodes.append(temp)
-                            temp.id = len(lsNodes) - 1
-                else: #-- a series of gml:pos
-                    posList = gmlnode.findall(".//{%s}pos" % self.gmlns)
-                    for i in posList:
-                        coords = i.text.split()
-                        temp = Point(coords[0], coords[1], coords[2])
-                        if lsNodes.count(temp) == 0:
-                            lsNodes.append(temp)
+        for s in gmlnode.findall(".//{%s}surfaceMember" % self.ns['gml']):
+            if (self.dxlinks is not None) and ("{%s}href" % self.ns['xlink'] in s.attrib):
+                link = s.attrib["{%s}href" % self.ns['xlink']]
+                if link[0] == '#':
+                    link = link[1:]
+                p = self.dxlinks[link]
+            else:
+                p = s.find(".//{%s}Polygon" % self.ns['gml'])
+            posList = p.find(".//{%s}posList" % self.ns['gml'])
+            if posList != None:
+                coords = posList.text.split()
+                assert(len(coords) % 3 == 0)
+                for i in range(0, len(coords), 3):
+                    temp = Point(coords[i], coords[i+1], coords[i+2])
+                    if lsNodes.count(temp) == 0:
+                        lsNodes.append(temp)
+                        temp.id = len(lsNodes) - 1
+            else: #-- a series of gml:pos
+                posList = p.findall(".//{%s}pos" % self.ns['gml'])
+                for i in posList:
+                    coords = i.text.split()
+                    temp = Point(coords[0], coords[1], coords[2])
+                    if lsNodes.count(temp) == 0:
+                        lsNodes.append(temp)
                         temp.id = len(lsNodes) - 1
         return lsNodes
-
     def parse_gml_shell(self, shellnode):
-        for i in shellnode.findall(".//{%s}surfaceMember" % self.gmlns):
+        for i in shellnode.findall(".//{%s}surfaceMember" % self.ns['gml']):
             self.s.append(self.parse_gml_surfaceMember(i))
     def parse_gml_surfaceMember(self, surfacenode):
         surf = Surface()
-        polynode = surfacenode.find(".//{%s}Polygon" % self.gmlns)
-        if polynode is not None:
-            self.parse_gml_polygon(polynode, surf)
-        else: #-- maybe a xlink was used... I don't support that yet
-            print "ERROR: xlink to another surface, for surface", surface.tag
+        if (self.dxlinks is not None) and ("{%s}href" % self.ns['xlink'] in surfacenode.attrib):
+            link = surfacenode.attrib["{%s}href" % self.ns['xlink']]
+            if link[0] == '#':
+                link = link[1:]
+            polynode = self.dxlinks[link]
+        else:
+            polynode = surfacenode.find(".//{%s}Polygon" % self.ns['gml'])
+        self.parse_gml_polygon(polynode, surf)
         return surf
     def parse_gml_polygon(self, poly, surf):
-        extnode = poly.find(".//{%s}exterior" % self.gmlns)
+        extnode = poly.find(".//{%s}exterior" % self.ns['gml'])
         surf.set_outer_ring(self.parse_gml_polygon_ring(extnode))
-        intnodes = poly.findall(".//{%s}interior" % self.gmlns)
+        intnodes = poly.findall(".//{%s}interior" % self.ns['gml'])
         if len(intnodes) != 0:
             irings = []
             for i in range(len(intnodes)):
                 surf.append_inner_ring(self.parse_gml_polygon_ring(intnodes[i]))
     def parse_gml_polygon_ring(self, ringnode):
         #-- 2 choices: (1) series of gml:pos; (2) one gml:posList
-        posList = ringnode.find(".//{%s}posList" % self.gmlns)
+        posList = ringnode.find(".//{%s}posList" % self.ns['gml'])
         ring = Ring()
         if posList != None:
             coords = posList.text.split()
@@ -310,192 +310,28 @@ class Shell:
                 j = self.lsNodes.index(temp)
                 ring.append(self.lsNodes[j])
         else: #-- a series of gml:pos
-            posList = ringnode.findall(".//{%s}pos" % self.gmlns)
+            posList = ringnode.findall(".//{%s}pos" % self.ns['gml'])
             for i in posList:
                 coords = i.text.split()
                 temp = Point(coords[0], coords[1], coords[2])
                 j = self.lsNodes.index(temp)
                 ring.append(self.lsNodes[j])
         return ring
-        
-    def validate(self):
-        for i in self.s:
-            i.validate()
     def number_of_points(self):
         return len(self.lsNodes)
     def number_of_surfaces(self):
         return len(self.s)
     def str_poly(self):
         sOut = StringIO.StringIO()
-        #sOut.write('# Created by val3d_part1.py\n# Hugo Ledoux, h.ledoux@tudelft.nl\n')
-        #sOut.write('# Part 1 - node list\n')
-        #sOut.write('# node count, 3 dim, no attribute, no boundary marker\n')
         sOut.write(str(self.number_of_points()) + ' 3 0 0\n')
         for i in self.lsNodes:
             sOut.write(i.str_poly() + "\n")
-        #sOut.write('\n# Part 2 - facet list\n')
-        #sOut.write('# facet count, no boundary marker\n')
         sOut.write(str(self.number_of_surfaces()) + " 0\n")
         for s in self.s:
             sOut.write(s.str_poly())
-        #sOut.write('\n# Part 3 - hole list\n0\n')
         sOut.write('0\n0\n')
-        #sOut.write('\n# Part 4 - region list\n')
-        #sOut.write('0            # no region\n')
-        return sOut
-    def str_off(self):
-        sOut = StringIO.StringIO()
-        #sOut.write('# Created by val3d_part1.py\n# Hugo Ledoux, h.ledoux@tudelft.nl\n')
-        #sOut.write('# Part 1 - node list\n')
-        #sOut.write('# node count, 3 dim, no attribute, no boundary marker\n')
-        sOut.write('OFF\n')
-        sOut.write(str(self.number_of_points()) + ' ' + str(self.number_of_surfaces()) + ' 0\n')
-        for i in self.lsNodes:
-            sOut.write(i.str_off() + "\n")
-        #sOut.write('\n# Part 2 - facet list\n')
-        #sOut.write('# facet count, no boundary marker\n')
-        for s in self.s:
-            sOut.write(s.str_off())
         return sOut
 
-
-class Solid:
-    def __init__(self, lsNodes=None):
-        self.oshell = None #- outer Shell
-        self.ishells = [] #-- of inner Shell(s)
-        self.lsNodes = lsNodes #-- of Point
-        self.gmlns = None
-    def gml_to_solid(self, gmlnode, gmlns):
-        self.gmlns = gmlns
-        self.lsNodes = self.fetch_all_unique_points_in_gml(gmlnode)
-        self.parse_gml_solid(gmlnode)
-    def solid_to_tetgen(self):
-        sOut = StringIO.StringIO()
-        sOut.write('# Created by gml2tetgen\n# Hugo Ledoux, h.ledoux@tudelft.nl\n')
-
-        sOut.write('# Part 1 - node list\n')
-        sOut.write('# node count, 3 dim, no attribute, no boundary marker\n')
-        sOut.write(str(self.number_of_points()) + ' 3 0 0\n')
-        for i in self.lsNodes:
-            sOut.write(i.str_tetgen() + "\n")
-
-        sOut.write('\n# Part 2 - facet list\n')
-        sOut.write('# facet count, no boundary marker\n')
-        sOut.write(str(self.number_of_surfaces()) + " 0\n")
-
-        for surf in self.oshell:
-            sOut.write(surf.str_tetgen())
-
-        for ishell in self.ishells:
-            for surf in ishell:
-                sOut.write(surf.str_tetgen())
-
-        sOut.write('\n# Part 3 - hole list\n')
-        sOut.write(str(len(self.ishells)) + "\n")
-        for ishell in self.ishells:
-            sOut.write("1 " + repr(ishell.get_a_point_inside()))
-
-        sOut.write('\n# Part 4 - region list\n')
-        sOut.write('0            # no region\n')
-        return sOut
-    def get_gml_repr(self, ns):
-        topnode = etree.Element('{%s}Solid' % ns['gml'], nsmap=ns)
-        temp = etree.SubElement(topnode, '{%s}exterior' % ns['gml'], nsmap=ns)
-        temp.append(self.oshell.get_gml_repr(ns))
-        if len(self.ishells) > 0:
-            temp = etree.SubElement(topnode, '{%s}interior' % ns['gml'], nsmap=ns)
-            for each in self.ishells:
-                temp.append(each.get_gml_repr(ns))
-        return topnode
-    def set_outer_shell(self, shell):
-        assert(isinstance(shell, Shell))
-        self.oshell = shell
-    def append_inner_shell(self, shell):
-        assert(isinstance(shell, Shell))
-        self.ishells.append(shell)
-    def validate(self):
-        self.oshell.validate()
-        for i in self.ishells:
-            i.validate()
-    def number_of_points(self):
-        return len(self.lsNodes)
-    def number_of_surfaces(self):
-        total = 0
-        total += len(self.oshell)
-        for i in self.ishells:
-            total += len(i)
-        return total
-    def fetch_all_unique_points_in_gml(self, solidnode):
-        lsNodes = []
-        for s in solidnode.findall(".//{%s}surfaceMember" % self.gmlns):
-            for p in s.find(".//{%s}Polygon" % self.gmlns):
-                posList = solidnode.find(".//{%s}posList" % self.gmlns)
-                if posList != None:
-                    coords = posList.text.split()
-                    assert(len(coords) % 3 == 0)
-                    for i in range(0, len(coords), 3):
-                        temp = Point(coords[i], coords[i+1], coords[i+2])
-                        if lsNodes.count(temp) == 0:
-                            lsNodes.append(temp)
-                            temp.id = len(lsNodes) - 1
-                else: #-- a series of gml:pos
-                    posList = solidnode.findall(".//{%s}pos" % self.gmlns)
-                    for i in posList:
-                        coords = i.text.split()
-                        temp = Point(coords[0], coords[1], coords[2])
-                        if lsNodes.count(temp) == 0:
-                            lsNodes.append(temp)
-                        temp.id = len(lsNodes) - 1
-        return lsNodes
-    def parse_gml_solid(self, solidnode):
-        #-- process exterior shell
-        oshell = Shell()
-        self.parse_gml_shell(solidnode.find(".//{%s}exterior" % self.gmlns), oshell)
-        self.set_outer_shell(oshell)
-        #-- process interior shell
-        for i in solidnode.findall("{%s}interior" % self.gmlns):
-            s = Shell()
-            self.parse_gml_shell(i, s)
-            self.append_inner_shell(s)
-        print "no of inner shells:", len(self.ishells)
-    def parse_gml_shell(self, shellnode, shell):
-        for i in shellnode.findall(".//{%s}surfaceMember" % self.gmlns):
-            shell.append(self.parse_gml_surfaceMember(i))
-    def parse_gml_surfaceMember(self, surfacenode):
-        surf = Surface()
-        polynode = surfacenode.find(".//{%s}Polygon" % self.gmlns)
-        if polynode is not None:
-            self.parse_gml_polygon(polynode, surf)
-        else: #-- maybe a xlink was used... I don't support that yet
-            print "ERROR: xlink to another surface, for surface", surface.tag
-        return surf
-    def parse_gml_polygon(self, poly, surf):
-        extnode = poly.find(".//{%s}exterior" % self.gmlns)
-        surf.set_outer_ring(self.parse_gml_polygon_ring(extnode))
-        intnodes = poly.findall(".//{%s}interior" % self.gmlns)
-        if len(intnodes) != 0:
-            irings = []
-            for i in range(len(intnodes)):
-                surf.append_inner_ring(self.parse_gml_polygon_ring(intnodes[i]))
-    def parse_gml_polygon_ring(self, ringnode):
-        #-- 2 choices: (1) series of gml:pos; (2) one gml:posList
-        posList = ringnode.find(".//{%s}posList" % self.gmlns)
-        ring = Ring()
-        if posList != None:
-            coords = posList.text.split()
-            assert(len(coords) % 3 == 0)
-            for i in range(0, len(coords), 3):
-                temp = Point(coords[i], coords[i+1], coords[i+2])
-                j = self.lsNodes.index(temp)
-                ring.append(self.lsNodes[j])
-        else: #-- a series of gml:pos
-            posList = ringnode.findall(".//{%s}pos" % self.gmlns)
-            for i in posList:
-                coords = i.text.split()
-                temp = Point(coords[0], coords[1], coords[2])
-                j = self.lsNodes.index(temp)
-                ring.append(self.lsNodes[j])
-        return ring
 
 
 def max_in_list_wrt_dim(ls, dim):
