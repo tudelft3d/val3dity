@@ -53,7 +53,7 @@ def process(fIn, tempfolder, snap_tolerance = '1e-3'):
 
         #-- handling of (potential) xlinks
         dxlinks = {}
-        if ns['xlink'] is not None:
+        if 'xlink' in ns:
             print "Oh no, the file might contain xlinks :/"
             print "Parsing whole file to find and store them."
             nodes = root.findall(".//{%s}surfaceMember[@{%s}href]" % (ns['gml'], ns['xlink']))
