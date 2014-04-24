@@ -39,7 +39,7 @@ def main():
   fin = open(sys.argv[1])
   if construct_polys(fin):
     validate_polys(fin)
-  shutil.rmtree(TEMPFOLDER)
+  # shutil.rmtree(TEMPFOLDER)
 
 def construct_polys(fin):
   print "Extracting the solids from the CityGML file"
