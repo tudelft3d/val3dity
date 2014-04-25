@@ -101,6 +101,10 @@ it explicitly.
   * unit cube with top face having a self-intersecting surface (2D invalid), 2 of the faces of cube22 are 'bundled' as one polygon (which self-intersects)
   * invalid: 2D projected surface is not valid, but whole in 3D is
 
+# cube24
+  * cube with an extra vertex on a straight edge
+  * valid
+
 # concave
   * concave shape; top and bottom faces are concave polygons
   * valid
