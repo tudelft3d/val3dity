@@ -379,8 +379,13 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
   if (isValid == true)
   {
     (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
+
+    //-- here the old simple way to construct Polyhedra can be used.
     //-- construct the CgalPolyhedron with batch operator (not used anymore)
-    // p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+    // P = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+    // std::cout << P->empty() << std::endl;
+    // std::cout << P->is_valid() << std::endl;
+    // std::cout << P->is_closed() << std::endl;
 
     //-- construct the CgalPolyhedron incrementally
     ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
@@ -955,7 +960,7 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
 bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb)
 {
   vector< vector<int*> >::iterator faceIt = faces.begin();
-  double ANGLETOLERANCE = 1.0;
+  double ANGLETOLERANCE = 0.1; // TODO: expose planarity
   int i = 0;
   bool isValid = true;
   for ( ; faceIt != faces.end(); faceIt++)
@@ -981,9 +986,13 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
   {
     a = *ittr;
     Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
-    if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
+    Vector a = CGAL::cross_product(v0, v1);
+    double norm = std::sqrt(a.squared_length());
+    double dot = CGAL::to_double((v0*v1));
+    double angle = atan2(norm, dot);
+    if (angle*180/PI > angleTolerance)
     {
-//      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
+      // cout << "\t---angle: " << angle*180/PI << endl;
       isPlanar = false;
       break;
     }

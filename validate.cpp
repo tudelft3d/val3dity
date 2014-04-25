@@ -234,12 +234,11 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
       return false;
     }
     vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
-    
-    int proj = projection_plane(shell.lsPts, idsob);
 
-	//unit_normal only applys to triangles or convex polygons
+    int proj = projection_plane(shell.lsPts, idsob);
+    //unit_normal only applys to triangles or convex polygons
     //Vector v0 = unit_normal( shell.lsPts[idsob[0]], shell.lsPts[idsob[1]], shell.lsPts[idsob[2]] );
-	Vector* v0 = polygon_normal(shell.lsPts, idsob);
+    Vector* v0 = polygon_normal(shell.lsPts, idsob);
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
@@ -397,9 +396,9 @@ bool construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >& pg
     }
     ct.insert_constraint(v0,firstv);
   }
-  //  cout << "faces " << ct.number_of_faces() << endl;
-  //  cout << "ct vertices " << ct.number_of_vertices() << endl;
-  //  cout << "constraints " << ct.number_of_constraints() << endl;
+   // cout << "faces " << ct.number_of_faces() << endl;
+   // cout << "ct vertices " << ct.number_of_vertices() << endl;
+   // cout << "constraints " << ct.number_of_constraints() << endl;
   
   //-- validation of the face itself
   //-- if the CT introduced new points, then there are irings intersectings either oring or other irings
