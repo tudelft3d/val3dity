@@ -351,7 +351,8 @@ public:
 CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
 bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
-bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
+bool              is_face_planar_normalsdeviation(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance);
+bool              is_face_planar_distance2plane(const vector<int*> &trs, const vector<Point3>& lsPts, float tolerance);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
@@ -956,16 +957,24 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
   return P;
 }
 
-
+//-- TODO: are these 2 bullet proof?!? I think not :(
 bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb)
 {
   vector< vector<int*> >::iterator faceIt = faces.begin();
   double ANGLETOLERANCE = 0.1; // TODO: expose planarity
+  double DISTANCETOLERANCE = 0.05; // TODO: expose planarity
   int i = 0;
   bool isValid = true;
   for ( ; faceIt != faces.end(); faceIt++)
-  {
-    if (is_face_planar(*faceIt, lsPts, ANGLETOLERANCE, cb) == false)
+  { 
+    //-- first with plane distance technique
+    if (is_face_planar_distance2plane(*faceIt, lsPts, DISTANCETOLERANCE) == false)
+    {
+       (*cb)(NON_PLANAR_SURFACE, shellID, i, "");
+       isValid = false;
+    }
+    else if (is_face_planar_normalsdeviation(*faceIt, lsPts, ANGLETOLERANCE) == false)
+    //-- second with normals deviation method
     {
        (*cb)(NON_PLANAR_SURFACE, shellID, i, "");
        isValid = false;
@@ -975,7 +984,31 @@ bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, 
   return isValid;
 }  
 
-bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb)
+bool is_face_planar_distance2plane(const vector<int*> &trs, const vector<Point3>& lsPts, float tolerance)
+{
+  vector<int*>::const_iterator ittr = trs.begin();
+  int* a = *ittr;
+  CgalPolyhedron::Plane_3 p(lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
+  ittr++;
+  bool isPlanar = true;
+  for ( ; ittr != trs.end(); ittr++)
+  {
+    a = *ittr;
+    for (int i=0; i<=2; i++)
+    {
+      double d2 = CGAL::squared_distance(p, lsPts[a[i]]);
+      std::cout << "square distance:" << d2 << std::endl;
+      if ( d2 > (tolerance*tolerance) )
+      {
+        isPlanar = false;
+        break;
+      }
+    }
+  }
+  return isPlanar;
+}
+
+bool is_face_planar_normalsdeviation(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
 {
   vector<int*>::const_iterator ittr = trs.begin();
   int* a = *ittr;
@@ -999,6 +1032,8 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
   }
   return isPlanar;
 }
+
+
   
 
 
