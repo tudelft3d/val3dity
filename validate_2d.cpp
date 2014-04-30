@@ -26,23 +26,47 @@
 #include "validate_2d.h"
 #include "validate.h"
 #include "CGAL/squared_distance_3.h"
-#include <geos_c.h>
+#include <GEOS/geos_c.h>
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance);
 
+
 bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
 {
-  
+//  if (CGAL::collinear(pts[0], pts[1], pts[2])) {
+//    std::cout << "collinear" << std::endl;
+//    if (CGAL::collinear(pts[0], pts[1], pts[3])) {
+//      std::cout << "collinear" << std::endl;
+//    }
+//  }
+
   CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
-  vector<Point3>::const_iterator it = pts.begin();
+  int i = 3;
+  while (plane.is_degenerate() == true) {
+//    std::cout << "PLANE DEGENERATE" << std::endl;
+    plane = CgalPolyhedron::Plane_3(pts[0], pts[1], pts[i]);
+    i++;
+    if (i > pts.size()) {
+      std::cout << "ERROR: all points of face are collinear." << std::endl;
+      break;
+    }
+    
+  }
   
+//  vector<Point3>::const_iterator it = pts.begin();
+//  for ( ; it != pts.end(); it++)
+//  {
+//    std::cout << std::fixed << std::setprecision( 12 ) << (*it).x() << "," << (*it).y() << "," << (*it).z() << std::endl;
+//  }
+  
+  vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
   for ( ; it != pts.end(); it++)
   {
     double d2 = CGAL::squared_distance(*it, plane);
-    std::cout << "square distance:" << d2 << std::endl;
     if ( d2 > (tolerance*tolerance) )
     {
+//      std::cout << "distance:" << sqrt(d2) << std::endl;
       isPlanar = false;
       break;
     }
@@ -52,6 +76,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
 
 bool validate_2D(vector<Shell*> &shells, cbf cb)
 {
+  double TOLERANCE = 0.01; // TODO: expose this?
   initGEOS(NULL, NULL);
   (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D with GEOS (their projection)");
   bool isvalid = true;
@@ -83,13 +108,13 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
           allpts.push_back(shell->lsPts[*itp2]);
         }
       }
-      std::cout << "size of allpts" << allpts.size() << std::endl;
-      std::cout << "isPlanar?" << is_face_planar_distance2plane(allpts, 0.01) << std::endl;
-      
-      
-      
-      
-      
+//      std::cout << "---FACE " << i << std::endl;
+      if (false == is_face_planar_distance2plane(allpts, TOLERANCE))
+	    {
+		    (*cb)(NON_PLANAR_SURFACE, is, i, "");
+		    isvalid = false;
+		    continue;
+	    }
       
       //-- get projected oring
       Polygon pgn;
