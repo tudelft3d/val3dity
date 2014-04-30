@@ -28,7 +28,27 @@
 #include "CGAL/squared_distance_3.h"
 #include <geos_c.h>
 
+bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance);
 
+bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
+{
+  
+  CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
+  vector<Point3>::const_iterator it = pts.begin();
+  
+  bool isPlanar = true;
+  for ( ; it != pts.end(); it++)
+  {
+    double d2 = CGAL::squared_distance(*it, plane);
+    std::cout << "square distance:" << d2 << std::endl;
+    if ( d2 > (tolerance*tolerance) )
+    {
+      isPlanar = false;
+      break;
+    }
+  }
+  return isPlanar;
+}
 
 bool validate_2D(vector<Shell*> &shells, cbf cb)
 {
@@ -46,6 +66,31 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
 
+//-- test planarity of the face
+      vector< Point3 > allpts;
+      vector<int>::const_iterator itp = ids.begin();
+      for ( ; itp != ids.end(); itp++)
+      {
+        allpts.push_back(shell->lsPts[*itp]);
+      }
+      //-- check for irings
+      for (int j = 1; j < static_cast<int>(numf); j++)
+      {
+        vector<int> &ids2 = shell->faces[i][j]; // helpful alias for the inner boundary
+        vector<int>::const_iterator itp2 = ids2.begin();
+        for ( ; itp2 != ids2.end(); itp2++)
+        {
+          allpts.push_back(shell->lsPts[*itp2]);
+        }
+      }
+      std::cout << "size of allpts" << allpts.size() << std::endl;
+      std::cout << "isPlanar?" << is_face_planar_distance2plane(allpts, 0.01) << std::endl;
+      
+      
+      
+      
+      
+      
       //-- get projected oring
       Polygon pgn;
       vector<Polygon> lsRings;
