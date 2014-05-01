@@ -674,7 +674,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 		list<AABBTree::Object_and_primitive_id> intersections;
 		myTree.all_intersections(queryRay, std::back_inserter(intersections));
 		//
-		float fDistance;
+    K::FT fDistance;
 		AABBTree::Object_and_primitive_id Hit;
 		//
 		list<AABBTree::Object_and_primitive_id>::iterator listItr = intersections.begin();
@@ -700,7 +700,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 			if (CGAL::assign(pt, obj))
 			{
 				//calculate the distance
-				float dist = (pt - stPt).squared_length();
+        K::FT dist = (pt - stPt).squared_length();
 				if (fDistance > dist)
 				{
 					fDistance = dist;
@@ -776,7 +776,7 @@ bool check_global_orientation_normals_rev2( CgalPolyhedron* p, bool bOuter, cbf 
 	{
 		//calculate the intersection
 		Vector vecR(hCirc->vertex()->point(), hCirc->opposite()->vertex()->point());
-		vecR = vecR / std::sqrt(vecR.squared_length());
+		vecR = vecR / sqrt(vecR.squared_length());
 		if (CGAL::compare(vecR.x(), 0.0) != CGAL::EQUAL)
 		{
 			K::FT para = -TOL/vecR.x(); // (cc->point().x() - TOL - cc->point().x()) / vecR.x()
@@ -989,9 +989,9 @@ bool is_face_planar_normalsdeviation(const vector<int*> &trs, const vector<Point
     a = *ittr;
     Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
     Vector a = CGAL::cross_product(v0, v1);
-    double norm = std::sqrt(a.squared_length());
+    K::FT norm = sqrt(a.squared_length());
     double dot = CGAL::to_double((v0*v1));
-    double angle = atan2(norm, dot);
+    double angle = atan2(CGAL::to_double(norm), dot);
     if (angle*180/PI > angleTolerance)
     {
       // cout << "\t---angle: " << angle*180/PI << endl;

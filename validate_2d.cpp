@@ -33,13 +33,6 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance);
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
 {
-//  if (CGAL::collinear(pts[0], pts[1], pts[2])) {
-//    std::cout << "collinear" << std::endl;
-//    if (CGAL::collinear(pts[0], pts[1], pts[3])) {
-//      std::cout << "collinear" << std::endl;
-//    }
-//  }
-
   CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
   int i = 3;
   while (plane.is_degenerate() == true) {
@@ -53,18 +46,12 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
     
   }
   
-//  vector<Point3>::const_iterator it = pts.begin();
-//  for ( ; it != pts.end(); it++)
-//  {
-//    std::cout << std::fixed << std::setprecision( 12 ) << (*it).x() << "," << (*it).y() << "," << (*it).z() << std::endl;
-//  }
-  
   vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
   for ( ; it != pts.end(); it++)
   {
-    double d2 = CGAL::squared_distance(*it, plane);
-    if ( d2 > (tolerance*tolerance) )
+    K::FT d2 = CGAL::squared_distance(*it, plane);
+    if ( CGAL::to_double(d2) > (tolerance*tolerance) )
     {
 //      std::cout << "distance:" << sqrt(d2) << std::endl;
       isPlanar = false;
