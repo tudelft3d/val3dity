@@ -358,7 +358,7 @@ bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool 
 
 //------------------------------------------
 
-CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool bIsPolyhedron, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb)
 {
   bool isValid = true;
   CgalPolyhedron *P = new CgalPolyhedron;
@@ -408,7 +408,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
           else
           {
             //-- check if there are holes in the surface
-            if (bIsPolyhedron && P->is_closed() == false)
+            if (P->is_closed() == false)
             {
               std::stringstream st;
               P->normalize_border();
@@ -452,7 +452,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
 	(*cb)(STATUS_OK, -1, -1, "\tyes");
   }
 //-- 4. orientation of the normals is outwards or inwards
-  if (bIsPolyhedron && isValid == true)
+  if (isValid == true)
   {
     (*cb)(STATUS_OK, -1, -1, "-----Orientation of normals");
     bool bOuter = true;

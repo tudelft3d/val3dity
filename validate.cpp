@@ -36,7 +36,7 @@ bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >&
 
 //--------------------------------------------------------------
 
-bool validate(vector<Shell*> &shells, bool bIsPolyhedron, cbf cb)
+bool validate(vector<Shell*> &shells, cbf cb)
 {
   bool foundError(false);
   
@@ -64,7 +64,7 @@ bool validate(vector<Shell*> &shells, bool bIsPolyhedron, cbf cb)
     std::stringstream st;
     st << endl << "Validating shell #" << i;
     (*cb)(STATUS_OK, -1, -1, st.str());
-    p  = validate_triangulated_shell(*(trShells[i]), i, bIsPolyhedron, cb);
+    p  = validate_triangulated_shell(*(trShells[i]), i, cb);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)

@@ -33,7 +33,7 @@
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool validate(vector<Shell*> &shells, bool bIsPolyhedron, cbf cb);
+bool validate(vector<Shell*> &shells, cbf cb);
 bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb);
 
 // -----------------------------------------------------------
