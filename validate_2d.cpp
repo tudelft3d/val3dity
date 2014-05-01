@@ -40,7 +40,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
     plane = CgalPolyhedron::Plane_3(pts[0], pts[1], pts[i]);
     i++;
     if (i > pts.size()) {
-      std::cout << "ERROR: all points of face are collinear." << std::endl;
+//      std::cout << "ERROR: all points of face are collinear." << std::endl;
       break;
     }
     
