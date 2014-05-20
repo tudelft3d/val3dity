@@ -27,9 +27,9 @@
 #include <fstream>
 #include <string>
 
-void readShell(ifstream& infile, Shell &allShells);
+void readShell(ifstream& infile, Shell &allShells, bool translatevertices = false);
 void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
-
+void translate_vertices(vector< Point3 > &lsPts);
 
 void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb)
 {
@@ -81,7 +81,7 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
   (*cb)(STATUS_OK, -1, -1, "");
 }
 
-void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf cb)
+void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf cb, bool translatevertices)
 {
   std::stringstream st;
   st << "Reading " << arguments.size() << " file(s).";
@@ -99,7 +99,7 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
   
   // Now let's read in the outer shell (the first input file)
   Shell* oneshell = new Shell;
-  readShell(infile, *oneshell);
+  readShell(infile, *oneshell, translatevertices);
   
   shells.push_back(oneshell);
   oneshell = NULL; // don't own this anymore
@@ -123,7 +123,7 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
     // Now let's read in the inner shell from the file.
     oneshell = new Shell;
     //bool isValid = true;
-    readShell(infile2, *oneshell);
+    readShell(infile2, *oneshell, translatevertices);
     
     shells.push_back(oneshell);
     oneshell = NULL; // don't own this anymore
@@ -133,7 +133,7 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
   
  
 
-void readShell(ifstream& infile, Shell &oneshell)
+void readShell(ifstream& infile, Shell &oneshell, bool translatevertices)
 {
   //-- read the points
   int num, tmpint;
@@ -156,6 +156,11 @@ void readShell(ifstream& infile, Shell &oneshell)
     Point3 p;
     infile >> tmpint >> p;
     oneshell.lsPts.push_back(p);
+  }
+  //-- translate all vertices to (minx, miny)
+  if (translatevertices == true)
+  {
+    translate_vertices(oneshell.lsPts);
   }
 
   //-- read the facets
@@ -291,3 +296,25 @@ void readShell_withIDs(ifstream& infile, Shell &oneshell, vector<string> &idShel
   }
   idFaces.push_back(tempIDs);
 }
+
+
+void translate_vertices(vector< Point3 > &lsPts)
+{
+  vector<Point3>::iterator it = lsPts.begin();
+  K::FT minx = 9e10;
+  K::FT miny = 9e10;
+  for ( ; it != lsPts.end(); it++)
+  {
+    if (it->x() < minx)
+      minx = it->x();
+    if (it->y() < miny)
+      miny = it->y();
+  }
+  for (it = lsPts.begin(); it != lsPts.end(); it++)
+  {
+    Point3 tp(CGAL::to_double(it->x() - minx), CGAL::to_double(it->y() - miny), CGAL::to_double(it->z()));
+    *it = tp;
+  }
+}
+
+

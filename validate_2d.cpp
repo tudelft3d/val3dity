@@ -26,12 +26,44 @@
 #include "validate_2d.h"
 #include "validate.h"
 #include "CGAL/squared_distance_3.h"
-#include <geos_c.h>
+#include <GEOS/geos_c.h>
+
+bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance);
 
 
+bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
+{
+  CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
+  int i = 3;
+  while (plane.is_degenerate() == true) {
+//    std::cout << "PLANE DEGENERATE" << std::endl;
+    plane = CgalPolyhedron::Plane_3(pts[0], pts[1], pts[i]);
+    i++;
+    if (i > pts.size()) {
+//      std::cout << "ERROR: all points of face are collinear." << std::endl;
+      break;
+    }
+    
+  }
+  
+  vector<Point3>::const_iterator it = pts.begin();
+  bool isPlanar = true;
+  for ( ; it != pts.end(); it++)
+  {
+    K::FT d2 = CGAL::squared_distance(*it, plane);
+    if ( CGAL::to_double(d2) > (tolerance*tolerance) )
+    {
+//      std::cout << "distance:" << sqrt(d2) << std::endl;
+      isPlanar = false;
+      break;
+    }
+  }
+  return isPlanar;
+}
 
 bool validate_2D(vector<Shell*> &shells, cbf cb)
 {
+  double TOLERANCE = 0.01; // TODO: expose this?
   initGEOS(NULL, NULL);
   (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D with GEOS (their projection)");
   bool isvalid = true;
@@ -46,6 +78,31 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
 
+//-- test planarity of the face
+      vector< Point3 > allpts;
+      vector<int>::const_iterator itp = ids.begin();
+      for ( ; itp != ids.end(); itp++)
+      {
+        allpts.push_back(shell->lsPts[*itp]);
+      }
+      //-- check for irings
+      for (int j = 1; j < static_cast<int>(numf); j++)
+      {
+        vector<int> &ids2 = shell->faces[i][j]; // helpful alias for the inner boundary
+        vector<int>::const_iterator itp2 = ids2.begin();
+        for ( ; itp2 != ids2.end(); itp2++)
+        {
+          allpts.push_back(shell->lsPts[*itp2]);
+        }
+      }
+//      std::cout << "---FACE " << i << std::endl;
+      if (false == is_face_planar_distance2plane(allpts, TOLERANCE))
+	    {
+		    (*cb)(NON_PLANAR_SURFACE, is, i, "");
+		    isvalid = false;
+		    continue;
+	    }
+      
       //-- get projected oring
       Polygon pgn;
       vector<Polygon> lsRings;

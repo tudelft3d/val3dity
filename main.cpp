@@ -203,6 +203,11 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
 //
 int main(int argc, char* const argv[])
 {
+#ifdef VAL3DITY_USE_EPECSQRT
+  std::cout << "USING EXACT-EXACT" << std::endl;
+#endif
+
+  bool TRANSLATE = true;
   bool bRepair = false;
   
   bool repairF = true; //-- flipping orientation of faces
@@ -237,8 +242,6 @@ int main(int argc, char* const argv[])
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
       bRepair = true;
-	else if (strcmp(argv[argNum], "-open") == 0)
-	  bIsPolyhedron = false;
     else {
       arguments.push_back(string(argv[argNum]));
     }
@@ -249,24 +252,29 @@ int main(int argc, char* const argv[])
       readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_cout);
     }
     else {
-      readAllInputShells(arguments, shells, callback_cout);
+      readAllInputShells(arguments, shells, callback_cout, TRANSLATE);
     }
+    
+//    vector<Point3>::iterator it = shells[0]->lsPts.begin();
+//    for ( ; it != shells[0]->lsPts.end(); it++)
+//    {
+//      std::cout << *it << std::endl;
+//    }
+    
     if (bRepair == false)
-      validate(shells, bIsPolyhedron, callback_cout);
+      validate(shells, callback_cout);
     else
       repair(shells, repairs, callback_cout);
   }
   else {
-
     if (bUsingIDs == true) {
       readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_xml);
     }
     else {
-      readAllInputShells(arguments, shells, callback_xml);
+      readAllInputShells(arguments, shells, callback_xml, TRANSLATE);
     }
-
     if (bRepair == false)
-		  validate(shells, bIsPolyhedron, callback_xml);
+		  validate(shells, callback_xml);
 	  else
 		  repair(shells, repairs, callback_xml);
   }

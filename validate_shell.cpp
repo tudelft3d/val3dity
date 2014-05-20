@@ -351,14 +351,14 @@ public:
 CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
 bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
-bool              is_face_planar(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb);
+bool              is_face_planar_normalsdeviation(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
 
 //------------------------------------------
 
-CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool bIsPolyhedron, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb)
 {
   bool isValid = true;
   CgalPolyhedron *P = new CgalPolyhedron;
@@ -379,8 +379,13 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
   if (isValid == true)
   {
     (*cb)(STATUS_OK, -1, -1, "-----Combinatorial consistency");
+
+    //-- here the old simple way to construct Polyhedra can be used.
     //-- construct the CgalPolyhedron with batch operator (not used anymore)
-    // p2 = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+    // P = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
+    // std::cout << P->empty() << std::endl;
+    // std::cout << P->is_valid() << std::endl;
+    // std::cout << P->is_closed() << std::endl;
 
     //-- construct the CgalPolyhedron incrementally
     ConstructShell<HalfedgeDS> s(&(tshell.faces), &(tshell.lsPts), shellID, false, cb);
@@ -403,7 +408,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
           else
           {
             //-- check if there are holes in the surface
-            if (bIsPolyhedron && P->is_closed() == false)
+            if (P->is_closed() == false)
             {
               std::stringstream st;
               P->normalize_border();
@@ -447,7 +452,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, bool b
 	(*cb)(STATUS_OK, -1, -1, "\tyes");
   }
 //-- 4. orientation of the normals is outwards or inwards
-  if (bIsPolyhedron && isValid == true)
+  if (isValid == true)
   {
     (*cb)(STATUS_OK, -1, -1, "-----Orientation of normals");
     bool bOuter = true;
@@ -669,7 +674,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 		list<AABBTree::Object_and_primitive_id> intersections;
 		myTree.all_intersections(queryRay, std::back_inserter(intersections));
 		//
-		float fDistance;
+    K::FT fDistance;
 		AABBTree::Object_and_primitive_id Hit;
 		//
 		list<AABBTree::Object_and_primitive_id>::iterator listItr = intersections.begin();
@@ -695,7 +700,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 			if (CGAL::assign(pt, obj))
 			{
 				//calculate the distance
-				float dist = (pt - stPt).squared_length();
+        K::FT dist = (pt - stPt).squared_length();
 				if (fDistance > dist)
 				{
 					fDistance = dist;
@@ -771,7 +776,7 @@ bool check_global_orientation_normals_rev2( CgalPolyhedron* p, bool bOuter, cbf 
 	{
 		//calculate the intersection
 		Vector vecR(hCirc->vertex()->point(), hCirc->opposite()->vertex()->point());
-		vecR = vecR / std::sqrt(vecR.squared_length());
+		vecR = vecR / sqrt(vecR.squared_length());
 		if (CGAL::compare(vecR.x(), 0.0) != CGAL::EQUAL)
 		{
 			K::FT para = -TOL/vecR.x(); // (cc->point().x() - TOL - cc->point().x()) / vecR.x()
@@ -951,16 +956,17 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
   return P;
 }
 
-
+//-- TODO: are these 2 bullet proof?!? I think not :(
 bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb)
 {
   vector< vector<int*> >::iterator faceIt = faces.begin();
-  double ANGLETOLERANCE = 1.0;
+  double ANGLETOLERANCE = 0.1; // TODO: expose planarity
   int i = 0;
   bool isValid = true;
   for ( ; faceIt != faces.end(); faceIt++)
-  {
-    if (is_face_planar(*faceIt, lsPts, ANGLETOLERANCE, cb) == false)
+  { 
+    if (is_face_planar_normalsdeviation(*faceIt, lsPts, ANGLETOLERANCE) == false)
+    //-- second with normals deviation method
     {
        (*cb)(NON_PLANAR_SURFACE, shellID, i, "");
        isValid = false;
@@ -970,7 +976,8 @@ bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, 
   return isValid;
 }  
 
-bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance, cbf cb)
+
+bool is_face_planar_normalsdeviation(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
 {
   vector<int*>::const_iterator ittr = trs.begin();
   int* a = *ittr;
@@ -981,15 +988,21 @@ bool is_face_planar(const vector<int*> &trs, const vector<Point3>& lsPts, float 
   {
     a = *ittr;
     Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
-    if ( (acos(CGAL::to_double(v0*v1))*180/PI) > angleTolerance)
+    Vector a = CGAL::cross_product(v0, v1);
+    K::FT norm = sqrt(a.squared_length());
+    double dot = CGAL::to_double((v0*v1));
+    double angle = atan2(CGAL::to_double(norm), dot);
+    if (angle*180/PI > angleTolerance)
     {
-//      cout << "---face not planar " << (acos((double)(v0*v1))*180/PI) << endl;
+      // cout << "\t---angle: " << angle*180/PI << endl;
       isPlanar = false;
       break;
     }
   }
   return isPlanar;
 }
+
+
   
 
 
