@@ -214,16 +214,15 @@ class Surface:
         return len(self.irings)
     def str_poly(self):
         ls = []
-        ls.append(str(self.get_number_inner_rings() + 1) + " ")
-        ls.append(str(self.get_number_inner_rings()))
-        ls.append("\n")
+        ls.append(str(self.get_number_inner_rings() + 1) + " 0\n")
+        # ls.append(str(self.get_number_inner_rings()))
+        # ls.append("\n")
         ls.append(self.oring.str_poly())
-        if self.get_number_inner_rings() > 0:
-            for i in self.irings:
-                ls.append(i.str_poly())
-                pt = i.get_a_point_inside()
-                ls.append("1 " + str(pt.x) + " " + str(pt.y) + " " + str(pt.z))
-                ls.append("\n")
+        for i in self.irings:
+            ls.append(i.str_poly())
+            # pt = i.get_a_point_inside()
+            # ls.append("1 " + str(pt.x) + " " + str(pt.y) + " " + str(pt.z))
+            # ls.append("\n")
         return "".join(ls)
     def str_off(self):
         if (self.get_number_inner_rings() > 0):

@@ -160,10 +160,11 @@ void readShell(ifstream& infile, Shell &oneshell)
 
   //-- read the facets
   infile >> num >> tmpint;
-  int numf, numpt;
+  int numf, numpt, numholes;
   string s;
   for (int i = 0; i < num; i++)
   {
+    numholes = 0;
     infile >> numf;
     while(true) {
       if (infile.peek() == '\n')
@@ -171,7 +172,7 @@ void readShell(ifstream& infile, Shell &oneshell)
       else if (infile.peek() == ' ')
         infile.ignore();
       else
-        infile >> tmpint;
+        infile >> numholes;
     }
 
     //-- read oring (there's always one and only one)
@@ -200,11 +201,10 @@ void readShell(ifstream& infile, Shell &oneshell)
         for (int k = 0; k < numpt; k++)
           ids[k] = (ids[k] - 1);      
       }
-
       pgnids.push_back(ids);
     }
-    //-- skip the line about point defining the hole (mandatory in a POLY file)
-    for (int j = 1; j < numf; j++)
+    //-- skip the line about points defining holes (if present)
+    for (int j = 0; j < numholes; j++)
       infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
 
     oneshell.faces.push_back(pgnids);
