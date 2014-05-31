@@ -15,6 +15,8 @@ It is a command-line program, which we provide as source code, together with mak
 
 If you use Windows, you can download the following [binary](https://www.dropbox.com/s/zhfyowbbmp80y7n/3dValidator1.11.zip). It has the latest val3dity, and [citygml2poly](https://github.com/tudelft-gist/citygml2poly) is used to parse CityGML files. Java and Python must be installed on the system.
 
+The easiest way to use it is through its [web interface](http://geovalidation.bk.tudelft.nl/val3dity). It takes as input any GML file containing one or more gml:Solids.
+
 To compile val3dity yourself, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org)--under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
 
     $ cmake .
