@@ -101,9 +101,26 @@ it explicitly.
   * unit cube with top face having a self-intersecting surface (2D invalid), 2 of the faces of cube22 are 'bundled' as one polygon (which self-intersects)
   * invalid: 2D projected surface is not valid, but whole in 3D is
 
-# cube24
-  * cube with an extra vertex on a straight edge
+# cube25
+  * cube translated by (99999990, 99999990) so that big coordinates
   * valid
+
+# cube26
+  * cube translated by (3333399999990, 3333399999990) so that big coordinates
+  * valid
+  
+# cube27
+  * cube with -100.0 as z-coordinates
+  * valid
+
+# m26
+  * solid #26 in "Josef's Muchen data"
+  * surface #12 ain't planar 
+
+# m41
+  * solid #41 in "Josef's Muchen data", crashing is no translation
+  * valid
+
 
 # concave
   * concave shape; top and bottom faces are concave polygons
