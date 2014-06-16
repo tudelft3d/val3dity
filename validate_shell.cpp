@@ -350,15 +350,15 @@ public:
 //-- function prototypes
 CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
-bool              check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb);
-bool              is_face_planar_normalsdeviation(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance);
+bool              check_planarity_normals(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb, double tolerance = 0.1);
+bool              is_face_planar_normals(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
 
 //------------------------------------------
 
-CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb)
+CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb, double TOL_PLANARITY_normals)
 {
   bool isValid = true;
   CgalPolyhedron *P = new CgalPolyhedron;
@@ -366,7 +366,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
 
 //-- 1. Planarity of faces
   (*cb)(STATUS_OK, -1, -1, "-----Planarity");
-  if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
+  if (check_planarity_normals(tshell.faces, tshell.lsPts, shellID, cb, TOL_PLANARITY_normals) == false)
   {
     isValid = false;
     //(*cb)(0, -1, -1, "\tno");
@@ -485,7 +485,7 @@ CgalPolyhedron* repair_triangulated_shell(TrShell& tshell, const vector<bool> &r
   
   //-- 1. Planarity of faces
   //TODO: triangulate non-planar faces? tja, tough...
-  if (check_planarity_faces(tshell.faces, tshell.lsPts, shellID, cb) == false)
+  if (check_planarity_normals(tshell.faces, tshell.lsPts, shellID, cb) == false)
     isValid = false;
   
   //-- 2. Combinatorial consistency
@@ -956,20 +956,20 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
   return P;
 }
 
-//-- TODO: are these 2 bullet proof?!? I think not :(
-bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb)
+bool check_planarity_normals(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb, double tolerance)
 {
   vector< vector<int*> >::iterator faceIt = faces.begin();
-  double ANGLETOLERANCE = 0.1; // TODO: expose planarity
   int i = 0;
   bool isValid = true;
   for ( ; faceIt != faces.end(); faceIt++)
   { 
-    if (is_face_planar_normalsdeviation(*faceIt, lsPts, ANGLETOLERANCE) == false)
+    if (is_face_planar_normals(*faceIt, lsPts, tolerance) == false)
     //-- second with normals deviation method
     {
-       (*cb)(NON_PLANAR_SURFACE, shellID, i, "");
-       isValid = false;
+      std::ostringstream msg;
+      msg << "tolerance normals: " << tolerance;
+      (*cb)(NON_PLANAR_SURFACE, shellID, i, msg.str());
+      isValid = false;
     }
     i++;
   }
@@ -977,7 +977,7 @@ bool check_planarity_faces(vector< vector<int*> >&faces, vector<Point3>& lsPts, 
 }  
 
 
-bool is_face_planar_normalsdeviation(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
+bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
 {
   vector<int*>::const_iterator ittr = trs.begin();
   int* a = *ittr;
@@ -994,7 +994,7 @@ bool is_face_planar_normalsdeviation(const vector<int*> &trs, const vector<Point
     double angle = atan2(CGAL::to_double(norm), dot);
     if (angle*180/PI > angleTolerance)
     {
-      // cout << "\t---angle: " << angle*180/PI << endl;
+      cout << "\t---angle: " << angle*180/PI << endl;
       isPlanar = false;
       break;
     }

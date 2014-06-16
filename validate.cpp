@@ -36,12 +36,12 @@ bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >&
 
 //--------------------------------------------------------------
 
-bool validate(vector<Shell*> &shells, cbf cb)
+bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double TOL_PLANARITY_normals)
 {
   bool foundError(false);
   
 //-- FIRST: use GEOS to test if (projected) surface are valid in 2D
-  if (! validate_2D(shells, cb))
+  if (! validate_2D(shells, cb, TOL_PLANARITY_d2p))
     return false;
   else
     (*cb)(STATUS_OK, -1, -1, "-----all valid");
@@ -64,7 +64,7 @@ bool validate(vector<Shell*> &shells, cbf cb)
     std::stringstream st;
     st << endl << "Validating shell #" << i;
     (*cb)(STATUS_OK, -1, -1, st.str());
-    p  = validate_triangulated_shell(*(trShells[i]), i, cb);
+    p  = validate_triangulated_shell(*(trShells[i]), i, cb, TOL_PLANARITY_normals);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)

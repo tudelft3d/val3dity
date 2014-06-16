@@ -33,7 +33,7 @@
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool validate(vector<Shell*> &shells, cbf cb);
+bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p = 0.001, double TOL_PLANARITY_normals = 0.1);
 bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb);
 
 // -----------------------------------------------------------

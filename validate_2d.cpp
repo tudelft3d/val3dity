@@ -27,6 +27,7 @@
 #include "validate.h"
 #include "CGAL/squared_distance_3.h"
 #include <GEOS/geos_c.h>
+#include <sstream>
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance);
 
@@ -45,7 +46,6 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
     }
     
   }
-  
   vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
   for ( ; it != pts.end(); it++)
@@ -53,7 +53,8 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
     K::FT d2 = CGAL::squared_distance(*it, plane);
     if ( CGAL::to_double(d2) > (tolerance*tolerance) )
     {
-//      std::cout << "distance:" << sqrt(d2) << std::endl;
+      std::cout << "distance: " << sqrt(CGAL::to_double(d2)) << std::endl;
+      std::cout << "tolerance: " << tolerance << std::endl;
       isPlanar = false;
       break;
     }
@@ -61,9 +62,9 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
   return isPlanar;
 }
 
-bool validate_2D(vector<Shell*> &shells, cbf cb)
+bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 {
-  double TOLERANCE = 0.01; // TODO: expose this?
+  // double TOLERANCE = 0.01; // TODO: expose this?
   initGEOS(NULL, NULL);
   (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D with GEOS (their projection)");
   bool isvalid = true;
@@ -96,9 +97,11 @@ bool validate_2D(vector<Shell*> &shells, cbf cb)
         }
       }
 //      std::cout << "---FACE " << i << std::endl;
-      if (false == is_face_planar_distance2plane(allpts, TOLERANCE))
+      if (false == is_face_planar_distance2plane(allpts, TOL_PLANARITY_d2p))
 	    {
-		    (*cb)(NON_PLANAR_SURFACE, is, i, "");
+        std::ostringstream msg;
+        msg << "tolerance point-to-plane: " << TOL_PLANARITY_d2p;
+        (*cb)(NON_PLANAR_SURFACE, is, i, msg.str());
 		    isvalid = false;
 		    continue;
 	    }

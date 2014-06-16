@@ -207,9 +207,11 @@ int main(int argc, char* const argv[])
   std::cout << "USING EXACT-EXACT" << std::endl;
 #endif
 
-  bool TRANSLATE = true;
-  bool bRepair = false;
+  bool TRANSLATE               = true;
+  double TOL_PLANARITY_d2p     = 0.001; //-- default: 1mm 
+  double TOL_PLANARITY_normals = 0.1;   //-- default: 0.1 degree
   
+  bool bRepair                 = false;
   bool repairF = true; //-- flipping orientation of faces
   bool repairD = true; //-- dangling pieces will be removed
   bool repairH = true; //-- holes will be filled
@@ -242,10 +244,23 @@ int main(int argc, char* const argv[])
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
       bRepair = true;
+    else if (strcmp(argv[argNum], "-planarity_d2p") == 0)
+    {
+      ++argNum;
+      TOL_PLANARITY_d2p = atof(argv[argNum]);
+    }
+    else if (strcmp(argv[argNum], "-planarity_normals") == 0)
+    {
+      ++argNum;
+      TOL_PLANARITY_normals = atof(argv[argNum]);
+    }
     else {
       arguments.push_back(string(argv[argNum]));
     }
   }
+  std::cout << "TOL d2p: "      << TOL_PLANARITY_d2p     << std::endl;
+  std::cout << "TOL: normals: " << TOL_PLANARITY_normals << std::endl;
+
   vector<Shell*> shells;
   if (xmloutput == false) {
     if (bUsingIDs == true) {
@@ -262,7 +277,7 @@ int main(int argc, char* const argv[])
 //    }
     
     if (bRepair == false)
-      validate(shells, callback_cout);
+      validate(shells, callback_cout, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
     else
       repair(shells, repairs, callback_cout);
   }

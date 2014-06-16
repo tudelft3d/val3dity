@@ -33,6 +33,6 @@
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool  validate_2D(vector<Shell*> &shells, cbf cb);
+bool  validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p = 0.001);
 
 #endif
