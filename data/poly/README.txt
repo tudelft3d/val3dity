@@ -49,6 +49,10 @@ it explicitly.
   * unit cube with one dangling face touching the cube at one point only; the dangling face is the last in the list
   * invalid
 
+# cube13
+  * cube3 with one surface filling the hole
+  * valid
+
 # cube14
   * axis-aligned cube with normals all pointing inwards
   * invalid
@@ -109,9 +113,17 @@ it explicitly.
   * cube with -100.0 as z-coordinates
   * valid
 
+# duplicates
+  * cube with one duplicate vertex (repeated in a ring)
+  * invalid
+
 # p1e-?
   * cube with one point of top surface moved upward by 1e-? units
-  * valid? it depends on the tolerance
+  * valid? it depends on the tolerance used
+
+# snap1e-?
+  * cube with top surface having one vertex moved a bit, to test snapping in GML input
+  * valid? it depends on the tolerance used
 
 # pfold1
   * cube with an almost vertical fold in the top surface, aka as the "Kevin Wiebe's case" 
