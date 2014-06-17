@@ -49,10 +49,6 @@ it explicitly.
   * unit cube with one dangling face touching the cube at one point only; the dangling face is the last in the list
   * invalid
 
-# cube13
-  * unit cube with top face not planar
-  * invalid
-
 # cube14
   * axis-aligned cube with normals all pointing inwards
   * invalid
@@ -112,6 +108,21 @@ it explicitly.
 # cube27
   * cube with -100.0 as z-coordinates
   * valid
+
+# p1e-?
+  * cube with one point of top surface moved upward by 1e-? units
+  * valid? it depends on the tolerance
+
+# pfold1
+  * cube with an almost vertical fold in the top surface, aka as the "Kevin Wiebe's case" 
+  * The shift is 1mm, so a plane fitting doesn't detect that case well.
+  * invalid
+
+# pfold2
+  * cube with a vertical fold in the top surface, aka as the "Kevin Wiebe's case" 
+  * The shift is 1mm, so a plane fitting doesn't detect that case well.
+  * a vertical shift makes the projection tricky
+  * invalid
 
 # m26
   * solid #26 in "Josef's Muchen data"
