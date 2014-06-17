@@ -37,11 +37,9 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
   CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
   int i = 3;
   while (plane.is_degenerate() == true) {
-//    std::cout << "PLANE DEGENERATE" << std::endl;
     plane = CgalPolyhedron::Plane_3(pts[0], pts[1], pts[i]);
     i++;
     if (i > pts.size()) {
-//      std::cout << "ERROR: all points of face are collinear." << std::endl;
       break;
     }
     
@@ -53,8 +51,6 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
     K::FT d2 = CGAL::squared_distance(*it, plane);
     if ( CGAL::to_double(d2) > (tolerance*tolerance) )
     {
-      // std::cout << "distance: " << sqrt(CGAL::to_double(d2)) << std::endl;
-      // std::cout << "tolerance: " << tolerance << std::endl;
       value = sqrt(CGAL::to_double(d2));
       isPlanar = false;
       break;
@@ -65,7 +61,6 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
 
 bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 {
-  // double TOLERANCE = 0.01; // TODO: expose this?
   initGEOS(NULL, NULL);
   (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D with GEOS (their projection)");
   bool isvalid = true;
@@ -101,7 +96,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       if (false == is_face_planar_distance2plane(allpts, value, TOL_PLANARITY_d2p))
 	    {
         std::ostringstream msg;
-        msg << "distance point-to-plane: " << value << " (tolerance=" << TOL_PLANARITY_d2p << ")";
+        msg << "distance to fitted plane: " << value << " (tolerance=" << TOL_PLANARITY_d2p << ")";
         (*cb)(NON_PLANAR_SURFACE, is, i, msg.str());
 		    isvalid = false;
 		    continue;

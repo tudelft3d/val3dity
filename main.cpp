@@ -208,8 +208,8 @@ int main(int argc, char* const argv[])
 #endif
 
   bool TRANSLATE               = true;
-  double TOL_PLANARITY_d2p     = 0.001; //-- default: 1mm 
-  double TOL_PLANARITY_normals = 0.1;   //-- default: 0.1 degree
+  double TOL_PLANARITY_d2p     = 0.01;  //-- default: 1cm 
+  double TOL_PLANARITY_normals = 1.0;   //-- default: 1.0 degree
   
   bool bRepair                 = false;
   bool repairF = true; //-- flipping orientation of faces
