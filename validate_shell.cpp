@@ -351,7 +351,7 @@ public:
 CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
 CgalPolyhedron*   construct_CgalPolyhedron(vector< vector<int*> >&faces, vector<Point3>& lsPts, cbf cb);
 bool              check_planarity_normals(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb, double tolerance = 0.1);
-bool              is_face_planar_normals(const vector<int*>& trs, const vector<Point3>& lsPts, float angleTolerance);
+bool              is_face_planar_normals(const vector<int*>& trs, const vector<Point3>& lsPts, double& value, float angleTolerance);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
@@ -961,13 +961,14 @@ bool check_planarity_normals(vector< vector<int*> >&faces, vector<Point3>& lsPts
   vector< vector<int*> >::iterator faceIt = faces.begin();
   int i = 0;
   bool isValid = true;
+  double value;
   for ( ; faceIt != faces.end(); faceIt++)
   { 
-    if (is_face_planar_normals(*faceIt, lsPts, tolerance) == false)
+    if (is_face_planar_normals(*faceIt, lsPts, value, tolerance) == false)
     //-- second with normals deviation method
     {
       std::ostringstream msg;
-      msg << "tolerance normals: " << tolerance;
+      msg << "deviation normals: " << value << " (tolerance=" << tolerance << ")";
       (*cb)(NON_PLANAR_SURFACE, shellID, i, msg.str());
       isValid = false;
     }
@@ -977,7 +978,7 @@ bool check_planarity_normals(vector< vector<int*> >&faces, vector<Point3>& lsPts
 }  
 
 
-bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts, float angleTolerance)
+bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts, double& value, float angleTolerance)
 {
   vector<int*>::const_iterator ittr = trs.begin();
   int* a = *ittr;
@@ -994,7 +995,8 @@ bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts
     double angle = atan2(CGAL::to_double(norm), dot);
     if (angle*180/PI > angleTolerance)
     {
-      cout << "\t---angle: " << angle*180/PI << endl;
+      // cout << "\t---angle: " << angle*180/PI << endl;
+      value = angle*180/PI;
       isPlanar = false;
       break;
     }

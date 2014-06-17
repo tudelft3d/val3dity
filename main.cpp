@@ -258,8 +258,8 @@ int main(int argc, char* const argv[])
       arguments.push_back(string(argv[argNum]));
     }
   }
-  std::cout << "TOL d2p: "      << TOL_PLANARITY_d2p     << std::endl;
-  std::cout << "TOL: normals: " << TOL_PLANARITY_normals << std::endl;
+  // std::cout << "TOL d2p: "      << TOL_PLANARITY_d2p     << std::endl;
+  // std::cout << "TOL: normals: " << TOL_PLANARITY_normals << std::endl;
 
   vector<Shell*> shells;
   if (xmloutput == false) {

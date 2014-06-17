@@ -29,10 +29,10 @@
 #include <GEOS/geos_c.h>
 #include <sstream>
 
-bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance);
+bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
 
 
-bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
+bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
 {
   CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
   int i = 3;
@@ -53,8 +53,9 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, float tolerance)
     K::FT d2 = CGAL::squared_distance(*it, plane);
     if ( CGAL::to_double(d2) > (tolerance*tolerance) )
     {
-      std::cout << "distance: " << sqrt(CGAL::to_double(d2)) << std::endl;
-      std::cout << "tolerance: " << tolerance << std::endl;
+      // std::cout << "distance: " << sqrt(CGAL::to_double(d2)) << std::endl;
+      // std::cout << "tolerance: " << tolerance << std::endl;
+      value = sqrt(CGAL::to_double(d2));
       isPlanar = false;
       break;
     }
@@ -96,11 +97,11 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
           allpts.push_back(shell->lsPts[*itp2]);
         }
       }
-//      std::cout << "---FACE " << i << std::endl;
-      if (false == is_face_planar_distance2plane(allpts, TOL_PLANARITY_d2p))
+      double value;
+      if (false == is_face_planar_distance2plane(allpts, value, TOL_PLANARITY_d2p))
 	    {
         std::ostringstream msg;
-        msg << "tolerance point-to-plane: " << TOL_PLANARITY_d2p;
+        msg << "distance point-to-plane: " << value << " (tolerance=" << TOL_PLANARITY_d2p << ")";
         (*cb)(NON_PLANAR_SURFACE, is, i, msg.str());
 		    isvalid = false;
 		    continue;
