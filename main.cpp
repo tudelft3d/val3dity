@@ -267,7 +267,7 @@ int main(int argc, char* const argv[])
       readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_cout);
     }
     else {
-      readAllInputShells(arguments, shells, callback_cout, TRANSLATE);
+      readAllInputShells(arguments, shells, callback_cout, TRANSLATE);           //<---
     }
     
 //    vector<Point3>::iterator it = shells[0]->lsPts.begin();
@@ -277,7 +277,7 @@ int main(int argc, char* const argv[])
 //    }
     
     if (bRepair == false)
-      validate(shells, callback_cout, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
+      validate(shells, callback_cout, TOL_PLANARITY_d2p, TOL_PLANARITY_normals); //<---
     else
       repair(shells, repairs, callback_cout);
   }
@@ -289,7 +289,7 @@ int main(int argc, char* const argv[])
       readAllInputShells(arguments, shells, callback_xml, TRANSLATE);
     }
     if (bRepair == false)
-		  validate(shells, callback_xml);
+		  validate(shells, callback_xml, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
 	  else
 		  repair(shells, repairs, callback_xml);
   }
