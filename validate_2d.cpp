@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2012, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,33 @@
 #include <sstream>
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
+bool has_face_duplicates(const vector< vector<int> >& theface);
+
+
+bool has_face_duplicates(const vector< vector<int> >& theface)
+{
+  bool bDuplicates = false;
+  vector< vector<int> >::const_iterator itr = theface.begin();
+  for ( ; itr != theface.end(); itr++) {
+    size_t numv = itr->size();
+    //-- first-last not the same (they are not in GML format anymore)
+    std::cout << "one ring" << std::endl;
+    if (itr[0] == itr[numv - 1]) {
+      std::cout << "shit" << std::endl;
+      bDuplicates = true;
+      break;
+    }
+    for (int i = 0; i < (static_cast<int>(numv) - 1); i++) {
+      if (itr[i] == itr[i+1]) {
+        std::cout << "oh" << std::endl;
+        std::cout << i << "-" << i+1 << std::endl;
+        bDuplicates = true;
+        break;
+      }
+    }
+  }
+  return bDuplicates;
+}
 
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
@@ -67,22 +94,30 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
   for (unsigned int is=0; is<shells.size(); is++)
   {
     Shell* shell = shells[is];
-    //-- read the facets
     size_t num = shell->faces.size();
     for (int i = 0; i < static_cast<int>(num); i++)
     {
-      // These are the number of rings on this facet
+
+      //-- test for duplicate vertices
+      if (has_face_duplicates(shell->faces[i]) == true)
+      {
+        (*cb)(REPEATED_POINTS, is, i, "");
+        isvalid = false;
+        continue;
+      }
+
+      //-- test planarity of the face
+      //-- read the faces
+      // These are the number of rings for this face
       size_t numf = shell->faces[i].size();
       vector<int> &ids = shell->faces[i][0]; // helpful alias for the outer boundary
-
-//-- test planarity of the face
       vector< Point3 > allpts;
       vector<int>::const_iterator itp = ids.begin();
       for ( ; itp != ids.end(); itp++)
       {
         allpts.push_back(shell->lsPts[*itp]);
       }
-      //-- check for irings
+      //-- irings
       for (int j = 1; j < static_cast<int>(numf); j++)
       {
         vector<int> &ids2 = shell->faces[i][j]; // helpful alias for the inner boundary
@@ -129,7 +164,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       
       //-- check the orientation of the rings: oring != irings
       //-- we don't care about CCW or CW at this point, just opposite is important
-      //-- GEOS doesn't do its job, so we have to do it here, sadly.
+      //-- GEOS doesn't do its job, so we have to do it here. Shame on you GEOS.
       bool vSurface = true;
       if (lsRings.size() > 1)
       {
@@ -149,7 +184,6 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
         if (vSurface == false)
           continue;
       }
-      
       //-- check 2D validity of the surface by (1) projecting them; (2) use GEOS IsValid()
       stringstream wkt;
       wkt << setprecision(15);
@@ -180,13 +214,11 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
         it->reverse_orientation();
       }
       wkt << ")";
-      
       GEOSWKTReader* r;
       r = GEOSWKTReader_create();
       GEOSGeometry* mygeom;
       mygeom = GEOSWKTReader_read(r, wkt.str().c_str());
       string reason = (string)GEOSisValidReason(mygeom);
-
       if (reason.find("Valid Geometry") == string::npos)
       {
         isvalid = false;
