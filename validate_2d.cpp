@@ -40,16 +40,12 @@ bool has_face_duplicates(const vector< vector<int> >& theface)
   for ( ; itr != theface.end(); itr++) {
     size_t numv = itr->size();
     //-- first-last not the same (they are not in GML format anymore)
-    std::cout << "one ring" << std::endl;
-    if (itr[0] == itr[numv - 1]) {
-      std::cout << "shit" << std::endl;
+    if ((*itr)[0] == (*itr)[numv - 1]) {
       bDuplicates = true;
       break;
     }
     for (int i = 0; i < (static_cast<int>(numv) - 1); i++) {
-      if (itr[i] == itr[i+1]) {
-        std::cout << "oh" << std::endl;
-        std::cout << i << "-" << i+1 << std::endl;
+      if ((*itr)[i] == (*itr)[i+1]) {
         bDuplicates = true;
         break;
       }
@@ -89,7 +85,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
 bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 {
   initGEOS(NULL, NULL);
-  (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D with GEOS (their projection)");
+  (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D (their projection)");
   bool isvalid = true;
   for (unsigned int is=0; is<shells.size(); is++)
   {

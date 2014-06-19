@@ -58,7 +58,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
     switch(errorCode)
     {
 //-- Ring level
-      case REPEATED_POINTS:                        cout << "Error 100: " << "2+ consecutive points"; break;
+      case REPEATED_POINTS:                        cout << "Error 100: " << "2 consecutive points are the same"; break;
       case RING_NOT_CLOSED:                        cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
       case RING_SELF_INTERSECT:                    cout << "Error 120: " << "ring self-intersects or is collapsed to a point or a line"; break;
 //-- Surface level
