@@ -235,10 +235,13 @@ int main(int argc, char* const argv[])
     return(1);
   }
 
+  cbf cbfunction = callback_cout;
   vector<string> arguments;
   for (int argNum = 1; argNum < argc; ++argNum) {
-    if (strcmp(argv[argNum], "-xml") == 0)
+    if (strcmp(argv[argNum], "-xml") == 0) {
       xmloutput = true;
+      cbfunction = callback_xml;
+    }
     else if (strcmp(argv[argNum], "-withids") == 0)
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
@@ -257,34 +260,15 @@ int main(int argc, char* const argv[])
       arguments.push_back(string(argv[argNum]));
     }
   }
-  // std::cout << "TOL d2p: "      << TOL_PLANARITY_d2p     << std::endl;
-  // std::cout << "TOL: normals: " << TOL_PLANARITY_normals << std::endl;
 
   vector<Shell*> shells;
-  if (xmloutput == false) {
-    if (bUsingIDs == true) {
-      readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_cout);
-    }
-    else {
-      readAllInputShells(arguments, shells, callback_cout, TRANSLATE);           //<---
-    }
-    
-    if (bRepair == false)
-      validate(shells, callback_cout, TOL_PLANARITY_d2p, TOL_PLANARITY_normals); //<---
-    else
-      repair(shells, repairs, callback_cout);
+  if (bRepair == false) {
+    readAllInputShells(arguments, shells, cbfunction, TRANSLATE);
+    if (!callbackWasCalledWithError)
+      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
   }
   else {
-    if (bUsingIDs == true) {
-      readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_xml);
-    }
-    else {
-      readAllInputShells(arguments, shells, callback_xml, TRANSLATE);
-    }
-    if (bRepair == false)
-		  validate(shells, callback_xml, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
-	  else
-		  repair(shells, repairs, callback_xml);
+    repair(shells, repairs, cbfunction);
   }
 
   if (xmloutput == false) {
@@ -295,7 +279,7 @@ int main(int argc, char* const argv[])
     }
     else
     {
-       cout << "\nValid solid. Hourrraaa!" << endl;
+       cout << "\nValid solid :)" << endl;
        return(1);
     }
   }

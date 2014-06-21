@@ -75,7 +75,7 @@ class Ring:
             ls.append("\n")
             return " ".join(ls)
         else:
-            print "2 consecutive points the same"
+            return "-1\n"
             
 
 
