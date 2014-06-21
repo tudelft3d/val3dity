@@ -1,5 +1,5 @@
 
-# val3dity - Copyright (c) 2011, Hugo Ledoux.  All rights reserved.
+# val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -45,8 +45,6 @@ class Ring:
         return self.l[index]
     def __len__(self):
         return len(self.l)
-    def reverse(self):
-        self.l.reverse()
     def set_cur_i(self, index):
         self.cur = index
     def set_cur_p(self, p):
@@ -64,112 +62,21 @@ class Ring:
             return self[0]
         else:
             return self[self.cur+1]
-    def get_prev(self):
-        if self.cur == 0:
-            return self[len(self) - 1]
-        else:
-            return self[self.cur-1]
-    def move_next(self):
-        if self.cur == (len(self) - 1):
-            self.cur = 0
-        else:
-            self.cur += 1
-    def move_prev(self):
-        if self.cur == 0:
-            self.cur = (len(self) - 1)
-        else:
-            self.cur -= 1
-    def get_projection_plane(self):
-        normal = geomtools.get_normal_rhr(self[0], self[1], self[2])
-        #-- check if the plane if vertical, and assign the projection plane
-        m = 0 #-- xy plane
-        n = 1
-        if geomtools.cmp_doubles(normal.z, 0.0) == 0:
-            if  geomtools.cmp_doubles(normal.y, 0.0) == 0:
-                m = 1 #-- yz plane
-                n = 2
-            else:
-                m = 0 #-- xz plane
-                n = 2
-        return m, n
-    def get_a_convex_corner(self):
-        m, n = self.get_projection_plane()
-        candidates = []
-        temp = self[0]
-        #-- find lowest
-        for j in range(len(self)):
-            p = self[j]
-            if geomtools.cmp_doubles(p[n], temp[n]) == -1:
-                temp = p
-        candidates.append(temp)
-        #-- check if another with same bottom
-        for j in range(len(self)):
-            p = self[j]
-            if p != temp and geomtools.cmp_doubles(p[n], temp[n]) == 0:
-                candidates.append(p)
-        if len(candidates) > 1:
-            temp = candidates[0]
-            #-- find lowest
-            for p in candidates:
-                if geomtools.cmp_doubles(p[m], temp[m]) == 1:
-                    temp = p
-            return temp
-        else:
-            return candidates[0]
-    def get_orientation(self):
-        corner = self.get_a_convex_corner()
-        self.set_cur_p(corner)
-        v1 = Vector()
-        v2 = Vector()
-        v1.set_vector(self.get_cur(), self.get_next())
-        v2.set_vector(self.get_cur(), self.get_prev())
-        n = v1.cross_product(v2)
-        return n
-    def get_a_point_inside(self):
-        m, n = self.get_projection_plane()
-        cc = self.get_a_convex_corner()
-        self.set_cur_p(cc)
-        ccprev = self.get_prev()
-        ccnext = self.get_next()
-        self.move_next()
-        dist = 1e8
-        closest = None
-        while self.get_next() != ccprev:
-            p = self.get_next()
-            if geomtools.point_in_triangle_3D(ccprev, cc, ccnext, p, m, n) == True:
-                temp = cc.distance_to_proj(p, m, n)
-                if temp <= dist:
-                    dist = temp
-                    closest = p
-            self.move_next()
-        if closest is None:
-            thept = geomtools.get_midpoint_of_segment(ccprev, ccnext)
-        else:
-            thept = geomtools.get_midpoint_of_segment(cc, closest)
-        return thept
-    def validate(self):
-        self.validate_first_last_coords_are_same()
-        self.validate_no_2_consecutive_vertices_same()
-        #self.validate_flatness()
     def validate_first_last_coords_are_same(self):
         if self.l[0] != self.l[-1]:
-            raise ValidationError(1, "1st and last point of a ring is not the same.")
-        self.l.pop()
-    def validate_no_2_consecutive_vertices_same(self):
-        for i in range(len(self.l) - 1):
-            if self.l[i] == self.l[i+1]:
-                raise ValidationError(2, "2 vertices of a ring are at the same location. " + str(self.l[i]))
-    def validate_flatness(self):
-        for i in range(3, len(self.l)):
-            if geomtools.orient3D(self.l[0], self.l[1], self.l[2], self.l[i]) != 0:
-                raise ValidationError(4, "One ring is not a flat face.")
+            return False
+        return True
     def str_poly(self):
-        ls = []
-        ls.append(str(len(self) - 1))
-        for i in range(0, len(self.l) - 1):
-            ls.append(str(self.l[i].id))
-        ls.append("\n")
-        return " ".join(ls)
+        if (self.validate_first_last_coords_are_same() == True):
+            ls = []
+            ls.append(str(len(self) - 1))
+            for i in range(0, len(self.l) - 1):
+                ls.append(str(self.l[i].id))
+            ls.append("\n")
+            return " ".join(ls)
+        else:
+            return "-1\n"
+            
 
 
 
@@ -193,23 +100,6 @@ class Surface:
     def append_inner_ring(self, ring):
         assert(isinstance(ring, Ring))
         self.irings.append(ring)
-    def validate(self):
-        #-- first validate each ring separately
-        self.oring.validate()
-        for i in self.irings:
-            i.validate()
-        #-- then validate the surface itself, orientation of the rings
-        self.validate_orientation_rings()
-    def validate_orientation_rings(self):
-        re = True
-        if len(self.irings) > 0:
-            ne = self.oring.get_orientation()
-            for i in self.irings:
-                ni = i.get_orientation()
-                if ne.dot_product(ni) > 0:
-                    re = False
-                    raise ValidationError(3, "Respective orientations of the rings of a gml:Polygon are not correct")
-        return re
     def get_number_inner_rings(self):
         return len(self.irings)
     def str_poly(self):

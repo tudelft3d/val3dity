@@ -1,6 +1,6 @@
 
 /*
- val3dity - Copyright (c) 2011-2012, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,7 @@
 #include <CGAL/AABB_tree.h>
 #include <CGAL/AABB_traits.h>
 #include <CGAL/AABB_polyhedron_triangle_primitive.h>
+//#include <CGAL/AABB_face_graph_triangle_primitive.h>
 
 #include<set>
 #include<list>

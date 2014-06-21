@@ -1,28 +1,32 @@
-# Surface level
+## Ring level
 
-  * 200   : exterior ring and interior rings have same orientation
-  * 210   : surface is not planar
-  * 220   : surface is not valid in 2D (its projection)
-    * 221 : interior ring intersect exterior ring
-    * 222 : interior ring outside exterior ring
-    * 223 : interior rings intersect
-    * 224 : interior not connected
+  * 100 REPEATED_POINTS     2 consecutive points are the same 
+  * 110 RING_NOT_CLOSED     first-last points are not the same 
+  * 120 RING_SELF_INTERSECT ring self-intersects or is collapsed to a point or a line 
 
+## Surface level (one polygon embedded in 3D)
 
-# Shell level
+  * 200 SELF_INTERSECTION      rings of the surface intersect
+  * 210 NON_PLANAR_SURFACE     surface is not planar
+  * 220 INTERIOR_DISCONNECTED  interior of surface is not connected
+  * 230 HOLE_OUTSIDE           1 or more holes are located outside the extering
+  * 240 HOLES_ARE_NESTED       holes of the surface are nested inside other
+  * 250 ORIENTATION_RINGS_SAME exterior and interior rings have same orientation
 
-  * 300   : is not a 2-manifold
-    * 301 : surface is not closed
-    * 302 : dangling faces 
-    * 303 : one(several) face(s) not connected to the 2-manifold 
-    * 304 : orientation of one/several face(s) not correct 
-    * 305 : surface self-intersect
-  * 310   : normals not pointing in correct direction (all of them)
+## Shell level (one envelop formed by several surfaces)
 
+  * 300  NOT_VALID_2_MANIFOLD                 
+  * 301  SURFACE_NOT_CLOSED                     there is 1+ 'hole' somewhere on the surface 
+  * 302  DANGLING_FACES                         dangling faces (more than 2 surfaces incident to an edge) 
+  * 303  FACE_ORIENTATION_INCORRECT_EDGE_USAGE  orientation of one or more faces not correct 
+  * 304  FREE_FACES                             1+ faces not connected to the others (eg 'floating' in the air) or duplicate faces 
+  * 305  SURFACE_SELF_INTERSECTS                surface self-intersect
+  * 306  VERTICES_NOT_USED                      some vertices are not referenced by the faces
+  * 310  SURFACE_NORMALS_WRONG_ORIENTATION      normals all pointing in wrong direction
 
-# Solid level
+## Solid level (1 exterior shell + [0..*n*] interior shells)
 
-  * 400   : shells are face adjacent
-  * 410   : interior of shells intersect
-  * 420   : interior shell completely outside the exterior shell
-  * 430   : interior not connected
+  * 400  SHELLS_FACE_ADJACENT            2+ shells are face adjacent
+  * 410  SHELL_INTERIOR_INTERSECT        2+ shell overlap 
+  * 420  INNER_SHELL_OUTSIDE_OUTER       1+ interior shell is located totally outside the exterior shell
+  * 430  INTERIOR_OF_SHELL_NOT_CONNECTED interior of the solid not connected

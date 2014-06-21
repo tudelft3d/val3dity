@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2012, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@
 #include <fstream>
 #include <string>
 
-void readShell(ifstream& infile, Shell &allShells, bool translatevertices = false);
+void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices = false);
 void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
 void translate_vertices(vector< Point3 > &lsPts);
 
@@ -44,7 +44,7 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
   if (!infile)
   {
     (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
-    exit(1);
+    return;
   }
   
   // Now let's read in the outer shell (the first input file)
@@ -67,7 +67,7 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
     if (!infile2)
     {
       (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
-      exit(1);
+      return;
     }
     
     // Now let's read in the inner shell from the file.
@@ -94,12 +94,14 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
   if (!infile)
   {
     (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
-    exit(1);
+    return;
   }
   
+  int is = 0; //-- shell index for reporting errors
   // Now let's read in the outer shell (the first input file)
   Shell* oneshell = new Shell;
-  readShell(infile, *oneshell, translatevertices);
+  readShell(infile, *oneshell, is, cb, translatevertices);
+  is++;
   
   shells.push_back(oneshell);
   oneshell = NULL; // don't own this anymore
@@ -117,13 +119,14 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
     if (!infile2)
     {
       (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
-      exit(1);
+      return;
     }
     
     // Now let's read in the inner shell from the file.
     oneshell = new Shell;
     //bool isValid = true;
-    readShell(infile2, *oneshell, translatevertices);
+    readShell(infile2, *oneshell, is, cb, translatevertices);
+    is++;
     
     shells.push_back(oneshell);
     oneshell = NULL; // don't own this anymore
@@ -133,7 +136,7 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
   
  
 
-void readShell(ifstream& infile, Shell &oneshell, bool translatevertices)
+void readShell(ifstream& infile, Shell &oneshell, int noshell, cbf cb, bool translatevertices)
 {
   //-- read the points
   int num, tmpint;
@@ -148,7 +151,6 @@ void readShell(ifstream& infile, Shell &oneshell, bool translatevertices)
   if (tmpint == 1)
   {
     zerobased = false;
-    cout << "1-based indexing file!" << endl;
   }
   //-- process other vertices
   for (int i = 1; i < num; i++)
@@ -182,6 +184,10 @@ void readShell(ifstream& infile, Shell &oneshell, bool translatevertices)
 
     //-- read oring (there's always one and only one)
     infile >> numpt;
+    if (numpt == -1) {
+      (*cb)(RING_NOT_CLOSED, noshell, i, "");
+      continue;
+    }
     vector<int> ids(numpt);
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
@@ -198,6 +204,10 @@ void readShell(ifstream& infile, Shell &oneshell, bool translatevertices)
     for (int j = 1; j < numf; j++)
     {
       infile >> numpt;
+      if (numpt == -1) {
+        (*cb)(RING_NOT_CLOSED, noshell, i, "");
+        continue;
+      }
       vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
         infile >> ids[l];

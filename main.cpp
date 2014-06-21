@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2012, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@ vector<string> idShells;
 vector< vector<string> > idFaces;
 bool bUsingIDs = false;
 bool xmloutput = false;
-bool bIsPolyhedron = true;//modified to false to prevent closure check for LoD0
+bool bIsPolyhedron = true; //modified to false to prevent closure check for LoD0
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
@@ -53,39 +53,38 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
   }
   else
   {
-    // cout << ":  errorCode=" << errorCode << "     Polyhedra #" << polyhedraNum << "       ";
-    
+    cout << "Error (#";
     switch(errorCode)
     {
-//-- Ring level
-      case REPEATED_POINTS:                        cout << "Error 100: " << "2 consecutive points are the same"; break;
-      case RING_NOT_CLOSED:                        cout << "Error 110: " << "ring is not closed (first-last point are not the same)"; break;
-      case RING_SELF_INTERSECT:                    cout << "Error 120: " << "ring self-intersects or is collapsed to a point or a line"; break;
-//-- Surface level
-      case SELF_INTERSECTION:                      cout << "Error 200: " << "rings of the surface intersect"; break;
-      case NON_PLANAR_SURFACE:                     cout << "Error 210: " << "surface is not planar"; break;
-      case INTERIOR_DISCONNECTED:                  cout << "Error 220: " << "interior of surface is not connected"; break;
-      case HOLE_OUTSIDE:                           cout << "Error 230: " << "1 or more holes are located outside the exterior ring"; break;
-      case HOLES_ARE_NESTED:                       cout << "Error 240: " << "holes of the surface are nested inside each other"; break;
-      case ORIENTATION_RINGS_SAME:                 cout << "Error 250: " << "rings have same orientation"; break;
-//-- Shell level
-      case NOT_VALID_2_MANIFOLD:                   cout << "Error 300: " << "is not a 2-manifold"; break;
-      case SURFACE_NOT_CLOSED:                     cout << "Error 301: " << "surface is not closed"; break;
-      case DANGLING_FACES:                         cout << "Error 302: " << "dangling faces (more than 2 surfaces incident to an edge)"; break;
-      case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << "Error 303: " << "orientation of faces not correct (edge not used 2 times: one in each direction)"; break;
-      case FREE_FACES:                             cout << "Error 304: " << "faces not connected to the 2-manifold (eg 'floating' in the air) or duplicate faces"; break;
-      case SURFACE_SELF_INTERSECTS:                cout << "Error 305: " << "surface self-intersect"; break;
-      case VERTICES_NOT_USED:                      cout << "Error 306: " << "some vertices are not referenced by faces"; break;
-      case SURFACE_NORMALS_WRONG_ORIENTATION:      cout << "Error 310: " << "normals pointing in wrong direction (oshell=outwards; ishell=inwards)"; break;
-//-- Solid level
-      case SHELLS_FACE_ADJACENT:                   cout << "Error 400: " << "shells are face adjacent"; break;
-      case SHELL_INTERIOR_INTERSECT:               cout << "Error 410: " << "interior of shells intersect"; break;
-      case INNER_SHELL_OUTSIDE_OUTER:              cout << "Error 420: " << "ishell outside the oshell"; break;
-      case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << "Error 430: " << "interior not connected"; break;
-        // Input problem
-      case INVALID_INPUT_FILE:                     cout << "Error 999: " << "input file is not valid"; break;
-        // Other reasons
-      default:                                     cout << "Error: invalid for unknown reasons (but for sure invalid!)"; break;
+        //-- Ring level
+      case REPEATED_POINTS:                        cout << errorCode << ") " << "REPEATED_POINTS"; break;
+      case RING_NOT_CLOSED:                        cout << errorCode << ") " << "RING_NOT_CLOSED"; break;
+      case RING_SELF_INTERSECT:                    cout << errorCode << ") " << "RING_SELF_INTERSECT"; break;
+        //-- Surface level
+      case SELF_INTERSECTION:                      cout << errorCode << ") " << "SELF_INTERSECTION"; break;
+      case NON_PLANAR_SURFACE:                     cout << errorCode << ") " << "NON_PLANAR_SURFACE"; break;
+      case INTERIOR_DISCONNECTED:                  cout << errorCode << ") " << "INTERIOR_DISCONNECTED"; break;
+      case HOLE_OUTSIDE:                           cout << errorCode << ") " << "HOLE_OUTSIDE"; break;
+      case HOLES_ARE_NESTED:                       cout << errorCode << ") " << "HOLES_ARE_NESTED"; break;
+      case ORIENTATION_RINGS_SAME:                 cout << errorCode << ") " << "ORIENTATION_RINGS_SAME"; break;
+        //-- Shell level
+      case NOT_VALID_2_MANIFOLD:                   cout << errorCode << ") " << "NOT_VALID_2_MANIFOLD"; break;
+      case SURFACE_NOT_CLOSED:                     cout << errorCode << ") " << "SURFACE_NOT_CLOSED"; break;
+      case DANGLING_FACES:                         cout << errorCode << ") " << "DANGLING_FACES"; break;
+      case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << errorCode << ") " << "FACE_ORIENTATION_INCORRECT_EDGE_USAGE"; break;
+      case FREE_FACES:                             cout << errorCode << ") " << "FREE_FACES"; break;
+      case SURFACE_SELF_INTERSECTS:                cout << errorCode << ") " << "SURFACE_SELF_INTERSECTS"; break;
+      case VERTICES_NOT_USED:                      cout << errorCode << ") " << "VERTICES_NOT_USED"; break;
+      case SURFACE_NORMALS_WRONG_ORIENTATION:      cout << errorCode << ") " << "SURFACE_NORMALS_WRONG_ORIENTATION"; break;
+        //-- Solid level
+      case SHELLS_FACE_ADJACENT:                   cout << errorCode << ") " << "SHELLS_FACE_ADJACENT"; break;
+      case SHELL_INTERIOR_INTERSECT:               cout << errorCode << ") " << "SHELL_INTERIOR_INTERSECT"; break;
+      case INNER_SHELL_OUTSIDE_OUTER:              cout << errorCode << ") " << "INNER_SHELL_OUTSIDE_OUTER"; break;
+      case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << errorCode << ") " << "INTERIOR_OF_SHELL_NOT_CONNECTED"; break;
+        //-- Input problem
+      case INVALID_INPUT_FILE:                     cout << errorCode << ") " << "INVALID_INPUT_FILE"; break;
+        //-- Other reasons
+      default:                                     cout << errorCode << ") " << "UNKNOWN"; break;
     }
     cout << endl;
     if (bUsingIDs == false)
@@ -236,10 +235,13 @@ int main(int argc, char* const argv[])
     return(1);
   }
 
+  cbf cbfunction = callback_cout;
   vector<string> arguments;
   for (int argNum = 1; argNum < argc; ++argNum) {
-    if (strcmp(argv[argNum], "-xml") == 0)
+    if (strcmp(argv[argNum], "-xml") == 0) {
       xmloutput = true;
+      cbfunction = callback_xml;
+    }
     else if (strcmp(argv[argNum], "-withids") == 0)
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
@@ -258,40 +260,15 @@ int main(int argc, char* const argv[])
       arguments.push_back(string(argv[argNum]));
     }
   }
-  // std::cout << "TOL d2p: "      << TOL_PLANARITY_d2p     << std::endl;
-  // std::cout << "TOL: normals: " << TOL_PLANARITY_normals << std::endl;
 
   vector<Shell*> shells;
-  if (xmloutput == false) {
-    if (bUsingIDs == true) {
-      readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_cout);
-    }
-    else {
-      readAllInputShells(arguments, shells, callback_cout, TRANSLATE);           //<---
-    }
-    
-//    vector<Point3>::iterator it = shells[0]->lsPts.begin();
-//    for ( ; it != shells[0]->lsPts.end(); it++)
-//    {
-//      std::cout << *it << std::endl;
-//    }
-    
-    if (bRepair == false)
-      validate(shells, callback_cout, TOL_PLANARITY_d2p, TOL_PLANARITY_normals); //<---
-    else
-      repair(shells, repairs, callback_cout);
+  if (bRepair == false) {
+    readAllInputShells(arguments, shells, cbfunction, TRANSLATE);
+    if (!callbackWasCalledWithError)
+      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
   }
   else {
-    if (bUsingIDs == true) {
-      readAllInputShells_withIDs(arguments, shells, idShells, idFaces, callback_xml);
-    }
-    else {
-      readAllInputShells(arguments, shells, callback_xml, TRANSLATE);
-    }
-    if (bRepair == false)
-		  validate(shells, callback_xml, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
-	  else
-		  repair(shells, repairs, callback_xml);
+    repair(shells, repairs, cbfunction);
   }
 
   if (xmloutput == false) {
@@ -302,7 +279,7 @@ int main(int argc, char* const argv[])
     }
     else
     {
-       cout << "\nValid solid. Hourrraaa!" << endl;
+       cout << "\nValid solid :)" << endl;
        return(1);
     }
   }
