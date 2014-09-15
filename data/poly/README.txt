@@ -113,6 +113,10 @@ it explicitly.
   * cube with -100.0 as z-coordinates
   * valid
 
+# cube28
+  * cube top face a line (with only 2 vertices)
+  * invalid
+
 # duplicates
   * cube with one duplicate vertex (repeated in a ring)
   * invalid
