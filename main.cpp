@@ -62,7 +62,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case RING_NOT_CLOSED:                        cout << errorCode << ") " << "RING_NOT_CLOSED"; break;
       case RING_SELF_INTERSECT:                    cout << errorCode << ") " << "RING_SELF_INTERSECT"; break;
         //-- Surface level
-      case SELF_INTERSECTION:                      cout << errorCode << ") " << "SELF_INTERSECTION"; break;
+      case INTERSECTION_RINGS:                     cout << errorCode << ") " << "INTERSECTION_RINGS"; break;
       case NON_PLANAR_SURFACE:                     cout << errorCode << ") " << "NON_PLANAR_SURFACE"; break;
       case INTERIOR_DISCONNECTED:                  cout << errorCode << ") " << "INTERIOR_DISCONNECTED"; break;
       case HOLE_OUTSIDE:                           cout << errorCode << ") " << "HOLE_OUTSIDE"; break;
@@ -137,7 +137,7 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
       case RING_NOT_CLOSED:                        cout << "RING_NOT_CLOSED"; break;
       case RING_SELF_INTERSECT:                    cout << "RING_SELF_INTERSECT"; break;
 //-- Surface level
-      case SELF_INTERSECTION:                      cout << "SELF_INTERSECTION"; break;
+      case INTERSECTION_RINGS:                     cout << "INTERSECTION_RINGS"; break;
       case NON_PLANAR_SURFACE:                     cout << "NON_PLANAR_SURFACE"; break;
       case INTERIOR_DISCONNECTED:                  cout << "INTERIOR_DISCONNECTED"; break;
       case HOLE_OUTSIDE:                           cout << "HOLE_OUTSIDE"; break;

@@ -241,7 +241,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       {
         isvalid = false;
         if (reason.find("Self-intersection") != string::npos)
-          (*cb)(SELF_INTERSECTION, is, i, reason.c_str());
+          (*cb)(INTERSECTION_RINGS, is, i, reason.c_str());
         else if (reason.find("Interior is disconnected") != string::npos)
           (*cb)(INTERIOR_DISCONNECTED, is, i, reason.c_str());
         else if (reason.find("Hole lies outside shell") != string::npos)

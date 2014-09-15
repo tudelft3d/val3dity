@@ -125,7 +125,7 @@ Invalid solid :(
 
 ## Surface level ##
 
-  * 200: SELF_INTERSECTION  
+  * 200: INTERSECTION_RINGS  
   * 210: NON_PLANAR_SURFACE                     
   * 220: INTERIOR_DISCONNECTED
   * 230: HOLE_OUTSIDE

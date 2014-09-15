@@ -35,7 +35,7 @@ typedef enum
    RING_NOT_CLOSED                        = 120,
    RING_SELF_INTERSECT                    = 130,
 //-- Surface level
-   SELF_INTERSECTION                      = 200,
+   INTERSECTION_RINGS                     = 200,
    NON_PLANAR_SURFACE                     = 210,
    INTERIOR_DISCONNECTED                  = 220,
    HOLE_OUTSIDE                           = 230,

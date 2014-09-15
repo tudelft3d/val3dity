@@ -7,12 +7,12 @@
 
 ## Surface level (one polygon embedded in 3D)
 
-  * 200 SELF_INTERSECTION      rings of the surface intersect
-  * 210 NON_PLANAR_SURFACE     surface is not planar
-  * 220 INTERIOR_DISCONNECTED  interior of surface is not connected
-  * 230 HOLE_OUTSIDE           1 or more holes are located outside the extering
-  * 240 HOLES_ARE_NESTED       holes of the surface are nested inside other
-  * 250 ORIENTATION_RINGS_SAME exterior and interior rings have same orientation
+  * 200 INTERSECTION_RINGS        rings of the surface intersect
+  * 210 NON_PLANAR_SURFACE        surface is not planar
+  * 220 INTERIOR_DISCONNECTED     interior of surface is not connected
+  * 230 HOLE_OUTSIDE              1 or more holes are located outside the extering
+  * 240 HOLES_ARE_NESTED          holes of the surface are nested inside other
+  * 250 ORIENTATION_RINGS_SAME    exterior and interior rings have same orientation
 
 ## Shell level (one envelop formed by several surfaces)
 
