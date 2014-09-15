@@ -35,9 +35,10 @@ VAL3DITYEXE = '/Users/hugo/projects/val3dity/val3dity'
 TEMPFOLDER  = '/Users/hugo/temp/tmpolys'
 
 dErrors = {
-  100: 'REPEATED_POINTS',
-  110: 'RING_NOT_CLOSED',   
-  120: 'RING_SELF_INTERSECT',
+  100: 'TOO_FEW_POINTS',
+  110: 'CONSECUTIVE_POINTS_SAME',
+  120: 'RING_NOT_CLOSED',   
+  130: 'RING_SELF_INTERSECT',
   200: 'SELF_INTERSECTION',  
   210: 'NON_PLANAR_SURFACE',                     
   220: 'INTERIOR_DISCONNECTED',

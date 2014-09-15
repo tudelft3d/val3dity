@@ -30,10 +30,11 @@
 #include <sstream>
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
-bool has_face_duplicates(const vector< vector<int> >& theface);
+bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface);
+bool has_face_rings_with_toofewpoints(const vector< vector<int> >& theface);
 
 
-bool has_face_duplicates(const vector< vector<int> >& theface)
+bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
 {
   bool bDuplicates = false;
   vector< vector<int> >::const_iterator itr = theface.begin();
@@ -54,6 +55,20 @@ bool has_face_duplicates(const vector< vector<int> >& theface)
   return bDuplicates;
 }
 
+bool has_face_rings_with_toofewpoints(const vector< vector<int> >& theface)
+{
+  bool bErrors = false;
+  vector< vector<int> >::const_iterator itr = theface.begin();
+  for ( ; itr != theface.end(); itr++) {
+    if (itr->size() < 3) {
+      bErrors = true;
+      break;
+    }
+  }
+  return bErrors;
+}
+
+
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
 {
@@ -65,7 +80,6 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
     if (i > pts.size()) {
       break;
     }
-    
   }
   vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
@@ -82,6 +96,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
   return isPlanar;
 }
 
+
 bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 {
   initGEOS(NULL, NULL);
@@ -93,11 +108,18 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
     size_t num = shell->faces.size();
     for (int i = 0; i < static_cast<int>(num); i++)
     {
-
-      //-- test for duplicate vertices
-      if (has_face_duplicates(shell->faces[i]) == true)
+      //-- test for too few points (<3 for a ring)
+      if (has_face_rings_with_toofewpoints(shell->faces[i]) == true)
       {
-        (*cb)(REPEATED_POINTS, is, i, "");
+        (*cb)(CONSECUTIVE_POINTS_SAME, is, i, "TOO FEW POINTS");
+        isvalid = false;
+        continue;
+      }
+      
+      //-- test for 2 repeated consecutive points
+      if (has_face_2_consecutive_repeated_pts(shell->faces[i]) == true)
+      {
+        (*cb)(CONSECUTIVE_POINTS_SAME, is, i, "");
         isvalid = false;
         continue;
       }

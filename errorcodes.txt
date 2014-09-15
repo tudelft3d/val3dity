@@ -1,8 +1,9 @@
 ## Ring level
 
-  * 100 REPEATED_POINTS     2 consecutive points are the same 
-  * 110 RING_NOT_CLOSED     first-last points are not the same 
-  * 120 RING_SELF_INTERSECT ring self-intersects or is collapsed to a point or a line 
+  * 100 TOO_FEW_POINTS            ring has <3 points
+  * 110 CONSECUTIVE_POINTS_SAME   2 consecutive points are the same 
+  * 120 RING_NOT_CLOSED           first-last points are not the same 
+  * 130 RING_SELF_INTERSECT       ring self-intersects or is collapsed to a point or a line 
 
 ## Surface level (one polygon embedded in 3D)
 

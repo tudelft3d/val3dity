@@ -118,9 +118,10 @@ Invalid solid :(
 
 ## Ring level ##
 
-  * 100: REPEATED_POINTS   
-  * 110: RING_NOT_CLOSED   
-  * 120: RING_SELF_INTERSECT
+  * 100: TOO_FEW_POINTS
+  * 110: CONSECUTIVE_POINTS_SAME   
+  * 120: RING_NOT_CLOSED   
+  * 130: RING_SELF_INTERSECT
 
 ## Surface level ##
 

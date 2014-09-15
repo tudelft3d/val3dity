@@ -30,9 +30,10 @@ typedef enum
 {
    STATUS_OK                              = 0,
 //-- Ring level
-   REPEATED_POINTS                        = 100,
-   RING_NOT_CLOSED                        = 110,
-   RING_SELF_INTERSECT                    = 120,
+   TOO_FEW_POINTS                         = 100,
+   CONSECUTIVE_POINTS_SAME                = 110,
+   RING_NOT_CLOSED                        = 120,
+   RING_SELF_INTERSECT                    = 130,
 //-- Surface level
    SELF_INTERSECTION                      = 200,
    NON_PLANAR_SURFACE                     = 210,

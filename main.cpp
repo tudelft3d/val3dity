@@ -57,7 +57,8 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
     switch(errorCode)
     {
         //-- Ring level
-      case REPEATED_POINTS:                        cout << errorCode << ") " << "REPEATED_POINTS"; break;
+      case TOO_FEW_POINTS:                         cout << errorCode << ") " << "TOO_FEW_POINTS"; break;
+      case CONSECUTIVE_POINTS_SAME:                cout << errorCode << ") " << "CONSECUTIVE_POINTS_SAME"; break;
       case RING_NOT_CLOSED:                        cout << errorCode << ") " << "RING_NOT_CLOSED"; break;
       case RING_SELF_INTERSECT:                    cout << errorCode << ") " << "RING_SELF_INTERSECT"; break;
         //-- Surface level
@@ -131,7 +132,8 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
     switch(errorCode)
     {
 //-- Ring level
-      case REPEATED_POINTS:                        cout << "REPEATED_POINTS"; break;
+      case TOO_FEW_POINTS:                         cout << "TOO_FEW_POINTS"; break;
+      case CONSECUTIVE_POINTS_SAME:                cout << "CONSECUTIVE_POINTS_SAME"; break;
       case RING_NOT_CLOSED:                        cout << "RING_NOT_CLOSED"; break;
       case RING_SELF_INTERSECT:                    cout << "RING_SELF_INTERSECT"; break;
 //-- Surface level
