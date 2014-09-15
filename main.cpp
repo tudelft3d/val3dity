@@ -70,13 +70,13 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
       case ORIENTATION_RINGS_SAME:                 cout << errorCode << ") " << "ORIENTATION_RINGS_SAME"; break;
         //-- Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << errorCode << ") " << "NOT_VALID_2_MANIFOLD"; break;
-      case SURFACE_NOT_CLOSED:                     cout << errorCode << ") " << "SURFACE_NOT_CLOSED"; break;
-      case DANGLING_FACES:                         cout << errorCode << ") " << "DANGLING_FACES"; break;
-      case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << errorCode << ") " << "FACE_ORIENTATION_INCORRECT_EDGE_USAGE"; break;
-      case FREE_FACES:                             cout << errorCode << ") " << "FREE_FACES"; break;
+      case SURFACE_HAS_HOLE:                       cout << errorCode << ") " << "SURFACE_HAS_HOLE"; break;
+      case NON_MANIFOLD:                         cout << errorCode << ") " << "NON_MANIFOLD"; break;
+      case FACE_WRONG_ORIENTATION:                 cout << errorCode << ") " << "FACE_WRONG_ORIENTATION"; break;
+      case FREE_FACE:                              cout << errorCode << ") " << "FREE_FACE"; break;
       case SURFACE_SELF_INTERSECTS:                cout << errorCode << ") " << "SURFACE_SELF_INTERSECTS"; break;
       case VERTICES_NOT_USED:                      cout << errorCode << ") " << "VERTICES_NOT_USED"; break;
-      case SURFACE_NORMALS_WRONG_ORIENTATION:      cout << errorCode << ") " << "SURFACE_NORMALS_WRONG_ORIENTATION"; break;
+      case ALL_FACES_WRONG_ORIENTATION:            cout << errorCode << ") " << "ALL_FACES_WRONG_ORIENTATION"; break;
         //-- Solid level
       case SHELLS_FACE_ADJACENT:                   cout << errorCode << ") " << "SHELLS_FACE_ADJACENT"; break;
       case SHELL_INTERIOR_INTERSECT:               cout << errorCode << ") " << "SHELL_INTERIOR_INTERSECT"; break;
@@ -145,13 +145,13 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
       case ORIENTATION_RINGS_SAME:                 cout << "ORIENTATION_RINGS_SAME"; break;
 //-- Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << "NOT_VALID_2_MANIFOLD"; break;
-      case SURFACE_NOT_CLOSED:                     cout << "SURFACE_NOT_CLOSED"; break;
-      case DANGLING_FACES:                         cout << "DANGLING_FACES"; break;
-      case FACE_ORIENTATION_INCORRECT_EDGE_USAGE:  cout << "FACE_ORIENTATION_INCORRECT_EDGE_USAGE"; break;
-      case FREE_FACES:                             cout << "FREE_FACES"; break;
+      case SURFACE_HAS_HOLE:                       cout << "SURFACE_HAS_HOLE"; break;
+      case NON_MANIFOLD:                           cout << "NON_MANIFOLD"; break;
+      case FACE_WRONG_ORIENTATION:                 cout << "FACE_WRONG_ORIENTATION"; break;
+      case FREE_FACE:                              cout << "FREE_FACE"; break;
       case SURFACE_SELF_INTERSECTS:                cout << "SURFACE_SELF_INTERSECTS"; break;
       case VERTICES_NOT_USED:                      cout << "VERTICES_NOT_USED"; break;
-      case SURFACE_NORMALS_WRONG_ORIENTATION:      cout << "SURFACE_NORMALS_WRONG_ORIENTATION"; break;
+      case ALL_FACES_WRONG_ORIENTATION:            cout << "ALL_FACES_WRONG_ORIENTATION"; break;
 //-- Solid level
       case SHELLS_FACE_ADJACENT:                   cout << "SHELLS_FACE_ADJACENT"; break;
       case SHELL_INTERIOR_INTERSECT:               cout << "SHELL_INTERIOR_INTERSECT"; break;

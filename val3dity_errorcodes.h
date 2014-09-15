@@ -43,13 +43,13 @@ typedef enum
    ORIENTATION_RINGS_SAME                 = 250,
 //-- Shell level
    NOT_VALID_2_MANIFOLD                   = 300,
-   SURFACE_NOT_CLOSED                     = 301,
-   DANGLING_FACES                         = 302,
-   FACE_ORIENTATION_INCORRECT_EDGE_USAGE  = 303,
-   FREE_FACES                             = 304,
+   SURFACE_HAS_HOLE                       = 301,
+   NON_MANIFOLD                           = 302,
+   FACE_WRONG_ORIENTATION                 = 303,
+   FREE_FACE                              = 304,
    SURFACE_SELF_INTERSECTS                = 305,
    VERTICES_NOT_USED                      = 306,
-   SURFACE_NORMALS_WRONG_ORIENTATION      = 310,
+   ALL_FACES_WRONG_ORIENTATION            = 310,
 //-- Solid level
    SHELLS_FACE_ADJACENT                   = 400,
    SHELL_INTERIOR_INTERSECT               = 410,

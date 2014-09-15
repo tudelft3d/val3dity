@@ -135,13 +135,13 @@ Invalid solid :(
 ## Shell level ##
 
   * 300: NOT_VALID_2_MANIFOLD
-    * 301: SURFACE_NOT_CLOSED                     
-    * 302: DANGLING_FACES                         
-    * 303: FACE_ORIENTATION_INCORRECT_EDGE_USAGE  
-    * 304: FREE_FACES                             
+    * 301: SURFACE_HAS_HOLE                     
+    * 302: NON_MANIFOLD                         
+    * 303: FACE_WRONG_ORIENTATION  
+    * 304: FREE_FACE                             
     * 305: SURFACE_SELF_INTERSECTS                
     * 306: VERTICES_NOT_USED                      
-  * 310: SURFACE_NORMALS_WRONG_ORIENTATION      
+  * 310: ALL_FACES_WRONG_ORIENTATION      
 
 ## Solid level
 

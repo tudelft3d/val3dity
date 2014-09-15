@@ -191,7 +191,7 @@ public:
 //      }
 //      if (success == false)
 //      {
-//        (*cb)(DANGLING_FACES, shellID, 0, "");       
+//        (*cb)(NON_MANIFOLD, shellID, 0, "");       
 //      }
 //    }
 //  }
@@ -338,10 +338,10 @@ public:
       if (B.test_facet(faceids.begin(), faceids.end()))
       {
         //std::cout << "*** Reversed orientation of the face" << std::endl;
-        (*cb)(FACE_ORIENTATION_INCORRECT_EDGE_USAGE, shellID, faceID, ""); 
+        (*cb)(FACE_WRONG_ORIENTATION, shellID, faceID, ""); 
    }
       else
-        (*cb)(DANGLING_FACES, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
+        (*cb)(NON_MANIFOLD, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
     }
     return ;
   } 
@@ -403,7 +403,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
           if (P->keep_largest_connected_components(1) > 0)
           {
             //TODO: how to report what face is not connected? a bitch of a problem...
-            (*cb)(FREE_FACES, shellID, -1, "");
+            (*cb)(FREE_FACE, shellID, -1, "");
             isValid = false;
           }
           else
@@ -416,7 +416,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
               while (P->size_of_border_edges() > 0) {
                 CgalPolyhedron::Halfedge_handle he = ++(P->border_halfedges_begin());
                 st << "Location hole: " << he->vertex()->point();
-                (*cb)(SURFACE_NOT_CLOSED, shellID, -1, st.str());
+                (*cb)(SURFACE_HAS_HOLE, shellID, -1, st.str());
                 st.str("");
                 P->fill_hole(he);
                 P->normalize_border();
@@ -463,7 +463,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
     isValid = check_global_orientation_normals_rev2(P, bOuter, cb);
 
     if (isValid == false)
-      (*cb)(SURFACE_NORMALS_WRONG_ORIENTATION, shellID, -1, "");
+      (*cb)(ALL_FACES_WRONG_ORIENTATION, shellID, -1, "");
     else
       (*cb)(STATUS_OK, -1, -1, "\tyes");
   }
@@ -509,14 +509,14 @@ CgalPolyhedron* repair_triangulated_shell(TrShell& tshell, const vector<bool> &r
           if (P->keep_largest_connected_components(1) > 0)
           {
             //TODO: how to report what face is not connected? a bitch of a problem...
-            (*cb)(FREE_FACES, shellID, -1, "REPAIR: unconnected faces were deleted.");
+            (*cb)(FREE_FACE, shellID, -1, "REPAIR: unconnected faces were deleted.");
           }
           else
           {
             //-- check if there are holes in the surface
             if (P->size_of_border_halfedges() > 0)
             {
-              (*cb)(SURFACE_NOT_CLOSED, shellID, -1, "");
+              (*cb)(SURFACE_HAS_HOLE, shellID, -1, "");
               //TODO: how to report where the hole is? report one of the edge? centre of the hole?
               isValid = false;
             }
@@ -557,7 +557,7 @@ CgalPolyhedron* repair_triangulated_shell(TrShell& tshell, const vector<bool> &r
     isValid = check_global_orientation_normals(P, bOuter, cb);
     if (isValid == false)
     {
-      (*cb)(SURFACE_NORMALS_WRONG_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
+      (*cb)(ALL_FACES_WRONG_ORIENTATION, shellID, -1, "Normals all have the wrong orientation.");
       P->inside_out();
       isValid = true;
     }

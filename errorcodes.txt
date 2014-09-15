@@ -17,13 +17,13 @@
 ## Shell level (one envelop formed by several surfaces)
 
   * 300  NOT_VALID_2_MANIFOLD                 
-  * 301  SURFACE_NOT_CLOSED                     there is 1+ 'hole' somewhere on the surface 
-  * 302  DANGLING_FACES                         dangling faces (more than 2 surfaces incident to an edge) 
-  * 303  FACE_ORIENTATION_INCORRECT_EDGE_USAGE  orientation of one or more faces not correct 
-  * 304  FREE_FACES                             1+ faces not connected to the others (eg 'floating' in the air) or duplicate faces 
-  * 305  SURFACE_SELF_INTERSECTS                surface self-intersect
-  * 306  VERTICES_NOT_USED                      some vertices are not referenced by the faces
-  * 310  SURFACE_NORMALS_WRONG_ORIENTATION      normals all pointing in wrong direction
+  * 301  SURFACE_HAS_HOLE                       there is 1+ 'hole' somewhere on the surface 
+  * 302  NON_MANIFOLD                           non-manifold case: dangling faces (more than 2 surfaces incident to an edge), several faces not forming an 'umbrella', etc.
+  * 303  FACE_WRONG_ORIENTATION                 orientation of one or more faces not correct 
+  * 304  FREE_FACE                              1+ faces not connected to the others (eg 'floating' in the air)
+  * 305  SURFACE_SELF_INTERSECTS                surface self-intersect (is not simple)
+  * 306  VERTICES_NOT_USED                      some vertices are not referenced by the faces (impossible with GML input)
+  * 310  ALL_FACES_WRONG_ORIENTATION            normals all pointing in wrong direction (inwards for exterior shells; outward for interior shell)
 
 ## Solid level (1 exterior shell + [0..*n*] interior shells)
 
