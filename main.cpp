@@ -190,7 +190,6 @@ int main(int argc, char* const argv[])
   for (int argNum = 1; argNum < argc; ++argNum) {
     if (strcmp(argv[argNum], "-xml") == 0) {
       XMLOUTPUT = true;
-//      cbfunction = callback_xml;
     }
     else if (strcmp(argv[argNum], "-multisurface") == 0)
       MULTISURFACE = true;
@@ -225,7 +224,7 @@ int main(int argc, char* const argv[])
 
   if (XMLOUTPUT == false) {
     if (MULTISURFACE == true)
-      cout << endl << "Only polygons are individually validated, no solid validation (input is MultiSurface)." << endl;
+      cout << endl << "MultiSurface\n-----only polygons are individually validated, no solid validation" << endl;
     if (callbackWasCalledWithError)
     {
       if (MULTISURFACE == false)
