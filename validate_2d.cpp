@@ -26,6 +26,7 @@
 #include "validate_2d.h"
 #include "validate.h"
 #include "CGAL/squared_distance_3.h"
+#include <CGAL/linear_least_squares_fitting_3.h>
 #include <GEOS/geos_c.h>
 #include <sstream>
 
@@ -72,15 +73,11 @@ bool has_face_rings_with_toofewpoints(const vector< vector<int> >& theface)
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
 {
-  CgalPolyhedron::Plane_3 plane(pts[0], pts[1], pts[2]);
-  int i = 3;
-  while (plane.is_degenerate() == true) {
-    plane = CgalPolyhedron::Plane_3(pts[0], pts[1], pts[i]);
-    i++;
-    if (i > pts.size()) {
-      break;
-    }
-  }
+  //-- find a fitted plane with least-square adjustment
+  CgalPolyhedron::Plane_3 plane;
+  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>());
+  
+  //-- test distance to that plane for each point
   vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
   for ( ; it != pts.end(); it++)

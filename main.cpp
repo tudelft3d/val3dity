@@ -71,7 +71,7 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
         //-- Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << errorCode << ") " << "NOT_VALID_2_MANIFOLD"; break;
       case SURFACE_HAS_HOLE:                       cout << errorCode << ") " << "SURFACE_HAS_HOLE"; break;
-      case NON_MANIFOLD:                         cout << errorCode << ") " << "NON_MANIFOLD"; break;
+      case NON_MANIFOLD:                           cout << errorCode << ") " << "NON_MANIFOLD"; break;
       case FACE_WRONG_ORIENTATION:                 cout << errorCode << ") " << "FACE_WRONG_ORIENTATION"; break;
       case FREE_FACE:                              cout << errorCode << ") " << "FREE_FACE"; break;
       case SURFACE_SELF_INTERSECTS:                cout << errorCode << ") " << "SURFACE_SELF_INTERSECTS"; break;
