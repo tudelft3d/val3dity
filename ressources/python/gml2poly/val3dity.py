@@ -21,7 +21,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 
-
+from optparse import OptionParser
 import os
 import sys
 import shutil
@@ -61,24 +61,25 @@ dErrors = {
 
 
 def main():
-  fin = open(sys.argv[1])
-  if construct_polys(fin):
-    validate_polys(fin)
+  options, args = parse_arguments()
+  fin = open(args[0])
+  if construct_polys(fin, options.multisurface):
+    validate_polys(fin, options.multisurface)
   # shutil.rmtree(TEMPFOLDER)
 
-def construct_polys(fin):
-  print "Extracting the solids from the CityGML file"
+def construct_polys(fin, multisurface):
+  print "Extracting the 3D primitives from the CityGML file"
   if not os.path.exists(TEMPFOLDER):
     os.mkdir(TEMPFOLDER)
   else:
     shutil.rmtree(TEMPFOLDER)
     os.mkdir(TEMPFOLDER)
-  re = gml2poly.process(fin, TEMPFOLDER) # TODO: snap tolerance?
+  re = gml2poly.process(fin, TEMPFOLDER, multisurface)
   return re
 
 
-def validate_polys(fin):
-  print "Validating each solid"
+def validate_polys(fin, multisurface):
+  print "Validating each Solid/MultiSurface"
   # validate each building/shell
   os.chdir(TEMPFOLDER)
   dFiles = {}
@@ -91,12 +92,11 @@ def validate_polys(fin):
       else:
         dFiles[f1].append(f)
   i = 0
-  print "Number of solids in file:", len(dFiles)
+  print "Number of Solids/MultiSurfaces in file:", len(dFiles)
   invalidsolids = 0
   xmlsolids = []
   exampleerrors = []
   for solidname in dFiles:
-    # check if solid or multisurface in first file
     t = open(dFiles[solidname][0])
     t.readline()
     if t.readline().split()[1] == '0':
@@ -106,7 +106,10 @@ def validate_polys(fin):
     t.close()
     
     # validate with val3dity
-    str1 = VAL3DITYEXE + " -xml " +  " ".join(dFiles[solidname])
+    if multisurface:
+      str1 = VAL3DITYEXE + " -xml -multisurface " +  " ".join(dFiles[solidname])
+    else:
+      str1 = VAL3DITYEXE + " -xml " +  " ".join(dFiles[solidname])
     op = subprocess.Popen(str1.split(' '),
                           stdout=subprocess.PIPE, 
                           stderr=subprocess.PIPE)
@@ -126,20 +129,12 @@ def validate_polys(fin):
           i = -1
         else:
           i = tmp + i + 1
-      o = '\t<Solid>\n\t\t<id>' + solidname + '</id>\n' + o + '\t</Solid>'
-      xmlsolids.append(o)
-    else: #-- no error detected, WARNING if MultiSurface!
-      if multisurface == True:
-        # print 'WARNING: MultiSurfce is actually a valid solid'
-        s = []
-        s.append("\t\t<ValidatorMessage>")
-        s.append("\t\t\t<type>WARNING</type>")
-        s.append("\t\t\t<explanation>MultiSurfaces form a valid Solid</explanation>")
-        s.append("\t\t</ValidatorMessage>\n")
-        o = "\n".join(s)
+      if multisurface:
         o = '\t<Solid>\n\t\t<id>' + solidname + '</id>\n' + o + '\t</Solid>'
-        xmlsolids.append(o)
-    # o = '\t<Solid>\n\t\t<id>' + solidname + '</id>\n' + o + '\t</Solid>'
+      else:
+        o = '\t<MultiSurface>\n\t\t<id>' + solidname + '</id>\n' + o + '\t</MultiSurface>'
+      xmlsolids.append(o)
+ 
 
   totalxml = []
   totalxml.append('<ValidatorContext>')
@@ -151,11 +146,29 @@ def validate_polys(fin):
   fout = open(s, 'w')
   fout.write('\n'.join(totalxml))
   fout.close()
-  print "Invalid solids: ", invalidsolids
+  if multisurface:
+    print "Invalid MultiSurfaces: ", invalidsolids
+  else:
+    print "Invalid Solids: ", invalidsolids
   print "Errors present:"
   for each in exampleerrors:
     print each, dErrors[int(each)]
   print "Report of the validation:", s
+
+def parse_arguments():
+    usage = "Usage: %prog [options] input\n(--help for a list of options)"
+    parser = OptionParser(usage)
+    parser.add_option("-s", "--multisurface",
+                      action="store_true", dest="multisurface", default=False)
+    (options, args) = parser.parse_args()
+
+    if len(args) != 1:
+        parser.error("The input file (*.gml or *.xml) must be specified.")
+    fIn = args[0]
+    if fIn[-3:] != "gml" and fIn[-3:] != "xml":
+        parser.error("The input file must be a GML/XML file.")
+    return options, args
+
 
 if __name__ == "__main__":
     main()

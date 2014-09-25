@@ -43,10 +43,10 @@ def main():
     st = 1e-3
     if options.snap_tolerance is not None:
         st = options.snap_tolerance
-    process(args[0], args[1], st)
+    process(args[0], args[1], options.multisurface, st)
 
 
-def process(fIn, tempfolder, snap_tolerance = '1e-3'):
+def process(fIn, tempfolder, multisurface, snap_tolerance = '1e-3'):
     global TEMPFOLDER
     TEMPFOLDER = tempfolder
 
@@ -94,18 +94,30 @@ def process(fIn, tempfolder, snap_tolerance = '1e-3'):
         else:
             dxlinks = None
 
-        solidid = 1
-        for solid in root.findall(".//{%s}Solid" % ns['gml']):
-            gmlid = solid.get("{%s}id" % ns['gml'])
-            if gmlid == None:
-                gmlid = str(solidid)
-            solidid += 1
-            shells = [Shell(solid.find("{%s}exterior" % ns['gml']), dxlinks, ns)]
-            for ishellnode in solid.findall("{%s}interior" % ns['gml']):
-                shells.append(Shell(ishellnode, dxlinks, ns))
-            for i, shell in enumerate(shells):
-                write_shell_to_file_poly(gmlid, shell, i)
-        print "Number of POLY files created:", solidid-1
+        if (multisurface == True):
+        #-- Process <gml:MultiSurface> instead of <gml:Solid>
+            msid = 1
+            for ms in root.findall(".//{%s}MultiSurface" % ns['gml']):
+                gmlid = ms.get("{%s}id" % ns['gml'])
+                if gmlid == None:
+                    gmlid = str(msid)
+                msid += 1
+                ms = Shell(ms, dxlinks, ns)
+                write_shell_to_file_poly(gmlid, ms, 0)
+            print "Number of POLY files created:", msid-1
+        else:
+            solidid = 1
+            for solid in root.findall(".//{%s}Solid" % ns['gml']):
+                gmlid = solid.get("{%s}id" % ns['gml'])
+                if gmlid == None:
+                    gmlid = str(solidid)
+                solidid += 1
+                shells = [Shell(solid.find("{%s}exterior" % ns['gml']), dxlinks, ns)]
+                for ishellnode in solid.findall("{%s}interior" % ns['gml']):
+                    shells.append(Shell(ishellnode, dxlinks, ns))
+                for i, shell in enumerate(shells):
+                    write_shell_to_file_poly(gmlid, shell, i)
+            print "Number of POLY files created:", solidid-1
     except:
         name = "%s/error" % (TEMPFOLDER)
         fOut = open(name, 'w')
@@ -144,6 +156,8 @@ def parse_arguments():
     parser = OptionParser(usage)
     parser.add_option("--snap_tolerance", dest="snap_tolerance",
                       help="tolerance for snapping of vertices (default: 1e-3 unit)")
+    parser.add_option("-s", "--multisurface",
+                      action="store_true", dest="multisurface", default=False)
     parser.add_option("-v", "--verbose",
                       action="store_true", dest="verbose")
     parser.add_option("-q", "--quiet",
