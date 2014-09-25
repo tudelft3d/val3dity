@@ -33,17 +33,18 @@ static bool callbackWasCalledWithError = false;
 vector<string> idShells;
 vector< vector<string> > idFaces;
 bool bUsingIDs = false;
-bool xmloutput = false;
+bool XMLOUTPUT = false;
 bool bIsPolyhedron = true; //modified to false to prevent closure check for LoD0
+
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
-                   int shellNum, // -1 means unused; 0-based
-                   int facetNum,     // -1 means unused; 0-based
-                   std::string messageStr) // optional
+void callback(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
+              int shellNum, // -1 means unused; 0-based
+              int facetNum,     // -1 means unused; 0-based
+              std::string messageStr) // optional
 {
-  if (0 == errorCode)
+  if ( (0 == errorCode) && (XMLOUTPUT == false) )
   {
     // This is just a status message.
     if ( (shellNum == -1) && (facetNum == -1) )
@@ -51,99 +52,34 @@ void callback_cout(Val3dity_ErrorCode errorCode,    // 0 means status message, -
     else
       cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
   }
-  else
+  
+  if (errorCode != 0)
   {
-    cout << "Error (#";
+    callbackWasCalledWithError = true;
+    if (XMLOUTPUT == false)
+      cout << "Error #" << errorCode << " ";
+    else
+    {
+      cout << "\t\t<ValidatorMessage>" << endl;
+      cout << "\t\t\t<type>ERROR</type>" << endl;
+      cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
+      cout << "\t\t\t<errorType>";
+    }
     switch(errorCode)
     {
         //-- Ring level
-      case TOO_FEW_POINTS:                         cout << errorCode << ") " << "TOO_FEW_POINTS"; break;
-      case CONSECUTIVE_POINTS_SAME:                cout << errorCode << ") " << "CONSECUTIVE_POINTS_SAME"; break;
-      case RING_NOT_CLOSED:                        cout << errorCode << ") " << "RING_NOT_CLOSED"; break;
-      case RING_SELF_INTERSECT:                    cout << errorCode << ") " << "RING_SELF_INTERSECT"; break;
-        //-- Surface level
-      case INTERSECTION_RINGS:                     cout << errorCode << ") " << "INTERSECTION_RINGS"; break;
-      case NON_PLANAR_SURFACE:                     cout << errorCode << ") " << "NON_PLANAR_SURFACE"; break;
-      case INTERIOR_DISCONNECTED:                  cout << errorCode << ") " << "INTERIOR_DISCONNECTED"; break;
-      case HOLE_OUTSIDE:                           cout << errorCode << ") " << "HOLE_OUTSIDE"; break;
-      case HOLES_ARE_NESTED:                       cout << errorCode << ") " << "HOLES_ARE_NESTED"; break;
-      case ORIENTATION_RINGS_SAME:                 cout << errorCode << ") " << "ORIENTATION_RINGS_SAME"; break;
-        //-- Shell level
-      case NOT_VALID_2_MANIFOLD:                   cout << errorCode << ") " << "NOT_VALID_2_MANIFOLD"; break;
-      case SURFACE_HAS_HOLE:                       cout << errorCode << ") " << "SURFACE_HAS_HOLE"; break;
-      case NON_MANIFOLD:                           cout << errorCode << ") " << "NON_MANIFOLD"; break;
-      case FACE_WRONG_ORIENTATION:                 cout << errorCode << ") " << "FACE_WRONG_ORIENTATION"; break;
-      case FREE_FACE:                              cout << errorCode << ") " << "FREE_FACE"; break;
-      case SURFACE_SELF_INTERSECTS:                cout << errorCode << ") " << "SURFACE_SELF_INTERSECTS"; break;
-      case VERTICES_NOT_USED:                      cout << errorCode << ") " << "VERTICES_NOT_USED"; break;
-      case ALL_FACES_WRONG_ORIENTATION:            cout << errorCode << ") " << "ALL_FACES_WRONG_ORIENTATION"; break;
-        //-- Solid level
-      case SHELLS_FACE_ADJACENT:                   cout << errorCode << ") " << "SHELLS_FACE_ADJACENT"; break;
-      case SHELL_INTERIOR_INTERSECT:               cout << errorCode << ") " << "SHELL_INTERIOR_INTERSECT"; break;
-      case INNER_SHELL_OUTSIDE_OUTER:              cout << errorCode << ") " << "INNER_SHELL_OUTSIDE_OUTER"; break;
-      case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << errorCode << ") " << "INTERIOR_OF_SHELL_NOT_CONNECTED"; break;
-        //-- Input problem
-      case INVALID_INPUT_FILE:                     cout << errorCode << ") " << "INVALID_INPUT_FILE"; break;
-        //-- Other reasons
-      default:                                     cout << errorCode << ") " << "UNKNOWN"; break;
-    }
-    cout << endl;
-    if (bUsingIDs == false)
-    {
-      if (shellNum != -1) shellNum = shellNum + 1;
-      if (facetNum != -1) facetNum = facetNum + 1;
-      cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
-    }
-    else
-  	{
-  		//add by John to prevent warning
-  		//-1 means unused
-  		string shelloutput = "-1";
-  		string faceoutput = "-1";
-  		if (shellNum >= 0) 
-      {
-  			shelloutput = idShells[shellNum];
-      }
-  		if (facetNum >= 0&&shellNum >= 0)
-      {  
-  			faceoutput = idFaces[shellNum][facetNum];
-      }
-  		cout << "\t" << "[shell: #" << shelloutput << "; face: #" << faceoutput << "]" << endl;    
-  	}
-    if (messageStr.size() > 0)
-      cout << "\t" << messageStr << endl;
-    callbackWasCalledWithError = true;
-  }
-}
-
-
-void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
-                  int shellNum,      // -1 means unused; 0-based
-                  int facetNum,      // -1 means unused; 0-based
-                  std::string messageStr) // optional
-{
-  if (0 != errorCode)
-  {
-    callbackWasCalledWithError = true;
-    cout << "\t\t<ValidatorMessage>" << endl;
-    cout << "\t\t\t<type>ERROR</type>" << endl;
-    cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
-    cout << "\t\t\t<errorType>";
-    switch(errorCode)
-    {
-//-- Ring level
       case TOO_FEW_POINTS:                         cout << "TOO_FEW_POINTS"; break;
       case CONSECUTIVE_POINTS_SAME:                cout << "CONSECUTIVE_POINTS_SAME"; break;
       case RING_NOT_CLOSED:                        cout << "RING_NOT_CLOSED"; break;
       case RING_SELF_INTERSECT:                    cout << "RING_SELF_INTERSECT"; break;
-//-- Surface level
+        //-- Polygon level
       case INTERSECTION_RINGS:                     cout << "INTERSECTION_RINGS"; break;
       case NON_PLANAR_SURFACE:                     cout << "NON_PLANAR_SURFACE"; break;
       case INTERIOR_DISCONNECTED:                  cout << "INTERIOR_DISCONNECTED"; break;
       case HOLE_OUTSIDE:                           cout << "HOLE_OUTSIDE"; break;
       case HOLES_ARE_NESTED:                       cout << "HOLES_ARE_NESTED"; break;
       case ORIENTATION_RINGS_SAME:                 cout << "ORIENTATION_RINGS_SAME"; break;
-//-- Shell level
+        //-- Shell level
       case NOT_VALID_2_MANIFOLD:                   cout << "NOT_VALID_2_MANIFOLD"; break;
       case SURFACE_HAS_HOLE:                       cout << "SURFACE_HAS_HOLE"; break;
       case NON_MANIFOLD:                           cout << "NON_MANIFOLD"; break;
@@ -152,49 +88,59 @@ void callback_xml(Val3dity_ErrorCode errorCode,    // 0 means status message, -1
       case SURFACE_SELF_INTERSECTS:                cout << "SURFACE_SELF_INTERSECTS"; break;
       case VERTICES_NOT_USED:                      cout << "VERTICES_NOT_USED"; break;
       case ALL_FACES_WRONG_ORIENTATION:            cout << "ALL_FACES_WRONG_ORIENTATION"; break;
-//-- Solid level
+        //-- Solid level
       case SHELLS_FACE_ADJACENT:                   cout << "SHELLS_FACE_ADJACENT"; break;
       case SHELL_INTERIOR_INTERSECT:               cout << "SHELL_INTERIOR_INTERSECT"; break;
       case INNER_SHELL_OUTSIDE_OUTER:              cout << "INNER_SHELL_OUTSIDE_OUTER"; break;
       case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << "INTERIOR_OF_SHELL_NOT_CONNECTED"; break;
-        // Input problem
+        //-- Input problem
       case INVALID_INPUT_FILE:                     cout << "INVALID_INPUT_FILE"; break;
-        // Other reasons
+        //-- Other reasons
       default:                                     cout << "UNKNOWN"; break;
     }
-    cout << "</errorType>" << endl;
+    if (XMLOUTPUT == false)
+      cout << endl;
+    else
+      cout << "</errorType>" << endl;
     
-
-    if (bUsingIDs == true) 
+    if (bUsingIDs == false)
     {
-  		//add by John to prevent warning
-  		//-1 means unused
-  		string shelloutput = "-1";
-  		string faceoutput = "-1";
-
-  		if (shellNum >= 0)
-  			shelloutput = idShells[shellNum];
-
-  		if (facetNum >= 0&&shellNum >= 0)
-  			faceoutput = idFaces[shellNum][facetNum];
-
-  		cout << "\t\t\t<shell>" << shelloutput << "</shell>" << endl;
-  		cout << "\t\t\t<face>" << faceoutput << "</face>" << endl;
-  		//cout << "\t\t\t<shell>" << idShells[shellNum] << "</shell>" << endl;
-  		//cout << "\t\t\t<face>" << idFaces[shellNum][facetNum] << "</face>" << endl;
+      if (shellNum != -1)
+        shellNum = shellNum + 1;
+      if (facetNum != -1)
+        facetNum = facetNum + 1;
+      if (XMLOUTPUT == false)
+        cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
+      else {
+        cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
+        cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
+      }
     }
-    else {
-      //-- returns -1 if unknown, otherwise 1-based is better for users, and less geeky...
-      if (shellNum != -1) shellNum = shellNum + 1;
-      if (facetNum != -1) facetNum = facetNum + 1;
-      cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
-      cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
+    
+    if (bUsingIDs == true)
+    {
+      string shelloutput = "-1";
+      string faceoutput = "-1";
+      if (shellNum >= 0)
+        shelloutput = idShells[shellNum];
+      if (facetNum >= 0&&shellNum >= 0)
+        faceoutput = idFaces[shellNum][facetNum];
+      if (XMLOUTPUT == false)
+        cout << "\t" << "[shell: #" << shelloutput << "; face: #" << faceoutput << "]" << endl;
+      else {
+        cout << "\t\t\t<shell>" << shelloutput << "</shell>" << endl;
+        cout << "\t\t\t<face>" << faceoutput << "</face>" << endl;
+      }
     }
-	if (messageStr.empty() == false)
-		cout << "\t\t\t<message>" << messageStr << "</message>" << endl;  
-	cout << "\t\t</ValidatorMessage>" << endl;
+    if (messageStr.empty() == false) {
+      if (XMLOUTPUT == false)
+        cout << "\t" << messageStr << endl;
+      else
+        cout << "\t\t\t<message>" << messageStr << "</message>" << endl;
+    }
+    if (XMLOUTPUT == true)
+      cout << "\t\t</ValidatorMessage>" << endl;
   }
-
 }
 
 
@@ -208,13 +154,13 @@ int main(int argc, char* const argv[])
   std::cout << "USING EXACT-EXACT" << std::endl;
 #endif
 
-  bool TRANSLATE               = true;
+  bool   TRANSLATE             = true;
   double TOL_PLANARITY_d2p     = 0.01;  //-- default: 1cm 
   double TOL_PLANARITY_normals = 1.0;   //-- default: 1.0 degree
   
-  bool MULTISURFACES           = false;
+  bool MULTISURFACE            = false;
   
-  bool bRepair                 = false;
+  bool bRepair = false;
   bool repairF = true; //-- flipping orientation of faces
   bool repairD = true; //-- dangling pieces will be removed
   bool repairH = true; //-- holes will be filled
@@ -239,15 +185,15 @@ int main(int argc, char* const argv[])
     return(1);
   }
 
-  cbf cbfunction = callback_cout;
+  cbf cbfunction = callback;
   vector<string> arguments;
   for (int argNum = 1; argNum < argc; ++argNum) {
     if (strcmp(argv[argNum], "-xml") == 0) {
-      xmloutput = true;
-      cbfunction = callback_xml;
+      XMLOUTPUT = true;
+//      cbfunction = callback_xml;
     }
-    else if (strcmp(argv[argNum], "-multisurfaces") == 0)
-      MULTISURFACES = true;
+    else if (strcmp(argv[argNum], "-multisurface") == 0)
+      MULTISURFACE = true;
     else if (strcmp(argv[argNum], "-withids") == 0)
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
@@ -271,18 +217,18 @@ int main(int argc, char* const argv[])
   if (bRepair == false) {
     readAllInputShells(arguments, shells, cbfunction, TRANSLATE);
     if (!callbackWasCalledWithError)
-      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals, MULTISURFACES);
+      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals, MULTISURFACE);
   }
   else {
     repair(shells, repairs, cbfunction);
   }
 
-  if (xmloutput == false) {
-    if (MULTISURFACES == true)
+  if (XMLOUTPUT == false) {
+    if (MULTISURFACE == true)
       cout << endl << "Only polygons are individually validated, no solid validation (input is MultiSurface)." << endl;
     if (callbackWasCalledWithError)
     {
-      if (MULTISURFACES == false)
+      if (MULTISURFACE == false)
         cout << "\nInvalid solid :(" << endl << endl;
       else
         cout << "\nSome polygons are invalid :(" << endl << endl;
@@ -290,7 +236,7 @@ int main(int argc, char* const argv[])
     }
     else
     {
-      if (MULTISURFACES == false)
+      if (MULTISURFACE == false)
         cout << "\nValid solid :)" << endl;
       else
         cout << "\nAll polygons are valid :)" << endl;
