@@ -212,6 +212,8 @@ int main(int argc, char* const argv[])
   double TOL_PLANARITY_d2p     = 0.01;  //-- default: 1cm 
   double TOL_PLANARITY_normals = 1.0;   //-- default: 1.0 degree
   
+  bool MULTISURFACES           = false;
+  
   bool bRepair                 = false;
   bool repairF = true; //-- flipping orientation of faces
   bool repairD = true; //-- dangling pieces will be removed
@@ -244,6 +246,8 @@ int main(int argc, char* const argv[])
       xmloutput = true;
       cbfunction = callback_xml;
     }
+    else if (strcmp(argv[argNum], "-multisurfaces") == 0)
+      MULTISURFACES = true;
     else if (strcmp(argv[argNum], "-withids") == 0)
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
@@ -267,22 +271,30 @@ int main(int argc, char* const argv[])
   if (bRepair == false) {
     readAllInputShells(arguments, shells, cbfunction, TRANSLATE);
     if (!callbackWasCalledWithError)
-      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals);
+      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals, MULTISURFACES);
   }
   else {
     repair(shells, repairs, cbfunction);
   }
 
   if (xmloutput == false) {
+    if (MULTISURFACES == true)
+      cout << endl << "Only polygons are individually validated, no solid validation (input is MultiSurface)." << endl;
     if (callbackWasCalledWithError)
     {
-       cout << "\nInvalid solid :(" << endl << endl;
-       return(0);
+      if (MULTISURFACES == false)
+        cout << "\nInvalid solid :(" << endl << endl;
+      else
+        cout << "\nSome polygons are invalid :(" << endl << endl;
+      return(0);
     }
     else
     {
-       cout << "\nValid solid :)" << endl;
-       return(1);
+      if (MULTISURFACES == false)
+        cout << "\nValid solid :)" << endl;
+      else
+        cout << "\nAll polygons are valid :)" << endl;
+      return(1);
     }
   }
 }
