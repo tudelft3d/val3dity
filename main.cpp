@@ -158,7 +158,7 @@ int main(int argc, char* const argv[])
   double TOL_PLANARITY_d2p     = 0.01;  //-- default: 1cm 
   double TOL_PLANARITY_normals = 1.0;   //-- default: 1.0 degree
   
-  bool MULTISURFACE            = false;
+  bool ONLYSURFACES            = false;
   
   bool bRepair = false;
   bool repairF = true; //-- flipping orientation of faces
@@ -192,8 +192,8 @@ int main(int argc, char* const argv[])
       XMLOUTPUT = true;
 //      cbfunction = callback_xml;
     }
-    else if (strcmp(argv[argNum], "-multisurface") == 0)
-      MULTISURFACE = true;
+    else if (strcmp(argv[argNum], "-onlysurfaces") == 0)
+      ONLYSURFACES = true;
     else if (strcmp(argv[argNum], "-withids") == 0)
       bUsingIDs = true;
     else if (strcmp(argv[argNum], "-repair") == 0)
@@ -217,18 +217,18 @@ int main(int argc, char* const argv[])
   if (bRepair == false) {
     readAllInputShells(arguments, shells, cbfunction, TRANSLATE);
     if (!callbackWasCalledWithError)
-      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals, MULTISURFACE);
+      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals, ONLYSURFACES);
   }
   else {
     repair(shells, repairs, cbfunction);
   }
 
   if (XMLOUTPUT == false) {
-    if (MULTISURFACE == true)
-      cout << endl << "Only polygons are individually validated, no solid validation (input is MultiSurface)." << endl;
+    if (ONLYSURFACES == true)
+      cout << endl << "Only polygons are individually validated, no solid validation." << endl;
     if (callbackWasCalledWithError)
     {
-      if (MULTISURFACE == false)
+      if (ONLYSURFACES == false)
         cout << "\nInvalid solid :(" << endl << endl;
       else
         cout << "\nSome polygons are invalid :(" << endl << endl;
@@ -236,7 +236,7 @@ int main(int argc, char* const argv[])
     }
     else
     {
-      if (MULTISURFACE == false)
+      if (ONLYSURFACES == false)
         cout << "\nValid solid :)" << endl;
       else
         cout << "\nAll polygons are valid :)" << endl;
