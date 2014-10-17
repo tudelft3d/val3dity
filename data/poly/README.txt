@@ -117,6 +117,10 @@ it explicitly.
   * cube top face a line (with only 2 vertices)
   * invalid
 
+# cube29
+  * 2 unit cubes touching at one vertex
+  * invalid
+
 # duplicates
   * cube with one duplicate vertex (repeated in a ring)
   * invalid
