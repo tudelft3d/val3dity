@@ -129,8 +129,24 @@ it explicitly.
   * unit cube with a intersecting rings in top face
   * invalid
 
+# cube32
+  * unit cube with a polygon with interior disconnected in top face
+  * invalid
+
+# cube33
+  * unit cube with a polygon with nested rings in top face
+  * invalid
+
 # duplicates
   * cube with one duplicate vertex (repeated in a ring)
+  * invalid
+
+# toofewpts
+  * cube with top face having only 2 points
+  * invalid
+
+# toofewpolys
+  * cube with only 3 surfaces
   * invalid
 
 # p1e-?
