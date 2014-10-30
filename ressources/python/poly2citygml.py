@@ -25,12 +25,14 @@ def processoneshell(s, exterior=True):
   print '\t\t\t\t\t\t<gml:CompositeSurface>'
   nof = int(s.readline().split()[0])
   for i in range(nof):
+    # print '***********', i
     print '\t\t\t\t\t\t\t<gml:surfaceMember>'
     print '\t\t\t\t\t\t\t\t<gml:Polygon>'
     print '\t\t\t\t\t\t\t\t\t<gml:exterior>'
     print '\t\t\t\t\t\t\t\t\t\t<gml:LinearRing>'
     a = map(int, s.readline().split())
     oring = map(int, s.readline().split())
+    # print '***********', oring
     oring.pop(0)
     poly = []
     for each in oring:
@@ -41,9 +43,9 @@ def processoneshell(s, exterior=True):
     print '\t\t\t\t\t\t\t\t\t</gml:exterior>'    
     
     if a[0] > 1:
-      print '\t\t\t\t\t\t\t\t\t<gml:interior>'
-      print '\t\t\t\t\t\t\t\t\t\t<gml:LinearRing>'
       for j in range(a[0]-1):
+        print '\t\t\t\t\t\t\t\t\t<gml:interior>'
+        print '\t\t\t\t\t\t\t\t\t\t<gml:LinearRing>'
         iring = map(int, s.readline().split())
         iring.pop(0)
         poly = []
@@ -51,9 +53,10 @@ def processoneshell(s, exterior=True):
           poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + str(lsPts[each][0]) + " " + str(lsPts[each][1]) + " " + str(lsPts[each][2])  + '</gml:pos>')
         poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + str(lsPts[iring[0]][0]) + " " + str(lsPts[iring[0]][1]) + " " + str(lsPts[iring[0]][2])  + '</gml:pos>')
         print "\n".join(poly)
-        s.readline().split() #--pass that line
-      print '\t\t\t\t\t\t\t\t\t\t</gml:LinearRing>'
-      print '\t\t\t\t\t\t\t\t\t</gml:interior>'
+        print '\t\t\t\t\t\t\t\t\t\t</gml:LinearRing>'
+        print '\t\t\t\t\t\t\t\t\t</gml:interior>'
+    for line in range(a[1]):
+      s.readline().split() #--pass that line
     print '\t\t\t\t\t\t\t\t</gml:Polygon>'    
     print '\t\t\t\t\t\t\t</gml:surfaceMember>'
   print '\t\t\t\t\t\t</gml:CompositeSurface>'
