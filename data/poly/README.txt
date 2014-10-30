@@ -86,7 +86,7 @@ it explicitly.
   * invalid
 
 # cube20
-  * flat cube, ie with volume of 0
+  * flat cube, ie with volume of 0, only 2 surfaces
   * invalid
 
 # cube21
@@ -119,6 +119,14 @@ it explicitly.
 
 # cube29
   * 2 unit cubes touching at one vertex
+  * invalid
+
+# cube30
+  * unit cube with a duplicate inner ring top face
+  * invalid
+
+# cube31
+  * unit cube with a intersecting rings in top face
   * invalid
 
 # duplicates
