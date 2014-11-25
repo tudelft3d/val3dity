@@ -27,7 +27,6 @@
 */
 
 
-#include "val3dity_errorcodes.h"
 
 // CGAL kernel
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -69,8 +68,6 @@ typedef CGAL::Constrained_triangulation_2<K, TDS, Itag>           CTa;
 typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
-// misc
-static const double PI = 3.14159265;
 
 // convenience structures:
 //-- the vector of faces, each which has a vector of rings, 
@@ -88,8 +85,11 @@ typedef struct triangulatedShell_tag {
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-typedef void (* cbf)(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
+typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
                      int shellNum, // -1 means unused
                      int facetNum,     // -1 means unused
                      std::string messageStr); // optional
+
+std::string errorcode2description(int code);
+
 #endif

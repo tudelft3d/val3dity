@@ -27,7 +27,6 @@
 */
 
 #include <string>
-#include "val3dity_errorcodes.h"
 #include "val3dity_defs.h"
 
 // -----------------------------------------------------------

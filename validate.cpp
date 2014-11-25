@@ -44,7 +44,7 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
   if (! validate_2D(shells, cb, TOL_PLANARITY_d2p))
     return false;
   else {
-    (*cb)(STATUS_OK, -1, -1, "-----all valid");
+    (*cb)(0, -1, -1, "-----all valid");
     if (multisurfaces == true) {
       return true;
     }
@@ -54,11 +54,11 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(UNKNOWN_ERROR, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
+    (*cb)(999, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
     return false;
   }
   else
-    (*cb)(STATUS_OK, -1, -1, "-----done");
+    (*cb)(0, -1, -1, "-----done");
   
 //-- THIRD: validate each (triangulated) shell, one by one
   vector<CgalPolyhedron*> polyhedra;
@@ -67,14 +67,14 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
   {
     std::stringstream st;
     st << endl << "Validating shell #" << i;
-    (*cb)(STATUS_OK, -1, -1, st.str());
+    (*cb)(0, -1, -1, st.str());
     p  = validate_triangulated_shell(*(trShells[i]), i, cb, TOL_PLANARITY_normals);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)
     {
       st << " valid";
-      (*cb)(STATUS_OK, -1, -1, st.str());
+      (*cb)(0, -1, -1, st.str());
       polyhedra.push_back(p);  
     }
     else
@@ -84,7 +84,7 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
       foundError = true;
     }
   }
-  (*cb)(STATUS_OK, -1, -1, "");
+  (*cb)(0, -1, -1, "");
 //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, cb);
 
@@ -122,17 +122,17 @@ bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb)
   if (! validate_2D(shells, cb))
     return false;
   else
-    (*cb)(STATUS_OK, -1, -1, "-----all valid");
+    (*cb)(0, -1, -1, "-----all valid");
   
   //-- triangulate every shell
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(INVALID_INPUT_FILE, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
+    (*cb)(999, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
     return false;
   }
   else
-    (*cb)(STATUS_OK, -1, -1, "-----done");
+    (*cb)(0, -1, -1, "-----done");
   
   //-- validate each (triangulated) shell, one by one
   vector<CgalPolyhedron*> polyhedra;
@@ -141,14 +141,14 @@ bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb)
   {
     std::stringstream st;
     st << endl << "Validating shell #" << i;
-    (*cb)(STATUS_OK, -1, -1, st.str());
+    (*cb)(0, -1, -1, st.str());
     p  = repair_triangulated_shell(*(trShells[i]), repairs, i, cb);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)
     {
       st << " valid";
-      (*cb)(STATUS_OK, -1, -1, st.str());
+      (*cb)(0, -1, -1, st.str());
       polyhedra.push_back(p);
     }
     else
@@ -158,7 +158,7 @@ bool repair(vector<Shell*> &shells, const vector<bool> &repairs, cbf cb)
       foundError = true;
     }
   }
-  (*cb)(STATUS_OK, -1, -1, "");
+  (*cb)(0, -1, -1, "");
   
   //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration
   bool isValid = validate_solid_with_nef(polyhedra, cb);
@@ -193,11 +193,11 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
   std::stringstream st;
   // Now let's triangulate the outer shell from the input.
   st << endl << "Triangulating outer shell";
-  (*cb)(STATUS_OK, -1, -1, st.str());
+  (*cb)(0, -1, -1, st.str());
   TrShell* tshell = new TrShell;
   if (! triangulate_one_shell(*(shells[0]), 0, *tshell, cb))
   {
-    (*cb)(STATUS_OK, -1, -1, "Could not triangulate in the outer shell.");
+    (*cb)(0, -1, -1, "Could not triangulate in the outer shell.");
     return false;
   }
   
@@ -209,16 +209,16 @@ bool triangulate_all_shells(vector<Shell*> &shells, vector<TrShell*> &trShells, 
     tshell = new TrShell;
     st.str("");
     st << "Triangulating inner shell #" << (is-1);
-    (*cb)(STATUS_OK, -1, -1, st.str());
+    (*cb)(0, -1, -1, st.str());
     if (!triangulate_one_shell(*(shells[is]), is, *tshell, cb))
     {
-      (*cb)(NOT_VALID_2_MANIFOLD, is, -1, "Could not triangulate the shell.");
+      (*cb)(300, is, -1, "Could not triangulate the shell.");
       return false;
     }
     trShells.push_back(tshell);
     tshell = NULL; // don't own this anymore
   }
-//  (*cb)(STATUS_OK, -1, -1, "");
+//  (*cb)(0, -1, -1, "");
   return true;
 }
 
@@ -234,7 +234,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     //-- read oring (there's always one and only one)
     if (numf < 1)
     {
-      (*cb)(UNKNOWN_ERROR, shellNum, -1, "surface does not have an outer boundary.");
+      (*cb)(999, shellNum, -1, "surface does not have an outer boundary.");
       return false;
     }
     vector<int> &idsob = shell.faces[i][0]; // helpful alias for the outer boundary
@@ -266,7 +266,7 @@ bool triangulate_one_shell(Shell& shell, int shellNum, TrShell& tshell, cbf cb)
     vector<int*> oneface;
     if (construct_ct(shell.lsPts, pgnids, lsRings, oneface, i) == false)
     {
-      (*cb)(UNKNOWN_ERROR, shellNum, i, "face does not have an outer boundary.");
+      (*cb)(999, shellNum, i, "face does not have an outer boundary.");
       return false;
     }
     

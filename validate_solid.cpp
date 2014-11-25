@@ -38,7 +38,7 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
   bool isValid = true;
   std::stringstream st;
   st << "Inspecting interactions between the " << polyhedra.size() << " shells";
-  (*cb)(STATUS_OK, -1, -1, st.str());
+  (*cb)(0, -1, -1, st.str());
   vector<Nef_polyhedron> nefs;
   vector<CgalPolyhedron*>::const_iterator polyhedraIt;
   for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
@@ -94,11 +94,11 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
         {
           //-- check if ishell is a subset of oshell
           if ((*nefsIt <= nefs[0]) == true)
-            (*cb)(INTERIOR_OF_SHELL_NOT_CONNECTED, 0, no, "");
+            (*cb)(404, 0, no, "");
           else
           {
-            (*cb)(SHELL_INTERIOR_INTERSECT, 0, no, "");
-            (*cb)(INTERIOR_OF_SHELL_NOT_CONNECTED, 0, no, "");
+            (*cb)(402, 0, no, "");
+            (*cb)(404, 0, no, "");
           }
         }
         else //-- solid.number_of_volumes() < 3
@@ -109,23 +109,23 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
           solid += *nefsIt;
 		  solid.regularization();
           if (solid.number_of_volumes() == 3)
-            (*cb)(INNER_SHELL_OUTSIDE_OUTER, -1, -1, "");
+            (*cb)(403, -1, -1, "");
           else
           {
             if ((*nefsIt <= nefs[0]) == true)
-              (*cb)(SHELLS_FACE_ADJACENT, 0, no, "");
+              (*cb)(401, 0, no, "");
             else
             {
               solid.clear();
               solid = nefs[0].intersection(nefsIt->interior());
-			  solid.regularization();	
+              solid.regularization();
               if (solid.is_empty() == true)
               {
-                (*cb)(SHELLS_FACE_ADJACENT, 0, no, "");
-                (*cb)(INNER_SHELL_OUTSIDE_OUTER, 0, no, "");
+                (*cb)(401, 0, no, "");
+                (*cb)(403, 0, no, "");
               }
               else
-                (*cb)(SHELL_INTERIOR_INTERSECT, 0, no, "");
+                (*cb)(402, 0, no, "");
             }
           }
         }
@@ -151,7 +151,7 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
         solid += *nefsIt2;
 		solid.regularization();
         if (solid.number_of_volumes() > 3)
-          (*cb)(SHELL_INTERIOR_INTERSECT, no, no2, "Both shells completely overlap");
+          (*cb)(402, no, no2, "Both shells completely overlap");
         else if (solid.number_of_volumes() < 3)
         {
           //-- either they are face adjacent or overlap
@@ -160,9 +160,9 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
           solid = solid.intersection(nefsIt2->interior());
 		  solid.regularization();
           if (solid.is_empty() == true)
-            (*cb)(SHELLS_FACE_ADJACENT, no, no2, "");
+            (*cb)(401, no, no2, "");
           else
-            (*cb)(SHELL_INTERIOR_INTERSECT, no, no2, "");
+            (*cb)(402, no, no2, "");
         }
         no2++;
       }

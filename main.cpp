@@ -37,16 +37,53 @@ bool XMLOUTPUT = false;
 bool bIsPolyhedron = true; //modified to false to prevent closure check for LoD0
 
 
+std::string errorcode2description(int code) {
+  switch(code)
+  {
+    case 0:   return string("STATUS_OK"); break;
+    case 101: return string("TOO_FEW_POINTS"); break;
+    case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
+    case 103: return string("RING_NOT_CLOSED"); break;
+    case 104: return string("RING_SELF_INTERSECTION"); break;
+    case 105: return string("RING_COLLAPSED"); break;
+    case 201: return string("INTERSECTION_RINGS"); break;
+    case 202: return string("DUPLICATED_RINGS"); break;
+    case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
+    case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
+    case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
+    case 206: return string("HOLE_OUTSIDE"); break;
+    case 207: return string("INNER_RINGS_NESTED"); break;
+    case 208: return string("ORIENTATION_RINGS_SAME"); break;
+    case 300: return string("NOT_VALID_2_MANIFOLD"); break;
+    case 301: return string("TOO_FEW_POLYGONS"); break;
+    case 302: return string("SHELL_NOT_CLOSED"); break;
+    case 303: return string("NON_MANIFOLD_VERTEX"); break;
+    case 304: return string("NON_MANIFOLD_EDGE"); break;
+    case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
+    case 306: return string("SHELL_SELF_INTERSECTION"); break;
+    case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
+    case 308: return string("ALL_POLYGONS_WRONG_ORIENTATION"); break;
+    case 309: return string("VERTICES_NOT_USED"); break;
+    case 401: return string("SHELLS_FACE_ADJACENT"); break;
+    case 402: return string("SHELL_INTERIOR_INTERSECT"); break;
+    case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
+    case 404: return string("INTERIOR_OF_SHELL_NOT_CONNECTED"); break;
+    case 901: return string("INVALID_INPUT_FILE"); break;
+    case 999: return string("UNKNOWN_ERROR"); break;
+    default:  return string("UNKNOWN"); break;
+  }
+}
+
+
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-void callback(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 means unknown error
+void callback(int errorCode,    // 0 means status message, -1 means unknown error
               int shellNum, // -1 means unused; 0-based
               int facetNum,     // -1 means unused; 0-based
               std::string messageStr) // optional
 {
   if ( (0 == errorCode) && (XMLOUTPUT == false) )
   {
-    // This is just a status message.
     if ( (shellNum == -1) && (facetNum == -1) )
       cout << messageStr << endl;
     else
@@ -65,39 +102,7 @@ void callback(Val3dity_ErrorCode errorCode,    // 0 means status message, -1 mea
       cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
       cout << "\t\t\t<errorType>";
     }
-    switch(errorCode)
-    {
-        //-- Ring level
-      case TOO_FEW_POINTS:                         cout << "TOO_FEW_POINTS"; break;
-      case CONSECUTIVE_POINTS_SAME:                cout << "CONSECUTIVE_POINTS_SAME"; break;
-      case RING_NOT_CLOSED:                        cout << "RING_NOT_CLOSED"; break;
-      case RING_SELF_INTERSECT:                    cout << "RING_SELF_INTERSECT"; break;
-        //-- Polygon level
-      case INTERSECTION_RINGS:                     cout << "INTERSECTION_RINGS"; break;
-      case NON_PLANAR_SURFACE:                     cout << "NON_PLANAR_SURFACE"; break;
-      case INTERIOR_DISCONNECTED:                  cout << "INTERIOR_DISCONNECTED"; break;
-      case HOLE_OUTSIDE:                           cout << "HOLE_OUTSIDE"; break;
-      case HOLES_ARE_NESTED:                       cout << "HOLES_ARE_NESTED"; break;
-      case ORIENTATION_RINGS_SAME:                 cout << "ORIENTATION_RINGS_SAME"; break;
-        //-- Shell level
-      case NOT_VALID_2_MANIFOLD:                   cout << "NOT_VALID_2_MANIFOLD"; break;
-      case SURFACE_HAS_HOLE:                       cout << "SURFACE_HAS_HOLE"; break;
-      case NON_MANIFOLD:                           cout << "NON_MANIFOLD"; break;
-      case FACE_WRONG_ORIENTATION:                 cout << "FACE_WRONG_ORIENTATION"; break;
-      case FREE_FACE:                              cout << "FREE_FACE"; break;
-      case SURFACE_SELF_INTERSECTS:                cout << "SURFACE_SELF_INTERSECTS"; break;
-      case VERTICES_NOT_USED:                      cout << "VERTICES_NOT_USED"; break;
-      case ALL_FACES_WRONG_ORIENTATION:            cout << "ALL_FACES_WRONG_ORIENTATION"; break;
-        //-- Solid level
-      case SHELLS_FACE_ADJACENT:                   cout << "SHELLS_FACE_ADJACENT"; break;
-      case SHELL_INTERIOR_INTERSECT:               cout << "SHELL_INTERIOR_INTERSECT"; break;
-      case INNER_SHELL_OUTSIDE_OUTER:              cout << "INNER_SHELL_OUTSIDE_OUTER"; break;
-      case INTERIOR_OF_SHELL_NOT_CONNECTED:        cout << "INTERIOR_OF_SHELL_NOT_CONNECTED"; break;
-        //-- Input problem
-      case INVALID_INPUT_FILE:                     cout << "INVALID_INPUT_FILE"; break;
-        //-- Other reasons
-      default:                                     cout << "UNKNOWN"; break;
-    }
+    std::cout << errorcode2description(errorCode);
     if (XMLOUTPUT == false)
       cout << endl;
     else
