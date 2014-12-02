@@ -97,7 +97,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
 bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 {
   initGEOS(NULL, NULL);
-  (*cb)(STATUS_OK, -1, -1, "Validating surface in 2D (their projection)");
+  (*cb)(0, -1, -1, "Validating surface in 2D (their projection)");
   bool isvalid = true;
   for (unsigned int is=0; is<shells.size(); is++)
   {
@@ -108,7 +108,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       //-- test for too few points (<3 for a ring)
       if (has_face_rings_with_toofewpoints(shell->faces[i]) == true)
       {
-        (*cb)(CONSECUTIVE_POINTS_SAME, is, i, "TOO FEW POINTS");
+        (*cb)(102, is, i, "TOO FEW POINTS");
         isvalid = false;
         continue;
       }
@@ -116,7 +116,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       //-- test for 2 repeated consecutive points
       if (has_face_2_consecutive_repeated_pts(shell->faces[i]) == true)
       {
-        (*cb)(CONSECUTIVE_POINTS_SAME, is, i, "");
+        (*cb)(102, is, i, "");
         isvalid = false;
         continue;
       }
@@ -147,7 +147,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 	    {
         std::ostringstream msg;
         msg << "distance to fitted plane: " << value << " (tolerance=" << TOL_PLANARITY_d2p << ")";
-        (*cb)(NON_PLANAR_SURFACE, is, i, msg.str());
+        (*cb)(203, is, i, msg.str());
 		    isvalid = false;
 		    continue;
 	    }
@@ -157,7 +157,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       vector<Polygon> lsRings;
       if (false == create_polygon(shell->lsPts, ids, pgn, false))
 	    {
-		    (*cb)(RING_SELF_INTERSECT, is, i, " outer ring self-intersects or is collapsed to a point or a line");
+		    (*cb)(104, is, i, " outer ring self-intersects or is collapsed to a point or a line");
 		    isvalid = false;
 		    continue;
 	    }
@@ -170,7 +170,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
         Polygon pgn;
         if (false == create_polygon(shell->lsPts, ids2, pgn, false))
   	    {
-  		    (*cb)(RING_SELF_INTERSECT, is, i, "Inner ring self-intersects or is collapsed to a point or a line");
+  		    (*cb)(104, is, i, "Inner ring self-intersects or is collapsed to a point or a line");
   		    isvalid = false;
   		    continue;
   	    }
@@ -190,7 +190,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
         {
           if (it->orientation() == ooring)
           {
-            (*cb)(ORIENTATION_RINGS_SAME, is, i, "same orientation for outer and inner rings");
+            (*cb)(208, is, i, "same orientation for outer and inner rings");
             isvalid = false;
             vSurface = false;
             break;
@@ -238,15 +238,15 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       {
         isvalid = false;
         if (reason.find("Self-intersection") != string::npos)
-          (*cb)(INTERSECTION_RINGS, is, i, reason.c_str());
+          (*cb)(201, is, i, reason.c_str());
         else if (reason.find("Interior is disconnected") != string::npos)
-          (*cb)(INTERIOR_DISCONNECTED, is, i, reason.c_str());
+          (*cb)(205, is, i, reason.c_str());
         else if (reason.find("Hole lies outside shell") != string::npos)
-          (*cb)(HOLE_OUTSIDE, is, i, reason.c_str());
+          (*cb)(206, is, i, reason.c_str());
         else if (reason.find("Holes are nested") != string::npos)
-          (*cb)(HOLES_ARE_NESTED, is, i, reason.c_str());
+          (*cb)(207, is, i, reason.c_str());
         else
-          (*cb)(UNKNOWN_ERROR, is, i, reason.c_str());
+          (*cb)(999, is, i, reason.c_str());
       }
       GEOSGeom_destroy( mygeom );
     }

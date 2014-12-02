@@ -9,13 +9,12 @@ Most of the details of the implementation are available in this scientific artic
 > Ledoux, Hugo (2013). On the validation of solids represented with the
 international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](http://3dgeoinfo.bk.tudelft.nl/hledoux/pdfs/_13cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
 
+
 ## How do I use val3dity?
 
 It is a command-line program, which we provide as source code, together with makefiles for Mac and Linux. 
 
-If you use Windows, you can download the following [binary](https://www.dropbox.com/s/zhfyowbbmp80y7n/3dValidator1.11.zip). It has the latest val3dity, and [citygml2poly](https://github.com/tudelft-gist/citygml2poly) is used to parse CityGML files. Java and Python must be installed on the system.
-
-The easiest way to use it is through its [web interface](http://geovalidation.bk.tudelft.nl/val3dity). It takes as input any GML file containing one or more gml:Solids.
+For Windows, we do not have binaries at this moment, but you can use the [web interface](http://geovalidation.bk.tudelft.nl/val3dity). 
 
 To compile val3dity yourself, you first need to install the free libraries [CGAL](http://www.cgal.org), [GEOS](http://trac.osgeo.org/geos/) and [CMake](http://www.cmake.org)--under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
 
@@ -26,7 +25,7 @@ To execute val3dity:
 
     $ ./val3dity outershell.poly innershell1.poly innershell2.poly
     
-Each shell of the solid must be modelled with a [POLY](http://tetgen.berlios.de/fformats.poly.html) file, the first argument is always the outer shell, and the others are inner shells. If you want to read CityGML files as input, have a look at [citygml2poly](https://github.com/tudelft-gist/citygml2poly).
+Each shell of the solid must be represented with a [POLY](http://tetgen.berlios.de/fformats.poly.html) file; the first argument is always the outer shell, and the others are inner shells. 
 
 There can be 0 or an infinity of inner shells, their order is not important.
 For instance, to validate a solid having only one outer shell (it's a unit cube):
@@ -34,9 +33,9 @@ For instance, to validate a solid having only one outer shell (it's a unit cube)
 ```  
 $ ./val3dity data/poly/cube.poly
 Reading 1 file(s).
-Reading outer shell:	data/poly/cube.poly
+Reading outer shell:  data/poly/cube.poly
 
-Validating surface in 2D with GEOS (their projection)
+Validating surface in 2D (their projection)
 -----all valid
 
 Triangulating outer shell
@@ -44,28 +43,53 @@ Triangulating outer shell
 
 Validating shell #0
 -----Planarity
-	yes
+  yes
 -----Combinatorial consistency
-	yes
+  yes
 -----Geometrical consistency
-	yes
+  yes
 -----Orientation of normals
-	yes
+  yes
 Shell #0 valid
 
-Valid solid. Hourrraaa!
+Valid solid :)
+```
+
+An example where an error is found is as follows (`cube3.poly` is a unit cube with hole in the top polygon):
+
+```
+$ ./val3dity data/poly/cube3.poly 
+Reading 1 file(s).
+Reading outer shell:  data/poly/cube3.poly
+
+Validating surface in 2D (their projection)
+-----all valid
+
+Triangulating outer shell
+-----done
+
+Validating shell #0
+-----Planarity
+  yes
+-----Combinatorial consistency
+Error #302 SHELL_NOT_CLOSED
+  [shell: #1; face: #-1]
+  Location hole: 0.2 0.8 1
+
+Invalid solid :(
 ```
 
 And to validate a solid with one outer shell and 2 inner shells:
 
 ```
-$ ./val3dity data/poly/cube.poly data/poly/py1.poly data/poly/py7.poly
+$ ./val3dity data/poly/cube.poly data/poly/py1.poly data/poly/py7
+.poly
 Reading 3 file(s).
-Reading outer shell:	data/poly/cube.poly
-Reading inner shell #0:	data/poly/py1.poly
-Reading inner shell #1:	data/poly/py7.poly
+Reading outer shell:  data/poly/cube.poly
+Reading inner shell #0: data/poly/py1.poly
+Reading inner shell #1: data/poly/py7.poly
 
-Validating surface in 2D with GEOS (their projection)
+Validating surface in 2D (their projection)
 -----all valid
 
 Triangulating outer shell
@@ -75,78 +99,89 @@ Triangulating inner shell #1
 
 Validating shell #0
 -----Planarity
-	yes
+  yes
 -----Combinatorial consistency
-	yes
+  yes
 -----Geometrical consistency
-	yes
+  yes
 -----Orientation of normals
-	yes
+  yes
 Shell #0 valid
 
 Validating shell #1
 -----Planarity
-	yes
+  yes
 -----Combinatorial consistency
-	yes
+  yes
 -----Geometrical consistency
-	yes
+  yes
 -----Orientation of normals
-	yes
+  yes
 Shell #1 valid
 
 Validating shell #2
 -----Planarity
-	yes
+  yes
 -----Combinatorial consistency
-	yes
+  yes
 -----Geometrical consistency
-	yes
+  yes
 -----Orientation of normals
-	yes
+  yes
 Shell #2 valid
 
 Inspecting interactions between the 3 shells
-Error 400: shells are face adjacent
-	[shell: #1; face: #2]
+Error #402 INTERSECTION_SHELLS
+  [shell: #2; face: #3]
 
 Invalid solid :(
 ```
 
 
+# GML/CityGML input?
+
+Yes it's possible: the script `ressources/python/gml2poly/val3dity.py` allows you to read a GML file and validate it. Not all bells and whistles of GML have been implemented, but `xlinks` are supported for the most common use (no resolving of URLs though).
+
+
+# Web-application
+
+If you're running Windows and/or you don't want to go through the troubles of compiling, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). It takes as input a GML file (of any flavour, including CityGML for instance) containing one or more `gml:Solids`.
+
+
 # Error reported 
 
-## Ring level ##
+## RING level ##
 
-  * 100: TOO_FEW_POINTS
-  * 110: CONSECUTIVE_POINTS_SAME   
-  * 120: RING_NOT_CLOSED   
-  * 130: RING_SELF_INTERSECT
+  * 101: TOO_FEW_POINTS
+  * 102: CONSECUTIVE_POINTS_SAME
+  * 103: RING_NOT_CLOSED
+  * 104: RING_SELF_INTERSECTION
+  * 105: RING_COLLAPSED
 
-## Surface level ##
+## POLYGON level
+  * 201: INTERSECTION_RINGS
+  * 202: DUPLICATED_RINGS
+  * 203: NON_PLANAR_POLYGON_DISTANCE_PLANE
+  * 204: NON_PLANAR_POLYGON_NORMALS_DEVIATION
+  * 205: POLYGON_INTERIOR_DISCONNECTED
+  * 206: HOLE_OUTSIDE
+  * 207: INNER_RINGS_NESTED
+  * 208: ORIENTATION_RINGS_SAME
 
-  * 200: INTERSECTION_RINGS  
-  * 210: NON_PLANAR_SURFACE                     
-  * 220: INTERIOR_DISCONNECTED
-  * 230: HOLE_OUTSIDE
-  * 240: HOLES_ARE_NESTED                      
-  * 250: ORIENTATION_RINGS_SAME
-
-## Shell level ##
-
+## SHELL level
   * 300: NOT_VALID_2_MANIFOLD
-    * 301: SURFACE_HAS_HOLE                     
-    * 302: NON_MANIFOLD                         
-    * 303: FACE_WRONG_ORIENTATION  
-    * 304: FREE_FACE                             
-    * 305: SURFACE_SELF_INTERSECTS                
-    * 306: VERTICES_NOT_USED                      
-  * 310: ALL_FACES_WRONG_ORIENTATION      
+  * 301: TOO_FEW_POLYGONS
+  * 302: SHELL_NOT_CLOSED
+  * 303: NON_MANIFOLD_VERTEX
+  * 304: NON_MANIFOLD_EDGE
+  * 305: MULTIPLE_CONNECTED_COMPONENTS
+  * 306: SHELL_SELF_INTERSECTION
+  * 307: POLYGON_WRONG_ORIENTATION
+  * 308: ALL_POLYGONS_WRONG_ORIENTATION
+  * 309: VERTICES_NOT_USED
 
-## Solid level
-
-  * 400: SHELLS_FACE_ADJACENT                   
-  * 410: SHELL_INTERIOR_INTERSECT               
-  * 420: INNER_SHELL_OUTSIDE_OUTER              
-  * 430: INTERIOR_OF_SHELL_NOT_CONNECTED        
-  
+## SOLID level
+  * 401: SHELLS_FACE_ADJACENT
+  * 402: INTERSECTION_SHELLS
+  * 403: INNER_SHELL_OUTSIDE_OUTER
+  * 404: SOLID_INTERIOR_DISCONNECTED

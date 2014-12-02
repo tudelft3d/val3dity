@@ -160,7 +160,7 @@ is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
     else if (assign(apoint, re))
      st << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
     //    st << "At least at location: (" << gTriangles[0][0].x() << ", " << gTriangles[0][0].y() << ", " << gTriangles[0][0].z() << ")"; 
-    (*cb)(SURFACE_SELF_INTERSECTS, shellID, -1, st.str());
+    (*cb)(306, shellID, -1, st.str());
     return false;
   }
 }

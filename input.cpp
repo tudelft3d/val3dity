@@ -35,15 +35,15 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
 {
   std::stringstream st;
   st << "Reading " << arguments.size() << " file(s).";
-  (*cb)(STATUS_OK, -1, -1, st.str());
+  (*cb)(0, -1, -1, st.str());
   
   st.str(""); //-- clear what's in st
   st << "Reading outer shell:\t" << arguments[0];
-  (*cb)(STATUS_OK, -1, -1, st.str());
+  (*cb)(0, -1, -1, st.str());
   ifstream infile(arguments[0].c_str(), ifstream::in);
   if (!infile)
   {
-    (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+    (*cb)(901, -1, -1, "Input file doesn't exist.");
     return;
   }
   
@@ -62,11 +62,11 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
     st.str("");
     st << "Reading inner shell #" << i << ":\t" << *it;
     i++;
-    (*cb)(STATUS_OK, -1, -1, st.str());
+    (*cb)(0, -1, -1, st.str());
     ifstream infile2(it->c_str(), ifstream::in);
     if (!infile2)
     {
-      (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+      (*cb)(901, -1, -1, "Input file doesn't exist.");
       return;
     }
     
@@ -78,22 +78,22 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
     shells.push_back(oneshell);
     oneshell = NULL; // don't own this anymore
   }
-  (*cb)(STATUS_OK, -1, -1, "");
+  (*cb)(0, -1, -1, "");
 }
 
 void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf cb, bool translatevertices)
 {
   std::stringstream st;
   st << "Reading " << arguments.size() << " file(s).";
-  (*cb)(STATUS_OK, -1, -1, st.str());
+  (*cb)(0, -1, -1, st.str());
   
   st.str(""); //-- clear what's in st
   st << "Reading outer shell:\t" << arguments[0];
-  (*cb)(STATUS_OK, -1, -1, st.str());
+  (*cb)(0, -1, -1, st.str());
   ifstream infile(arguments[0].c_str(), ifstream::in);
   if (!infile)
   {
-    (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+    (*cb)(901, -1, -1, "Input file doesn't exist.");
     return;
   }
   
@@ -114,11 +114,11 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
     st.str("");
     st << "Reading inner shell #" << i << ":\t" << *it;
     i++;
-    (*cb)(STATUS_OK, -1, -1, st.str());
+    (*cb)(0, -1, -1, st.str());
     ifstream infile2(it->c_str(), ifstream::in);
     if (!infile2)
     {
-      (*cb)(INVALID_INPUT_FILE, -1, -1, "Input file doesn't exist.");
+      (*cb)(901, -1, -1, "Input file doesn't exist.");
       return;
     }
     
@@ -131,7 +131,7 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
     shells.push_back(oneshell);
     oneshell = NULL; // don't own this anymore
   }
-  (*cb)(STATUS_OK, -1, -1, "");
+  (*cb)(0, -1, -1, "");
 }
   
  
@@ -185,7 +185,7 @@ void readShell(ifstream& infile, Shell &oneshell, int noshell, cbf cb, bool tran
     //-- read oring (there's always one and only one)
     infile >> numpt;
     if (numpt == -1) {
-      (*cb)(RING_NOT_CLOSED, noshell, i, "");
+      (*cb)(103, noshell, i, "");
       continue;
     }
     vector<int> ids(numpt);
@@ -205,7 +205,7 @@ void readShell(ifstream& infile, Shell &oneshell, int noshell, cbf cb, bool tran
     {
       infile >> numpt;
       if (numpt == -1) {
-        (*cb)(RING_NOT_CLOSED, noshell, i, "");
+        (*cb)(103, noshell, i, "");
         continue;
       }
       vector<int> ids(numpt);
