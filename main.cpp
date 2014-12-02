@@ -34,43 +34,90 @@ vector<string> idShells;
 vector< vector<string> > idFaces;
 bool bUsingIDs = false;
 bool XMLOUTPUT = false;
+//-- error codes from the OGC CityGML QIE (https://portal.opengeospatial.org/wiki/CityGMLqIE/WebHome)
+bool QIECODES = true;
+
 bool bIsPolyhedron = true; //modified to false to prevent closure check for LoD0
 
 
-std::string errorcode2description(int code) {
-  switch(code)
-  {
-    case 0:   return string("STATUS_OK"); break;
-    case 101: return string("TOO_FEW_POINTS"); break;
-    case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
-    case 103: return string("RING_NOT_CLOSED"); break;
-    case 104: return string("RING_SELF_INTERSECTION"); break;
-    case 105: return string("RING_COLLAPSED"); break;
-    case 201: return string("INTERSECTION_RINGS"); break;
-    case 202: return string("DUPLICATED_RINGS"); break;
-    case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
-    case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
-    case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
-    case 206: return string("HOLE_OUTSIDE"); break;
-    case 207: return string("INNER_RINGS_NESTED"); break;
-    case 208: return string("ORIENTATION_RINGS_SAME"); break;
-    case 300: return string("NOT_VALID_2_MANIFOLD"); break;
-    case 301: return string("TOO_FEW_POLYGONS"); break;
-    case 302: return string("SHELL_NOT_CLOSED"); break;
-    case 303: return string("NON_MANIFOLD_VERTEX"); break;
-    case 304: return string("NON_MANIFOLD_EDGE"); break;
-    case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
-    case 306: return string("SHELL_SELF_INTERSECTION"); break;
-    case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
-    case 308: return string("ALL_POLYGONS_WRONG_ORIENTATION"); break;
-    case 309: return string("VERTICES_NOT_USED"); break;
-    case 401: return string("SHELLS_FACE_ADJACENT"); break;
-    case 402: return string("SHELL_INTERIOR_INTERSECT"); break;
-    case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
-    case 404: return string("INTERIOR_OF_SHELL_NOT_CONNECTED"); break;
-    case 901: return string("INVALID_INPUT_FILE"); break;
-    case 999: return string("UNKNOWN_ERROR"); break;
-    default:  return string("UNKNOWN"); break;
+std::string errorcode2description(int code, bool qie) {
+  if (qie == false) {
+    switch(code)
+    {
+      case 0:   return string("STATUS_OK"); break;
+      //-- RING
+      case 101: return string("TOO_FEW_POINTS"); break;
+      case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
+      case 103: return string("RING_NOT_CLOSED"); break;
+      case 104: return string("RING_SELF_INTERSECTION"); break;
+      case 105: return string("RING_COLLAPSED"); break;
+      //-- POLYGON
+      case 201: return string("INTERSECTION_RINGS"); break;
+      case 202: return string("DUPLICATED_RINGS"); break;
+      case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
+      case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
+      case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
+      case 206: return string("HOLE_OUTSIDE"); break;
+      case 207: return string("INNER_RINGS_NESTED"); break;
+      case 208: return string("ORIENTATION_RINGS_SAME"); break;
+      //-- SHELL
+      case 300: return string("NOT_VALID_2_MANIFOLD"); break;
+      case 301: return string("TOO_FEW_POLYGONS"); break;
+      case 302: return string("SHELL_NOT_CLOSED"); break;
+      case 303: return string("NON_MANIFOLD_VERTEX"); break;
+      case 304: return string("NON_MANIFOLD_EDGE"); break;
+      case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
+      case 306: return string("SHELL_SELF_INTERSECTION"); break;
+      case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
+      case 308: return string("ALL_POLYGONS_WRONG_ORIENTATION"); break;
+      case 309: return string("VERTICES_NOT_USED"); break;
+      //--SOLID
+      case 401: return string("SHELLS_FACE_ADJACENT"); break;
+      case 402: return string("INTERSECTION_SHELLS"); break;
+      case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
+      case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
+      case 901: return string("INVALID_INPUT_FILE"); break;
+      case 999: return string("UNKNOWN_ERROR"); break;
+      default:  return string("UNKNOWN_ERROR"); break;
+    }
+  }
+  else { //-- return QIE error codes
+    switch(code)
+    {
+      case 0:   return string("STATUS_OK"); break;
+      //-- RING
+      case 101: return string("GE_R_TOO_FEW_POINTS"); break;
+      case 102: return string("GE_R_CONSECUTIVE_POINTS_SAME"); break;
+      case 103: return string("GE_R_NOT_CLOSED"); break;
+      case 104: return string("GE_R_SELF_INTERSECTION"); break;
+      case 105: return string("GE_R_COLLAPSED"); break;
+      //-- POLYGON
+      case 201: return string("GE_P_INTERSECTION_RINGS"); break;
+      case 202: return string("GE_P_DUPLICATED_RINGS"); break;
+      case 203: return string("GE_P_NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
+      case 204: return string("GE_P_NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
+      case 205: return string("GE_P_INTERIOR_DISCONNECTED"); break;
+      case 206: return string("GE_P_HOLE_OUTSIDE"); break;
+      case 207: return string("GE_P_INNER_RINGS_NESTED"); break;
+      case 208: return string("GE_P_ORIENTATION_RINGS_SAME"); break;
+      //-- SHELL
+      case 301: return string("GE_S_TOO_FEW_POLYGONS"); break;
+      case 302: return string("GE_S_NOT_CLOSED"); break;
+      case 303: return string("GE_S_NON_MANIFOLD_VERTEX"); break;
+      case 304: return string("GE_S_NON_MANIFOLD_EDGE"); break;
+      case 305: return string("GE_S_MULTIPLE_CONNECTED_COMPONENTS"); break;
+      case 306: return string("GE_S_SELF_INTERSECTION"); break;
+      case 307: return string("GE_S_POLYGON_WRONG_ORIENTATION"); break;
+      case 308: return string("GE_S_ALL_POLYGONS_WRONG_ORIENTATION"); break;
+      //--SOLID
+      case 401: return string("GE_SO_SHELLS_FACE_ADJACENT"); break;
+      case 402: return string("GE_SO_INTERSECTION_SHELLS"); break;
+      case 403: return string("GE_SO_INNER_SHELL_OUTSIDE_OUTER"); break;
+      case 404: return string("GE_SO_INTERIOR_DISCONNECTED"); break;
+      case 901: return string("INVALID_INPUT_FILE"); break;
+      case 999: return string("UNKNOWN_ERROR"); break;
+      default:  return string("UNKNOWN_ERROR"); break;
+    }
   }
 }
 
@@ -102,7 +149,7 @@ void callback(int errorCode,    // 0 means status message, -1 means unknown erro
       cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
       cout << "\t\t\t<errorType>";
     }
-    std::cout << errorcode2description(errorCode);
+    std::cout << errorcode2description(errorCode, QIECODES);
     if (XMLOUTPUT == false)
       cout << endl;
     else
@@ -162,7 +209,6 @@ int main(int argc, char* const argv[])
   bool   TRANSLATE             = true;
   double TOL_PLANARITY_d2p     = 0.01;  //-- default: 1cm 
   double TOL_PLANARITY_normals = 1.0;   //-- default: 1.0 degree
-  
   bool ONLYSURFACES            = false;
   
   bool bRepair = false;
@@ -196,6 +242,8 @@ int main(int argc, char* const argv[])
     if (strcmp(argv[argNum], "-xml") == 0) {
       XMLOUTPUT = true;
     }
+    else if (strcmp(argv[argNum], "-qie") == 0)
+      QIECODES = true;
     else if (strcmp(argv[argNum], "-onlysurfaces") == 0)
       ONLYSURFACES = true;
     else if (strcmp(argv[argNum], "-withids") == 0)
