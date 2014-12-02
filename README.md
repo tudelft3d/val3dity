@@ -52,7 +52,6 @@ Validating shell #0
   yes
 Shell #0 valid
 
-
 Valid solid :)
 ```
 
@@ -77,10 +76,8 @@ Error #302 SHELL_NOT_CLOSED
   [shell: #1; face: #-1]
   Location hole: 0.2 0.8 1
 
-
 Invalid solid :(
 ``
-
 
 And to validate a solid with one outer shell and 2 inner shells:
 
