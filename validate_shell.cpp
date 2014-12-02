@@ -696,7 +696,6 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 		{
 			AABBTree::Object_and_primitive_id op = *listItr;
 			CGAL::Object obj = op.first;
-			CgalPolyhedron::Face_handle face = op.second;
 			Point3 pt;
 			if (CGAL::assign(pt, obj))
 			{
