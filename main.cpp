@@ -35,9 +35,7 @@ vector< vector<string> > idFaces;
 bool bUsingIDs = false;
 bool XMLOUTPUT = false;
 //-- error codes from the OGC CityGML QIE (https://portal.opengeospatial.org/wiki/CityGMLqIE/WebHome)
-bool QIECODES = true;
-
-bool bIsPolyhedron = true; //modified to false to prevent closure check for LoD0
+bool USEQIECODES = false;
 
 
 std::string errorcode2description(int code, bool qie) {
@@ -149,7 +147,7 @@ void callback(int errorCode,    // 0 means status message, -1 means unknown erro
       cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
       cout << "\t\t\t<errorType>";
     }
-    std::cout << errorcode2description(errorCode, QIECODES);
+    std::cout << errorcode2description(errorCode, USEQIECODES);
     if (XMLOUTPUT == false)
       cout << endl;
     else
@@ -243,7 +241,7 @@ int main(int argc, char* const argv[])
       XMLOUTPUT = true;
     }
     else if (strcmp(argv[argNum], "-qie") == 0)
-      QIECODES = true;
+      USEQIECODES = true;
     else if (strcmp(argv[argNum], "-onlysurfaces") == 0)
       ONLYSURFACES = true;
     else if (strcmp(argv[argNum], "-withids") == 0)
