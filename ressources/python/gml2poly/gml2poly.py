@@ -82,15 +82,17 @@ def process(fIn, tempfolder, multisurface, snap_tolerance = '1e-3'):
             nodes = root.findall(".//{%s}surfaceMember[@{%s}href]" % (ns['gml'], ns['xlink']))
             if nodes is not None:
                 print "There are %d xlinks for gml:surfaceMember" % len(nodes)
+                # get all polygons with an id
+                allp = {}
+                for n in root.findall(".//{%s}Polygon[@{%s}id]" % (ns['gml'], ns['gml'])):
+                    allp[n.attrib["{%s}id" % ns['gml']]] = n
+                    
                 for node in nodes:
                     x = node.attrib["{%s}href" % ns['xlink']]
                     if x[0] == '#':
                         x = x[1:]
-                    for n in root.findall(".//{%s}Polygon[@{%s}id]" % (ns['gml'], ns['gml'])):
-                        if n.attrib["{%s}id" % ns['gml']] == x:
-                            dxlinks[x] = n
-                            break
-            print "dico of xlinks", len(dxlinks)
+                    dxlinks[x] = allp[x]
+            print "Resolved successfully", len(dxlinks), "xlinks."
         else:
             dxlinks = None
 
@@ -106,12 +108,15 @@ def process(fIn, tempfolder, multisurface, snap_tolerance = '1e-3'):
                 write_shell_to_file_poly(gmlid, ms, 0)
             print "Number of POLY files created:", msid-1
         else:
+            print "Extracting geometries to POLY files"
             solidid = 1
             for solid in root.findall(".//{%s}Solid" % ns['gml']):
                 gmlid = solid.get("{%s}id" % ns['gml'])
                 if gmlid == None:
                     gmlid = str(solidid)
                 solidid += 1
+                if solidid % 10 == 0:
+                    print solidid
                 shells = [Shell(solid.find("{%s}exterior" % ns['gml']), dxlinks, ns)]
                 for ishellnode in solid.findall("{%s}interior" % ns['gml']):
                     shells.append(Shell(ishellnode, dxlinks, ns))
