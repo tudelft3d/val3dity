@@ -363,17 +363,25 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
 {
   bool isValid = true;
   CgalPolyhedron *P = new CgalPolyhedron;
-//  CgalPolyhedron *p2 = NULL;
+
+  //-- 0. minimum number of faces = 4
+  if (tshell.faces.size() <= 5) {
+    (*cb)(301, shellID, -1, "");
+    isValid = false;
+  }
 
 //-- 1. Planarity of faces
-  (*cb)(0, -1, -1, "-----Planarity");
-  if (check_planarity_normals(tshell.faces, tshell.lsPts, shellID, cb, TOL_PLANARITY_normals) == false)
+  if (isValid == true) 
   {
-    isValid = false;
-    //(*cb)(0, -1, -1, "\tno");
+    (*cb)(0, -1, -1, "-----Planarity");
+    if (check_planarity_normals(tshell.faces, tshell.lsPts, shellID, cb, TOL_PLANARITY_normals) == false)
+    {
+      isValid = false;
+      //(*cb)(0, -1, -1, "\tno");
+    }
+    else
+      (*cb)(0, -1, -1, "\tyes");
   }
-  else
-    (*cb)(0, -1, -1, "\tyes");
     
   
 //-- 2. Combinatorial consistency
