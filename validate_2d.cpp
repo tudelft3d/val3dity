@@ -108,7 +108,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       //-- test for too few points (<3 for a ring)
       if (has_face_rings_with_toofewpoints(shell->faces[i]) == true)
       {
-        (*cb)(102, is, i, "TOO FEW POINTS");
+        (*cb)(101, is, i, "");
         isvalid = false;
         continue;
       }
@@ -239,6 +239,8 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
         isvalid = false;
         if (reason.find("Self-intersection") != string::npos)
           (*cb)(201, is, i, reason.c_str());
+        else if (reason.find("Duplicate Rings") != string::npos)
+          (*cb)(202, is, i, reason.c_str());
         else if (reason.find("Interior is disconnected") != string::npos)
           (*cb)(205, is, i, reason.c_str());
         else if (reason.find("Hole lies outside shell") != string::npos)
