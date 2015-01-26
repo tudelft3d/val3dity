@@ -437,7 +437,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
         {
           if (P->keep_largest_connected_components(1) > 0) 
           {
-            (*cb)(300, shellID, -1, "More than one connected components.");
+            (*cb)(305, shellID, -1, "More than one connected components.");
             isValid = false;
           }
         }
