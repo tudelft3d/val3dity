@@ -365,7 +365,7 @@ CgalPolyhedron* validate_triangulated_shell(TrShell& tshell, int shellID, cbf cb
   CgalPolyhedron *P = new CgalPolyhedron;
 
   //-- 0. minimum number of faces = 4
-  if (tshell.faces.size() <= 5) {
+  if (tshell.faces.size() <= 4) {
     (*cb)(301, shellID, -1, "");
     isValid = false;
   }
