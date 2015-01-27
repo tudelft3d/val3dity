@@ -32,7 +32,7 @@
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
 bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface);
-bool has_face_rings_with_toofewpoints(const vector< vector<int> >& theface);
+bool has_face_rings_toofewpoints(const vector< vector<int> >& theface);
 
 
 bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
@@ -56,7 +56,7 @@ bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
   return bDuplicates;
 }
 
-bool has_face_rings_with_toofewpoints(const vector< vector<int> >& theface)
+bool has_face_rings_toofewpoints(const vector< vector<int> >& theface)
 {
   bool bErrors = false;
   vector< vector<int> >::const_iterator itr = theface.begin();
@@ -73,10 +73,15 @@ bool has_face_rings_with_toofewpoints(const vector< vector<int> >& theface)
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
 {
+  if (pts.size() == 3) {
+    return true;
+  }
   //-- find a fitted plane with least-square adjustment
   CgalPolyhedron::Plane_3 plane;
-  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>());
-  
+  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>());  
+//  std::cout << plane << std::endl;
+//  std::cout << "deg:" << plane.is_degenerate() << std::endl;
+
   //-- test distance to that plane for each point
   vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
@@ -106,7 +111,7 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
     for (int i = 0; i < static_cast<int>(num); i++)
     {
       //-- test for too few points (<3 for a ring)
-      if (has_face_rings_with_toofewpoints(shell->faces[i]) == true)
+      if (has_face_rings_toofewpoints(shell->faces[i]) == true)
       {
         (*cb)(101, is, i, "");
         isvalid = false;
