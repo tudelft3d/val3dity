@@ -201,7 +201,7 @@ void callback(int errorCode,    // 0 means status message, -1 means unknown erro
 int main(int argc, char* const argv[])
 {
 #ifdef VAL3DITY_USE_EPECSQRT
-  std::cout << "USING EXACT-EXACT" << std::endl;
+  std::cout << "***** USING EXACT-EXACT *****" << std::endl;
 #endif
 
   bool   TRANSLATE             = true;
