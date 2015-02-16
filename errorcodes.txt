@@ -3,9 +3,9 @@
 
   * 101: TOO_FEW_POINTS (<3 points)
   * 102: CONSECUTIVE_POINTS_SAME (2 consecutive points are the same)           
-  * 103: NOT_CLOSED (first-last points are not the same)            
+  * 103: NOT_CLOSED (first-last points are not the same---only for GML input)            
   * 104: SELF_INTERSECTION (self-intersects, ie a bowtie)
-  * 105: COLLAPSED (is point or line)       
+  * 105: COLLAPSED_TO_LINE
 
 
 ## POLYGON level
