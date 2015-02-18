@@ -1,40 +1,41 @@
 
 ## Ring level
 
-  * 101: TOO_FEW_POINTS (<3 points)
-  * 102: CONSECUTIVE_POINTS_SAME (2 consecutive points are the same)           
-  * 103: NOT_CLOSED (first-last points are not the same---only for GML input)            
-  * 104: SELF_INTERSECTION (self-intersects, ie a bowtie)
+  * 101: TOO_FEW_POINTS
+  * 102: CONSECUTIVE_POINTS_SAME
+  * 103: NOT_CLOSED
+  * 104: SELF_INTERSECTION 
   * 105: COLLAPSED_TO_LINE
 
 
 ## POLYGON level
 
-  * 201: INTERSECTION_RINGS (2+ rings intersect)       
-  * 202: DUPLICATED_RINGS (2+ rings identical)       
-  * 203: NON_PLANAR_POLYGON_DISTANCE_PLANE  (w.r.t. tolerance)      
-  * 204: NON_PLANAR_POLYGON_NORMALS_DEVIATION  (w.r.t. tolerance)      
-  * 205: INTERIOR_DISCONNECTED (interior is not connected)     
-  * 206: HOLE_OUTSIDE (1 or more interior rings are located outside the exterior ring)             
-  * 207: INNER_RINGS_NESTED (interior ring is located inside other)         
-  * 208: ORIENTATION_RINGS_SAME (exterior and interior rings have same orientation)   
+  * 201: INTERSECTION_RINGS
+  * 202: DUPLICATED_RINGS
+  * 203: NON_PLANAR_POLYGON_DISTANCE_PLANE 
+  * 204: NON_PLANAR_POLYGON_NORMALS_DEVIATION 
+  * 205: INTERIOR_DISCONNECTED
+  * 206: HOLE_OUTSIDE
+  * 207: INNER_RINGS_NESTED
+  * 208: ORIENTATION_RINGS_SAME
 
 
 ## SHELL level
 
-  * 301: TOO_FEW_POLYGONS (<4 polygons)
-  * 302: NOT_CLOSED (there is 1+ hole(s) on the surface)          
+  * 301: TOO_FEW_POLYGONS
+  * 302: NOT_CLOSED
   * 303: NON_MANIFOLD_VERTEX
   * 304: NON_MANIFOLD_EDGE 
-  * 305: MULTIPLE_CONNECTED_COMPONENTS (1+ polygons not connected to main shell)
+  * 305: MULTIPLE_CONNECTED_COMPONENTS
   * 306: SELF_INTERSECTION
-  * 307: POLYGON_WRONG_ORIENTATION (orientation of a polygon not correct)
-  * 308: ALL_POLYGONS_WRONG_ORIENTATION (normals all pointing in wrong direction)       
+  * 307: POLYGON_WRONG_ORIENTATION
+  * 308: ALL_POLYGONS_WRONG_ORIENTATION
+  * 309: VERTICES_NOT_USED 
 
 
-## SOLID level (1 exterior shell + [0..*n*] interior shells)
+## SOLID level
 
-  * 400:  SHELLS_FACE_ADJACENT (2+ shells are face adjacent)
-  * 410:  SHELL_INTERIOR_INTERSECT (2+ shell overlap) 
-  * 420:  INNER_SHELL_OUTSIDE_OUTER (1+ interior shell is located totally outside the exterior shell)
-  * 430:  INTERIOR_OF_SHELL_NOT_CONNECTED (interior of the solid not connected)
+  * 401:  SHELLS_FACE_ADJACENT
+  * 402:  SHELL_INTERIOR_INTERSECT
+  * 403:  INNER_SHELL_OUTSIDE_OUTER
+  * 404:  INTERIOR_OF_SHELL_NOT_CONNECTED
