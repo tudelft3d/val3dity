@@ -36,8 +36,8 @@ def processoneshell(s, exterior=True):
     oring.pop(0)
     poly = []
     for each in oring:
-      poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + str(lsPts[each][0]) + " " + str(lsPts[each][1]) + " " + str(lsPts[each][2])  + '</gml:pos>')
-    poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + str(lsPts[oring[0]][0]) + " " + str(lsPts[oring[0]][1]) + " " + str(lsPts[oring[0]][2])  + '</gml:pos>')
+      poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + "{:f}".format(lsPts[each][0]) + " " + "{:f}".format(lsPts[each][1]) + " " + "{:f}".format(lsPts[each][2])  + '</gml:pos>')
+    poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + "{:f}".format(lsPts[oring[0]][0]) + " " + "{:f}".format(lsPts[oring[0]][1]) + " " + "{:f}".format(lsPts[oring[0]][2])  + '</gml:pos>')
     print "\n".join(poly)
     print '\t\t\t\t\t\t\t\t\t\t</gml:LinearRing>'
     print '\t\t\t\t\t\t\t\t\t</gml:exterior>'    
@@ -50,8 +50,8 @@ def processoneshell(s, exterior=True):
         iring.pop(0)
         poly = []
         for each in iring:
-          poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + str(lsPts[each][0]) + " " + str(lsPts[each][1]) + " " + str(lsPts[each][2])  + '</gml:pos>')
-        poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + str(lsPts[iring[0]][0]) + " " + str(lsPts[iring[0]][1]) + " " + str(lsPts[iring[0]][2])  + '</gml:pos>')
+          poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + "{:f}".format(lsPts[each][0]) + " " + "{:f}".format(lsPts[each][1]) + " " + "{:f}".format(lsPts[each][2])  + '</gml:pos>')
+        poly.append('\t\t\t\t\t\t\t\t\t\t\t<gml:pos>' + "{:f}".format(lsPts[iring[0]][0]) + " " + "{:f}".format(lsPts[iring[0]][1]) + " " + "{:f}".format(lsPts[iring[0]][2])  + '</gml:pos>')
         print "\n".join(poly)
         print '\t\t\t\t\t\t\t\t\t\t</gml:LinearRing>'
         print '\t\t\t\t\t\t\t\t\t</gml:interior>'

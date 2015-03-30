@@ -37,11 +37,11 @@ class Point:
     def __repr__(self):
         return str(self.x) + " " + str(self.y) + " " + str(self.z)
     def str_poly(self):
-        return str(self.id) + " " + str(self.x) + " " + str(self.y) + " " + str(self.z)
+        return str(self.id) + " " + "{:f}".format(self.x) + " " + "{:f}".format(self.y) + " " + "{:f}".format(self.z)
     def str_off(self):
-        return str(self.x) + " " + str(self.y) + " " + str(self.z)
+        return "{:f}".format(self.x) + " " + "{:f}".format(self.y) + " " + "{:f}".format(self.z)
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.z)
+        return "{:f}".format(self.x) + "," + "{:f}".format(self.y) + "," + "{:f}".format(self.z)
     def __getitem__(self, index):
         if index < 0 or index > 2:
             raise Exception("out of bound for Point access.")
