@@ -82,12 +82,12 @@ typedef struct triangulatedShell_tag {
    vector< vector<int*> > faces;
 } TrShell;
 
-// typedef enum
-// {
-//    SOLID          = 0,
-//    COMPOSITESOLID = 1,
-//    MULTISOLID     = 2,
-// } Primitive_to_validate;
+typedef enum
+{
+   SOLID          = 0,
+   COMPOSITESOLID = 1,
+   MULTISOLID     = 2,
+} Primitives3D;
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.

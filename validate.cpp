@@ -36,19 +36,19 @@ bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >&
 
 //--------------------------------------------------------------
 
-bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double TOL_PLANARITY_normals, bool multisurfaces)
+bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double TOL_PLANARITY_normals, Primitives3D prim3d)
 {
   bool foundError(false);
   
 //-- FIRST: 2D validation of projected polygons (with GEOS)
   if (! validate_2D(shells, cb, TOL_PLANARITY_d2p))
     return false;
-  else {
-    (*cb)(0, -1, -1, "-----all valid");
-    if (multisurfaces == true) {
-      return true;
-    }
-  }
+  // else {
+  //   (*cb)(0, -1, -1, "-----all valid");
+  //   if (multisurfaces == true) {
+  //     return true;
+  //   }
+  // }
   
 //-- SECOND: triangulate every shell 
   vector<TrShell*> trShells;
