@@ -75,11 +75,11 @@ This ring is for instance invalid:
 
 | 203: NON_PLANAR_POLYGON_DISTANCE_PLANE |
 |:--- |
-| A polygon must be planar, ie all its points (used for both the exterior and interior rings) must lie on a plane. To verify this, we must ensure that the the distance between every point and a plane is less than $$\epsilon_1$$, a given *tolerance* (eg 1cm). This plane should be a plane fitted with least-square adjustment. |
+| A polygon must be planar, ie all its points (used for both the exterior and interior rings) must lie on a plane. To verify this, we must ensure that the the distance between every point and a plane is less than a given *tolerance* (eg 1cm). This plane should be a plane fitted with least-square adjustment. |
 
 | 204: NON_PLANAR_POLYGON_NORMALS_DEVIATION |
 |:--- |
-| To ensure that cases such as that below are detected (the top polygon is clearly non-planar, but would not be detected with 203 and a tolerance of 1cm for instance) , another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinaisons of 3 non-colinear points is less than $$\epsilon_1$$. In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain usef-defined tolerance $$\epsilon_2$$ (eg 1 degree).     |
+| To ensure that cases such as that below are detected (the top polygon is clearly non-planar, but would not be detected with 203 and a tolerance of 1cm for instance) , another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinaisons of 3 non-colinear points is less than a given tolerance. In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain usef-defined tolerance (eg 1 degree).  |
 
 ![](figs/204.png)
 
