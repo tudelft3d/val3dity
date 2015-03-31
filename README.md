@@ -150,6 +150,8 @@ If you're running Windows and/or you don't want to go through the troubles of co
 
 # Error reported 
 
+(a description of each error is available [here](https://github.com/tudelft3d/val3dity/blob/master/errors_description/errors_description.md))
+
 ## Ring level
 
   * 101: TOO_FEW_POINTS
