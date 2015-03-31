@@ -54,11 +54,14 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(999, -1, -1, "Something went wrong during the triangulation of the faces. Cannot continue.");
+    (*cb)(999, -1, -1, "Something went wrong during the triangulation of the polygons (which indicates that the 3D object is most likely invalid). Cannot continue.");
     return false;
   }
   else
     (*cb)(0, -1, -1, "-----done");
+
+
+// check_planarity_normals(tshell.faces, tshell.lsPts, shellID, cb, TOL_PLANARITY_normals) == false
   
 //-- THIRD: validate each (triangulated) shell, one by one
   vector<CgalPolyhedron*> polyhedra;

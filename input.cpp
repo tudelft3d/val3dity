@@ -81,16 +81,16 @@ void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shell
   (*cb)(0, -1, -1, "");
 }
 
-void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf cb, bool translatevertices)
+void readAllInputShells(string &foshell, vector<string> &fishells, vector<Shell*> &shells, cbf cb, bool translatevertices)
 {
   std::stringstream st;
-  st << "Reading " << arguments.size() << " file(s).";
+  st << "Reading " << (fishells.size() + 1) << " file(s).";
   (*cb)(0, -1, -1, st.str());
   
   st.str(""); //-- clear what's in st
-  st << "Reading outer shell:\t" << arguments[0];
+  st << "Reading outer shell:\t" << foshell;
   (*cb)(0, -1, -1, st.str());
-  ifstream infile(arguments[0].c_str(), ifstream::in);
+  ifstream infile(foshell.c_str(), ifstream::in);
   if (!infile)
   {
     (*cb)(901, -1, -1, "Input file doesn't exist.");
@@ -106,10 +106,9 @@ void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf c
   shells.push_back(oneshell);
   oneshell = NULL; // don't own this anymore
   
-  vector<string>::const_iterator it = arguments.begin();
-  it++;
-  int i = 0;
-  for ( ; it < arguments.end(); it++)
+  vector<string>::const_iterator it = fishells.begin();
+  int i = 1;
+  for ( ; it < fishells.end(); it++)
   {
     st.str("");
     st << "Reading inner shell #" << i << ":\t" << *it;

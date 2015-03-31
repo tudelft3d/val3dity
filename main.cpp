@@ -26,6 +26,41 @@
 
 #include "input.h"
 #include "validate.h"
+#include <tclap/CmdLine.h>
+
+class MyOutput : public TCLAP::StdOutput
+{
+public:
+  
+  virtual void usage(TCLAP::CmdLineInterface& c)
+  {
+    std::cout << "===== val3dity =====" << std::endl;
+    std::cout << "OPTIONS" << std::endl;
+    std::list<TCLAP::Arg*> args = c.getArgList();
+    for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
+      if ((*it)->getFlag() == "")
+        std::cout << "\t--" << (*it)->getName() << std::endl;
+      else
+        std::cout << "\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl;
+      std::cout << "\t\t" << (*it)->getDescription() << std::endl;
+    }
+    std::cout << "EXAMPLES" << std::endl;
+    std::cout << "\tpprepair -i file1.shp -i file2.geojson --outerrors out.shp -v" << std::endl;
+    std::cout << "\t\tTakes 2 input files, validates them," << std::endl;
+    std::cout << "\t\tand output the problematic regions to out.shp" << std::endl << std::endl;
+    std::cout << "\tpprepair -i file1.shp -i file2.geojson -o /home/elvis/temp/ -r fix" << std::endl;
+    std::cout << "\t\tTakes 2 input files, repairs them with the default method (RandomNeighbour)" << std::endl;
+    std::cout << "\t\tand outputs 2 repaired shapefiles to /home/elvis/temp/ folder" << std::endl;
+    std::cout << "\t\t(file1.r.shp and file2.r.shp)" << std::endl << std::endl;
+    std::cout << "\tpprepair -i file1.shp -o /home/elvis/temp/ -r PL --priority prio.txt" << std::endl;
+    std::cout << "\t\tTakes 1 input file, repairs it with PriorityList rule" << std::endl;
+    std::cout << "\t\tand outputs the repaired shapefile to /home/elvis/temp/ folder" << std::endl << std::endl;
+    std::cout << "\tpprepair -i file1.shp -e extent.geojson -o . -r LB" << std::endl;
+    std::cout << "\t\tTakes 1 input file and a spatial extent file," << std::endl; 
+    std::cout << "\t\trepairs file1.shp for holes and overlaps + 'aligns' it to extent.geojson" << std::endl; 
+    std::cout << "\t\tRepaired shapefile file1.r.shp saved to current folder" << std::endl << std::endl;
+  }
+};
 
 static bool callbackWasCalledWithError = false;
 
@@ -204,10 +239,14 @@ int main(int argc, char* const argv[])
   std::cout << "***** USING EXACT-EXACT *****" << std::endl;
 #endif
 
-  bool   TRANSLATE             = true;
-  double TOL_PLANARITY_d2p     = 0.01;  //-- default: 1cm 
-  double TOL_PLANARITY_normals = 1.0;   //-- default: 1.0 degree
-  bool ONLYSURFACES            = false;
+  // double TOL_PLANARITY_d2p = 0.01;  //-- default: 1cm 
+  // double TOL_PLANARITY_n   = 1.0;   //-- default: 1.0 degree
+
+  bool   TRANSLATE             = true;  //-- to handle very large coordinates 
+                                        //   the object is translated to its min xyz
+
+  bool MULTISURFACE            = false;
+  bool COMPOSITESURFACE        = false;
   
   bool bRepair = false;
   bool repairF = true; //-- flipping orientation of faces
@@ -225,73 +264,96 @@ int main(int argc, char* const argv[])
   repairs.push_back(repairV);
   repairs.push_back(repairP);
 
+  //-- tclap options
+
+  std::vector<std::string> primitivestovalidate;
+  primitivestovalidate.push_back("S");  
+  primitivestovalidate.push_back("CS");   
+  primitivestovalidate.push_back("MS");   
+  TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
+  TCLAP::CmdLine cmd("Allowed options", ' ', "");
+  MyOutput my;
+  cmd.setOutput(&my);
+  try {
+    TCLAP::ValueArg<std::string> oshell     ("i", "oshell", "exterior shell (one and only one given)", true, "", "string");
+    TCLAP::MultiArg<std::string> ishells    ("", "ishell", "interior shell (more than one possible)", false, "string");
+    TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS>", false, "S", &primVals);
+    TCLAP::SwitchArg             repair     ("", "repair", "attempt repair", false);
+    TCLAP::SwitchArg             xml        ("", "xml", "XML output", false);
+    TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
+    TCLAP::SwitchArg             withids    ("", "withids", "POLY files contain IDs", false);
+    TCLAP::ValueArg<double> planarity_d2p    ("", "planarity_d2p", "tolerance for planarity distance_to_plane", false, 0.1, "double");
+    TCLAP::ValueArg<double> planarity_n      ("", "planarity_n", "tolerance for planarity based on normals deviation", false, 1.0, "double");
+    
+    cmd.add(xml);
+    cmd.add(qie);
+    cmd.add(withids);
+    cmd.add(planarity_d2p);
+    cmd.add(planarity_n);
+    cmd.add(repair);
+    cmd.add(primitives);
+    cmd.add(ishells);
+    cmd.add(oshell);
+    cmd.parse( argc, argv );
   
-  if (argc < 2)
-  {
-    cout << "You have to give at least one input POLY file (a shell)." << endl;
-    cout << endl << "Usage: val3dity ./src/data/cube.poly ./src/data/py1.poly" << endl;
-    cout << "This example would validate a solid with the outer shell from cube.poly and one inner shell from py1.poly" << endl;
-    return(1);
-  }
 
-  cbf cbfunction = callback;
-  vector<string> arguments;
-  for (int argNum = 1; argNum < argc; ++argNum) {
-    if (strcmp(argv[argNum], "-xml") == 0) {
-      XMLOUTPUT = true;
-    }
-    else if (strcmp(argv[argNum], "-qie") == 0)
-      USEQIECODES = true;
-    else if (strcmp(argv[argNum], "-onlysurfaces") == 0)
-      ONLYSURFACES = true;
-    else if (strcmp(argv[argNum], "-withids") == 0)
-      bUsingIDs = true;
-    else if (strcmp(argv[argNum], "-repair") == 0)
-      bRepair = true;
-    else if (strcmp(argv[argNum], "-planarity_d2p") == 0)
-    {
-      ++argNum;
-      TOL_PLANARITY_d2p = atof(argv[argNum]);
-    }
-    else if (strcmp(argv[argNum], "-planarity_normals") == 0)
-    {
-      ++argNum;
-      TOL_PLANARITY_normals = atof(argv[argNum]);
-    }
-    else {
-      arguments.push_back(string(argv[argNum]));
-    }
-  }
+    cbf cbfunction = callback;
 
-  vector<Shell*> shells;
-  if (bRepair == false) {
-    readAllInputShells(arguments, shells, cbfunction, TRANSLATE);
-    if (!callbackWasCalledWithError)
-      validate(shells, cbfunction, TOL_PLANARITY_d2p, TOL_PLANARITY_normals, ONLYSURFACES);
-  }
-  else {
-    repair(shells, repairs, cbfunction);
-  }
 
-  if (XMLOUTPUT == false) {
-    if (ONLYSURFACES == true)
-      cout << endl << "Only polygons are individually validated, no solid validation." << endl;
-    if (callbackWasCalledWithError)
-    {
-      if (ONLYSURFACES == false)
-        cout << "\nInvalid solid :(" << endl << endl;
-      else
-        cout << "\nSome polygons are invalid :(" << endl << endl;
-      return(0);
+  // for (int argNum = 1; argNum < argc; ++argNum) {
+  //   if (strcmp(argv[argNum], "-xml") == 0) {
+  //     XMLOUTPUT = true;
+  //   }
+  //   else if (strcmp(argv[argNum], "-qie") == 0)
+  //     USEQIECODES = true;
+  //   else if (strcmp(argv[argNum], "-multisurface") == 0)
+  //     MULTISURFACE = true;
+  //   else if (strcmp(argv[argNum], "-withids") == 0)
+  //     bUsingIDs = true;
+  //   else if (strcmp(argv[argNum], "-repair") == 0)
+  //     bRepair = true;
+  //   else if (strcmp(argv[argNum], "-planarity_d2p") == 0)
+  //   {
+  //     ++argNum;
+  //     TOL_PLANARITY_d2p = atof(argv[argNum]);
+  //   }
+  //   else if (strcmp(argv[argNum], "-planarity_normals") == 0)
+  //   {
+  //     ++argNum;
+  //     TOL_PLANARITY_normals = atof(argv[argNum]);
+  //   }
+  //   else {
+  //     arguments.push_back(string(argv[argNum]));
+  //   }
+  // }
+
+    // std::cout << (ishells.getValue()).size() << std::endl;
+    std::vector<std::string> fishells = ishells.getValue();
+    vector<Shell*> shells;
+    if (repair.getValue() == false) {
+      readAllInputShells(oshell.getValue(), fishells, shells, cbfunction, TRANSLATE);
+      if (!callbackWasCalledWithError)
+        validate(shells, cbfunction, planarity_d2p.getValue(), planarity_n.getValue(), false);
     }
-    else
-    {
-      if (ONLYSURFACES == false)
-        cout << "\nValid solid :)" << endl;
-      else
-        cout << "\nAll polygons are valid :)" << endl;
-      return(1);
-    }
+    // else {
+      // repair(shells, repairs, cbfunction);
+    // }
   }
+  catch (TCLAP::ArgException &e) {
+    std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
+    return(0);
+  }
+  catch (std::string problem) {
+    std::cerr << std::endl << "ERROR: " << problem << " (our other project 'prepair' can perform automatic repair of single polygons)" << std::endl;
+    std::cerr << "Aborted." << std::endl;
+    return(0);
+  }
+  catch (bool b) {
+    std::cerr << "Aborted." << std::endl;
+    return(0);
+  }
+  // std::cout << "\nSuccessfully terminated." << std::endl;
+  return 1;
+
 }
 
