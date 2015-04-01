@@ -27,7 +27,6 @@
 */
 
 
-
 // CGAL kernel
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
@@ -44,7 +43,6 @@
 using namespace std;
 
 // CGAL typedefs
-
 #ifdef VAL3DITY_USE_EPECSQRT
 typedef CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt K;
 #else
@@ -84,9 +82,9 @@ typedef struct triangulatedShell_tag {
 
 typedef enum
 {
-   SOLID          = 0,
-   COMPOSITESOLID = 1,
-   MULTISOLID     = 2,
+  SOLID            = 0,
+  COMPOSITESURFACE = 1,
+  MULTISURFACE     = 2,
 } Primitives3D;
 
 // This callback function will be used to both report progress

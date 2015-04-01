@@ -237,9 +237,6 @@ int main(int argc, char* const argv[])
   bool   TRANSLATE             = true;  //-- to handle very large coordinates 
                                         //   the object is translated to its min xyz
 
-  bool MULTISURFACE            = false;
-  bool COMPOSITESURFACE        = false;
-  
   bool bRepair = false;
   bool repairF = true; //-- flipping orientation of faces
   bool repairD = true; //-- dangling pieces will be removed
@@ -270,7 +267,7 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<std::string> oshell     ("i", "oshell", "exterior shell (one and only one given)", true, "", "string");
     TCLAP::MultiArg<std::string> ishells    ("", "ishell", "interior shell (more than one possible)", false, "string");
     TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS>", false, "S", &primVals);
-    TCLAP::SwitchArg             dorepair     ("", "repair", "attempt repair", false);
+    TCLAP::SwitchArg             dorepair   ("", "repair", "attempt repair", false);
     TCLAP::SwitchArg             xml        ("", "xml", "XML output", false);
     TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
     TCLAP::SwitchArg             withids    ("", "withids", "POLY files contain IDs", false);
@@ -292,9 +289,9 @@ int main(int argc, char* const argv[])
 
     Primitives3D prim3d = SOLID;
     if (primitives.getValue() == "CS")
-      prim3d = COMPOSITESOLID;
+      prim3d = COMPOSITESURFACE;
     if (primitives.getValue() == "MS")
-      prim3d = MULTISOLID;
+      prim3d = MULTISURFACE;
 
     XMLOUTPUT = xml.getValue();
     USEQIECODES = qie.getValue();

@@ -38,17 +38,16 @@ bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >&
 
 bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double TOL_PLANARITY_normals, Primitives3D prim3d)
 {
+  if (prim3d == MULTISURFACE)
+    (*cb)(0, -1, -1, "--- validating as MULTISURFACE ---\n");
+  if (prim3d == COMPOSITESURFACE)
+    (*cb)(0, -1, -1, "--- validating as COMPOSITESURFACE ---\n");
+
   bool foundError(false);
   
 //-- FIRST: 2D validation of projected polygons (with GEOS)
   if (! validate_2D(shells, cb, TOL_PLANARITY_d2p))
     return false;
-  // else {
-  //   (*cb)(0, -1, -1, "-----all valid");
-  //   if (multisurfaces == true) {
-  //     return true;
-  //   }
-  // }
   
 //-- SECOND: triangulate every shell 
   vector<TrShell*> trShells;
@@ -60,8 +59,43 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
   else
     (*cb)(0, -1, -1, "-----done");
 
+//-- if MULTISURFACE only validation of surface + planarity then stop
+  if (prim3d == MULTISURFACE) {
+    (*cb)(0, -1, -1, "\nDouble-checking the planarity of faces");
+    for (unsigned int i = 0; i < trShells.size(); i++)
+    {
+      TrShell* ts = trShells[i];
+      if (check_planarity_normals(ts->faces, ts->lsPts, i, cb, TOL_PLANARITY_normals) == false)
+        return false;
+    }
+    (*cb)(0, -1, -1, "-----all valid");
+    return true;
+  }
 
-// check_planarity_normals(tshell.faces, tshell.lsPts, shellID, cb, TOL_PLANARITY_normals) == false
+
+//-- if COMPOSITESURFACE 
+  if (prim3d == COMPOSITESURFACE) {
+    vector<CgalPolyhedron*> polyhedra;
+    CgalPolyhedron* p = NULL;
+    std::stringstream st;
+    st << endl << "Validating";
+    (*cb)(0, -1, -1, st.str());
+    p  = validate_triangulated_shell_cs(*(trShells[0]), 0, cb, TOL_PLANARITY_normals);
+    st.str("");
+    // st << "Shell #" << (i);
+    if (p != NULL)
+    {
+      st << "---valid";
+      (*cb)(0, -1, -1, st.str());
+      return true;
+    }
+    else
+    {
+      st << "---invalid";
+      (*cb)(300, 0, -1, st.str());
+      return false;
+    }
+  }
   
 //-- THIRD: validate each (triangulated) shell, one by one
   vector<CgalPolyhedron*> polyhedra;
@@ -71,7 +105,7 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
     std::stringstream st;
     st << endl << "Validating shell #" << i;
     (*cb)(0, -1, -1, st.str());
-    p  = validate_triangulated_shell(*(trShells[i]), i, cb, TOL_PLANARITY_normals);
+    p  = validate_triangulated_shell_solid(*(trShells[i]), i, cb, TOL_PLANARITY_normals);
     st.str("");
     st << "Shell #" << (i);
     if (p != NULL)
