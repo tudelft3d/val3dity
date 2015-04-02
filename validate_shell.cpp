@@ -1,6 +1,6 @@
 
 /*
- val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2015, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -537,9 +537,8 @@ CgalPolyhedron* validate_triangulated_shell_cs(TrShell& tshell, int shellID, cbf
   }
   if (isValid)
   {
-  (*cb)(0, -1, -1, "\tyes");
+  (*cb)(0, -1, -1, "\tyes\n");
   }
-
 //-- Return CgalPolyhedron if valid, NULL otherwise
   if (isValid == false)
   {

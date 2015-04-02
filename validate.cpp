@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2015, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -38,22 +38,27 @@ bool    construct_ct(const vector< Point3 > &lsPts, const vector< vector<int> >&
 
 bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double TOL_PLANARITY_normals, Primitives3D prim3d)
 {
-  if (prim3d == MULTISURFACE)
-    (*cb)(0, -1, -1, "--- validating as MULTISURFACE ---\n");
-  if (prim3d == COMPOSITESURFACE)
-    (*cb)(0, -1, -1, "--- validating as COMPOSITESURFACE ---\n");
+  if (prim3d == SOLID)
+    (*cb)(0, -1, -1, "--- SOLID validation ---\n");
+  else if (prim3d == MULTISURFACE)
+    (*cb)(0, -1, -1, "--- MULTISURFACE validation ---\n");
+  else if (prim3d == COMPOSITESURFACE)
+    (*cb)(0, -1, -1, "--- COMPOSITESURFACE validation ---\n");
 
   bool foundError(false);
   
 //-- FIRST: 2D validation of projected polygons (with GEOS)
   if (! validate_2D(shells, cb, TOL_PLANARITY_d2p))
     return false;
+  else
+    (*cb)(0, -1, -1, "-----all valid");
+    
   
 //-- SECOND: triangulate every shell 
   vector<TrShell*> trShells;
   if (! triangulate_all_shells(shells, trShells, cb))
   {
-    (*cb)(999, -1, -1, "Something went wrong during the triangulation of the polygons (which indicates that the 3D object is most likely invalid). Cannot continue.");
+    (*cb)(999, -1, -1, "Something went wrong during the triangulation of the polygons (which indicates that the 3D object is most likely invalid). Abort.");
     return false;
   }
   else
@@ -61,7 +66,7 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
 
 //-- if MULTISURFACE only validation of surface + planarity then stop
   if (prim3d == MULTISURFACE) {
-    (*cb)(0, -1, -1, "\nDouble-checking the planarity of faces");
+    (*cb)(0, -1, -1, "\nChecking the planarity of surfaces");
     for (unsigned int i = 0; i < trShells.size(); i++)
     {
       TrShell* ts = trShells[i];
@@ -69,32 +74,23 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
         return false;
     }
     (*cb)(0, -1, -1, "-----all valid");
+    (*cb)(0, -1, -1, "");
     return true;
   }
-
 
 //-- if COMPOSITESURFACE 
   if (prim3d == COMPOSITESURFACE) {
     vector<CgalPolyhedron*> polyhedra;
     CgalPolyhedron* p = NULL;
     std::stringstream st;
-    st << endl << "Validating";
+    st << endl << "Validating composite surface";
     (*cb)(0, -1, -1, st.str());
     p  = validate_triangulated_shell_cs(*(trShells[0]), 0, cb, TOL_PLANARITY_normals);
-    st.str("");
-    // st << "Shell #" << (i);
+    (*cb)(0, -1, -1, "");
     if (p != NULL)
-    {
-      st << "---valid";
-      (*cb)(0, -1, -1, st.str());
       return true;
-    }
-    else
-    {
-      st << "---invalid";
-      (*cb)(300, 0, -1, st.str());
+    else 
       return false;
-    }
   }
   
 //-- THIRD: validate each (triangulated) shell, one by one
@@ -117,11 +113,11 @@ bool validate(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p, double T
     else
     {
       st << " invalid";
-      //(*cb)(300, 0, -1, st.str());
       foundError = true;
     }
   }
   (*cb)(0, -1, -1, "");
+
 //-- FOURTH: put all the valid shells in a Nef_polyhedron and check their configuration  
   bool isValid = validate_solid_with_nef(polyhedra, cb);
 

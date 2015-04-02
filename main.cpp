@@ -57,9 +57,18 @@ public:
     }
     std::cout << "EXAMPLES" << std::endl;
     std::cout << "\tval3dity -i data/poly/cube.poly" << std::endl;
-    std::cout << "\t\tTakes the outer shell cube.poly and validates it." << std::endl;
+    std::cout << "\t\tTakes the outer shell cube.poly and validates it (as a solid)." << std::endl;
+    std::cout << "\tval3dity -i data/poly/cube.poly -p MS" << std::endl;
+    std::cout << "\t\tTakes the outer shell cube.poly and validates it (as a multisurface)." << std::endl;
     std::cout << "\tval3dity -i data/poly/cube.poly --ishell data/poly/py.poly" << std::endl;
-    std::cout << "\t\tTakes the outer shell cube.poly with the inner shell py.poly and validates the solid." << std::endl;
+    std::cout << "\t\tTakes the outer shell cube.poly with the inner shell py.poly" << std::endl;
+    std::cout << "\t\tand validates the solid." << std::endl;
+    std::cout << "\tval3dity -i data/poly/cube.poly --ishell data/poly/py.poly --ishell data/poly/py2.poly" << std::endl;
+    std::cout << "\t\tTakes the outer shell cube.poly with the inner shells py.poly" << std::endl;
+    std::cout << "\t\tand py2.poly and validates the solid." << std::endl;
+    std::cout << "\tval3dity -i data/poly/cube.poly --planarity_d2p 0.1" << std::endl;
+    std::cout << "\t\tTakes the outer shell cube.poly and validates it (as a solid)" << std::endl;
+    std::cout << "\t\twith tolerance 0.1unit (distance point to fitted plane)." << std::endl;
   }
 };
 
@@ -221,7 +230,6 @@ void callback(int errorCode,    // 0 means status message, -1 means unknown erro
 }
 
 
-
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
@@ -231,11 +239,7 @@ int main(int argc, char* const argv[])
   std::cout << "***** USING EXACT-EXACT *****" << std::endl;
 #endif
 
-  // double TOL_PLANARITY_d2p = 0.01;  //-- default: 1cm 
-  // double TOL_PLANARITY_n   = 1.0;   //-- default: 1.0 degree
-
   bool   TRANSLATE             = true;  //-- to handle very large coordinates 
-                                        //   the object is translated to its min xyz
 
   bool bRepair = false;
   bool repairF = true; //-- flipping orientation of faces
@@ -260,19 +264,19 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("CS");   
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
-  TCLAP::CmdLine cmd("Allowed options", ' ', "");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "0.9");
   MyOutput my;
   cmd.setOutput(&my);
   try {
-    TCLAP::ValueArg<std::string> oshell     ("i", "oshell", "exterior shell (one and only one given)", true, "", "string");
+    TCLAP::ValueArg<std::string> oshell     ("i", "oshell", "exterior shell (one and only one)", true, "", "string");
     TCLAP::MultiArg<std::string> ishells    ("", "ishell", "interior shell (more than one possible)", false, "string");
-    TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS>", false, "S", &primVals);
+    TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
     TCLAP::SwitchArg             dorepair   ("", "repair", "attempt repair", false);
     TCLAP::SwitchArg             xml        ("", "xml", "XML output", false);
     TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
     TCLAP::SwitchArg             withids    ("", "withids", "POLY files contain IDs", false);
-    TCLAP::ValueArg<double> planarity_d2p   ("", "planarity_d2p", "tolerance for planarity distance_to_plane", false, 0.1, "double");
-    TCLAP::ValueArg<double> planarity_n     ("", "planarity_n", "tolerance for planarity based on normals deviation", false, 1.0, "double");
+    TCLAP::ValueArg<double> planarity_d2p   ("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
+    TCLAP::ValueArg<double> planarity_n     ("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0)", false, 1.0, "double");
     
     cmd.add(xml);
     cmd.add(qie);
@@ -312,12 +316,12 @@ int main(int argc, char* const argv[])
     if (xml.getValue() == false) {
       if (callbackWasCalledWithError)
       {
-        cout << "Invalid :(" << endl << endl;
+        cout << "--> Invalid :(" << endl << endl;
         return(0);
       }
       else
       {
-        cout << "Valid :)" << endl << endl;
+        cout << "--> Valid :)" << endl << endl;
         return(1);
       }
     }
