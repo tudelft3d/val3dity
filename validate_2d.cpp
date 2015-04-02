@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2015, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -102,7 +102,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
 bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
 {
   initGEOS(NULL, NULL);
-  (*cb)(0, -1, -1, "Validating surface in 2D (their projection)");
+  (*cb)(0, -1, -1, "Validating surfaces in 2D (their projection)");
   bool isvalid = true;
   for (unsigned int is=0; is<shells.size(); is++)
   {
