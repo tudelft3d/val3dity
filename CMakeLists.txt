@@ -44,7 +44,7 @@ if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
 
-include_directories( ${GEOS_INCLUDE_DIR} )
+include_directories( ${GEOS_INCLUDE_DIR}, include )
 
 # Creating entries for target: val3dity
 # ############################
