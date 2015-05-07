@@ -109,7 +109,6 @@ def process(fIn, tempfolder, multisurface, snap_tolerance = '1e-3'):
                     print objid
                 ms = Shell(ms, dxlinks, ns)
                 write_shell_to_file_poly(gmlid, ms, 0)
-            print "Number of POLY files created:", objid-1
         else:
             for solid in root.findall(".//{%s}Solid" % ns['gml']):
                 gmlid = solid.get("{%s}id" % ns['gml'])
@@ -123,7 +122,7 @@ def process(fIn, tempfolder, multisurface, snap_tolerance = '1e-3'):
                     shells.append(Shell(ishellnode, dxlinks, ns))
                 for i, shell in enumerate(shells):
                     write_shell_to_file_poly(gmlid, shell, i)
-            print "Number of POLY files created:", solidid-1
+        print "Number of POLY files created:", objid-1
     except:
         name = "%s/error" % (TEMPFOLDER)
         fOut = open(name, 'w')
