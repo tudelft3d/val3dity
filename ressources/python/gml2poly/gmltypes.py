@@ -147,18 +147,19 @@ class Shell:
                 p = self.dxlinks[link]
             else:
                 p = s.find(".//{%s}Polygon" % self.ns['gml'])
-            posList = p.find(".//{%s}posList" % self.ns['gml'])
+            posList = p.findall(".//{%s}posList" % self.ns['gml'])
             if posList != None:
-                coords = posList.text.split()
-                assert(len(coords) % 3 == 0)
-                for i in range(0, len(coords), 3):
-                    temp = Point(coords[i], coords[i+1], coords[i+2])
-                    if lsNodes.count(temp) == 0:
-                        lsNodes.append(temp)
-                        temp.id = len(lsNodes) - 1
+                for pos in posList:
+                    coords = pos.text.split()
+                    assert(len(coords) % 3 == 0)
+                    for i in range(0, len(coords), 3):
+                        temp = Point(coords[i], coords[i+1], coords[i+2])
+                        if lsNodes.count(temp) == 0:
+                            lsNodes.append(temp)
+                            temp.id = len(lsNodes) - 1
             else: #-- a series of gml:pos
-                posList = p.findall(".//{%s}pos" % self.ns['gml'])
-                for i in posList:
+                lpos = p.findall(".//{%s}pos" % self.ns['gml'])
+                for i in lpos:
                     coords = i.text.split()
                     temp = Point(coords[0], coords[1], coords[2])
                     if lsNodes.count(temp) == 0:
@@ -196,6 +197,7 @@ class Shell:
             assert(len(coords) % 3 == 0)
             for i in range(0, len(coords), 3):
                 temp = Point(coords[i], coords[i+1], coords[i+2])
+                assert(self.lsNodes.count(temp) > 0)
                 j = self.lsNodes.index(temp)
                 ring.append(self.lsNodes[j])
         else: #-- a series of gml:pos
