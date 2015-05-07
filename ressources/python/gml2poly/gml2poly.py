@@ -96,28 +96,27 @@ def process(fIn, tempfolder, multisurface, snap_tolerance = '1e-3'):
         else:
             dxlinks = None
 
-        print "Extracting geometries to POLY files"
-        objid = 1
         if (multisurface == True):
         #-- Process <gml:MultiSurface> instead of <gml:Solid>
+            msid = 1
             for ms in root.findall(".//{%s}MultiSurface" % ns['gml']):
                 gmlid = ms.get("{%s}id" % ns['gml'])
                 if gmlid == None:
-                    gmlid = str(objid)
-                objid += 1
-                if objid % 10 == 0:
-                    print objid
+                    gmlid = str(msid)
+                msid += 1
                 ms = Shell(ms, dxlinks, ns)
                 write_shell_to_file_poly(gmlid, ms, 0)
-            print "Number of POLY files created:", objid-1
+            print "Number of POLY files created:", msid-1
         else:
+            print "Extracting geometries to POLY files"
+            solidid = 1
             for solid in root.findall(".//{%s}Solid" % ns['gml']):
                 gmlid = solid.get("{%s}id" % ns['gml'])
                 if gmlid == None:
-                    gmlid = str(objid)
-                objid += 1
-                if objid % 10 == 0:
-                    print objid
+                    gmlid = str(solidid)
+                solidid += 1
+                if solidid % 10 == 0:
+                    print solidid
                 shells = [Shell(solid.find("{%s}exterior" % ns['gml']), dxlinks, ns)]
                 for ishellnode in solid.findall("{%s}interior" % ns['gml']):
                     shells.append(Shell(ishellnode, dxlinks, ns))
