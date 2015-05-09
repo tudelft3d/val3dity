@@ -27,7 +27,7 @@
 #include "validate.h"
 #include "CGAL/squared_distance_3.h"
 #include <CGAL/linear_least_squares_fitting_3.h>
-#include <GEOS/geos_c.h>
+#include <geos_c.h>
 #include <sstream>
 
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
