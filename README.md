@@ -7,7 +7,7 @@ The validation of a solid is performed hierarchically, ie first every surface is
 Most of the details of the implementation are available in this scientific article:
 
 > Ledoux, Hugo (2013). On the validation of solids represented with the
-international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](http://3dgeoinfo.bk.tudelft.nl/hledoux/pdfs/_13cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
+international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](http://3dgeoinfo.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
 
 
 ## How do I use val3dity?
