@@ -18,6 +18,8 @@ public:
   ~Shell2();
   
   int number_points();
+  int number_faces();
+  
   int add_point(Point3 p);
   void add_face(vector< vector<int> > f);
 

@@ -28,7 +28,7 @@
 
 vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices);
 bool processshell(pugi::xml_node n, bool oshell);
-vector<int> processring(pugi::xml_node n, Shell& sh);
+vector<int> processring(pugi::xml_node n, Shell2* sh);
 std::string localise(std::string s);
 
 void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices);
@@ -45,7 +45,7 @@ std::string localise(std::string s)
 }
 
 
-vector<int> processring(pugi::xml_node n, Shell2& sh) {
+vector<int> processring(pugi::xml_node n, Shell2* sh) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   vector<int> r;
@@ -58,7 +58,7 @@ vector<int> processring(pugi::xml_node n, Shell2& sh) {
       while (ss >> buf)
         tokens.push_back(buf);
       Point3 p(std::stod(tokens[0]), std::stod(tokens[1]), std::stod(tokens[2]));
-      r.push_back(sh.add_point(p));
+      r.push_back(sh->add_point(p));
     }
   }
   else //-- <gml:posList> used
@@ -83,7 +83,7 @@ vector<int> processring(pugi::xml_node n, Shell2& sh) {
     for (auto it = tokens.begin(); it != tokens.end(); it++)
     {
       Point3 p(std::stod(*it), std::stod(*++it), std::stod(*++it));
-      r.push_back(sh.add_point(p));
+      r.push_back(sh->add_point(p));
     }
   }
   r.pop_back();
@@ -92,12 +92,16 @@ vector<int> processring(pugi::xml_node n, Shell2& sh) {
 
 
 bool processshell(pugi::xml_node n, bool oshell, double tol_snap) {
-  std::cout << "--- Shell ---" << std::endl;
+  if (oshell)
+    std::cout << "--- Shell (outer) ---"   << std::endl;
+  else
+    std::cout << "--- Shell (inner) ---"   << std::endl;
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
-  Shell2 sh(oshell, tol_snap);
+  Shell2* sh = new Shell2(oshell, tol_snap);
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
+    vector< vector<int> > oneface;
     bool bxlink = false;
     pugi::xml_node tmpnode = it->node();
     pugi::xpath_node p;
@@ -120,16 +124,17 @@ bool processshell(pugi::xml_node n, bool oshell, double tol_snap) {
     //-- exterior ring (only 1)
     s = "./" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
-    processring(ring.node(), sh);
+    oneface.push_back(processring(ring.node(), sh));
     //-- interior rings
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
-//      std::cout << "an iring";
-      processring(it->node(), sh);
+      oneface.push_back(processring(it->node(), sh));
     }
+    sh->add_face(oneface);
   }
-  std::cout << "size lsPts: " << sh.number_points() << std::endl;
+  std::cout << "size lsPts: " << sh->number_points() << std::endl;
+  std::cout << "size lsFaces: " << sh->number_faces() << std::endl;
   return true;
 }
 
@@ -146,11 +151,10 @@ vector<Solid> readGMLfile(string &ifile, double tol_snap, cbf cb, bool translate
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
   std::cout << "# of Solids: " << nsolids.size() << std::endl;
-
   int curSolid = 1;
   for(auto& nsolid: nsolids)
   {
-    //-- get exterior shell's polygons
+    //-- exterior shell
     Solid sol;
     if (nsolid.node().attribute("gml:id") == 0)
       sol.set_id(std::to_string(curSolid));
@@ -159,8 +163,11 @@ vector<Solid> readGMLfile(string &ifile, double tol_snap, cbf cb, bool translate
     std::string s = "./" + localise("exterior");
     pugi::xpath_node next = nsolid.node().select_node(s.c_str());
     processshell(next.node(), true, tol_snap);
-    // TODO : add ishells
-
+    //-- interior shells
+    s = "./" + localise("interior");
+    pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
+    for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
+      processshell(it->node(), true, tol_snap);
     lsSolids.push_back(sol);
     break;
   }

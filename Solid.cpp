@@ -24,7 +24,7 @@ Solid::~Solid()
   
 }
 
-Shell& Solid::get_oshell()
+Shell* Solid::get_oshell()
 {
   return _oshell;
 }
@@ -36,7 +36,7 @@ void Solid::set_oshell(Shell sh)
 }
 
 
-Shell& Solid::get_ishell(int i)
+Shell* Solid::get_ishell(int i)
 {
   return _ishells[i];
 }

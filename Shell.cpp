@@ -62,6 +62,10 @@ int Shell2::number_points()
   return _lsPts.size();
 }
 
+int Shell2::number_faces()
+{
+  return _lsFaces.size();
+}
 
 Shell2::~Shell2()
 {

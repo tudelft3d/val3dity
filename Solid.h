@@ -18,9 +18,9 @@ public:
   Solid();
   Solid(std::string id);
   ~Solid();
-  Shell&  get_oshell();
+  Shell*  get_oshell();
   void set_oshell(Shell sh);
-  Shell&  get_ishell(int i);
+  Shell*  get_ishell(int i);
   void add_ishell(Shell sh);
   int     num_ishells();
   std::string get_id();
@@ -28,9 +28,9 @@ public:
   bool    validate();
   
 private:
-  std::string   _id;
-  Shell         _oshell;
-  vector<Shell> _ishells;
+  std::string    _id;
+  Shell*         _oshell;
+  vector<Shell*> _ishells;
 };
 
 

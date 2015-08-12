@@ -293,7 +293,7 @@ int main(int argc, char* const argv[])
     //-- read the input GML
     vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), snap_tolerance.getValue(), cbfunction, TRANSLATE);
     std::cout << "\n# of <gml:Solids>: " << lsSolids.size() << std::endl;
-    std::cout << lsSolids[0].num_ishells() << lsSolids[0].get_id() << std::endl;
+//    std::cout << lsSolids[0].num_ishells() << lsSolids[0].get_id() << std::endl;
     return 1;
 
     // if (dorepair.getValue() == false) {
