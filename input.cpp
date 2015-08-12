@@ -27,7 +27,7 @@
 #include <fstream>
 #include <string>
 
-void readGMLfile(string &ifile, vector<Shell*> &shells, cbf cb, bool translatevertices);
+void readGMLfile(string &ifile, vector<Shell*> &shells, double tol_snapping, cbf cb, bool translatevertices);
 
 void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices);
 void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
@@ -39,10 +39,19 @@ std::string localise(std::string s);
 //-- ignore XML namespace
 std::string localise(std::string s)
 {
-    return "*[local-name(.) = '" + s + "']";
+  return "*[local-name(.) = '" + s + "']";
 }
 
-void readGMLfile(string &ifile, vector<Shell*> &shells, cbf cb, bool translatevertices) 
+bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
+{
+  if ( (p1 == p2) || (CGAL::squared_distance(p1, p2) <= (tol * tol)) )
+    return true;
+  else
+    return false;
+}
+
+
+void readGMLfile(string &ifile, vector<Shell*> &shells, double tol_snapping, cbf cb, bool translatevertices) 
 {
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) {
@@ -54,6 +63,9 @@ void readGMLfile(string &ifile, vector<Shell*> &shells, cbf cb, bool translateve
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
   std::cout << "# of Solids: " << nsolids.size() << std::endl;
 
+  Point3 p(0.1, 0.1, 0.0);
+  Point3 p2(0.1005, 0.1006, 0.001);
+  std::cout << "equal: " << cmpPoint3(p, p2, tol_snapping) << std::endl;
 }
 
 void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb)

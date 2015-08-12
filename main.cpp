@@ -259,6 +259,7 @@ int main(int argc, char* const argv[])
     TCLAP::SwitchArg             outputxml  ("", "outputxml", "XML output", false);
     TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
     TCLAP::SwitchArg             withids    ("", "withids", "POLY files contain IDs", false);
+    TCLAP::ValueArg<double> snap_tolerance  ("", "snap_tolerance", "tolerance for snapping vertices (default=0.001)", false, 0.001, "double");
     TCLAP::ValueArg<double> planarity_d2p   ("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double> planarity_n     ("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0)", false, 1.0, "double");
     
@@ -267,6 +268,7 @@ int main(int argc, char* const argv[])
     cmd.add(withids);
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
+    cmd.add(snap_tolerance);
     cmd.add(primitives);
     cmd.add(inputxml);
     cmd.parse( argc, argv );
@@ -289,9 +291,10 @@ int main(int argc, char* const argv[])
 
     vector<Shell*> shells;
     //-- read the input GML
-    readGMLfile(inputxml.getValue(), shells, cbfunction, TRANSLATE);
+    readGMLfile(inputxml.getValue(), shells, snap_tolerance.getValue(), cbfunction, TRANSLATE);
     std::cout << "done." << std::endl;
     return 1;
+
     // if (dorepair.getValue() == false) {
     //   readAllInputShells(oshell.getValue(), fishells, shells, cbfunction, TRANSLATE);
     //   if (!callbackWasCalledWithError)

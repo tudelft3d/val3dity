@@ -38,6 +38,6 @@
 void readAllInputShells(string &foshell, vector<string> &fishells, vector<Shell*> &shells, cbf cb, bool translatevertices = true);
 void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb);
 
-void readGMLfile(string &ifile, vector<Shell*> &shells, cbf cb, bool translatevertices = true);
+void readGMLfile(string &ifile, vector<Shell*> &shells, double tol_snapping, cbf cb, bool translatevertices = true);
 
 #endif
