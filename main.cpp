@@ -26,6 +26,7 @@
 
 #include "input.h"
 #include "validate.h"
+#include "Solid.h"
 #include <tclap/CmdLine.h>
 
 static bool callbackWasCalledWithError = false;
@@ -285,14 +286,14 @@ int main(int argc, char* const argv[])
     USEQIECODES = qie.getValue();
     bUsingIDs = withids.getValue();
 
-    Point3 p(0.1, 0.1, 0.0);
-    Point3 p2(0.1, 0.1, 0.0);
-    std::cout << (p == p2) << std::endl;
 
-    vector<Shell*> shells;
+//    vector<Shell*> shells;
+//    vector<Solid*> lsSolids;
+//    Solid s1;
     //-- read the input GML
-    readGMLfile(inputxml.getValue(), shells, snap_tolerance.getValue(), cbfunction, TRANSLATE);
-    std::cout << "done." << std::endl;
+    vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), snap_tolerance.getValue(), cbfunction, TRANSLATE);
+    std::cout << "\n# of <gml:Solids>: " << lsSolids.size() << std::endl;
+    std::cout << lsSolids[0].num_ishells() << lsSolids[0].get_id() << std::endl;
     return 1;
 
     // if (dorepair.getValue() == false) {

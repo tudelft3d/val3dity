@@ -24,12 +24,11 @@
 */
 
 #include "input.h"
-#include <fstream>
-#include <string>
 
-void readGMLfile(string &ifile, vector<Shell*> &shells, double tol_snapping, cbf cb, bool translatevertices);
-bool processshell(pugi::xml_node n);
-bool processring(pugi::xml_node n);
+
+vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices);
+bool processshell(pugi::xml_node n, bool oshell);
+bool processring(pugi::xml_node n, Shell& sh);
 std::string localise(std::string s);
 bool cmpPoint3(Point3 &p1, Point3 &p2, double tol);
 
@@ -56,20 +55,20 @@ bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 }
 
 
-bool processring(pugi::xml_node n) {
+bool processring(pugi::xml_node n, Shell& sh) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   if (npos.size() > 0) //-- <gml:pos> used
   {
-    std::cout << "#pos: " << npos.size() << std::endl;
+//    std::cout << "#pos: " << npos.size() << std::endl;
     for (pugi::xpath_node_set::const_iterator it = npos.begin(); it != npos.end(); ++it) {
       std::string buf;
       std::stringstream ss(it->node().child_value());
       std::vector<std::string> tokens;
       while (ss >> buf)
         tokens.push_back(buf);
-      std::cout << tokens.size() << std::endl;
-      std::cout << tokens[0] << std::endl;
+//      std::cout << tokens.size() << std::endl;
+//      std::cout << tokens[0] << std::endl;
     }
   }
   else //-- <gml:posList> used
@@ -83,7 +82,7 @@ bool processring(pugi::xml_node n) {
     }
     std::string buf;
     std::stringstream ss(pl.node().child_value());
-    std::cout << ss.str() << std::endl;
+//    std::cout << ss.str() << std::endl;
     std::vector<std::string> tokens;
     while (ss >> buf)
       tokens.push_back(buf);
@@ -97,7 +96,7 @@ bool processring(pugi::xml_node n) {
 }
 
 
-bool processshell(pugi::xml_node n) {
+bool processshell(pugi::xml_node n, bool oshell) {
   std::cout << "--- Shell ---" << std::endl;
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
@@ -117,52 +116,63 @@ bool processshell(pugi::xml_node n) {
       //-- find the gml:Polygon in the DOM tree
       std::string s2 = "//" + localise("Polygon") + "[@" + localise("id") + "='" + it->node().attribute("xlink:href").value() + "']";
       p = it->node().select_node(s2.c_str());
-      std::cout << p.node().name() << std::endl;
+//      std::cout << p.node().name() << std::endl;
     }
     else {
       std::string s2 = "./" + localise("Polygon");
       p = it->node().select_node(s2.c_str());
-      std::cout << p.node().name() << std::endl;
+//      std::cout << p.node().name() << std::endl;
     }
+
+    Shell sh(oshell);  
+
     //-- exterior ring (only 1)
     s = "./" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
-    processring(ring.node());
+    processring(ring.node(), sh);
     //-- interior rings
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
-      std::cout << "an iring";
-      processring(it->node());
+//      std::cout << "an iring";
+      processring(it->node(), sh);
     }
   }
   return true;
 }
 
 
-void readGMLfile(string &ifile, vector<Shell*> &shells, double tol_snapping, cbf cb, bool translatevertices)
+vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices)
 {
+  vector<Solid> lsSolids;
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) {
-    std::cout << "FILE DOESN'T EXIST" << std::endl;
-    return;
+    std::cout << "Error: input file not found." << std::endl;
+    return lsSolids;
   }
   std::string s = "//" + localise("Solid");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
   std::cout << "# of Solids: " << nsolids.size() << std::endl;
 
+  int curSolid = 1;
   for(auto& nsolid: nsolids)
   {
     //-- get exterior shell's polygons
+    Solid sol;
+    if (nsolid.node().attribute("gml:id") == 0)
+      sol.set_id(std::to_string(curSolid));
+    else
+      sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
     std::string s = "./" + localise("exterior");
     pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-    processshell(next.node());
+    processshell(next.node(), sol);
+    // TODO : add ishells
+
+    lsSolids.push_back(sol);
     break;
   }
-//  Point3 p(0.1, 0.1, 0.0);
-//  Point3 p2(0.1005, 0.1006, 0.001);
-//  std::cout << "equal: " << cmpPoint3(p, p2, tol_snapping) << std::endl;
+  return lsSolids;
 }
 
 

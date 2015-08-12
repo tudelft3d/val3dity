@@ -7,16 +7,45 @@
 //
 
 #include "Solid.h"
-
+#include "Shell.h"
 
 Solid::Solid()
 {
+  _id = "";
+}
+
+Solid::Solid(std::string id)
+{
+  _id = id;
 }
 
 Solid::~Solid()
 {
   
 }
+
+Shell& Solid::get_oshell()
+{
+  return _oshell;
+}
+
+
+void Solid::set_oshell(Shell sh)
+{
+
+}
+
+
+Shell& Solid::get_ishell(int i)
+{
+  return _ishells[i];
+}
+
+void Solid::add_ishell(Shell sh)
+{
+
+}
+
 
 bool Solid::validate()
 {
@@ -28,6 +57,15 @@ int Solid::num_ishells()
 {
   return _ishells.size();
 }
-  
+
+std::string Solid::get_id()
+{
+  return _id;
+}
+
+void Solid::set_id(std::string id)
+{
+  _id = id;
+}
 
 
