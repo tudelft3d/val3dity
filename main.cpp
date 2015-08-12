@@ -230,10 +230,111 @@ void callback(int errorCode,    // 0 means status message, -1 means unknown erro
 }
 
 
+
+
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
 int main(int argc, char* const argv[])
+{
+#ifdef VAL3DITY_USE_EPECSQRT
+  std::cout << "***** USING EXACT-EXACT *****" << std::endl;
+#endif
+
+  bool   TRANSLATE             = true;  //-- to handle very large coordinates 
+
+  //-- tclap options
+  std::vector<std::string> primitivestovalidate;
+  primitivestovalidate.push_back("S");  
+  primitivestovalidate.push_back("CS");   
+  primitivestovalidate.push_back("MS");   
+  TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
+
+  TCLAP::CmdLine cmd("Allowed options", ' ', "0.9");
+  MyOutput my;
+  cmd.setOutput(&my);
+  try {
+    TCLAP::ValueArg<std::string> inputxml   ("i", "", "xml file input", true, "", "string");
+    TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
+    TCLAP::SwitchArg             outputxml  ("", "outputxml", "XML output", false);
+    TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
+    TCLAP::SwitchArg             withids    ("", "withids", "POLY files contain IDs", false);
+    TCLAP::ValueArg<double> planarity_d2p   ("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
+    TCLAP::ValueArg<double> planarity_n     ("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0)", false, 1.0, "double");
+    
+    cmd.add(outputxml);
+    cmd.add(qie);
+    cmd.add(withids);
+    cmd.add(planarity_d2p);
+    cmd.add(planarity_n);
+    cmd.add(primitives);
+    cmd.add(inputxml);
+    cmd.parse( argc, argv );
+  
+    cbf cbfunction = callback;
+
+    Primitives3D prim3d = SOLID;
+    if (primitives.getValue() == "CS")
+      prim3d = COMPOSITESURFACE;
+    if (primitives.getValue() == "MS")
+      prim3d = MULTISURFACE;
+
+    XMLOUTPUT = outputxml.getValue();
+    USEQIECODES = qie.getValue();
+    bUsingIDs = withids.getValue();
+
+    Point3 p(0.1, 0.1, 0.0);
+    Point3 p2(0.1, 0.1, 0.0);
+    std::cout << (p == p2) << std::endl;
+
+    vector<Shell*> shells;
+    //-- read the input GML
+    readGMLfile(inputxml.getValue(), shells, cbfunction, TRANSLATE);
+    std::cout << "done." << std::endl;
+    return 1;
+    // if (dorepair.getValue() == false) {
+    //   readAllInputShells(oshell.getValue(), fishells, shells, cbfunction, TRANSLATE);
+    //   if (!callbackWasCalledWithError)
+    //     validate(shells, cbfunction, planarity_d2p.getValue(), planarity_n.getValue(), prim3d);
+    // }
+    // else {
+    //   repair(shells, repairmeths, cbfunction);
+    // }
+
+    //-- feedback to user
+    if (outputxml.getValue() == false) {
+      if (callbackWasCalledWithError)
+      {
+        cout << "--> Invalid :(" << endl << endl;
+        return(0);
+      }
+      else
+      {
+        cout << "--> Valid :)" << endl << endl;
+        return(1);
+      }
+    }
+  }
+  catch (TCLAP::ArgException &e) {
+    std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
+    return(0);
+  }
+  catch (std::string problem) {
+    std::cerr << std::endl << "ERROR: " << problem << " (our other project 'prepair' can perform automatic repair of single polygons)" << std::endl;
+    std::cerr << "Aborted." << std::endl;
+    return(0);
+  }
+  catch (bool b) {
+    std::cerr << "Aborted." << std::endl;
+    return(0);
+  }
+}
+
+
+// -----------------------------------------------------------
+// Usage documentation for this method goes here.
+//
+int main_2(int argc, char* const argv[])
 {
 #ifdef VAL3DITY_USE_EPECSQRT
   std::cout << "***** USING EXACT-EXACT *****" << std::endl;
@@ -258,17 +359,18 @@ int main(int argc, char* const argv[])
   repairmeths.push_back(repairP);
 
   //-- tclap options
-
   std::vector<std::string> primitivestovalidate;
   primitivestovalidate.push_back("S");  
   primitivestovalidate.push_back("CS");   
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
+
   TCLAP::CmdLine cmd("Allowed options", ' ', "0.9");
   MyOutput my;
   cmd.setOutput(&my);
   try {
     TCLAP::ValueArg<std::string> oshell     ("i", "oshell", "exterior shell (one and only one)", true, "", "string");
+    TCLAP::ValueArg<std::string> inputxml   ("x", "", "xml file input", true, "", "string");
     TCLAP::MultiArg<std::string> ishells    ("", "ishell", "interior shell (more than one possible)", false, "string");
     TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
     TCLAP::SwitchArg             dorepair   ("", "repair", "attempt repair", false);
@@ -287,6 +389,7 @@ int main(int argc, char* const argv[])
     cmd.add(primitives);
     cmd.add(ishells);
     cmd.add(oshell);
+    cmd.add(inputxml);
     cmd.parse( argc, argv );
   
     cbf cbfunction = callback;

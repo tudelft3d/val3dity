@@ -27,9 +27,34 @@
 #include <fstream>
 #include <string>
 
-void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices = false);
+void readGMLfile(string &ifile, vector<Shell*> &shells, cbf cb, bool translatevertices);
+
+void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices);
 void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
 void translate_vertices(vector< Point3 > &lsPts);
+std::string localise(std::string s);
+
+/////
+
+//-- ignore XML namespace
+std::string localise(std::string s)
+{
+    return "*[local-name(.) = '" + s + "']";
+}
+
+void readGMLfile(string &ifile, vector<Shell*> &shells, cbf cb, bool translatevertices) 
+{
+  pugi::xml_document doc;
+  if (!doc.load_file(ifile.c_str())) {
+    std::cout << "FILE DOESN'T EXIST" << std::endl;
+    return;
+  }
+  std::string s = "//" + localise("Solid");
+  pugi::xpath_query myquery(s.c_str());
+  pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
+  std::cout << "# of Solids: " << nsolids.size() << std::endl;
+
+}
 
 void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb)
 {
