@@ -8,10 +8,19 @@
 
 #include "Shell.h"
 
+bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
+{
+  if ( (p1 == p2) || (CGAL::squared_distance(p1, p2) <= (tol * tol)) )
+    return true;
+  else
+    return false;
+}
 
-Shell2::Shell2(bool oshell)
+
+Shell2::Shell2(bool oshell, double tol_snap)
 {
   _is_oshell = oshell;
+  _tol_snap = tol_snap;
 }
 
 bool Shell2::validate()
@@ -21,7 +30,36 @@ bool Shell2::validate()
 
 int Shell2::add_point(Point3 p)
 {
-  _lsPts.push_back(p);
+  int pos = -1;
+  int cur = 0;
+  for (auto &itr : _lsPts)
+  {
+    // std::cout << "---" << itr << std::endl;
+    if (cmpPoint3(p, itr, _tol_snap) == true)
+    {
+      pos = cur;
+      break;
+    }
+    cur++;
+  }
+  if (pos == -1)
+  {
+    _lsPts.push_back(p);
+    return (_lsPts.size() - 1);
+  }
+  else
+    return pos;
+}
+
+
+void Shell2::add_face(vector< vector<int> > f)
+{
+  _lsFaces.push_back(f);
+}
+
+int Shell2::number_points()
+{
+  return _lsPts.size();
 }
 
 

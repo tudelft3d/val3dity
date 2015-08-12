@@ -14,19 +14,23 @@
 class Shell2
 {
 public:
-  Shell2(bool outershell = true);
+  Shell2(bool outershell, double tol_snap);
   ~Shell2();
   
+  int number_points();
   int add_point(Point3 p);
+  void add_face(vector< vector<int> > f);
 
   vector<Point3>& get_lsPts();
 
-  bool is_outer();
-  bool    validate();
+  bool            is_outer();
+  bool            validate();
   
 private:
-  vector<Point3> _lsPts;  
-  bool _is_oshell;
+  vector<Point3>                  _lsPts;
+  vector< vector< vector<int> > > _lsFaces;
+  bool                            _is_oshell;
+  double                          _tol_snap;
 };
 
 

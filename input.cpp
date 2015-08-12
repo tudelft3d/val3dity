@@ -28,9 +28,8 @@
 
 vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices);
 bool processshell(pugi::xml_node n, bool oshell);
-bool processring(pugi::xml_node n, Shell& sh);
+vector<int> processring(pugi::xml_node n, Shell& sh);
 std::string localise(std::string s);
-bool cmpPoint3(Point3 &p1, Point3 &p2, double tol);
 
 void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices);
 void readShell_withIDs(ifstream& infile, Shell &allShells, vector<string> &idShells, vector< vector<string> > &idFaces);
@@ -46,29 +45,20 @@ std::string localise(std::string s)
 }
 
 
-bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
-{
-  if ( (p1 == p2) || (CGAL::squared_distance(p1, p2) <= (tol * tol)) )
-    return true;
-  else
-    return false;
-}
-
-
-bool processring(pugi::xml_node n, Shell& sh) {
+vector<int> processring(pugi::xml_node n, Shell2& sh) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
+  vector<int> r;
   if (npos.size() > 0) //-- <gml:pos> used
   {
-//    std::cout << "#pos: " << npos.size() << std::endl;
     for (pugi::xpath_node_set::const_iterator it = npos.begin(); it != npos.end(); ++it) {
       std::string buf;
       std::stringstream ss(it->node().child_value());
       std::vector<std::string> tokens;
       while (ss >> buf)
         tokens.push_back(buf);
-//      std::cout << tokens.size() << std::endl;
-//      std::cout << tokens[0] << std::endl;
+      Point3 p(std::stod(tokens[0]), std::stod(tokens[1]), std::stod(tokens[2]));
+      r.push_back(sh.add_point(p));
     }
   }
   else //-- <gml:posList> used
@@ -78,28 +68,34 @@ bool processring(pugi::xml_node n, Shell& sh) {
     if (pl == NULL)
     {
       std::cout << "Error: GML way to store Polygon not handled." << std::endl;
-      return false;
+      return r;
     }
     std::string buf;
     std::stringstream ss(pl.node().child_value());
-//    std::cout << ss.str() << std::endl;
     std::vector<std::string> tokens;
     while (ss >> buf)
       tokens.push_back(buf);
     if (tokens.size() % 3 != 0)
     {
       std::cout << "Error: <gml:posList> has bad coordinates." << std::endl;
-      return false;
+      return r;
+    }
+    for (auto it = tokens.begin(); it != tokens.end(); it++)
+    {
+      Point3 p(std::stod(*it), std::stod(*++it), std::stod(*++it));
+      r.push_back(sh.add_point(p));
     }
   }
-  return true;
+  r.pop_back();
+  return r;
 }
 
 
-bool processshell(pugi::xml_node n, bool oshell) {
+bool processshell(pugi::xml_node n, bool oshell, double tol_snap) {
   std::cout << "--- Shell ---" << std::endl;
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
+  Shell2 sh(oshell, tol_snap);
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
     bool bxlink = false;
@@ -116,16 +112,11 @@ bool processshell(pugi::xml_node n, bool oshell) {
       //-- find the gml:Polygon in the DOM tree
       std::string s2 = "//" + localise("Polygon") + "[@" + localise("id") + "='" + it->node().attribute("xlink:href").value() + "']";
       p = it->node().select_node(s2.c_str());
-//      std::cout << p.node().name() << std::endl;
     }
     else {
       std::string s2 = "./" + localise("Polygon");
       p = it->node().select_node(s2.c_str());
-//      std::cout << p.node().name() << std::endl;
     }
-
-    Shell sh(oshell);  
-
     //-- exterior ring (only 1)
     s = "./" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
@@ -138,11 +129,12 @@ bool processshell(pugi::xml_node n, bool oshell) {
       processring(it->node(), sh);
     }
   }
+  std::cout << "size lsPts: " << sh.number_points() << std::endl;
   return true;
 }
 
 
-vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices)
+vector<Solid> readGMLfile(string &ifile, double tol_snap, cbf cb, bool translatevertices)
 {
   vector<Solid> lsSolids;
   pugi::xml_document doc;
@@ -166,7 +158,7 @@ vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool trans
       sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
     std::string s = "./" + localise("exterior");
     pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-    processshell(next.node(), sol);
+    processshell(next.node(), true, tol_snap);
     // TODO : add ishells
 
     lsSolids.push_back(sol);
@@ -304,6 +296,7 @@ void readShell(ifstream& infile, Shell &oneshell, int noshell, cbf cb, bool tran
     oneshell.lsPts.push_back(p);
   }
   //-- translate all vertices to (minx, miny)
+  // TODO: translate the vertices for GML too?
   if (translatevertices == true)
   {
     translate_vertices(oneshell.lsPts);
