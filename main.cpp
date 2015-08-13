@@ -300,14 +300,15 @@ int main(int argc, char* const argv[])
 //      std::cout << s.get_oshell()->number_faces() << std::endl;
 //    }
     
-    Solid s = lsSolids[3];
+    Solid s = lsSolids[0];
     std::cout << s.num_ishells() << std::endl;
     std::cout << s.get_id() << std::endl;
     
     Shell2* sh = s.get_oshell();
     std::cout << sh->number_faces() << std::endl;
-    
-    
+    sh = s.get_ishell(1);
+    std::cout << sh->number_faces() << std::endl;
+        
     return 1;
 
     // if (dorepair.getValue() == false) {
