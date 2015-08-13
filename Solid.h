@@ -12,25 +12,29 @@
 #include "Shell.h"
 #include "val3dity_defs.h"
 
+
 class Solid
 {
 public:
   Solid();
   Solid(std::string id);
   ~Solid();
-  Shell*  get_oshell();
-  void set_oshell(Shell sh);
-  Shell*  get_ishell(int i);
-  void add_ishell(Shell sh);
-  int     num_ishells();
-  std::string get_id();
-  void set_id(std::string id);
-  bool    validate();
   
+  Shell2*   get_oshell();
+  void      set_oshell(Shell2* sh);
+  Shell2*   get_ishell(int i);
+  void      add_ishell(Shell2* sh);
+  int       num_ishells();
+  
+  bool        validate();
+
+  static int  _counter;
+  std::string get_id();
+  void        set_id(std::string id);
 private:
   std::string    _id;
-  Shell*         _oshell;
-  vector<Shell*> _ishells;
+  Shell2*         _oshell;
+  vector<Shell2*> _ishells;
 };
 
 

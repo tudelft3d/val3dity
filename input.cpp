@@ -27,7 +27,7 @@
 
 
 vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices);
-bool processshell(pugi::xml_node n, bool oshell);
+Shell2* processshell(pugi::xml_node n, bool oshell);
 vector<int> processring(pugi::xml_node n, Shell2* sh);
 std::string localise(std::string s);
 
@@ -91,11 +91,11 @@ vector<int> processring(pugi::xml_node n, Shell2* sh) {
 }
 
 
-bool processshell(pugi::xml_node n, bool oshell, double tol_snap) {
-  if (oshell)
-    std::cout << "--- Shell (outer) ---"   << std::endl;
-  else
-    std::cout << "--- Shell (inner) ---"   << std::endl;
+Shell2* processshell(pugi::xml_node n, bool oshell, double tol_snap) {
+//  if (oshell)
+//    std::cout << "--- Shell (outer) ---"   << std::endl;
+//  else
+//    std::cout << "--- Shell (inner) ---"   << std::endl;
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
   Shell2* sh = new Shell2(oshell, tol_snap);
@@ -133,44 +133,44 @@ bool processshell(pugi::xml_node n, bool oshell, double tol_snap) {
     }
     sh->add_face(oneface);
   }
-  std::cout << "size lsPts: " << sh->number_points() << std::endl;
-  std::cout << "size lsFaces: " << sh->number_faces() << std::endl;
-  return true;
+//  std::cout << "size lsPts: " << sh->number_points() << std::endl;
+//  std::cout << "size lsFaces: " << sh->number_faces() << std::endl;
+  return sh;
 }
 
 
 vector<Solid> readGMLfile(string &ifile, double tol_snap, cbf cb, bool translatevertices)
 {
+  std::cout << "<--- " << ifile << std::endl;
   vector<Solid> lsSolids;
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) {
     std::cout << "Error: input file not found." << std::endl;
     return lsSolids;
   }
+
   std::string s = "//" + localise("Solid");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
-  std::cout << "# of Solids: " << nsolids.size() << std::endl;
-  int curSolid = 1;
+  std::cout << "# of gml:Solids: " << nsolids.size() << std::endl;
+  std::cout << "...parsing the file" << std::endl;
   for(auto& nsolid: nsolids)
   {
     //-- exterior shell
     Solid sol;
-    if (nsolid.node().attribute("gml:id") == 0)
-      sol.set_id(std::to_string(curSolid));
-    else
+    if (nsolid.node().attribute("gml:id") != 0)
       sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
     std::string s = "./" + localise("exterior");
     pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-    processshell(next.node(), true, tol_snap);
+    sol.set_oshell(processshell(next.node(), true, tol_snap));
     //-- interior shells
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
-      processshell(it->node(), true, tol_snap);
+      sol.add_ishell(processshell(it->node(), true, tol_snap));
     lsSolids.push_back(sol);
-    break;
   }
+  std::cout << "done." << std::endl;
   return lsSolids;
 }
 

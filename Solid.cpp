@@ -9,9 +9,12 @@
 #include "Solid.h"
 #include "Shell.h"
 
+int Solid::_counter = 1;
+
 Solid::Solid()
 {
-  _id = "";
+  _id = std::to_string(_counter);
+ _counter++;
 }
 
 Solid::Solid(std::string id)
@@ -21,29 +24,29 @@ Solid::Solid(std::string id)
 
 Solid::~Solid()
 {
-  
+  // TODO: destructor for Solid, memory-management jongens
 }
 
-Shell* Solid::get_oshell()
+Shell2* Solid::get_oshell()
 {
   return _oshell;
 }
 
 
-void Solid::set_oshell(Shell sh)
+void Solid::set_oshell(Shell2* sh)
 {
-
+  _oshell = sh;
 }
 
 
-Shell* Solid::get_ishell(int i)
+Shell2* Solid::get_ishell(int i)
 {
   return _ishells[i];
 }
 
-void Solid::add_ishell(Shell sh)
+void Solid::add_ishell(Shell2* sh)
 {
-
+  _ishells.push_back(sh);
 }
 
 
