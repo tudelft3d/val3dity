@@ -11,16 +11,12 @@
 
 int Solid::_counter = 1;
 
-Solid::Solid()
+Solid::Solid(cbf cb)
 {
   _id = std::to_string(_counter);
- _counter++;
+  _counter++;
 }
 
-Solid::Solid(std::string id)
-{
-  _id = id;
-}
 
 Solid::~Solid()
 {

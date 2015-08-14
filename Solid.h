@@ -16,8 +16,7 @@
 class Solid
 {
 public:
-  Solid();
-  Solid(std::string id);
+  Solid(cbf cb);
   ~Solid();
   
   Shell2*   get_oshell();
@@ -26,7 +25,7 @@ public:
   void      add_ishell(Shell2* sh);
   int       num_ishells();
   
-  bool        validate();
+  bool      validate();
 
   static int  _counter;
   std::string get_id();

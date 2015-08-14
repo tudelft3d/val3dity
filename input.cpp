@@ -27,8 +27,8 @@
 
 
 vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices);
-Shell2* processshell(pugi::xml_node n, bool oshell);
-vector<int> processring(pugi::xml_node n, Shell2* sh);
+Shell2* processshell(pugi::xml_node n, int id, double tol_snap, cbf cb);
+vector<int> processring(pugi::xml_node n, Shell2* sh, cbf cb);
 std::string localise(std::string s);
 
 void readShell(ifstream& infile, Shell &allShells, int noshell, cbf cb, bool translatevertices);
@@ -45,7 +45,7 @@ std::string localise(std::string s)
 }
 
 
-vector<int> processring(pugi::xml_node n, Shell2* sh) {
+vector<int> processring(pugi::xml_node n, Shell2* sh, cbf cb) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   vector<int> r;
@@ -67,7 +67,7 @@ vector<int> processring(pugi::xml_node n, Shell2* sh) {
     pugi::xpath_node pl = n.select_node(s.c_str());
     if (pl == NULL)
     {
-      std::cout << "Error: GML way to store Polygon not handled." << std::endl;
+      (*cb)(0, -1, -1, "Error: GML way to represent gml:Polygon not handled.");
       return r;
     }
     std::string buf;
@@ -77,7 +77,7 @@ vector<int> processring(pugi::xml_node n, Shell2* sh) {
       tokens.push_back(buf);
     if (tokens.size() % 3 != 0)
     {
-      std::cout << "Error: <gml:posList> has bad coordinates." << std::endl;
+      (*cb)(0, -1, -1, "Error: <gml:posList> has bad coordinates.");
       return r;
     }
     for (auto it = tokens.begin(); it != tokens.end(); it++)
@@ -91,14 +91,10 @@ vector<int> processring(pugi::xml_node n, Shell2* sh) {
 }
 
 
-Shell2* processshell(pugi::xml_node n, bool oshell, double tol_snap) {
-//  if (oshell)
-//    std::cout << "--- Shell (outer) ---"   << std::endl;
-//  else
-//    std::cout << "--- Shell (inner) ---"   << std::endl;
+Shell2* processshell(pugi::xml_node n, int id, double tol_snap, cbf cb) {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
-  Shell2* sh = new Shell2(oshell, tol_snap);
+  Shell2* sh = new Shell2(id, tol_snap, cb);
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
     vector< vector<int> > oneface;
@@ -124,53 +120,59 @@ Shell2* processshell(pugi::xml_node n, bool oshell, double tol_snap) {
     //-- exterior ring (only 1)
     s = "./" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
-    oneface.push_back(processring(ring.node(), sh));
+    oneface.push_back(processring(ring.node(), sh, cb));
     //-- interior rings
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
-      oneface.push_back(processring(it->node(), sh));
+      oneface.push_back(processring(it->node(), sh, cb));
     }
     sh->add_face(oneface);
   }
-//  std::cout << "size lsPts: " << sh->number_points() << std::endl;
-//  std::cout << "size lsFaces: " << sh->number_faces() << std::endl;
   return sh;
 }
 
 
 vector<Solid> readGMLfile(string &ifile, double tol_snap, cbf cb, bool translatevertices)
 {
-  std::cout << "<--- " << ifile << std::endl;
+  std::stringstream ss;
+  ss << "Reading file: " << ifile;
+  (*cb)(0, -1, -1, ss.str());
   vector<Solid> lsSolids;
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) {
-    std::cout << "Error: input file not found." << std::endl;
+    (*cb)(901, -1, -1, "Input file not found.");
     return lsSolids;
   }
 
   std::string s = "//" + localise("Solid");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
-  std::cout << "# of gml:Solids: " << nsolids.size() << std::endl;
-  std::cout << "...parsing the file" << std::endl;
+  ss.str("");
+  ss << "# of gml:Solids found: " << nsolids.size();
+  (*cb)(0, -1, -1, ss.str());
+  (*cb)(0, -1, -1, "...parsing the file and building the solids.");
   for(auto& nsolid: nsolids)
   {
     //-- exterior shell
-    Solid sol;
+    Solid sol(cb);
     if (nsolid.node().attribute("gml:id") != 0)
       sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
     std::string s = "./" + localise("exterior");
     pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-    sol.set_oshell(processshell(next.node(), true, tol_snap));
+    sol.set_oshell(processshell(next.node(), 0, tol_snap, cb));
     //-- interior shells
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
+    int id = 1;
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
-      sol.add_ishell(processshell(it->node(), true, tol_snap));
+    {
+      sol.add_ishell(processshell(it->node(), id, tol_snap, cb));
+      id++;
+    }
     lsSolids.push_back(sol);
   }
-  std::cout << "done." << std::endl;
+  (*cb)(0, -1, -1, "done.");
   return lsSolids;
 }
 
