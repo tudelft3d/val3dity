@@ -8,6 +8,8 @@
 
 #include "geomtools.h"
 
+
+
 int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
   Vector* pnormal = polygon_normal(lsPts, ids);
@@ -105,4 +107,30 @@ bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon
   if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
     pgn.reverse_orientation();
   return true;
+}
+
+bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts, double& value, float angleTolerance)
+{
+  vector<int*>::const_iterator ittr = trs.begin();
+  int* a = *ittr;
+  Vector v0 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
+  ittr++;
+  bool isPlanar = true;
+  for ( ; ittr != trs.end(); ittr++)
+  {
+    a = *ittr;
+    Vector v1 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]] );
+    Vector a = CGAL::cross_product(v0, v1);
+    K::FT norm = sqrt(a.squared_length());
+    double dot = CGAL::to_double((v0*v1));
+    double angle = atan2(CGAL::to_double(norm), dot);
+    if (angle*180/PI > angleTolerance)
+    {
+      // cout << "\t---angle: " << angle*180/PI << endl;
+      value = angle*180/PI;
+      isPlanar = false;
+      break;
+    }
+  }
+  return isPlanar;
 }

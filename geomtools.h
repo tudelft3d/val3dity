@@ -11,6 +11,9 @@
 
 #include <val3dity_defs.h>
 
+//-- misc
+#define PI 3.14159265
+
 bool    cmpPoint3(Point3 &p1, Point3 &p2, double tol);
 int     projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids);
 bool    create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient);

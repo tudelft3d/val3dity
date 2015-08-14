@@ -301,13 +301,15 @@ int main(int argc, char* const argv[])
 //    }
     
     Solid s = lsSolids[0];
-    std::cout << s.num_ishells() << std::endl;
-    std::cout << s.get_id() << std::endl;
+    std::cout << "id " << s.get_id() << std::endl;
+    std::cout << "# ishells: " << s.num_ishells() << std::endl;
     
     Shell2* sh = s.get_oshell();
     std::cout << sh->number_faces() << std::endl;
-    sh = s.get_ishell(1);
-    std::cout << sh->number_faces() << std::endl;
+//    sh = s.get_ishell(1);
+//    std::cout << sh->number_faces() << std::endl;
+    
+    sh->validate_2d_primitives(planarity_d2p.getValue(), planarity_n.getValue());
         
     return 1;
 

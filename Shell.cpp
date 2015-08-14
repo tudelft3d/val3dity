@@ -16,17 +16,13 @@ Shell2::Shell2(int id, double tol_snap, cbf cb)
   _id = id;
   _tol_snap = tol_snap;
   _cb = cb;
+  _valid_2d = false;
 }
 
 Shell2::~Shell2()
 {
   // TODO: clear memory properly
   _lsPts.clear();
-}
-
-bool Shell2::validate()
-{
-  return true;
 }
 
 
@@ -256,11 +252,10 @@ bool Shell2::construct_ct(const vector< vector<int> >& pgnids, const vector<Poly
 }
 
 
-bool Shell2::validate_2d_primitives(double tol_planarity_d2p)
+bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
   (*_cb)(0, -1, -1, "Validating surfaces in 2D (their projection)");
   bool isValid = true;
-
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
   {
@@ -271,7 +266,6 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p)
       isValid = false;
       continue;
     }
-    
     //-- test for 2 repeated consecutive points
     if (has_face_2_consecutive_repeated_pts(_lsFaces[i]) == true)
     {
@@ -279,10 +273,6 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p)
       isValid = false;
       continue;
     }
-
-    //-- test planarity of the face
-    //-- read the faces
-    // These are the number of rings for this face
     size_t numf = _lsFaces[i].size();
     vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
     vector< Point3 > allpts;
@@ -335,9 +325,38 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p)
       }
       lsRings.push_back(pgn);
     }
-    //-- use GEOS to validate
+    //-- use GEOS to validate projected polygon
     if (!validate_polygon(lsRings, _id, num, _cb, tol_planarity_d2p))
       isValid = false;
   }
+  if (isValid)
+  {
+    //-- triangulate faces of the shell
+    triangulate_shell();
+    //-- check planarity by normal deviation method (of all triangle)
+//    (*_cb)(0, -1, -1, "\nChecking the planarity of surfaces (with normals deviation)");
+    for (unsigned int i = 0; i < _lsTr.size(); i++)
+    {
+      vector< vector<int*> >::iterator it = _lsTr.begin();
+      int j = 0;
+      double deviation;
+      for ( ; it != _lsTr.end(); it++)
+      { 
+        if (is_face_planar_normals(*it, _lsPts, deviation, tol_planarity_normals) == false)
+        //-- second with normals deviation method
+        {
+          std::ostringstream msg;
+          msg << "deviation normals: " << deviation << " (tolerance=" << tol_planarity_normals << ")";
+          (*_cb)(204, _id, j, msg.str());
+          isValid = false;
+        }
+        j++;
+      }
+    }
+  }
+  _valid_2d = isValid;
+  std::cout << "so is it valid? " << isValid << std::endl;
   return isValid;
 }
+
+

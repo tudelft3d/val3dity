@@ -26,8 +26,7 @@ public:
   void    add_face(vector< vector<int> > f);
 
 
-  bool            validate();
-  bool            validate_2d_primitives(double tol_planarity_d2p);
+  bool            validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
   bool            validate_as_shell();
   bool            validate_as_compositesurface();
   bool            validate_as_multisurface();
@@ -39,6 +38,7 @@ private:
   vector< vector<int*> >          _lsTr;
   double                          _tol_snap;
   cbf                             _cb;
+  bool                            _valid_2d;
 
   bool triangulate_shell();
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
