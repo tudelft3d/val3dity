@@ -461,7 +461,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
   {
     (*_cb)(0, -1, -1, "\tyes");
     (*_cb)(0, -1, -1, "-----Geometrical consistency");
-    isValid = is_polyhedron_geometrically_consistent(P, _id, cb);
+    isValid = is_polyhedron_geometrically_consistent(P, _id, _cb);
   }
   if (isValid)
   {
@@ -471,7 +471,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
   if (isValid == true)
   {
     (*_cb)(0, -1, -1, "-----Orientation of normals");
-    isValid = check_global_orientation_normals_rev2(P, this->is_outer(), cb);
+    isValid = check_global_orientation_normals_rev2(P, this->is_outer(), _cb);
     if (isValid == false)
       (*_cb)(308, _id, -1, "");
     else

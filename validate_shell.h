@@ -25,6 +25,44 @@
 */
 
 #include "validate.h"
+#include <CGAL/intersections.h>
+#include <CGAL/IO/Polyhedron_iostream.h>
+#include <CGAL/intersections.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/AABB_polyhedron_triangle_primitive.h>
+//#include <CGAL/AABB_face_graph_triangle_primitive.h>
+
+#include<set>
+#include<list>
+
+
+
+
+
+template <class HDS>
+class ConstructShell : public CGAL::Modifier_base<HDS> {
+  vector< vector<int*> > *faces;
+  vector<Point3> *lsPts;
+  int shellID;
+  int bRepair;
+  int _width;
+  cbf cb;
+public:
+  bool isValid;
+  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, bool bRepair, cbf cb)
+    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true), _width(static_cast<int>(lsPts->size()))
+  {
+  }
+  void operator()( HDS& hds);
+  void construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb);
+  int m2a(int m, int n);
+  void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb);
+  bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected);
+  bool is_connected(int* tr, bool* halfedges);
+  void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb) ;
+};
 
 
 CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);

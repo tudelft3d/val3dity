@@ -27,18 +27,6 @@
 #include "validate_shell.h"
 #include "validate_shell_intersection.h"
 
-#include <CGAL/intersections.h>
-#include <CGAL/IO/Polyhedron_iostream.h>
-#include <CGAL/intersections.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/AABB_polyhedron_triangle_primitive.h>
-//#include <CGAL/AABB_face_graph_triangle_primitive.h>
-
-#include<set>
-#include<list>
-
 //-- CGAL stuff
 typedef CgalPolyhedron::HalfedgeDS              HalfedgeDS;
 typedef CGAL::Bbox_3                            Bbox;
@@ -48,69 +36,55 @@ typedef CgalPolyhedron::Facet_const_iterator    Facet_const_iterator;
 typedef CgalPolyhedron::Facet_const_handle      Facet_const_handle;
 
 
+template <class HDS>
+void ConstructShell<HDS>::operator()( HDS& hds) 
+{
+  typedef typename HDS::Vertex          Vertex;
+  typedef typename Vertex::Point        Point;
+  typedef typename HDS::Face_handle     FaceH;
+  typedef typename HDS::Halfedge_handle heH;
+  CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, false);
+  B.begin_surface((*lsPts).size(), (*faces).size());
+  vector<Point3>::const_iterator itPt = lsPts->begin();
+  for ( ; itPt != lsPts->end(); itPt++)
+  { 
+    B.add_vertex( Point(itPt->x(), itPt->y(), itPt->z()));
+  }
+  if (bRepair == false)
+    construct_faces_order_given(B, cb);
+//      construct_faces_keep_adjcent(B, cb);
+  else
+    construct_faces_flip_when_possible(B, cb);
+  //
+  if (isValid)
+  {
+    if (B.check_unconnected_vertices() == true) {
+      (*cb)(309, shellID, -1, "");
+      B.remove_unconnected_vertices();
+    }
+  }
+  B.end_surface();
+}
 
 template <class HDS>
-class ConstructShell : public CGAL::Modifier_base<HDS> {
-  vector< vector<int*> > *faces;
-  vector<Point3> *lsPts;
-  int shellID;
-  int bRepair;
-  int _width;
-  cbf cb;
-public:
-  bool isValid;
-  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, bool bRepair, cbf cb)
-    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true), _width(static_cast<int>(lsPts->size()))
+void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+{
+  vector< vector<int*> >::const_iterator itF = faces->begin();
+  int faceID = 0;
+  for ( ; itF != faces->end(); itF++)
   {
-  }
-  void operator()( HDS& hds) 
-  {
-    typedef typename HDS::Vertex          Vertex;
-    typedef typename Vertex::Point        Point;
-    typedef typename HDS::Face_handle     FaceH;
-    typedef typename HDS::Halfedge_handle heH;
-    CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, false);
-    B.begin_surface((*lsPts).size(), (*faces).size());
-    vector<Point3>::const_iterator itPt = lsPts->begin();
-    for ( ; itPt != lsPts->end(); itPt++)
-    { 
-      B.add_vertex( Point(itPt->x(), itPt->y(), itPt->z()));
-    }
-    if (bRepair == false)
-      construct_faces_order_given(B, cb);
-//      construct_faces_keep_adjcent(B, cb);
-    else
-      construct_faces_flip_when_possible(B, cb);
-
-	//
-	if (isValid)
-	{
-		if (B.check_unconnected_vertices() == true) {
-			(*cb)(309, shellID, -1, "");
-			B.remove_unconnected_vertices();
-		}
-	}
-	B.end_surface();
-  }
-  
-  void construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
-  {
-    vector< vector<int*> >::const_iterator itF = faces->begin();
-    int faceID = 0;
-    for ( ; itF != faces->end(); itF++)
+    vector<int*>::const_iterator itF2 = itF->begin();
+    for ( ; itF2 != itF->end(); itF2++)
     {
-      vector<int*>::const_iterator itF2 = itF->begin();
-      for ( ; itF2 != itF->end(); itF2++)
-      {
-        int* a = *itF2;
+      int* a = *itF2;
 //        std::cout << a[0] << " - " << a[1] << " - " << a[2] << std::endl;
 
-        add_one_face(B, a[0], a[1], a[2], faceID, cb);
-      }
-      faceID++;
+      add_one_face(B, a[0], a[1], a[2], faceID, cb);
     }
+    faceID++;
   }
-  
+}
+
 //  void construct_faces_keep_adjcent(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
 //  {
 //    //-- build a 2D-matrix of usage for each edge
@@ -193,156 +167,159 @@ public:
 //    }
 //  }
 
+template <class HDS>
+int ConstructShell<HDS>::m2a(int m, int n)
+{
+  return (m+(n*_width));
+}
 
-  int m2a(int m, int n)
+template <class HDS>
+void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+{
+  int size = static_cast<int>((*lsPts).size());
+#ifdef WIN32
+  bool *halfedges = new bool[size*size];
+#else
+  bool halfedges[size*size];
+#endif
+  for (int i = 0; i <= (size*size); i++)
+    halfedges[i] = false;
+  
+  //-- build one flat list of the triangular faces, for convenience
+  list<int*> trFaces;
+  vector< vector<int*> >::const_iterator itF = faces->begin();
+  for ( ; itF != faces->end(); itF++)
   {
-    return (m+(n*_width));
+    vector<int*>::const_iterator itF2 = itF->begin();
+    for ( ; itF2 != itF->end(); itF2++)
+    {
+      int* a = *itF2;
+      trFaces.push_back(a);
+    }
   }
   
+  //-- start with the first one
+  int* a = trFaces.front();
+  std::vector< std::size_t> faceids(3);        
+  faceids[0] = a[0];
+  faceids[1] = a[1];
+  faceids[2] = a[2];
+  B.add_facet(faceids.begin(), faceids.end());
 
-  void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+  halfedges[m2a(a[0], a[1])] = true;
+  halfedges[m2a(a[1], a[2])] = true;
+  halfedges[m2a(a[2], a[0])] = true;
+
+  trFaces.pop_front();
+  while (trFaces.size() > 0)
   {
-    int size = static_cast<int>((*lsPts).size());
 #ifdef WIN32
-    bool *halfedges = new bool[size*size];
+     if (try_to_add_face(B, trFaces, halfedges, true) == false)
 #else
-    bool halfedges[size*size];
+     if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
 #endif
-    for (int i = 0; i <= (size*size); i++)
-      halfedges[i] = false;
-    
-    //-- build one flat list of the triangular faces, for convenience
-    list<int*> trFaces;
-    vector< vector<int*> >::const_iterator itF = faces->begin();
-    for ( ; itF != faces->end(); itF++)
     {
-      vector<int*>::const_iterator itF2 = itF->begin();
-      for ( ; itF2 != itF->end(); itF2++)
+      //-- add first face possible, will be dangling by definition
+      //cout << "had problems..." << endl;
+#ifdef WIN32
+       if (try_to_add_face(B, trFaces, halfedges, false) == false)
+#else
+       if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
+#endif
       {
-        int* a = *itF2;
-        trFaces.push_back(a);
+        //-- cannot repair. non-manifold situations.
+        trFaces.clear();
       }
+           
     }
-    
-    //-- start with the first one
-    int* a = trFaces.front();
+  }
+#ifdef WIN32
+  delete [] halfedges; halfedges = NULL;
+#endif
+}
+
+
+template <class HDS>
+bool ConstructShell<HDS>::try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected)
+{
+  bool success = false;
+  for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
+  {
+    int* a = *it1;
     std::vector< std::size_t> faceids(3);        
     faceids[0] = a[0];
     faceids[1] = a[1];
     faceids[2] = a[2];
-    B.add_facet(faceids.begin(), faceids.end());
-
-    halfedges[m2a(a[0], a[1])] = true;
-    halfedges[m2a(a[1], a[2])] = true;
-    halfedges[m2a(a[2], a[0])] = true;
-
-    trFaces.pop_front();
-    while (trFaces.size() > 0)
+    bool test = B.test_facet(faceids.begin(), faceids.end());
+    if (test == true)
     {
-#ifdef WIN32
-       if (try_to_add_face(B, trFaces, halfedges, true) == false)
-#else
-       if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
-#endif
+      if ( (bMustBeConnected == false) || (is_connected(a, halfedges) == true) )
       {
-        //-- add first face possible, will be dangling by definition
-        //cout << "had problems..." << endl;
-#ifdef WIN32
-         if (try_to_add_face(B, trFaces, halfedges, false) == false)
-#else
-         if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
-#endif
-        {
-          //-- cannot repair. non-manifold situations.
-          trFaces.clear();
-        }
-             
-      }
-    }
-#ifdef WIN32
-    delete [] halfedges; halfedges = NULL;
-#endif
-  }
-
-  bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected)
-  {
-    bool success = false;
-    for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
-    {
-      int* a = *it1;
-      std::vector< std::size_t> faceids(3);        
-      faceids[0] = a[0];
-      faceids[1] = a[1];
-      faceids[2] = a[2];
-      bool test = B.test_facet(faceids.begin(), faceids.end());
-      if (test == true)
-      {
-        if ( (bMustBeConnected == false) || (is_connected(a, halfedges) == true) )
-        {
-          B.add_facet(faceids.begin(), faceids.end());
-          halfedges[m2a(a[0],a[1])] = true;
-          halfedges[m2a(a[1],a[2])] = true;
-          halfedges[m2a(a[2],a[0])] = true;
-          trFaces.erase(it1);
-          success = true;
-          break;
-        }
-      }
-      else //-- face conflicts with one, try to flip it and insert if possible
-      {
-        faceids[1] = a[2];
-        faceids[2] = a[1];
-        if (B.test_facet(faceids.begin(), faceids.end()))
-        {
-          B.add_facet(faceids.begin(), faceids.end());
-          halfedges[m2a(a[0],a[1])] = true;
-          halfedges[m2a(a[1],a[2])] = true;
-          halfedges[m2a(a[2],a[0])] = true;
-          trFaces.erase(it1);
-          success = true;
-          break;
-        }
-      }
-    }
-    return success;
-  }
-  
-  
-  bool is_connected(int* tr, bool* halfedges)
-  {
-    if ( (halfedges[m2a(tr[1],tr[0])] == true) ||
-         (halfedges[m2a(tr[2],tr[1])] == true) ||
-         (halfedges[m2a(tr[0],tr[2])] == true) )
-      return true;
-    else 
-      return false;
-  }
-  
-  void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb)
-  {
-    std::vector< std::size_t> faceids(3);        
-    faceids[0] = i0;
-    faceids[1] = i1;
-    faceids[2] = i2;
-    if (B.test_facet(faceids.begin(), faceids.end()))
         B.add_facet(faceids.begin(), faceids.end());
-    else
-    { //-- reverse the face and test if it would be possible to insert it
-      isValid = false;
-      faceids[0] = i0;
-      faceids[1] = i2;
-      faceids[2] = i1;
+        halfedges[m2a(a[0],a[1])] = true;
+        halfedges[m2a(a[1],a[2])] = true;
+        halfedges[m2a(a[2],a[0])] = true;
+        trFaces.erase(it1);
+        success = true;
+        break;
+      }
+    }
+    else //-- face conflicts with one, try to flip it and insert if possible
+    {
+      faceids[1] = a[2];
+      faceids[2] = a[1];
       if (B.test_facet(faceids.begin(), faceids.end()))
       {
-        //std::cout << "*** Reversed orientation of the face" << std::endl;
-        (*cb)(307, shellID, faceID, ""); 
-   }
-      else
-        (*cb)(304, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
+        B.add_facet(faceids.begin(), faceids.end());
+        halfedges[m2a(a[0],a[1])] = true;
+        halfedges[m2a(a[1],a[2])] = true;
+        halfedges[m2a(a[2],a[0])] = true;
+        trFaces.erase(it1);
+        success = true;
+        break;
+      }
     }
-    return ;
-  } 
-};
+  }
+  return success;
+}
+
+
+template <class HDS>
+bool ConstructShell<HDS>::is_connected(int* tr, bool* halfedges)
+{
+  if ( (halfedges[m2a(tr[1],tr[0])] == true) ||
+       (halfedges[m2a(tr[2],tr[1])] == true) ||
+       (halfedges[m2a(tr[0],tr[2])] == true) )
+    return true;
+  else 
+    return false;
+}
+
+template <class HDS>
+void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb)
+{
+  std::vector< std::size_t> faceids(3);        
+  faceids[0] = i0;
+  faceids[1] = i1;
+  faceids[2] = i2;
+  if (B.test_facet(faceids.begin(), faceids.end()))
+      B.add_facet(faceids.begin(), faceids.end());
+  else
+  { //-- reverse the face and test if it would be possible to insert it
+    isValid = false;
+    faceids[0] = i0;
+    faceids[1] = i2;
+    faceids[2] = i1;
+    if (B.test_facet(faceids.begin(), faceids.end()))
+    {
+      //std::cout << "*** Reversed orientation of the face" << std::endl;
+      (*cb)(307, shellID, faceID, ""); 
+ }
+    else
+      (*cb)(304, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
+  }
+  return ;
+} 
 
 
 // CgalPolyhedron* validate_triangulated_shell_cs(TrShell& tshell, int shellID, cbf cb, double TOL_PLANARITY_normals)
