@@ -30,10 +30,6 @@
 #include <GEOS/geos_c.h>
 #include <sstream>
 
-bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
-bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface);
-bool has_face_rings_toofewpoints(const vector< vector<int> >& theface);
-
 
 bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
 {
@@ -258,6 +254,88 @@ bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p)
       GEOSGeom_destroy( mygeom );
     }
   }
+  finishGEOS();
+  return isvalid;
+}
+
+
+bool validate_polygon(vector<Polygon> &lsRings, int shellid, int polygonid, cbf cb, double TOL_PLANARITY_d2p)
+{
+  // TODO: need to init GEOS and "close" it each time? I guess not...
+  initGEOS(NULL, NULL);
+  //-- check the orientation of the rings: oring != irings
+  //-- we don't care about CCW or CW at this point, just opposite is important
+  //-- GEOS doesn't do its job, so we have to do it here. Shame on you GEOS.
+  bool isvalid = true;
+  if (lsRings.size() > 1)
+  {
+    CGAL::Orientation ooring = lsRings[0].orientation();
+    vector<Polygon>::iterator it = lsRings.begin();
+    it++;
+    for ( ; it != lsRings.end(); it++)
+    {
+      if (it->orientation() == ooring)
+      {
+        (*cb)(208, shellid, polygonid, "same orientation for outer and inner rings");
+        isvalid = false;
+        break;
+      }
+    }
+  }
+  if (isvalid == false)
+    return isvalid;
+  //-- check 2D validity of the surface by (1) projecting them; (2) use GEOS IsValid()
+  stringstream wkt;
+  wkt << setprecision(15);
+  wkt << "POLYGON(";
+  vector<Polygon>::iterator it = lsRings.begin();
+  //-- oring
+  wkt << "(";
+  Polygon::Vertex_iterator vit = it->vertices_begin();
+  for ( ; vit != it->vertices_end(); vit++)
+  {
+    wkt << vit->x() << " " << vit->y() << ",";
+  }
+  vit = it->vertices_begin();
+  wkt << vit->x() << " " << vit->y() << ")";
+  it++;
+  //-- irings
+  for ( ; it != lsRings.end(); it++)
+  {
+    wkt << ", (";
+    it->reverse_orientation();
+    Polygon::Vertex_iterator vit = it->vertices_begin();
+    for ( ; vit != it->vertices_end(); vit++)
+    {
+      wkt << vit->x() << " " << vit->y() << ",";
+    }
+    vit = it->vertices_begin();
+    wkt << vit->x() << " " << vit->y() << ")";
+    it->reverse_orientation();
+  }
+  wkt << ")";
+  GEOSWKTReader* r;
+  r = GEOSWKTReader_create();
+  GEOSGeometry* mygeom;
+  mygeom = GEOSWKTReader_read(r, wkt.str().c_str());
+  string reason = (string)GEOSisValidReason(mygeom);
+  if (reason.find("Valid Geometry") == string::npos)
+  {
+    isvalid = false;
+    if (reason.find("Self-intersection") != string::npos)
+      (*cb)(201, shellid, polygonid, reason.c_str());
+    else if (reason.find("Duplicate Rings") != string::npos)
+      (*cb)(202, shellid, polygonid, reason.c_str());
+    else if (reason.find("Interior is disconnected") != string::npos)
+      (*cb)(205, shellid, polygonid, reason.c_str());
+    else if (reason.find("Hole lies outside shell") != string::npos)
+      (*cb)(206, shellid, polygonid, reason.c_str());
+    else if (reason.find("Holes are nested") != string::npos)
+      (*cb)(207, shellid, polygonid, reason.c_str());
+    else
+      (*cb)(999, shellid, polygonid, reason.c_str());
+  }
+  GEOSGeom_destroy( mygeom );
   finishGEOS();
   return isvalid;
 }

@@ -27,13 +27,11 @@ public:
 
 
   bool            validate();
-  bool            validate_2d_primitives();
+  bool            validate_2d_primitives(double tol_planarity_d2p);
   bool            validate_as_shell();
   bool            validate_as_compositesurface();
   bool            validate_as_multisurface();
   
-  // vector<Point3>& get_lsPts();
-
 private:
   int                             _id;
   vector<Point3>                  _lsPts;
@@ -43,7 +41,6 @@ private:
   cbf                             _cb;
 
   bool triangulate_shell();
-  bool create_polygon(const vector<int>& ids, Polygon &pgn, bool ccworient);
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
 };
 

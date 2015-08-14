@@ -8,7 +8,7 @@
 
 #include "Shell.h"
 #include "geomtools.h"
-
+#include "validate_2d.h"
 
 
 Shell2::Shell2(int id, double tol_snap, cbf cb)
@@ -98,7 +98,7 @@ bool Shell2::triangulate_shell()
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
-    create_polygon(idsob, pgn, true);
+    create_polygon(_lsPts, idsob, pgn, true);
     lsRings.push_back(pgn);
     vector< vector<int> > pgnids;
     pgnids.push_back(idsob);
@@ -109,7 +109,7 @@ bool Shell2::triangulate_shell()
       vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected Polygon
       Polygon pgn;
-      create_polygon(ids2, pgn, true);
+      create_polygon(_lsPts, ids2, pgn, true);
       lsRings.push_back(pgn);
       pgnids.push_back(ids2);
     }
@@ -156,33 +156,6 @@ bool Shell2::triangulate_shell()
     }
     _lsTr.push_back(oneface);
   }
-  return true;
-}
-
-// bool Shell2::create_polygon(const vector< Point3 > &lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient)
-bool Shell2::create_polygon(const vector<int>& ids, Polygon &pgn, bool ccworient)
-{
-  int proj = projection_plane(_lsPts, ids);
-  if (proj == -1) //-- polygon self-intersects or is collapsed to a point or a polyline
-    return false;
-  vector<int>::const_iterator it = ids.begin();
-  for ( ; it != ids.end(); it++)
-  {
-    Point3 p = _lsPts[*it];
-    if (proj == 2)
-      pgn.push_back(Point2(p.x(), p.y()));
-    else if (proj == 1)
-      pgn.push_back(Point2(p.x(), p.z()));
-    else if (proj == 0)
-      pgn.push_back(Point2(p.y(), p.z()));
-  }
-  
-  if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
-    return false;
-  if (pgn.orientation() == CGAL::COLLINEAR)
-    return false;
-  if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
-    pgn.reverse_orientation();
   return true;
 }
 
@@ -278,6 +251,93 @@ bool Shell2::construct_ct(const vector< vector<int> >& pgnids, const vector<Poly
       tr[2] = fi->vertex(2)->info();
       oneface.push_back(tr);
     }
+  }
+  return isValid;
+}
+
+
+bool Shell2::validate_2d_primitives(double tol_planarity_d2p)
+{
+  (*_cb)(0, -1, -1, "Validating surfaces in 2D (their projection)");
+  bool isValid = true;
+
+  size_t num = _lsFaces.size();
+  for (int i = 0; i < static_cast<int>(num); i++)
+  {
+    //-- test for too few points (<3 for a ring)
+    if (has_face_rings_toofewpoints(_lsFaces[i]) == true)
+    {
+      (*_cb)(101, _id, i, "");
+      isValid = false;
+      continue;
+    }
+    
+    //-- test for 2 repeated consecutive points
+    if (has_face_2_consecutive_repeated_pts(_lsFaces[i]) == true)
+    {
+      (*_cb)(102, _id, i, "");
+      isValid = false;
+      continue;
+    }
+
+    //-- test planarity of the face
+    //-- read the faces
+    // These are the number of rings for this face
+    size_t numf = _lsFaces[i].size();
+    vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
+    vector< Point3 > allpts;
+    vector<int>::const_iterator itp = ids.begin();
+    for ( ; itp != ids.end(); itp++)
+    {
+      allpts.push_back(_lsPts[*itp]);
+    }
+    //-- irings
+    for (int j = 1; j < static_cast<int>(numf); j++)
+    {
+      vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
+      vector<int>::const_iterator itp2 = ids2.begin();
+      for ( ; itp2 != ids2.end(); itp2++)
+      {
+        allpts.push_back(_lsPts[*itp2]);
+      }
+    }
+    double value;
+    if (false == is_face_planar_distance2plane(allpts, value, tol_planarity_d2p))
+    {
+      std::stringstream msg;
+      msg << "distance to fitted plane: " << value << " (tolerance=" << tol_planarity_d2p << ")";
+      (*_cb)(203, _id, i, msg.str());
+      isValid = false;
+      continue;
+    }
+    
+    //-- get projected oring
+    Polygon pgn;
+    vector<Polygon> lsRings;
+    if (false == create_polygon(_lsPts, ids, pgn, false))
+    {
+      (*_cb)(104, _id, i, " outer ring self-intersects or is collapsed to a point or a line");
+      isValid = false;
+      continue;
+    }
+    lsRings.push_back(pgn);
+    //-- check for irings
+    for (int j = 1; j < static_cast<int>(numf); j++)
+    {
+      vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
+      //-- get projected iring
+      Polygon pgn;
+      if (false == create_polygon(_lsPts, ids2, pgn, false))
+      {
+        (*_cb)(104, _id, i, "Inner ring self-intersects or is collapsed to a point or a line");
+        isValid = false;
+        continue;
+      }
+      lsRings.push_back(pgn);
+    }
+    //-- use GEOS to validate
+    if (!validate_polygon(lsRings, _id, num, _cb, tol_planarity_d2p))
+      isValid = false;
   }
   return isValid;
 }

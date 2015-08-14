@@ -79,3 +79,30 @@ Vector* polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids)
   }
   return pnormal;
 }
+
+
+bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient)
+{
+  int proj = projection_plane(lsPts, ids);
+  if (proj == -1) //-- polygon self-intersects or is collapsed to a point or a polyline
+    return false;
+  vector<int>::const_iterator it = ids.begin();
+  for ( ; it != ids.end(); it++)
+  {
+    Point3 p = lsPts[*it];
+    if (proj == 2)
+      pgn.push_back(Point2(p.x(), p.y()));
+    else if (proj == 1)
+      pgn.push_back(Point2(p.x(), p.z()));
+    else if (proj == 0)
+      pgn.push_back(Point2(p.y(), p.z()));
+  }
+  
+  if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
+    return false;
+  if (pgn.orientation() == CGAL::COLLINEAR)
+    return false;
+  if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
+    pgn.reverse_orientation();
+  return true;
+}

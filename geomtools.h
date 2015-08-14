@@ -13,7 +13,10 @@
 
 bool    cmpPoint3(Point3 &p1, Point3 &p2, double tol);
 int     projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids);
+bool    create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient);
 Vector* polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids);
+
+
 
 
 #endif /* defined(__val3dity__geomtools__) */
