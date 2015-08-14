@@ -309,8 +309,8 @@ int main(int argc, char* const argv[])
 //    sh = s.get_ishell(1);
 //    std::cout << sh->number_faces() << std::endl;
     
-    sh->validate_2d_primitives(planarity_d2p.getValue(), planarity_n.getValue());
-        
+//    sh->validate_2d_primitives(planarity_d2p.getValue(), planarity_n.getValue());
+    sh->validate_as_multisurface(planarity_d2p.getValue(), planarity_n.getValue());
     return 1;
 
     // if (dorepair.getValue() == false) {

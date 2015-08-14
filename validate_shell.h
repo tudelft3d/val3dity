@@ -27,7 +27,7 @@
 #include "validate.h"
 
 
-CgalPolyhedron*   validate_triangulated_shell_solid(TrShell& tshell, int shellID, cbf cb, double TOL_PLANARITY_normals = 0.1);
-CgalPolyhedron*   validate_triangulated_shell_cs(TrShell& tshell, int shellID, cbf cb, double TOL_PLANARITY_normals = 0.1);
-CgalPolyhedron*   repair_triangulated_shell(TrShell& tshell, const vector<bool> &repairs, int shellID, cbf cb);
-bool              check_planarity_normals(vector< vector<int*> >&faces, vector<Point3>& lsPts, int shellID, cbf cb, double tolerance = 0.1);
+CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
+bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
+bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
+bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
