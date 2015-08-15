@@ -10,6 +10,7 @@
 #include "geomtools.h"
 #include "validate_2d.h"
 #include "validate_shell.h"
+#include "validate_shell_intersection.h"
 
 
 Shell2::Shell2(int id, double tol_snap, cbf cb)
@@ -388,7 +389,6 @@ bool Shell2::validate_as_compositesurface(double tol_planarity_d2p, double tol_p
 bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
   bool isValid = true;
-  CgalPolyhedron *P = new CgalPolyhedron;
 //-- 1. minimum number of faces = 4
   if (_lsTr.size() < 4) 
   {
@@ -397,26 +397,17 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
     return false;
   }
 //-- 2. Combinatorial consistency
-  //-- TODO: construct the CgalPolyhedron with batch operator (not used anymore)
-  // P = get_CgalPolyhedron_DS(tshell.faces, tshell.lsPts);
-  // std::cout << P->empty() << std::endl;
-  // std::cout << P->is_valid() << std::endl;
-  // std::cout << P->is_closed() << std::endl;
-
-  //-- construct the CgalPolyhedron incrementally
   (*_cb)(0, -1, -1, "-----Combinatorial consistency");
-  ConstructShell<HalfedgeDS> s(&(_lsTr), &(_lsPts), _id, false, _cb);
-  P->delegate(s);
-  isValid = s.isValid;
-  if (isValid == true)
+  _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), _id, _cb);
+  if (_polyhedron != NULL)
   {
-    if (P->is_valid() == true) //-- combinatorially valid that is
+    if (_polyhedron->is_valid() == true)
     {
-      if (P->is_closed() == false)
+      if (_polyhedron->is_closed() == false)
       {
-        P->normalize_border();
+        _polyhedron->normalize_border();
         //-- check for unconnected faces
-        if (P->keep_largest_connected_components(1) > 0)
+        if (_polyhedron->keep_largest_connected_components(1) > 0)
         {
           //TODO: how to report what face is not connected? a bitch of a problem...
           (*_cb)(305, _id, -1, "");
@@ -425,17 +416,17 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
         else
         {
           //-- check if there are holes in the surface
-          if (P->is_closed() == false)
+          if (_polyhedron->is_closed() == false)
           {
             std::stringstream st;
-            P->normalize_border();
-            while (P->size_of_border_edges() > 0) {
-              CgalPolyhedron::Halfedge_handle he = ++(P->border_halfedges_begin());
+            _polyhedron->normalize_border();
+            while (_polyhedron->size_of_border_edges() > 0) {
+              CgalPolyhedron::Halfedge_handle he = ++(_polyhedron->border_halfedges_begin());
               st << "Location hole: " << he->vertex()->point();
               (*_cb)(302, _id, -1, st.str());
               st.str("");
-              // P->fill_hole(he);
-              // P->normalize_border();
+              // _polyhedron->fill_hole(he);
+              // _polyhedron->normalize_border();
             }
             isValid = false;
           }
@@ -443,7 +434,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
       }
       else //-- check if >1 connected components exist (both valid)
       {
-        if (P->keep_largest_connected_components(1) > 0) 
+        if (_polyhedron->keep_largest_connected_components(1) > 0) 
         {
           (*_cb)(305, _id, -1, "More than one connected components.");
           isValid = false;
@@ -461,7 +452,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
   {
     (*_cb)(0, -1, -1, "\tyes");
     (*_cb)(0, -1, -1, "-----Geometrical consistency");
-    isValid = is_polyhedron_geometrically_consistent(P, _id, _cb);
+    isValid = is_polyhedron_geometrically_consistent(_polyhedron, _id, _cb);
   }
   if (isValid)
   {
@@ -471,7 +462,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
   if (isValid == true)
   {
     (*_cb)(0, -1, -1, "-----Orientation of normals");
-    isValid = check_global_orientation_normals_rev2(P, this->is_outer(), _cb);
+    isValid = check_global_orientation_normals_rev2(_polyhedron, this->is_outer(), _cb);
     if (isValid == false)
       (*_cb)(308, _id, -1, "");
     else
@@ -479,12 +470,12 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
   }
   if (isValid == false)
   {
-    delete P;
+    delete _polyhedron;
     _is_valid = 0;
   }
   else
   {
-    _polyhedron = P;
+    // _polyhedron = P;
     _is_valid = 1;
   }
   return isValid;

@@ -41,18 +41,18 @@
 
 
 
+
 template <class HDS>
 class ConstructShell : public CGAL::Modifier_base<HDS> {
   vector< vector<int*> > *faces;
   vector<Point3> *lsPts;
-  int shellID;
-  int bRepair;
   int _width;
+  int shellID;
   cbf cb;
 public:
   bool isValid;
-  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, bool bRepair, cbf cb)
-    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), bRepair(bRepair), isValid(true), _width(static_cast<int>(lsPts->size()))
+  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, cbf cb)
+    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), isValid(true), _width(static_cast<int>(lsPts->size()))
   {
   }
   void operator()( HDS& hds);
@@ -65,7 +65,8 @@ public:
 };
 
 
-CgalPolyhedron*   get_CgalPolyhedron_DS(const vector< vector<int*> >&shell, const vector<Point3>& lsPts);
+CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, int shellID, cbf cb);
+CgalPolyhedron*   construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
 bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);

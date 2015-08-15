@@ -25,7 +25,7 @@
 */
 
 #include "validate_shell.h"
-#include "validate_shell_intersection.h"
+
 
 //-- CGAL stuff
 typedef CgalPolyhedron::HalfedgeDS              HalfedgeDS;
@@ -35,6 +35,20 @@ typedef CgalPolyhedron::Halfedge_const_handle   Halfedge_const_handle;
 typedef CgalPolyhedron::Facet_const_iterator    Facet_const_iterator;
 typedef CgalPolyhedron::Facet_const_handle      Facet_const_handle;
 
+
+CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, int shellID, cbf cb)
+{
+  CgalPolyhedron* P = new CgalPolyhedron();
+  ConstructShell<HalfedgeDS> s(lsTr, lsPts, shellID, cb);
+  if (s.isValid)
+    P->delegate(s);
+  else
+  {
+    delete P;
+    P = NULL;
+  }
+  return P;
+}
 
 template <class HDS>
 void ConstructShell<HDS>::operator()( HDS& hds) 
@@ -50,12 +64,7 @@ void ConstructShell<HDS>::operator()( HDS& hds)
   { 
     B.add_vertex( Point(itPt->x(), itPt->y(), itPt->z()));
   }
-  if (bRepair == false)
-    construct_faces_order_given(B, cb);
-//      construct_faces_keep_adjcent(B, cb);
-  else
-    construct_faces_flip_when_possible(B, cb);
-  //
+  construct_faces_order_given(B, cb);
   if (isValid)
   {
     if (B.check_unconnected_vertices() == true) {
@@ -77,8 +86,6 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
     for ( ; itF2 != itF->end(); itF2++)
     {
       int* a = *itF2;
-//        std::cout << a[0] << " - " << a[1] << " - " << a[2] << std::endl;
-
       add_one_face(B, a[0], a[1], a[2], faceID, cb);
     }
     faceID++;
@@ -197,7 +204,6 @@ void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_in
       trFaces.push_back(a);
     }
   }
-  
   //-- start with the first one
   int* a = trFaces.front();
   std::vector< std::size_t> faceids(3);        
@@ -722,13 +728,13 @@ bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
 }
 
 
-CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const vector<Point3>& lsPts)
+CgalPolyhedron* construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts)
 {
   //-- construct the 2-manifold, using the "batch" way
   stringstream offrep (stringstream::in | stringstream::out);
-  vector< vector<int*> >::const_iterator it = faces.begin();
+  vector< vector<int*> >::const_iterator it = lsTr.begin();
   size_t noFaces = 0;
-  for ( ; it != faces.end(); it++)
+  for ( ; it != lsTr.end(); it++)
     noFaces += it->size();
   offrep << "OFF" << endl << lsPts.size() << " " << noFaces << " 0" << endl;
 
@@ -736,7 +742,7 @@ CgalPolyhedron* get_CgalPolyhedron_DS(const vector< vector<int*> >&faces, const 
   for ( ; itPt != lsPts.end(); itPt++)
     offrep << *itPt << endl;
 
-  for (it = faces.begin(); it != faces.end(); it++)
+  for (it = lsTr.begin(); it != lsTr.end(); it++)
   {
     vector<int*>::const_iterator it2 = it->begin();
     for ( ; it2 != it->end(); it2++)
