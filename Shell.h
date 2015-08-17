@@ -21,6 +21,7 @@ public:
   int    number_points();
   int    number_faces();
   bool   is_outer();
+  int    get_id();
   
   int    add_point(Point3 p);
   void   add_face(vector< vector<int> > f);
@@ -29,13 +30,18 @@ public:
   bool   validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals);
   bool   validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
   bool   validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
+
+  void   add_error(int code, int faceid, std::string info = "");
   
 private:
   int                             _id;
   vector<Point3>                  _lsPts;
   vector< vector< vector<int> > > _lsFaces;
-  CgalPolyhedron*                 _polyhedron;
   vector< vector<int*> >          _lsTr;
+  CgalPolyhedron*                 _polyhedron;
+
+  std::map<int, vector<std::pair<int, std::string> > > _errors;
+
   double                          _tol_snap;
   cbf                             _cb;
   int                             _is_valid;    //-1: not done yet; 0: nope; 1: yes it's valid
@@ -43,6 +49,7 @@ private:
 
   bool triangulate_shell();
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
+
 };
 
 

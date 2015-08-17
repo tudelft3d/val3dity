@@ -28,13 +28,13 @@
 
 // CGAL kernel
 #include "val3dity_defs.h"
+#include "Shell.h"
 
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.
 //
-bool validate_2D(vector<Shell*> &shells, cbf cb, double TOL_PLANARITY_d2p = 0.001);
-bool validate_polygon(vector<Polygon> &lsRings, int shellid, int polygonid, cbf cb, double TOL_PLANARITY_d2p = 0.001);
+bool validate_polygon(vector<Polygon> &lsRings, Shell2* sh, int polygonid, double TOL_PLANARITY_d2p = 0.001);
 bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance);
 bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts, double& value, float angleTolerance);
 bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface);

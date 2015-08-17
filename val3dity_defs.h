@@ -39,8 +39,9 @@
 
 
 // STL library
-#include <vector>
 using namespace std;
+#include <vector>
+#include <map>
 
 // CGAL typedefs
 #ifdef VAL3DITY_USE_EPECSQRT
@@ -66,6 +67,12 @@ typedef CGAL::Constrained_triangulation_2<K, TDS, Itag>           CTa;
 typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
+typedef struct validationerror 
+{
+  int code;
+  int face;
+  std::string info;
+} VError;
 
 // convenience structures:
 //-- the vector of faces, each which has a vector of rings, 
