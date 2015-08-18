@@ -34,11 +34,25 @@
 #include <string>
 
 
+
+class IOErrors {
+  std::map<int, vector<std::string> >  _errors;
+public:
+  void add_error(int code, std::string info)
+  {
+    _errors[code].push_back(info);
+    std::clog << "--> errors #" << code << " : " << info << std::endl;
+  }
+};
+
+
+
+
 // -----------------------------------------------------------
 // Ignore the first value in the array filenames for now...
 void readAllInputShells(string &foshell, vector<string> &fishells, vector<Shell*> &shells, cbf cb, bool translatevertices = true);
 void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb);
 
-vector<Solid> readGMLfile(string &ifile, double tol_snapping, cbf cb, bool translatevertices = true);
+vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool translatevertices);
 
 #endif

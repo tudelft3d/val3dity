@@ -159,76 +159,76 @@ std::string errorcode2description(int code, bool qie) {
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-void callback(int errorCode,    // 0 means status message, -1 means unknown error
-              int shellNum, // -1 means unused; 0-based
-              int facetNum,     // -1 means unused; 0-based
-              std::string messageStr) // optional
-{
-  if ( (0 == errorCode) && (XMLOUTPUT == false) )
-  {
-    if ( (shellNum == -1) && (facetNum == -1) )
-      cout << messageStr << endl;
-    else
-      cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
-  }
+// void callback(int errorCode,    // 0 means status message, -1 means unknown error
+//               int shellNum, // -1 means unused; 0-based
+//               int facetNum,     // -1 means unused; 0-based
+//               std::string messageStr) // optional
+// {
+//   if ( (0 == errorCode) && (XMLOUTPUT == false) )
+//   {
+//     if ( (shellNum == -1) && (facetNum == -1) )
+//       cout << messageStr << endl;
+//     else
+//       cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
+//   }
   
-  if (errorCode != 0)
-  {
-    callbackWasCalledWithError = true;
-    if (XMLOUTPUT == false)
-      cout << "Error #" << errorCode << " ";
-    else
-    {
-      cout << "\t\t<ValidatorMessage>" << endl;
-      cout << "\t\t\t<type>ERROR</type>" << endl;
-      cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
-      cout << "\t\t\t<errorType>";
-    }
-    std::cout << errorcode2description(errorCode, USEQIECODES);
-    if (XMLOUTPUT == false)
-      cout << endl;
-    else
-      cout << "</errorType>" << endl;
+//   if (errorCode != 0)
+//   {
+//     callbackWasCalledWithError = true;
+//     if (XMLOUTPUT == false)
+//       cout << "Error #" << errorCode << " ";
+//     else
+//     {
+//       cout << "\t\t<ValidatorMessage>" << endl;
+//       cout << "\t\t\t<type>ERROR</type>" << endl;
+//       cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
+//       cout << "\t\t\t<errorType>";
+//     }
+//     std::cout << errorcode2description(errorCode, USEQIECODES);
+//     if (XMLOUTPUT == false)
+//       cout << endl;
+//     else
+//       cout << "</errorType>" << endl;
     
-    if (bUsingIDs == false)
-    {
-      if (shellNum != -1)
-        shellNum = shellNum + 1;
-      if (facetNum != -1)
-        facetNum = facetNum + 1;
-      if (XMLOUTPUT == false)
-        cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
-      else {
-        cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
-        cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
-      }
-    }
+//     if (bUsingIDs == false)
+//     {
+//       if (shellNum != -1)
+//         shellNum = shellNum + 1;
+//       if (facetNum != -1)
+//         facetNum = facetNum + 1;
+//       if (XMLOUTPUT == false)
+//         cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
+//       else {
+//         cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
+//         cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
+//       }
+//     }
     
-    if (bUsingIDs == true)
-    {
-      string shelloutput = "-1";
-      string faceoutput = "-1";
-      if (shellNum >= 0)
-        shelloutput = idShells[shellNum];
-      if (facetNum >= 0&&shellNum >= 0)
-        faceoutput = idFaces[shellNum][facetNum];
-      if (XMLOUTPUT == false)
-        cout << "\t" << "[shell: #" << shelloutput << "; face: #" << faceoutput << "]" << endl;
-      else {
-        cout << "\t\t\t<shell>" << shelloutput << "</shell>" << endl;
-        cout << "\t\t\t<face>" << faceoutput << "</face>" << endl;
-      }
-    }
-    if (messageStr.empty() == false) {
-      if (XMLOUTPUT == false)
-        cout << "\t" << messageStr << endl;
-      else
-        cout << "\t\t\t<message>" << messageStr << "</message>" << endl;
-    }
-    if (XMLOUTPUT == true)
-      cout << "\t\t</ValidatorMessage>" << endl;
-  }
-}
+//     if (bUsingIDs == true)
+//     {
+//       string shelloutput = "-1";
+//       string faceoutput = "-1";
+//       if (shellNum >= 0)
+//         shelloutput = idShells[shellNum];
+//       if (facetNum >= 0&&shellNum >= 0)
+//         faceoutput = idFaces[shellNum][facetNum];
+//       if (XMLOUTPUT == false)
+//         cout << "\t" << "[shell: #" << shelloutput << "; face: #" << faceoutput << "]" << endl;
+//       else {
+//         cout << "\t\t\t<shell>" << shelloutput << "</shell>" << endl;
+//         cout << "\t\t\t<face>" << faceoutput << "</face>" << endl;
+//       }
+//     }
+//     if (messageStr.empty() == false) {
+//       if (XMLOUTPUT == false)
+//         cout << "\t" << messageStr << endl;
+//       else
+//         cout << "\t\t\t<message>" << messageStr << "</message>" << endl;
+//     }
+//     if (XMLOUTPUT == true)
+//       cout << "\t\t</ValidatorMessage>" << endl;
+//   }
+// }
 
 
 
@@ -243,6 +243,7 @@ int main(int argc, char* const argv[])
 #endif
 
   bool   TRANSLATE             = true;  //-- to handle very large coordinates 
+  IOErrors errs;
 
   //-- tclap options
   std::vector<std::string> primitivestovalidate;
@@ -274,8 +275,6 @@ int main(int argc, char* const argv[])
     cmd.add(inputxml);
     cmd.parse( argc, argv );
   
-    cbf cbfunction = callback;
-
     Primitives3D prim3d = SOLID;
     if (primitives.getValue() == "CS")
       prim3d = COMPOSITESURFACE;
@@ -297,7 +296,7 @@ int main(int argc, char* const argv[])
 //    vector<Solid*> lsSolids;
 //    Solid s1;
     //-- read the input GML
-    vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), snap_tolerance.getValue(), cbfunction, TRANSLATE);
+    vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), errs, snap_tolerance.getValue(), TRANSLATE);
     std::clog << "\n# of <gml:Solids>: " << lsSolids.size() << std::endl;
     std::clog << "HUGOLEDOUX# of <gml:Solids>: " << lsSolids.size() << std::endl;
 //    std::clog << lsSolids[0].get_id() << std::endl;
