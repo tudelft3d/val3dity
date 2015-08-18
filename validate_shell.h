@@ -24,7 +24,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "validate.h"
 #include "Shell.h"
 #include <CGAL/intersections.h>
 #include <CGAL/IO/Polyhedron_iostream.h>

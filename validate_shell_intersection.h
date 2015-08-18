@@ -24,7 +24,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "validate.h"
 
 // Checks for self-intersections between triangles contained in shell
 bool is_polyhedron_geometrically_consistent(Shell2* sh);

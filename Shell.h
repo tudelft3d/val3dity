@@ -15,7 +15,7 @@
 class Shell2
 {
 public:
-  Shell2  (int id, double tol_snap);
+  Shell2  (int id = -1, double tol_snap = 0.0);
   ~Shell2 ();
   
   int    number_points();
@@ -33,6 +33,7 @@ public:
   bool   validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
 
   void   add_error(int code, int faceid, std::string info = "");
+  void   translate_vertices();
   
 private:
   int                             _id;

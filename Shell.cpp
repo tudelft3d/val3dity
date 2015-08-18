@@ -264,6 +264,26 @@ bool Shell2::construct_ct(const vector< vector<int> >& pgnids, const vector<Poly
 }
 
 
+void Shell2::translate_vertices()
+{
+  vector<Point3>::iterator it = _lsPts.begin();
+  K::FT minx = 9e10;
+  K::FT miny = 9e10;
+  for ( ; it != _lsPts.end(); it++)
+  {
+    if (it->x() < minx)
+      minx = it->x();
+    if (it->y() < miny)
+      miny = it->y();
+  }
+  for (it = _lsPts.begin(); it != _lsPts.end(); it++)
+  {
+    Point3 tp(CGAL::to_double(it->x() - minx), CGAL::to_double(it->y() - miny), CGAL::to_double(it->z()));
+    *it = tp;
+  }
+}
+
+
 bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "Validating surfaces in 2D (their projection)" << std::endl;
