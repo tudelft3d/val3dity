@@ -27,7 +27,7 @@
 */
 
 // We are currently only including this to get the definition of polyhedraShell.
-#include "validate.h"
+#include "Shell.h"
 #include "Solid.h"
 #include "pugixml.hpp"
 #include <fstream>
@@ -44,7 +44,8 @@ public:
   }
 };
 
-void readAllInputShells(string &foshell, vector<string> &fishells, vector<Shell*> &shells, cbf cb, bool translatevertices = true);
-vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool translatevertices);
+vector<Solid> readGMLfile(std::string &ifile, IOErrors& errs, double tol_snap, bool translatevertices = true);
+Shell2*       readPolyShell(std::string &ifile, IOErrors& errs, bool translatevertices = true);
+
 
 #endif

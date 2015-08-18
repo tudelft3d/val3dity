@@ -25,7 +25,7 @@
 
 
 #include "input.h"
-#include "validate.h"
+#include "Shell.h"
 #include "Solid.h"
 #include <tclap/CmdLine.h>
 
@@ -297,30 +297,30 @@ int main(int argc, char* const argv[])
 //    Solid s1;
     //-- read the input GML
     vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), errs, snap_tolerance.getValue(), TRANSLATE);
-    std::clog << "\n# of <gml:Solids>: " << lsSolids.size() << std::endl;
-    std::clog << "HUGOLEDOUX# of <gml:Solids>: " << lsSolids.size() << std::endl;
+    std::clog << "# of <gml:Solids>: " << lsSolids.size() << std::endl;
 //    std::clog << lsSolids[0].get_id() << std::endl;
     
 //    for (auto& s : lsSolids)
 //    {
 //      std::clog << s.get_oshell()->number_faces() << std::endl;
 //    }
-    
-    Solid s = lsSolids[0];
-    std::clog << "id " << s.get_id() << std::endl;
-    std::clog << "# ishells: " << s.num_ishells() << std::endl;
-    
-    Shell2* sh = s.get_oshell();
-    std::clog << sh->number_faces() << std::endl;
+    if (lsSolids.empty() == false)
+    {
+      Solid s = lsSolids[0];
+      std::clog << "id " << s.get_id() << std::endl;
+      std::clog << "# ishells: " << s.num_ishells() << std::endl;
+      Shell2* sh = s.get_oshell();
+      std::clog << sh->number_faces() << std::endl;
 //    sh = s.get_ishell(1);
 //    std::cout << sh->number_faces() << std::endl;
     
 //    sh->validate_2d_primitives(planarity_d2p.getValue(), planarity_n.getValue());
-    sh->validate_as_multisurface(planarity_d2p.getValue(), planarity_n.getValue());
+      sh->validate_as_multisurface(planarity_d2p.getValue(), planarity_n.getValue());
+    }
     
 //    clog.rdbuf(savedBufferCLOG);
 //    mylog.close();
-
+    
     return 1;
 
     // if (dorepair.getValue() == false) {
