@@ -27,7 +27,7 @@
 */
 
 #include <string>
-#include "val3dity_defs.h"
+#include "definitions.h"
 
 // -----------------------------------------------------------
 // Usage documentation for this method goes here.

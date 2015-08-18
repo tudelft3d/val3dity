@@ -10,7 +10,7 @@
 #define __val3dity__Solid__
 
 #include "Shell.h"
-#include "val3dity_defs.h"
+#include "definitions.h"
 
 
 class Solid

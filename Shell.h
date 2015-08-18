@@ -9,7 +9,7 @@
 #ifndef __val3dity__Shell__
 #define __val3dity__Shell__
 
-#include "val3dity_defs.h"
+#include "definitions.h"
 //#include "geomtools.h"
 
 class Shell2

@@ -27,7 +27,7 @@
 */
 
 // CGAL kernel
-#include "val3dity_defs.h"
+#include "definitions.h"
 #include "Shell.h"
 
 

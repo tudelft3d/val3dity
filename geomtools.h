@@ -9,7 +9,7 @@
 #ifndef __val3dity__geomtools__
 #define __val3dity__geomtools__
 
-#include <val3dity_defs.h>
+#include <definitions.h>
 
 //-- misc
 #define PI 3.14159265

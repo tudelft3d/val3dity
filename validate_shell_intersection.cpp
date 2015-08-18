@@ -25,7 +25,7 @@
 */
 
 #include "validate_shell.h"
-#include "val3dity_defs.h"
+#include "definitions.h"
 
 #include <CGAL/intersections.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
