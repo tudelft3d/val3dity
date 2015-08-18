@@ -17,6 +17,7 @@ class Solid
 {
 public:
   Solid();
+  Solid(Shell2* sh);
   ~Solid();
   
   Shell2*                 get_oshell();

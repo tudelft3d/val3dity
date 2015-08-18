@@ -256,23 +256,23 @@ int main(int argc, char* const argv[])
   MyOutput my;
   cmd.setOutput(&my);
   try {
-    TCLAP::ValueArg<std::string> inputxml   ("i", "", "xml file input", true, "", "string");
+    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "file input", true, "", "string");
+    // TCLAP::ValueArg<std::string> inputxml   ("i", "", "xml file input", true, "", "string");
     TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
     TCLAP::SwitchArg             outputxml  ("", "outputxml", "XML output", false);
     TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
-    TCLAP::SwitchArg             withids    ("", "withids", "POLY files contain IDs", false);
     TCLAP::ValueArg<double> snap_tolerance  ("", "snap_tolerance", "tolerance for snapping vertices (default=0.001)", false, 0.001, "double");
     TCLAP::ValueArg<double> planarity_d2p   ("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double> planarity_n     ("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0)", false, 1.0, "double");
-    
+
     cmd.add(outputxml);
     cmd.add(qie);
-    cmd.add(withids);
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
     cmd.add(primitives);
-    cmd.add(inputxml);
+    // cmd.add(inputxml);
+    cmd.add(inputfile);
     cmd.parse( argc, argv );
   
     Primitives3D prim3d = SOLID;
@@ -283,7 +283,6 @@ int main(int argc, char* const argv[])
 
     XMLOUTPUT = outputxml.getValue();
     USEQIECODES = qie.getValue();
-    bUsingIDs = withids.getValue();
 
 //    std::streambuf* savedBufferCLOG;
 //    savedBufferCLOG = clog.rdbuf();
@@ -292,12 +291,39 @@ int main(int argc, char* const argv[])
 //    std::clog.rdbuf(mylog.rdbuf());
 
 
-//    vector<Shell*> shells;
-//    vector<Solid*> lsSolids;
-//    Solid s1;
-    //-- read the input GML
-    vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), errs, snap_tolerance.getValue(), TRANSLATE);
+    vector<Solid> lsSolids;
+
+    std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
+    if ( (extension == "gml") ||  
+         (extension == "GML") ||  
+         (extension == "xml") ||  
+         (extension == "XML") ) 
+    {
+      // std::clog << "GML FILE TYPE" << std::endl; 
+      lsSolids = readGMLfile(inputfile.getValue(), errs, snap_tolerance.getValue(), TRANSLATE);
+    }
+    else if ( (extension == "poly") ||
+              (extension == "POLY") )
+    {
+      // std::cout << "POLY FILE TYPE" << std::endl; 
+      Shell2* sh = readPolyfile(inputfile.getValue(), errs, TRANSLATE);
+      if (sh != NULL)
+      {
+        Solid s(sh);
+        lsSolids.push_back(s);
+      }
+    }
+    else
+    {
+      std::cout << "UNKNOWN FILE TYPE" << std::endl; 
+    }
+
     std::clog << "# of <gml:Solids>: " << lsSolids.size() << std::endl;
+    
+//    return -1;
+    // if (inputfile.getValue() = "") {
+
+    //-- read the input GML
 //    std::clog << lsSolids[0].get_id() << std::endl;
     
 //    for (auto& s : lsSolids)

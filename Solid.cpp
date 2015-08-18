@@ -31,6 +31,13 @@ Solid::Solid()
 }
 
 
+Solid::Solid(Shell2* sh)
+{
+  _shells.push_back(sh);
+  _id = std::to_string(_counter);
+  _counter++;
+}
+
 Solid::~Solid()
 {
   // TODO: destructor for Solid, memory-management jongens

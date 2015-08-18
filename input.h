@@ -45,7 +45,7 @@ public:
 };
 
 vector<Solid> readGMLfile(std::string &ifile, IOErrors& errs, double tol_snap, bool translatevertices = true);
-Shell2*       readPolyShell(std::string &ifile, IOErrors& errs, bool translatevertices = true);
+Shell2*       readPolyfile(std::string &ifile, IOErrors& errs, bool translatevertices = true);
 
 
 #endif

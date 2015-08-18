@@ -171,7 +171,7 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
 
 
 
-Shell2* readPolyShell(std::string &ifile, IOErrors& errs, bool translatevertices)
+Shell2* readPolyfile(std::string &ifile, IOErrors& errs, bool translatevertices)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   std::stringstream st;
