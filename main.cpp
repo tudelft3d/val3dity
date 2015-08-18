@@ -239,7 +239,7 @@ void callback(int errorCode,    // 0 means status message, -1 means unknown erro
 int main(int argc, char* const argv[])
 {
 #ifdef VAL3DITY_USE_EPECSQRT
-  std::cout << "***** USING EXACT-EXACT *****" << std::endl;
+  std::clog << "***** USING EXACT-EXACT *****" << std::endl;
 #endif
 
   bool   TRANSLATE             = true;  //-- to handle very large coordinates 
@@ -286,31 +286,42 @@ int main(int argc, char* const argv[])
     USEQIECODES = qie.getValue();
     bUsingIDs = withids.getValue();
 
+//    std::streambuf* savedBufferCLOG;
+//    savedBufferCLOG = clog.rdbuf();
+//    std::ofstream mylog;
+//    mylog.open("/Users/hugo/temp/0.log");
+//    std::clog.rdbuf(mylog.rdbuf());
+
 
 //    vector<Shell*> shells;
 //    vector<Solid*> lsSolids;
 //    Solid s1;
     //-- read the input GML
     vector<Solid> lsSolids = readGMLfile(inputxml.getValue(), snap_tolerance.getValue(), cbfunction, TRANSLATE);
-    std::cout << "\n# of <gml:Solids>: " << lsSolids.size() << std::endl;
-//    std::cout << lsSolids[0].get_id() << std::endl;
+    std::clog << "\n# of <gml:Solids>: " << lsSolids.size() << std::endl;
+    std::clog << "HUGOLEDOUX# of <gml:Solids>: " << lsSolids.size() << std::endl;
+//    std::clog << lsSolids[0].get_id() << std::endl;
     
 //    for (auto& s : lsSolids)
 //    {
-//      std::cout << s.get_oshell()->number_faces() << std::endl;
+//      std::clog << s.get_oshell()->number_faces() << std::endl;
 //    }
     
     Solid s = lsSolids[0];
-    std::cout << "id " << s.get_id() << std::endl;
-    std::cout << "# ishells: " << s.num_ishells() << std::endl;
+    std::clog << "id " << s.get_id() << std::endl;
+    std::clog << "# ishells: " << s.num_ishells() << std::endl;
     
     Shell2* sh = s.get_oshell();
-    std::cout << sh->number_faces() << std::endl;
+    std::clog << sh->number_faces() << std::endl;
 //    sh = s.get_ishell(1);
 //    std::cout << sh->number_faces() << std::endl;
     
 //    sh->validate_2d_primitives(planarity_d2p.getValue(), planarity_n.getValue());
     sh->validate_as_multisurface(planarity_d2p.getValue(), planarity_n.getValue());
+    
+//    clog.rdbuf(savedBufferCLOG);
+//    mylog.close();
+
     return 1;
 
     // if (dorepair.getValue() == false) {

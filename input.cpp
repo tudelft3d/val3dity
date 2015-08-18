@@ -94,7 +94,7 @@ vector<int> processring(pugi::xml_node n, Shell2* sh, cbf cb) {
 Shell2* processshell(pugi::xml_node n, int id, double tol_snap, cbf cb) {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
-  Shell2* sh = new Shell2(id, tol_snap, cb);
+  Shell2* sh = new Shell2(id, tol_snap);
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
     vector< vector<int> > oneface;
