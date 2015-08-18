@@ -34,7 +34,6 @@
 #include <string>
 
 
-
 class IOErrors {
   std::map<int, vector<std::string> >  _errors;
 public:
@@ -45,14 +44,7 @@ public:
   }
 };
 
-
-
-
-// -----------------------------------------------------------
-// Ignore the first value in the array filenames for now...
 void readAllInputShells(string &foshell, vector<string> &fishells, vector<Shell*> &shells, cbf cb, bool translatevertices = true);
-void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb);
-
 vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool translatevertices);
 
 #endif
