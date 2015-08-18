@@ -36,10 +36,10 @@ typedef CgalPolyhedron::Facet_const_iterator    Facet_const_iterator;
 typedef CgalPolyhedron::Facet_const_handle      Facet_const_handle;
 
 
-CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, int shellID, cbf cb)
+CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell2* sh)
 {
   CgalPolyhedron* P = new CgalPolyhedron();
-  ConstructShell<HalfedgeDS> s(lsTr, lsPts, shellID, cb);
+  ConstructShell<HalfedgeDS> s(lsTr, lsPts, sh);
   if (s.isValid)
     P->delegate(s);
   else
@@ -64,11 +64,11 @@ void ConstructShell<HDS>::operator()( HDS& hds)
   { 
     B.add_vertex( Point(itPt->x(), itPt->y(), itPt->z()));
   }
-  construct_faces_order_given(B, cb);
+  construct_faces_order_given(B);
   if (isValid)
   {
     if (B.check_unconnected_vertices() == true) {
-      (*cb)(309, shellID, -1, "");
+      sh->add_error(309, -1, "");
       B.remove_unconnected_vertices();
     }
   }
@@ -76,7 +76,7 @@ void ConstructShell<HDS>::operator()( HDS& hds)
 }
 
 template <class HDS>
-void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B)
 {
   vector< vector<int*> >::const_iterator itF = faces->begin();
   int faceID = 0;
@@ -86,7 +86,7 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
     for ( ; itF2 != itF->end(); itF2++)
     {
       int* a = *itF2;
-      add_one_face(B, a[0], a[1], a[2], faceID, cb);
+      add_one_face(B, a[0], a[1], a[2], faceID);
     }
     faceID++;
   }
@@ -181,7 +181,7 @@ int ConstructShell<HDS>::m2a(int m, int n)
 }
 
 template <class HDS>
-void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
+void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B)
 {
   int size = static_cast<int>((*lsPts).size());
 #ifdef WIN32
@@ -302,7 +302,7 @@ bool ConstructShell<HDS>::is_connected(int* tr, bool* halfedges)
 }
 
 template <class HDS>
-void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb)
+void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID)
 {
   std::vector< std::size_t> faceids(3);        
   faceids[0] = i0;
@@ -319,10 +319,10 @@ void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HD
     if (B.test_facet(faceids.begin(), faceids.end()))
     {
       //std::cout << "*** Reversed orientation of the face" << std::endl;
-      (*cb)(307, shellID, faceID, ""); 
+      sh->add_error(307, faceID, ""); 
  }
     else
-      (*cb)(304, shellID, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
+      sh->add_error(304, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
   }
   return ;
 } 
@@ -395,7 +395,7 @@ void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HD
 
 //revised version of check_global_orientation_normals
 //should be careful!! still have contradict cases but low probability
-bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf cb )
+bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter)
 {
 	/*calculation the AABB tree for select an exterior point outside the bounding box
 	and calculate intersections for the ray. selected the closest intersection point and comparing the normal*/
@@ -553,7 +553,7 @@ bool check_global_orientation_normals_rev( CgalPolyhedron* p, bool bOuter, cbf c
 
 //using local method proposed by Sjors Donkers
 //Requirments: The input polyhedron should be valid without intersections or degeneracies.
-bool check_global_orientation_normals_rev2( CgalPolyhedron* p, bool bOuter, cbf cb )
+bool check_global_orientation_normals_rev2( CgalPolyhedron* p, bool bOuter)
 {
 	//-- get a 'convex corner' along x
 	CgalPolyhedron::Vertex_iterator vIt;
@@ -636,17 +636,17 @@ bool check_global_orientation_normals_rev2( CgalPolyhedron* p, bool bOuter, cbf 
 			return !bOuter;
 		}
 		else//collinear
-			return check_global_orientation_normals_rev(p, bOuter, cb );
+			return check_global_orientation_normals_rev(p, bOuter);
 	}
 	else
 	{
 		//do ray shooting
-		return check_global_orientation_normals_rev(p, bOuter, cb );
+		return check_global_orientation_normals_rev(p, bOuter);
 	}
 }
 
 //problematic
-bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter, cbf cb )
+bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter)
 {
 	//-- get a 'convex corner', sorting order is x-y-z
 	CgalPolyhedron::Vertex_iterator vIt;

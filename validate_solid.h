@@ -25,6 +25,7 @@
 */
 
 #include "validate.h"
+#include "Solid.h"
 
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
@@ -38,4 +39,4 @@ typedef CGAL::Polyhedron_3<Ke>                              PolyhedronExact;
 
 typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
 
-bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb);
+bool validate_solid_with_nef(Solid& sol);

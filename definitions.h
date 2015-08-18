@@ -39,8 +39,9 @@
 
 
 // STL library
-#include <vector>
 using namespace std;
+#include <vector>
+#include <map>
 
 // CGAL typedefs
 #ifdef VAL3DITY_USE_EPECSQRT
@@ -67,18 +68,18 @@ typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
 
-// convenience structures:
-//-- the vector of faces, each which has a vector of rings, 
-//-- which is a vector of IDs from vertex pool lsPts
-typedef struct fullPolyhedraShell_tag {
-   vector< Point3 > lsPts;
-   vector< vector< vector<int> > > faces;
-} Shell;
-
-typedef struct triangulatedShell_tag {
-   vector< Point3 > lsPts;
-   vector< vector<int*> > faces;
-} TrShell;
+//// convenience structures:
+////-- the vector of faces, each which has a vector of rings, 
+////-- which is a vector of IDs from vertex pool lsPts
+//typedef struct fullPolyhedraShell_tag {
+//   vector< Point3 > lsPts;
+//   vector< vector< vector<int> > > faces;
+//} Shell;
+//
+//typedef struct triangulatedShell_tag {
+//   vector< Point3 > lsPts;
+//   vector< vector<int*> > faces;
+//} TrShell;
 
 typedef enum
 {
@@ -89,10 +90,10 @@ typedef enum
 
 // This callback function will be used to both report progress
 // as well as any validity problems that are encountered.
-typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
-                     int shellNum, // -1 means unused
-                     int facetNum,     // -1 means unused
-                     std::string messageStr); // optional
+//typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
+//                     int shellNum, // -1 means unused
+//                     int facetNum,     // -1 means unused
+//                     std::string messageStr); // optional
 
 std::string errorcode2description(int code);
 

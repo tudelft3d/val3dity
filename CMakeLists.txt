@@ -2,6 +2,18 @@
 
 project( val3dity )
 
+# C++11
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
@@ -49,10 +61,10 @@ include_directories( ${GEOS_INCLUDE_DIR}, include )
 # Creating entries for target: val3dity
 # ############################
 
-add_executable( val3dity  input.cpp validate.cpp validate_2d.cpp validate_shell.cpp validate_solid.cpp validate_shell_intersection.cpp main.cpp )
+add_executable( val3dity input.cpp pugixml.cpp geomtools.cpp Shell.cpp Solid.cpp validate_shell.cpp validate_solid.cpp validate_shell_intersection.cpp main.cpp )
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(val3dity   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY})
+target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY})
 

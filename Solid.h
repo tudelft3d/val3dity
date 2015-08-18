@@ -10,30 +10,34 @@
 #define __val3dity__Solid__
 
 #include "Shell.h"
-#include "val3dity_defs.h"
+#include "definitions.h"
 
 
 class Solid
 {
 public:
-  Solid(cbf cb);
+  Solid();
   ~Solid();
   
-  Shell2*   get_oshell();
-  void      set_oshell(Shell2* sh);
-  Shell2*   get_ishell(int i);
-  void      add_ishell(Shell2* sh);
-  int       num_ishells();
+  Shell2*                 get_oshell();
+  void                    set_oshell(Shell2* sh);
+  Shell2*                 get_ishell(int i);
+  void                    add_ishell(Shell2* sh);
+  const vector<Shell2*>&  get_shells();
+  int                     num_ishells();
   
-  bool      validate();
+  bool        validate();
+  void        add_error(int code, int shell1, int shell2, std::string info);
 
   static int  _counter;
   std::string get_id();
   void        set_id(std::string id);
 private:
-  std::string    _id;
-  Shell2*         _oshell;
-  vector<Shell2*> _ishells;
+  std::string     _id;
+  vector<Shell2*> _shells;
+  // std::map<int, vector<std::pair<int, std::string> > > _errors;
+
+  bool validate_solid_with_nef();
 };
 
 

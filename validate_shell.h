@@ -24,7 +24,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "validate.h"
+#include "Shell.h"
 #include <CGAL/intersections.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/intersections.h>
@@ -38,35 +38,30 @@
 #include<list>
 
 
-
-
-
-
 template <class HDS>
 class ConstructShell : public CGAL::Modifier_base<HDS> {
   vector< vector<int*> > *faces;
   vector<Point3> *lsPts;
   int _width;
-  int shellID;
-  cbf cb;
+  Shell2* sh;
 public:
   bool isValid;
-  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, int shellID, cbf cb)
-    :faces(faces), lsPts(lsPts), shellID(shellID), cb(cb), isValid(true), _width(static_cast<int>(lsPts->size()))
+  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, Shell2* sh)
+    :faces(faces), lsPts(lsPts), sh(sh), isValid(true), _width(static_cast<int>(lsPts->size()))
   {
   }
   void operator()( HDS& hds);
-  void construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb);
+  void construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B);
   int m2a(int m, int n);
-  void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb);
+  void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B);
   bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected);
   bool is_connected(int* tr, bool* halfedges);
-  void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID, cbf cb) ;
+  void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID) ;
 };
 
 
-CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, int shellID, cbf cb);
+CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell2* sh);
 CgalPolyhedron*   construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts);
-bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter, cbf cb);
-bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter, cbf cb);
-bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter, cbf cb);
+bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter);
+bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter);
+bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter);
