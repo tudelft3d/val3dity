@@ -38,4 +38,4 @@ typedef CGAL::Polyhedron_3<Ke>                              PolyhedronExact;
 
 typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
 
-bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb);
+bool validate_solid_with_nef(Solid& sol);

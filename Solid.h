@@ -31,9 +31,10 @@ public:
   std::string get_id();
   void        set_id(std::string id);
 private:
-  std::string    _id;
+  std::string     _id;
   Shell2*         _oshell;
   vector<Shell2*> _ishells;
+  // std::map<int, vector<std::pair<int, std::string> > > _errors;
 };
 
 

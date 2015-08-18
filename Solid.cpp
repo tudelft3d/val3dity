@@ -67,4 +67,12 @@ void Solid::set_id(std::string id)
   _id = id;
 }
 
+void Solid::add_error(int code, int shell1, int shell2, std::string info)
+{
+  // TODO: how to store these errors? shell-shell numbers?
+  // std::pair<int, std::string> a(faceid, info);
+  // _errors[code].push_back(a);
+  // std::clog << "--> errors #" << code << " for Shell " << this->_id << std::endl;
+}
+
 

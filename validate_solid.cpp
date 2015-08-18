@@ -28,22 +28,23 @@
 #include "validate_solid.h"
 #include <CGAL/IO/Polyhedron_iostream.h>
 
-
-
-bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
+// bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
+bool validate_solid_with_nef(Solid& sol)
 {
-  if (polyhedra.size() <= 1)
+  if (sol.num_ishells() == 0)
     return true;
+  vector<CgalPolyhedron*> polyhedra;
+  polyhedra.push_back(sol.get_oshell()->get_cgal_polyhedron())
+  for (auto& ishell : sol.get_ishells())
+    polyhedra.push_back(ishell->get_cgal_polyhedron())
     
   bool isValid = true;
   std::stringstream st;
-  st << "Inspecting interactions between the " << polyhedra.size() << " shells";
-  (*cb)(0, -1, -1, st.str());
+  std::clog << "Inspecting interactions between the " << polyhedra.size() << " shells";
   vector<Nef_polyhedron> nefs;
   vector<CgalPolyhedron*>::const_iterator polyhedraIt;
   for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
   {
-
 #ifdef VAL3DITY_USE_EPECSQRT
      Nef_polyhedron onef(**polyhedraIt);
 #else
@@ -58,18 +59,17 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
      nefs.push_back(onef);
   }
   vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
-
-  Nef_polyhedron solid;
-  solid += (*nefsIt);
+  Nef_polyhedron nef;
+  nef += (*nefsIt);
   nefsIt++;
   int numvol = 2;
   bool success = true;
   for ( ; nefsIt != nefs.end(); nefsIt++) 
   {
-    solid -= (*nefsIt);
-	solid.regularization();
+    nef -= (*nefsIt);
+  	nef.regularization();
     numvol++;
-    if (solid.number_of_volumes() != numvol)
+    if (nef.number_of_volumes() != numvol)
     {
       success = false;
       break;
@@ -84,48 +84,48 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
     int no = 1;
     for ( ; nefsIt != nefs.end(); nefsIt++) 
     {
-      solid.clear();
-      solid += *(nefs.begin());
-      solid -= *nefsIt;
-	  solid.regularization();	
-      if (solid.number_of_volumes() != 3)
+      nef.clear();
+      nef += *(nefs.begin());
+      nef -= *nefsIt;
+      nef.regularization();	
+      if (nef.number_of_volumes() != 3)
       {
-        if (solid.number_of_volumes() > 3)
+        if (nef.number_of_volumes() > 3)
         {
           //-- check if ishell is a subset of oshell
           if ((*nefsIt <= nefs[0]) == true)
-            (*cb)(404, 0, no, "");
+            sol.add_error(404, 0, no, "");
           else
           {
-            (*cb)(402, 0, no, "");
-            (*cb)(404, 0, no, "");
+            sol.add_error(402, 0, no, "");
+            sol.add_error(404, 0, no, "");
           }
         }
-        else //-- solid.number_of_volumes() < 3
+        else //-- nef.number_of_volumes() < 3
         {
           //-- perform union
-          solid.clear();
-          solid += *(nefs.begin());
-          solid += *nefsIt;
-		  solid.regularization();
-          if (solid.number_of_volumes() == 3)
-            (*cb)(403, -1, -1, "");
+          nef.clear();
+          nef += *(nefs.begin());
+          nef += *nefsIt;
+          nef.regularization();
+          if (nef.number_of_volumes() == 3)
+            sol.add_error(403, -1, -1, "");
           else
           {
             if ((*nefsIt <= nefs[0]) == true)
-              (*cb)(401, 0, no, "");
+              sol.add_error(401, 0, no, "");
             else
             {
-              solid.clear();
-              solid = nefs[0].intersection(nefsIt->interior());
-              solid.regularization();
-              if (solid.is_empty() == true)
+              nef.clear();
+              nef = nefs[0].intersection(nefsIt->interior());
+              nef.regularization();
+              if (nef.is_empty() == true)
               {
-                (*cb)(401, 0, no, "");
-                (*cb)(403, 0, no, "");
+                sol.add_error(401, 0, no, "");
+                sol.add_error(403, 0, no, "");
               }
               else
-                (*cb)(402, 0, no, "");
+                sol.add_error(402, 0, no, "");
             }
           }
         }
@@ -146,23 +146,23 @@ bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
       no2 = no + 1;
       for ( ; nefsIt2 != nefs.end(); nefsIt2++)
       {
-        solid.clear();
-        solid += *nefsIt;
-        solid += *nefsIt2;
-		solid.regularization();
-        if (solid.number_of_volumes() > 3)
-          (*cb)(402, no, no2, "Both shells completely overlap");
-        else if (solid.number_of_volumes() < 3)
+        nef.clear();
+        nef += *nefsIt;
+        nef += *nefsIt2;
+		    nef.regularization();
+        if (nef.number_of_volumes() > 3)
+          sol.add_error(402, no, no2, "Both shells completely overlap");
+        else if (nef.number_of_volumes() < 3)
         {
           //-- either they are face adjacent or overlap
-          solid.clear();
-          solid = nefsIt->interior();
-          solid = solid.intersection(nefsIt2->interior());
-		  solid.regularization();
-          if (solid.is_empty() == true)
-            (*cb)(401, no, no2, "");
+          nef.clear();
+          nef = nefsIt->interior();
+          nef = nef.intersection(nefsIt2->interior());
+		      nef.regularization();
+          if (nef.is_empty() == true)
+            sol.add_error(401, no, no2, "");
           else
-            (*cb)(402, no, no2, "");
+            sol.add_error(402, no, no2, "");
         }
         no2++;
       }
