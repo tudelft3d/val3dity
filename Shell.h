@@ -15,13 +15,14 @@
 class Shell2
 {
 public:
-  Shell2  (int id, double tol_snap, cbf cb);
+  Shell2  (int id, double tol_snap);
   ~Shell2 ();
   
   int    number_points();
   int    number_faces();
   bool   is_outer();
   int    get_id();
+  CgalPolyhedron* get_cgal_polyhedron();
   
   int    add_point(Point3 p);
   void   add_face(vector< vector<int> > f);
@@ -43,12 +44,14 @@ private:
   std::map<int, vector<std::pair<int, std::string> > > _errors;
 
   double                          _tol_snap;
-  cbf                             _cb;
   int                             _is_valid;    //-1: not done yet; 0: nope; 1: yes it's valid
   int                             _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
 
   bool triangulate_shell();
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
+  bool validate_polygon(vector<Polygon> &lsRings, int polygonid);
+  bool has_face_rings_toofewpoints(const vector< vector<int> >& theface);
+  bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface);
 
 };
 

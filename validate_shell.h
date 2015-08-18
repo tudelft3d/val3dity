@@ -45,7 +45,6 @@ class ConstructShell : public CGAL::Modifier_base<HDS> {
   vector<Point3> *lsPts;
   int _width;
   Shell2* sh;
-  cbf cb;
 public:
   bool isValid;
   ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, Shell2* sh)

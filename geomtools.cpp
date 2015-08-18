@@ -7,18 +7,41 @@
 //
 
 #include "geomtools.h"
+#include "CGAL/squared_distance_3.h"
+#include <CGAL/linear_least_squares_fitting_3.h>
 
 
+bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
+{
+  if (pts.size() == 3) {
+    return true;
+  }
+  //-- find a fitted plane with least-square adjustment
+  CgalPolyhedron::Plane_3 plane;
+  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>());  
+
+  //-- test distance to that plane for each point
+  vector<Point3>::const_iterator it = pts.begin();
+  bool isPlanar = true;
+  for ( ; it != pts.end(); it++)
+  {
+    K::FT d2 = CGAL::squared_distance(*it, plane);
+    if ( CGAL::to_double(d2) > (tolerance*tolerance) )
+    {
+      value = sqrt(CGAL::to_double(d2));
+      isPlanar = false;
+      break;
+    }
+  }
+  return isPlanar;
+}
 
 int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
   Vector* pnormal = polygon_normal(lsPts, ids);
-  K::FT TOL(1e-12); //-- tolerance
-  // K::FT TOL(1e-8); //-- tolerance
+  K::FT TOL(1e-12); //-- tolerance, TODO: can users change this one?
   if (CGAL::compare(sqrt(pnormal->squared_length()), TOL) != CGAL::LARGER)
-  {
     return -1;
-  }
   //-- normalise the normal
   *pnormal = *pnormal / sqrt(pnormal->squared_length());
   // need to use K::FT instead of double to ensure compilation under core level 4
@@ -28,13 +51,9 @@ int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
   K::FT m = max(max(a, b), c);
   delete pnormal;
   if (CGAL::compare(a, m) == CGAL::EQUAL)
-  {
     return 0;//yz
-  }
   else if (CGAL::compare(b, m) == CGAL::EQUAL)
-  {
     return 1;//xz
-  }
   else
     return 2;//xy
 }

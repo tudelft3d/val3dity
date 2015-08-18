@@ -126,10 +126,12 @@ struct Intersect_facets {
   }
 };
 
+// is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID)
 bool
-is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
+is_polyhedron_geometrically_consistent(Shell2* sh)
 {
   std::vector<Box> boxes;
+  CgalPolyhedron* p = sh->get_cgal_polyhedron();
   boxes.reserve(p->size_of_facets());
   for ( Facet_const_iterator i = p->facets_begin(); i != p->facets_end(); ++i)
   {
@@ -159,8 +161,7 @@ is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb)
      st << "Segment intersection: " << asegment[0].x() << asegment[0].y() << asegment[0].z() << endl;
     else if (assign(apoint, re))
      st << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
-    //    st << "At least at location: (" << gTriangles[0][0].x() << ", " << gTriangles[0][0].y() << ", " << gTriangles[0][0].z() << ")"; 
-    (*cb)(306, shellID, -1, st.str());
+    sh->add_error(306, -1, st.str());
     return false;
   }
 }

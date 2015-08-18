@@ -27,4 +27,4 @@
 #include "validate.h"
 
 // Checks for self-intersections between triangles contained in shell
-bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb);
+bool is_polyhedron_geometrically_consistent(Shell2* sh);
