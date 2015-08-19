@@ -27,7 +27,7 @@ public:
   const vector<Shell2*>&  get_shells();
   int                     num_ishells();
   
-  bool        validate();
+  bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
   void        add_error(int code, int shell1, int shell2, std::string info);
 
   static int  _counter;

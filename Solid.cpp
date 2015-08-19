@@ -70,14 +70,15 @@ void Solid::add_ishell(Shell2* sh)
 }
 
 
-bool Solid::validate()
+bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "I'm validating the solid" << std::endl;
+  bool isValid = true;
   for (auto sh : _shells)
   {
-    sh->validate_as_shell(0.001, 1.0);
+    if (sh->validate_as_shell(tol_planarity_d2p, tol_planarity_normals) == false)
+      isValid = false;
   }
-  return true;
+  return isValid;
 }
 
 

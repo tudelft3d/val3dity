@@ -8,6 +8,7 @@
 
 #include "Shell.h"
 #include "geomtools.h"
+#include "input.h"
 #include "validate_shell.h"
 #include "validate_shell_intersection.h"
 #include <GEOS/geos_c.h>
@@ -43,7 +44,12 @@ void Shell2::add_error(int code, int faceid, std::string info)
 {
   std::pair<int, std::string> a(faceid, info);
   _errors[code].push_back(a);
-  std::clog << "--> errors #" << code << " for Shell " << this->_id << std::endl;
+  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  if (faceid != -1)
+    std::clog << " (face #" << faceid << ")";
+  std::clog << std::endl;
+  if (info.empty() == false)
+    std::clog << "\t[" << info << "]" << std::endl;
 }
 
 int Shell2::add_point(Point3 p)
@@ -95,6 +101,7 @@ bool Shell2::is_outer()
 
 bool Shell2::triangulate_shell()
 {
+  std::clog << "--Triangulation of each surface" << std::endl;
   //-- read the facets
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
@@ -286,7 +293,7 @@ void Shell2::translate_vertices()
 
 bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "Validating surfaces in 2D (their projection)" << std::endl;
+  std::clog << "--2D validation of each surface" << std::endl;
   bool isValid = true;
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
@@ -365,7 +372,7 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planari
     //-- triangulate faces of the shell
     triangulate_shell();
     //-- check planarity by normal deviation method (of all triangle)
-    std::clog << "\nChecking the planarity of surfaces (with normals deviation)" << std::endl;
+    std::clog << "--Planarity of surfaces (with normals deviation)" << std::endl;
     for (unsigned int i = 0; i < _lsTr.size(); i++)
     {
       vector< vector<int*> >::iterator it = _lsTr.begin();
@@ -386,7 +393,6 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planari
     }
   }
   _is_valid_2d = isValid;
-  std::clog << "so is it valid? " << isValid << std::endl;
   return isValid;
 }
 
@@ -417,6 +423,11 @@ bool Shell2::validate_as_compositesurface(double tol_planarity_d2p, double tol_p
 // CgalPolyhedron* validate_triangulated_shell_solid(TrShell& tshell, int _id, cbf cb, double TOL_PLANARITY_normals)
 bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
+  std::clog << "Shell validation (#" << _id << ")" << std::endl;
+  if (_is_valid_2d == -1)
+    validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
+  if (_is_valid_2d == 0)
+    return false;
   bool isValid = true;
 //-- 1. minimum number of faces = 4
   if (_lsTr.size() < 4) 
@@ -426,7 +437,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
     return false;
   }
 //-- 2. Combinatorial consistency
-  std::clog << "-----Combinatorial consistency-----" << std::endl;
+  std::clog << "--Combinatorial consistency" << std::endl;
   _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
   if (_polyhedron != NULL)
   {
@@ -454,8 +465,8 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
               st << "Location hole: " << he->vertex()->point();
               this->add_error(302, -1, st.str());
               st.str("");
-              // _polyhedron->fill_hole(he);
-              // _polyhedron->normalize_border();
+              _polyhedron->fill_hole(he);
+              _polyhedron->normalize_border();
             }
             isValid = false;
           }
@@ -479,21 +490,16 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
 //-- 3. Geometrical consistency (aka intersection tests between faces)
   if (isValid == true)
   {
-    std::clog << "\tyes" << std::endl;
-    std::clog << "-----Geometrical consistency" << std::endl;
+    std::clog << "--Geometrical consistency" << std::endl;
     isValid = is_polyhedron_geometrically_consistent(this);
   }
-  if (isValid)
-    std::clog << "\tyes" << std::endl;
 //-- 4. orientation of the normals is outwards or inwards
   if (isValid == true)
   {
-    std::clog << "-----Orientation of normals" << std::endl;
+    std::clog << "--Orientation of normals" << std::endl;
     isValid = check_global_orientation_normals_rev2(_polyhedron, this->is_outer());
     if (isValid == false)
       this->add_error(308, -1);
-    else
-      std::clog << "\tyes" << std::endl;
   }
   if (isValid == false)
   {
