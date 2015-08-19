@@ -256,14 +256,14 @@ int main(int argc, char* const argv[])
   MyOutput my;
   cmd.setOutput(&my);
   try {
-    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "file input", true, "", "string");
-    // TCLAP::ValueArg<std::string> inputxml   ("i", "", "xml file input", true, "", "string");
-    TCLAP::ValueArg<std::string> primitives ("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
-    TCLAP::SwitchArg             outputxml  ("", "outputxml", "XML output", false);
-    TCLAP::SwitchArg             qie        ("", "qie", "use the OGC QIE codes", false);
-    TCLAP::ValueArg<double> snap_tolerance  ("", "snap_tolerance", "tolerance for snapping vertices (default=0.001)", false, 0.001, "double");
-    TCLAP::ValueArg<double> planarity_d2p   ("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
-    TCLAP::ValueArg<double> planarity_n     ("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0)", false, 1.0, "double");
+    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one shell)", true, "", "string");
+    TCLAP::MultiArg<std::string>           ishells("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
+    TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
+    TCLAP::SwitchArg                       outputxml("", "outputxml", "XML output", false);
+    TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE codes", false);
+    TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
+    TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
+    TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
 
     cmd.add(outputxml);
     cmd.add(qie);
@@ -271,8 +271,8 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
     cmd.add(primitives);
-    // cmd.add(inputxml);
     cmd.add(inputfile);
+    cmd.add(ishells);
     cmd.parse( argc, argv );
   
     Primitives3D prim3d = SOLID;
@@ -301,16 +301,25 @@ int main(int argc, char* const argv[])
     {
       // std::clog << "GML FILE TYPE" << std::endl; 
       lsSolids = readGMLfile(inputfile.getValue(), errs, snap_tolerance.getValue(), TRANSLATE);
+      if (ishells.getValue().size() > 0)
+      {
+        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+        throw false;
+      }
     }
     else if ( (extension == "poly") ||
               (extension == "POLY") )
     {
-      // std::cout << "POLY FILE TYPE" << std::endl; 
+      // std::cout << "POLY FILE TYPE" << std::endl;
+      Solid s;
       Shell2* sh = readPolyfile(inputfile.getValue(), errs, TRANSLATE);
       if (sh != NULL)
+        s.set_oshell(sh);
+      for (auto ifile : ishells.getValue())
       {
-        Solid s(sh);
-        lsSolids.push_back(s);
+        Shell2* sh = readPolyfile(ifile, errs, TRANSLATE);
+        if (sh != NULL)
+          s.add_ishell(sh);
       }
     }
     else
@@ -320,28 +329,20 @@ int main(int argc, char* const argv[])
 
     std::clog << "# of <gml:Solids>: " << lsSolids.size() << std::endl;
     
-//    return -1;
-    // if (inputfile.getValue() = "") {
-
-    //-- read the input GML
-//    std::clog << lsSolids[0].get_id() << std::endl;
-    
-//    for (auto& s : lsSolids)
-//    {
-//      std::clog << s.get_oshell()->number_faces() << std::endl;
-//    }
-    if (lsSolids.empty() == false)
+   
+    for (auto& s : lsSolids)
     {
-      Solid s = lsSolids[0];
       std::clog << "id " << s.get_id() << std::endl;
       std::clog << "# ishells: " << s.num_ishells() << std::endl;
-      Shell2* sh = s.get_oshell();
-      std::clog << sh->number_faces() << std::endl;
+      s.validate();
+      // std::clog << s.get_oshell()->number_faces() << std::endl;
+      // Shell2* sh = s.get_oshell();
+      // std::clog << sh->number_faces() << std::endl;
 //    sh = s.get_ishell(1);
 //    std::cout << sh->number_faces() << std::endl;
     
 //    sh->validate_2d_primitives(planarity_d2p.getValue(), planarity_n.getValue());
-      sh->validate_as_multisurface(planarity_d2p.getValue(), planarity_n.getValue());
+      // sh->validate_as_multisurface(planarity_d2p.getValue(), planarity_n.getValue());
     }
     
 //    clog.rdbuf(savedBufferCLOG);
@@ -349,28 +350,7 @@ int main(int argc, char* const argv[])
     
     return 1;
 
-    // if (dorepair.getValue() == false) {
-    //   readAllInputShells(oshell.getValue(), fishells, shells, cbfunction, TRANSLATE);
-    //   if (!callbackWasCalledWithError)
-    //     validate(shells, cbfunction, planarity_d2p.getValue(), planarity_n.getValue(), prim3d);
-    // }
-    // else {
-    //   repair(shells, repairmeths, cbfunction);
-    // }
 
-    //-- feedback to user
-    if (outputxml.getValue() == false) {
-      if (callbackWasCalledWithError)
-      {
-        cout << "--> Invalid :(" << endl << endl;
-        return(0);
-      }
-      else
-      {
-        cout << "--> Valid :)" << endl << endl;
-        return(1);
-      }
-    }
   }
   catch (TCLAP::ArgException &e) {
     std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;

@@ -73,6 +73,10 @@ void Solid::add_ishell(Shell2* sh)
 bool Solid::validate()
 {
   std::clog << "I'm validating the solid" << std::endl;
+  for (auto sh : _shells)
+  {
+    sh->validate_as_shell(0.001, 1.0);
+  }
   return true;
 }
 
