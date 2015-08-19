@@ -28,6 +28,7 @@ Solid::Solid()
 {
   _id = std::to_string(_counter);
   _counter++;
+  _is_valid = -1;
 }
 
 
@@ -70,14 +71,27 @@ void Solid::add_ishell(Shell2* sh)
 }
 
 
+bool Solid::is_valid()
+{
+  if (_is_valid > 0)
+    return true;
+  else
+    return false;
+}
+
+
 bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
   bool isValid = true;
-  for (auto sh : _shells)
+  for (auto& sh : _shells)
   {
     if (sh->validate_as_shell(tol_planarity_d2p, tol_planarity_normals) == false)
       isValid = false;
   }
+  if (isValid)
+    if (validate_solid_with_nef() == false)
+      isValid = false;
+  _is_valid = isValid;
   return isValid;
 }
 
@@ -121,7 +135,7 @@ bool Solid::validate_solid_with_nef()
     
   bool isValid = true;
   std::stringstream st;
-  std::clog << "Inspecting interactions between the " << polyhedra.size() << " shells";
+  std::clog << "----------" << std::endl << "--Inspection interactions between the " << polyhedra.size() << " shells" << std::endl;
   vector<Nef_polyhedron> nefs;
   vector<CgalPolyhedron*>::const_iterator polyhedraIt;
   for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)

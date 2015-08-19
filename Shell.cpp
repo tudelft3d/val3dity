@@ -423,7 +423,7 @@ bool Shell2::validate_as_compositesurface(double tol_planarity_d2p, double tol_p
 // CgalPolyhedron* validate_triangulated_shell_solid(TrShell& tshell, int _id, cbf cb, double TOL_PLANARITY_normals)
 bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "Shell validation (#" << _id << ")" << std::endl;
+  std::clog << "----- Shell validation (#" << _id << ") -----" << std::endl;
   if (_is_valid_2d == -1)
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)

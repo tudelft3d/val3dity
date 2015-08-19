@@ -236,16 +236,16 @@ int main(int argc, char* const argv[])
       if (errs.has_errors())
         throw "901: INVALID_INPUT_FILE";
       s.set_oshell(sh);
-      lsSolids.push_back(s);
       int sid = 1;
       for (auto ifile : ishellfiles.getValue())
       {
         Shell2* sh = readPolyfile(ifile, sid, errs, TRANSLATE);
         if (errs.has_errors())
           throw "901: INVALID_INPUT_FILE";
-        s.set_oshell(sh);
+        s.add_ishell(sh);
         sid++;
       }
+      lsSolids.push_back(s);
     }
     else
       throw "unknown file type";
@@ -254,11 +254,26 @@ int main(int argc, char* const argv[])
     std::clog << "# of <gml:Solids>: " << lsSolids.size() << std::endl;
     for (auto& s : lsSolids)
     {
-      std::clog << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
+      std::clog << std::endl << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
       if (s.validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
-        std::clog << "-->invalid" << std::endl;
+        std::clog << "===== Solid invalid =====" << std::endl;
       else
-        std::clog << "-->valid" << std::endl;
+        std::clog << "===== Solid valid =====" << std::endl;
+    }
+
+    //-- print summary of errors
+    if (lsSolids.size() > 1)
+    {
+      std::clog << std::endl;
+      std::clog << "++++++++++ SUMMARY ++++++++++" << std::endl;
+      std::clog << "total # of Solids: " << lsSolids.size() << std::endl;
+      int bValid = 0;
+      for (auto& s : lsSolids)
+        if (s.is_valid() == true)
+          bValid++;
+      std::clog << "\tvalid: " << bValid << "/" << lsSolids.size() << std::endl;
+      std::clog << "\tinvalid: " << (lsSolids.size() - bValid) << "/" << lsSolids.size() << std::endl;
+      std::clog << "+++++++++++++++++++++++++++++" << std::endl;
     }
 
 //    clog.rdbuf(savedBufferCLOG);

@@ -33,9 +33,11 @@ public:
   static int  _counter;
   std::string get_id();
   void        set_id(std::string id);
+  bool        is_valid();
 private:
   std::string     _id;
   vector<Shell2*> _shells;
+  int             _is_valid;
   // std::map<int, vector<std::pair<int, std::string> > > _errors;
 
   bool validate_solid_with_nef();
