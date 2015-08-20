@@ -267,7 +267,9 @@ int main(int argc, char* const argv[])
     }
 
     //--
-//    std::cout << lsSolids[0].get_validation_xml() << std::endl;
+    std::cout << lsSolids[0].get_validation_xml() << std::endl;
+
+    lsSolids[0].get_list_errors() << std::endl;
     
     
     //-- print summary of errors

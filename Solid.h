@@ -30,6 +30,7 @@ public:
   bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
   std::string get_validation_xml();
   void        add_error(int code, int shell1, int shell2, std::string info);
+  vector<int> get_list_errors();
 
   static int  _counter;
   std::string get_id();

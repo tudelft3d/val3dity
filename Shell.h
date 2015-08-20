@@ -33,7 +33,8 @@ public:
   bool   validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
 
   std::string get_validation_xml();
-  void   add_error(int code, int faceid, std::string info = "");
+  void        add_error(int code, int faceid, std::string info = "");
+  vector<int> get_list_errors();
   void   translate_vertices();
   
 private:

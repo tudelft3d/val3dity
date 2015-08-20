@@ -52,20 +52,33 @@ void Shell2::add_error(int code, int faceid, std::string info)
     std::clog << "\t[" << info << "]" << std::endl;
 }
 
+vector<int> Shell2::get_list_errors()
+{
+  vector<int> l;
+  for (auto& err : _errors)
+  {
+    l.push_back(err.first);
+  }
+  return l;
+}
+
+
 std::string Shell2::get_validation_xml()
 {
   // std::map<int, vector<std::pair<int, std::string> > > _errors;
   std::stringstream ss;
   for (auto& err : _errors)
   {
-//    for (auto)
-    ss << "<Error>" << std::endl;
-    ss << "<code>" << err.first << "</code>" << std::endl;
-    ss << "<type>" << errorcode2description(err.first) << "</type>" << std::endl;
-    ss << "<shell>" << this->_id << "</shell>" << std::endl;
-    ss << "<face>" << (_errors[err.first])[0].first << "</face>" << std::endl;
-    ss << "<info>" << (_errors[err.first])[0].second << "</info>" << std::endl;
-    ss << "</Error>" << std::endl;
+    for (auto& e : _errors[err.first])
+    {
+      ss << "\t<Error>" << std::endl;
+      ss << "\t\t<code>" << err.first << "</code>" << std::endl;
+      ss << "\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
+      ss << "\t\t<shell>" << this->_id << "</shell>" << std::endl;
+      ss << "\t\t<face>" << e.first << "</face>" << std::endl;
+      ss << "\t\t<info>" << e.second << "</info>" << std::endl;
+      ss << "\t</Error>" << std::endl;
+    }
   }
   return ss.str();
 }
