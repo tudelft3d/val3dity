@@ -26,7 +26,9 @@
 // ============================================================================
 // TODO: redirect std::clog to a file (XML + plain text)
 // TODO: check Nef unit, crashed with 015.gml 
-// TODO:  
+// TODO: validation of MultiSurfaces and CompositeSurfaces?  
+// TODO: OBJ input? or OFF?  
+// TODO: Shell2 --> Shell *everywhere*  
 // ============================================================================
 
 
@@ -176,7 +178,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "0.9");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "0.92");
   MyOutput my;
   cmd.setOutput(&my);
   try {
@@ -264,6 +266,10 @@ int main(int argc, char* const argv[])
         std::clog << "===== Solid valid =====" << std::endl;
     }
 
+    //--
+//    std::cout << lsSolids[0].get_validation_xml() << std::endl;
+    
+    
     //-- print summary of errors
     if (lsSolids.size() > 1)
     {
