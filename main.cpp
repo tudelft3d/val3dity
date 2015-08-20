@@ -23,6 +23,13 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
+// ============================================================================
+// TODO: redirect std::clog to a file (XML + plain text)
+// TODO: check Nef unit, crashed with 015.gml 
+// TODO:  
+// ============================================================================
+
+
 
 #include "input.h"
 #include "Shell.h"
@@ -56,6 +63,7 @@ public:
         std::cout << "\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl;
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
+    // TODO: update tclap help 
     std::cout << "EXAMPLES" << std::endl;
     std::cout << "\tval3dity -i data/poly/cube.poly" << std::endl;
     std::cout << "\t\tTakes the outer shell cube.poly and validates it (as a solid)." << std::endl;
@@ -152,11 +160,6 @@ public:
 // }
 
 
-
-
-// -----------------------------------------------------------
-// Usage documentation for this method goes here.
-//
 int main(int argc, char* const argv[])
 {
 #ifdef VAL3DITY_USE_EPECSQRT
@@ -205,11 +208,12 @@ int main(int argc, char* const argv[])
     XMLOUTPUT = outputxml.getValue();
     USEQIECODES = qie.getValue();
 
-//    std::streambuf* savedBufferCLOG;
-//    savedBufferCLOG = clog.rdbuf();
-//    std::ofstream mylog;
-//    mylog.open("/Users/hugo/temp/0.log");
-//    std::clog.rdbuf(mylog.rdbuf());
+    // TODO : redirect clog to a file?
+    //    std::streambuf* savedBufferCLOG;
+    //    savedBufferCLOG = clog.rdbuf();
+    //    std::ofstream mylog;
+    //    mylog.open("/Users/hugo/temp/0.log");
+    //    std::clog.rdbuf(mylog.rdbuf());
 
     vector<Solid> lsSolids;
 
@@ -248,10 +252,9 @@ int main(int argc, char* const argv[])
       lsSolids.push_back(s);
     }
     else
-      throw "unknown file type";
+      throw "unknown file type (only GML/XML and POLY accepted)";
 
     //-- now the validation starts
-    std::clog << "# of <gml:Solids>: " << lsSolids.size() << std::endl;
     for (auto& s : lsSolids)
     {
       std::clog << std::endl << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
@@ -276,8 +279,9 @@ int main(int argc, char* const argv[])
       std::clog << "+++++++++++++++++++++++++++++" << std::endl;
     }
 
-//    clog.rdbuf(savedBufferCLOG);
-//    mylog.close();
+    // TODO : redirect clog to a file?
+    //    clog.rdbuf(savedBufferCLOG);
+    //    mylog.close();
 
   }
   catch (TCLAP::ArgException &e) {
