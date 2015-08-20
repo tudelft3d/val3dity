@@ -28,6 +28,7 @@ public:
   int                     num_ishells();
   
   bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
+  std::string get_validation_xml();
   void        add_error(int code, int shell1, int shell2, std::string info);
 
   static int  _counter;

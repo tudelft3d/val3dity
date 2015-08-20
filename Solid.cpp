@@ -96,6 +96,24 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 }
 
 
+std::string Solid::get_validation_xml()
+{
+  std::stringstream ss;
+  ss << "<Solid>" << std::endl;
+  ss << "<id>" << this->_id << "</id>" << std::endl;
+  for (auto& sh : _shells)
+  {
+    ss << sh->get_validation_xml() << std::endl;
+  }
+
+  //       cout << "\t\t<ValidatorMessage>" << endl;
+//       cout << "\t\t\t<type>ERROR</type>" << endl;
+//       cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
+//       cout << "\t\t\t<errorType>";
+  ss << "</Solid>" << std::endl;
+  return ss.str();
+}
+
 int Solid::num_ishells()
 {
   return (_shells.size() - 1);
