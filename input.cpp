@@ -26,7 +26,7 @@
 #include "input.h"
 
 
-Shell2*       process_gml_shell(pugi::xml_node n, int id, double tol_snap, IOErrors& errs);
+Shell2*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 vector<int>   process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs);
 
 std::string   localise(std::string s);
@@ -168,7 +168,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs) {
 }
 
 
-Shell2* process_gml_shell(pugi::xml_node n, int id, double tol_snap, IOErrors& errs) {
+Shell2* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
   Shell2* sh = new Shell2(id, tol_snap);
@@ -185,12 +185,10 @@ Shell2* process_gml_shell(pugi::xml_node n, int id, double tol_snap, IOErrors& e
         break;
       }
     }
-    if (bxlink == true) {
-      //-- find the gml:Polygon in the DOM tree
-      std::string s2 = "//" + localise("Polygon") + "[@" + localise("id") + "='" + it->node().attribute("xlink:href").value() + "']";
-      p = it->node().select_node(s2.c_str());
-    }
-    else {
+    if (bxlink == true)
+      p = dallpoly[it->node().attribute("xlink:href").value()];
+    else
+    {
       std::string s2 = "./" + localise("Polygon");
       p = it->node().select_node(s2.c_str());
     }
@@ -224,6 +222,21 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
   std::clog << "# of gml:Solids found: " << nsolids.size() << std::endl;
   std::clog << "...parsing the file and building the solids." << std::endl;
+
+  //-- build dico of xlinks
+  s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
+  pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
+  map<std::string, pugi::xpath_node> dallpoly;
+  for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
+  {
+    dallpoly[it->node().attribute("gml:id").value()] = *it;
+  }
+  map<std::string, pugi::xpath_node> dxlinks;
+  s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
+  pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
+  for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it)
+    dxlinks[it->node().attribute("xlink:href").value()] = dallpoly[it->node().attribute("xlink:href").value()];
+
   for(auto& nsolid: nsolids)
   {
     //-- exterior shell
@@ -232,14 +245,14 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
       sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
     std::string s = "./" + localise("exterior");
     pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-    sol.set_oshell(process_gml_shell(next.node(), 0, tol_snap, errs));
+    sol.set_oshell(process_gml_shell(next.node(), 0, dallpoly, tol_snap, errs));
     //-- interior shells
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
     int id = 1;
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
     {
-      sol.add_ishell(process_gml_shell(it->node(), id, tol_snap, errs));
+      sol.add_ishell(process_gml_shell(it->node(), id, dallpoly, tol_snap, errs));
       id++;
     }
     lsSolids.push_back(sol);
