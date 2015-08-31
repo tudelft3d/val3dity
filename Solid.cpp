@@ -80,6 +80,7 @@ bool Solid::is_valid()
 }
 
 
+// TODO : validate MS, CS to add here
 bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
   bool isValid = true;
@@ -88,9 +89,11 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
     if (sh->validate_as_shell(tol_planarity_d2p, tol_planarity_normals) == false)
       isValid = false;
   }
-  if (isValid)
+  if (isValid == true)
+  {
     if (validate_solid_with_nef() == false)
       isValid = false;
+  }
   _is_valid = isValid;
   return isValid;
 }

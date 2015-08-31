@@ -451,7 +451,6 @@ bool Shell2::validate_as_compositesurface(double tol_planarity_d2p, double tol_p
 }
 
 
-// CgalPolyhedron* validate_triangulated_shell_solid(TrShell& tshell, int _id, cbf cb, double TOL_PLANARITY_normals)
 bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "----- Shell validation (#" << _id << ") -----" << std::endl;
@@ -515,7 +514,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
     else 
     {
       this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
-      isValid =  false;
+      isValid = false;
     }
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
@@ -532,6 +531,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
     if (isValid == false)
       this->add_error(308, -1);
   }
+  
   if (isValid == false)
   {
     delete _polyhedron;

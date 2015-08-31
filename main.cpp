@@ -235,7 +235,7 @@ void print_summary_validation(vector<Solid>& lsSolids)
   {
     std::clog << "Errors present:" << std::endl;
     for (auto e : allerrs)
-      std::cout << "  " << e << " --- " << errorcode2description(e) << std::endl;
+      std::clog << "  " << e << " --- " << errorcode2description(e) << std::endl;
   }
   std::clog << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 }
