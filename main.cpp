@@ -256,6 +256,17 @@ int main(int argc, char* const argv[])
     else
       throw "unknown file type (only GML/XML and POLY accepted)";
 
+    // std::set<int> s;
+    // s.insert(3);
+    // s.insert(3);
+    // s.insert(4);
+
+    // std::set<int> s2;
+    // s2.insert(s.begin(), s.end());
+    // std::cout << s2.size() << std::endl;
+
+    // return 0;
+
     //-- now the validation starts
     for (auto& s : lsSolids)
     {
@@ -266,25 +277,35 @@ int main(int argc, char* const argv[])
         std::clog << "===== Solid valid =====" << std::endl;
     }
 
-    //--
-    std::cout << lsSolids[0].get_validation_xml() << std::endl;
-
-    lsSolids[0].get_list_errors() << std::endl;
-    
-    
+   
     //-- print summary of errors
-    if (lsSolids.size() > 1)
+    if (lsSolids.size() > 0)
     {
       std::clog << std::endl;
-      std::clog << "++++++++++ SUMMARY ++++++++++" << std::endl;
-      std::clog << "total # of Solids: " << lsSolids.size() << std::endl;
+      std::clog << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+      std::clog << "total # of Solids: " << setw(12) << lsSolids.size() << std::endl;
       int bValid = 0;
       for (auto& s : lsSolids)
         if (s.is_valid() == true)
           bValid++;
-      std::clog << "\tvalid: " << bValid << "/" << lsSolids.size() << std::endl;
-      std::clog << "\tinvalid: " << (lsSolids.size() - bValid) << "/" << lsSolids.size() << std::endl;
-      std::clog << "+++++++++++++++++++++++++++++" << std::endl;
+      std::clog << "# valid: " << setw(22) << bValid << std::endl;
+      std::clog << "# invalid: " << setw(20) << (lsSolids.size() - bValid) << std::endl;
+      std::set<int> allerrs;
+      for (auto& s : lsSolids)
+      {
+        if (s.get_unique_error_codes().size() > 0)
+        {
+          std::set<int> tmp = s.get_unique_error_codes();
+          allerrs.insert(tmp.begin(), tmp.end());
+        }
+      }
+      if (allerrs.size() > 0)
+      {
+        std::clog << "Errors present:" << std::endl;
+        for (auto e : allerrs)
+          std::cout << "  " << e << " --- " << errorcode2description(e) << std::endl;
+      }
+      std::clog << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
     }
 
     // TODO : redirect clog to a file?

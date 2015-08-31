@@ -52,14 +52,14 @@ void Shell2::add_error(int code, int faceid, std::string info)
     std::clog << "\t[" << info << "]" << std::endl;
 }
 
-vector<int> Shell2::get_list_errors()
+std::set<int> Shell2::get_unique_error_codes()
 {
-  vector<int> l;
+  std::set<int> errs;
   for (auto& err : _errors)
   {
-    l.push_back(err.first);
+    errs.insert(err.first);
   }
-  return l;
+  return errs;
 }
 
 

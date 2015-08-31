@@ -96,14 +96,15 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 }
 
 
-vector<int> Solid::get_list_errors()
+std::set<int> Solid::get_unique_error_codes()
 {
-  vector<int> l;
+  std::set<int> errs;
   for (auto& sh : _shells)
   {
-    l = sh->get_list_errors();
+    std::set<int> errsh = sh->get_unique_error_codes();
+    errs.insert(errsh.begin(), errsh.end());
   }
-
+  return errs;
 }
 
 

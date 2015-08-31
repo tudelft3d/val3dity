@@ -27,10 +27,10 @@ public:
   const vector<Shell2*>&  get_shells();
   int                     num_ishells();
   
-  bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
-  std::string get_validation_xml();
-  void        add_error(int code, int shell1, int shell2, std::string info);
-  vector<int> get_list_errors();
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  std::string   get_validation_xml();
+  void          add_error(int code, int shell1, int shell2, std::string info);
+  std::set<int> get_unique_error_codes();
 
   static int  _counter;
   std::string get_id();
