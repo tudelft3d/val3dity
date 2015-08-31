@@ -317,10 +317,7 @@ void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HD
     faceids[1] = i2;
     faceids[2] = i1;
     if (B.test_facet(faceids.begin(), faceids.end()))
-    {
-      //std::cout << "*** Reversed orientation of the face" << std::endl;
-      sh->add_error(307, faceID, ""); 
- }
+      sh->add_error(307, faceID, "");
     else
       sh->add_error(304, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
   }

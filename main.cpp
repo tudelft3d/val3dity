@@ -37,9 +37,11 @@
 #include "Shell.h"
 #include "Solid.h"
 #include <tclap/CmdLine.h>
+#include <ctime>
 
 
-void print_summary_validation(vector<Solid>& lsSolids);
+std::string print_summary_validation(vector<Solid>& lsSolids);
+
 
 class MyOutput : public TCLAP::StdOutput
 {
@@ -83,7 +85,6 @@ int main(int argc, char* const argv[])
   std::clog << "***** USING EXACT-EXACT *****" << std::endl;
 #endif
 
-  bool   TRANSLATE             = true;  //-- to handle very large coordinates 
   IOErrors errs;
 
   //-- tclap options
@@ -100,13 +101,13 @@ int main(int argc, char* const argv[])
     TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one shell)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
-    TCLAP::SwitchArg                       outputxml("", "outputxml", "XML output", false);
+    TCLAP::SwitchArg                       xmloutput("", "xml", "XML output", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
     TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
 
-    cmd.add(outputxml);
+    cmd.add(xmloutput);
     cmd.add(qie);
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
@@ -138,7 +139,7 @@ int main(int argc, char* const argv[])
          (extension == "xml") ||  
          (extension == "XML") ) 
     {
-      lsSolids = readGMLfile(inputfile.getValue(), errs, snap_tolerance.getValue(), TRANSLATE);
+      lsSolids = readGMLfile(inputfile.getValue(), errs, snap_tolerance.getValue());
       if (errs.has_errors())
         throw "901: INVALID_INPUT_FILE";
       if (ishellfiles.getValue().size() > 0)
@@ -151,14 +152,14 @@ int main(int argc, char* const argv[])
               (extension == "POLY") )
     {
       Solid s;
-      Shell2* sh = readPolyfile(inputfile.getValue(), 0, errs, TRANSLATE);
+      Shell2* sh = readPolyfile(inputfile.getValue(), 0, errs);
       if (errs.has_errors())
         throw "901: INVALID_INPUT_FILE";
       s.set_oshell(sh);
       int sid = 1;
       for (auto ifile : ishellfiles.getValue())
       {
-        Shell2* sh = readPolyfile(ifile, sid, errs, TRANSLATE);
+        Shell2* sh = readPolyfile(ifile, sid, errs);
         if (errs.has_errors())
           throw "901: INVALID_INPUT_FILE";
         s.add_ishell(sh);
@@ -169,19 +170,76 @@ int main(int argc, char* const argv[])
     else
       throw "unknown file type (only GML/XML and POLY accepted)";
 
+
     //-- now the validation starts
     for (auto& s : lsSolids)
     {
       std::clog << std::endl << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
       if (s.validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
-        std::clog << "===== Solid invalid =====" << std::endl;
+        std::clog << "===== INVALID =====" << std::endl;
       else
-        std::clog << "===== Solid valid =====" << std::endl;
+        std::clog << "===== VALID =====" << std::endl;
     }
-
+        
+    //-- outputting report with results
+    if (xmloutput.getValue() == true)
+    {
+      std::stringstream ss;
+      ss << "<val3dity>" << std::endl;
+      ss << "\t<inputFile>" << inputfile.getValue() << "</inputFile>" << std::endl;
+      ss << "\t<primitives>";
+      if (prim3d == SOLID)
+        ss << "gml:Solid";
+      else if (prim3d == COMPOSITESURFACE)
+        ss << "gml:CompositeSurface";
+      else
+        ss << "gml:MultiSurface";
+      ss << "</primitives>" << std::endl;
+      ss << "\t<snap_tolerance>" << snap_tolerance.getValue() << "</snap_tolerance>" << std::endl;
+      ss << "\t<planarity_d2p>" << planarity_d2p.getValue() << "</planarity_d2p>" << std::endl;
+      ss << "\t<planarity_n>" << planarity_n.getValue() << "</planarity_n>" << std::endl;
+      std::time_t t = std::time(nullptr);
+      std::tm tm = *std::localtime(&t);
+      ss << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
+      int bValid = 0;
+      for (auto& s : lsSolids)
+        if (s.is_valid() == true)
+          bValid++;
+      ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
+      ss << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
+      ss << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
+      for (auto& s : lsSolids)
+        ss << s.get_report_xml();
+      ss << "</val3dity>" << std::endl;
+      std::cout << ss.str();
+    }
+    else
+    {
+      std::stringstream ss;
+      ss << "Input File: " << inputfile.getValue() << std::endl;
+      ss << "Primitives: ";
+      if (prim3d == SOLID)
+        ss << "gml:Solid";
+      else if (prim3d == COMPOSITESURFACE)
+        ss << "gml:CompositeSurface";
+      else
+        ss << "gml:MultiSurface";
+      ss << std::endl;
+      ss << "Snap_tolerance: " << snap_tolerance.getValue() << std::endl;
+      ss << "Planarity_d2p: " << planarity_d2p.getValue() << std::endl;
+      ss << "Planarity_n: " << planarity_n.getValue() << std::endl;
+      std::time_t t = std::time(nullptr);
+      std::tm tm = *std::localtime(&t);
+      ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
+      ss << print_summary_validation(lsSolids) << std::endl;
+      for (auto& s : lsSolids)
+        ss << s.get_report_text();
+      std::cout << ss.str();
+    }
+      
     //-- print summary of errors
     if (lsSolids.size() > 0)
-      print_summary_validation(lsSolids);
+      std::clog << print_summary_validation(lsSolids) << std::endl;
 
     // TODO : redirect clog to a file?
     //    clog.rdbuf(savedBufferCLOG);
@@ -206,22 +264,25 @@ int main(int argc, char* const argv[])
     std::cout << "Aborted." << std::endl;
     return(0);
   }
-  std::cout << "\nSuccessfully terminated." << std::endl;
+  std::clog << "\nSuccessfully terminated." << std::endl;
   return(1);
 }
 
 
-void print_summary_validation(vector<Solid>& lsSolids)
+
+
+std::string print_summary_validation(vector<Solid>& lsSolids)
 {
-  std::clog << std::endl;
-  std::clog << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  std::clog << "total # of Solids: " << setw(12) << lsSolids.size() << std::endl;
+  std::stringstream ss;
+  ss << std::endl;
+  ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  ss << "total # of Solids: " << setw(12) << lsSolids.size() << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
     if (s.is_valid() == true)
       bValid++;
-  std::clog << "# valid: " << setw(22) << bValid << std::endl;
-  std::clog << "# invalid: " << setw(20) << (lsSolids.size() - bValid) << std::endl;
+  ss << "# valid: " << setw(22) << bValid << std::endl;
+  ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid) << std::endl;
   std::set<int> allerrs;
   for (auto& s : lsSolids)
   {
@@ -233,10 +294,11 @@ void print_summary_validation(vector<Solid>& lsSolids)
   }
   if (allerrs.size() > 0)
   {
-    std::clog << "Errors present:" << std::endl;
+    ss << "Errors present:" << std::endl;
     for (auto e : allerrs)
-      std::clog << "  " << e << " --- " << errorcode2description(e) << std::endl;
+      ss << "  " << e << " --- " << errorcode2description(e) << std::endl;
   }
-  std::clog << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+  ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+  return ss.str();
 }
 

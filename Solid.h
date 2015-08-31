@@ -28,14 +28,16 @@ public:
   int                     num_ishells();
   
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
-  std::string   get_validation_xml();
+  std::string   get_report_xml();
+  std::string   get_report_text();
   void          add_error(int code, int shell1, int shell2, std::string info);
   std::set<int> get_unique_error_codes();
-
-  static int  _counter;
-  std::string get_id();
-  void        set_id(std::string id);
-  bool        is_valid();
+  std::string   get_poly_representation();
+  bool          is_valid();
+  
+  static int    _counter;
+  std::string   get_id();
+  void          set_id(std::string id);
 private:
   std::string     _id;
   vector<Shell2*> _shells;

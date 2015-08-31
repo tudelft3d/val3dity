@@ -63,24 +63,72 @@ std::set<int> Shell2::get_unique_error_codes()
 }
 
 
-std::string Shell2::get_validation_xml()
+std::string Shell2::get_report_xml()
 {
-  // std::map<int, vector<std::pair<int, std::string> > > _errors;
   std::stringstream ss;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[err.first])
     {
-      ss << "\t<Error>" << std::endl;
-      ss << "\t\t<code>" << err.first << "</code>" << std::endl;
-      ss << "\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
-      ss << "\t\t<shell>" << this->_id << "</shell>" << std::endl;
-      ss << "\t\t<face>" << e.first << "</face>" << std::endl;
-      ss << "\t\t<info>" << e.second << "</info>" << std::endl;
-      ss << "\t</Error>" << std::endl;
+      ss << "\t\t<Error>" << std::endl;
+      ss << "\t\t\t<code>" << err.first << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
+      ss << "\t\t\t<shell>" << this->_id << "</shell>" << std::endl;
+      ss << "\t\t\t<face>" << e.first << "</face>" << std::endl;
+      ss << "\t\t\t<info>" << e.second << "</info>" << std::endl;
+      ss << "\t\t</Error>" << std::endl;
     }
   }
   return ss.str();
+}
+
+
+std::string Shell2::get_report_text()
+{
+  std::stringstream ss;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[err.first])
+    {
+      ss << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << "\tShell: " << this->_id << std::endl;
+      ss << "\tFace: "  << e.first << std::endl;
+      ss << "\tInfo: "  << e.second << std::endl;
+    }
+  }
+  return ss.str();
+}
+
+
+std::string Shell2::get_poly_representation()
+{
+  std::ostringstream s;
+  //-- points
+  s << _lsPts.size() << " 3 0 0" << std::endl;
+  int i = 0;
+  for (auto& p : _lsPts)
+  {
+    s << i << " " << setprecision(15) << p.x() << " " << p.y() << " " << p.z() << std::endl;
+    i++;
+  }
+  //-- faces
+  s << _lsFaces.size() << " 0" << std::endl;
+  for (auto& f : _lsFaces)
+  {
+    s << f.size() << " " << (f.size() - 1) << std::endl;
+    for (auto& r : f)
+    {
+      s << r.size() << " ";
+      for (auto p : r)
+      {
+        s << p << " ";
+      }
+      s << std::endl;
+    }
+  }
+  s << "0" << std::endl;
+  s << "0" << std::endl;
+  return s.str();
 }
 
 int Shell2::add_point(Point3 p)

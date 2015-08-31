@@ -32,10 +32,12 @@ public:
   bool   validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
   bool   validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
 
-  std::string   get_validation_xml();
+  std::string   get_report_xml();
+  std::string   get_report_text();
   void          add_error(int code, int faceid, std::string info = "");
   std::set<int> get_unique_error_codes();
   void          translate_vertices();
+  std::string   get_poly_representation();
   
 private:
   int                             _id;

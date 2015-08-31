@@ -22,7 +22,7 @@
 typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
 
 //-- to keep track of all gml:Solids in a GML file
-int Solid::_counter = 1;
+int Solid::_counter = 0;
 
 Solid::Solid()
 {
@@ -110,19 +110,44 @@ std::set<int> Solid::get_unique_error_codes()
   return errs;
 }
 
-
-std::string Solid::get_validation_xml()
+std::string Solid::get_poly_representation()
 {
-  std::stringstream ss;
-  ss << "<Solid>" << std::endl;
-  ss << "\t<id>" << this->_id << "</id>" << std::endl;
+  std::ostringstream s;
   for (auto& sh : _shells)
   {
-    ss << sh->get_validation_xml();
+    s << sh->get_poly_representation() << std::endl;
   }
-  ss << "</Solid>" << std::endl;
+  return s.str();
+}
+
+std::string Solid::get_report_xml()
+{
+  std::stringstream ss;
+  ss << "\t<Solid>" << std::endl;
+  ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  for (auto& sh : _shells)
+  {
+    ss << sh->get_report_xml();
+  }
+  ss << "\t</Solid>" << std::endl;
   return ss.str();
 }
+
+std::string Solid::get_report_text()
+{
+  std::stringstream ss;
+  ss << "===== Solid " << this->_id << " =====" << std::endl;
+  for (auto& sh : _shells)
+  {
+    ss << sh->get_report_text();
+  }
+  if (this->is_valid() == true)
+    ss << "VALID" << std::endl;
+  else
+    ss << "===== INVALID =====" << std::endl;
+  return ss.str();
+}
+
 
 int Solid::num_ishells()
 {

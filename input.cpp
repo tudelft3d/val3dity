@@ -26,7 +26,7 @@
 #include "input.h"
 
 
-Shell2*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Shell2*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
 vector<int>   process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs);
 
 std::string   localise(std::string s);
@@ -168,7 +168,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs) {
 }
 
 
-Shell2* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) {
+Shell2* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
   Shell2* sh = new Shell2(id, tol_snap);
@@ -204,6 +204,8 @@ Shell2* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath
     }
     sh->add_face(oneface);
   }
+  if (translatevertices == true)
+    sh->translate_vertices();
   return sh;
 }
 
@@ -257,6 +259,8 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
     }
     lsSolids.push_back(sol);
   }
+  if (translatevertices == true)
+
   std::clog << "done." << std::endl;
   return lsSolids;
 }
