@@ -38,16 +38,8 @@
 #include "Solid.h"
 #include <tclap/CmdLine.h>
 
-static bool callbackWasCalledWithError = false;
 
-//-- global lists to keep track of IDs for shells and faces
-vector<string> idShells;
-vector< vector<string> > idFaces;
-bool bUsingIDs = false;
-bool XMLOUTPUT = false;
-//-- error codes from the OGC CityGML QIE (https://portal.opengeospatial.org/wiki/CityGMLqIE/WebHome)
-bool USEQIECODES = false;
-
+void print_summary_validation(vector<Solid>& lsSolids);
 
 class MyOutput : public TCLAP::StdOutput
 {
@@ -83,83 +75,6 @@ public:
   }
 };
 
-
-
-
-
-
-// This callback function will be used to both report progress
-// as well as any validity problems that are encountered.
-// void callback(int errorCode,    // 0 means status message, -1 means unknown error
-//               int shellNum, // -1 means unused; 0-based
-//               int facetNum,     // -1 means unused; 0-based
-//               std::string messageStr) // optional
-// {
-//   if ( (0 == errorCode) && (XMLOUTPUT == false) )
-//   {
-//     if ( (shellNum == -1) && (facetNum == -1) )
-//       cout << messageStr << endl;
-//     else
-//       cout << "Status: shell " << shellNum << "; face " << facetNum << ". " << messageStr << endl;
-//   }
-  
-//   if (errorCode != 0)
-//   {
-//     callbackWasCalledWithError = true;
-//     if (XMLOUTPUT == false)
-//       cout << "Error #" << errorCode << " ";
-//     else
-//     {
-//       cout << "\t\t<ValidatorMessage>" << endl;
-//       cout << "\t\t\t<type>ERROR</type>" << endl;
-//       cout << "\t\t\t<errorCode>" << errorCode << "</errorCode>" << endl;
-//       cout << "\t\t\t<errorType>";
-//     }
-//     std::cout << errorcode2description(errorCode, USEQIECODES);
-//     if (XMLOUTPUT == false)
-//       cout << endl;
-//     else
-//       cout << "</errorType>" << endl;
-    
-//     if (bUsingIDs == false)
-//     {
-//       if (shellNum != -1)
-//         shellNum = shellNum + 1;
-//       if (facetNum != -1)
-//         facetNum = facetNum + 1;
-//       if (XMLOUTPUT == false)
-//         cout << "\t" << "[shell: #" << shellNum << "; face: #" << facetNum << "]" << endl;
-//       else {
-//         cout << "\t\t\t<shell>" << shellNum << "</shell>" << endl;
-//         cout << "\t\t\t<face>" << facetNum << "</face>" << endl;
-//       }
-//     }
-    
-//     if (bUsingIDs == true)
-//     {
-//       string shelloutput = "-1";
-//       string faceoutput = "-1";
-//       if (shellNum >= 0)
-//         shelloutput = idShells[shellNum];
-//       if (facetNum >= 0&&shellNum >= 0)
-//         faceoutput = idFaces[shellNum][facetNum];
-//       if (XMLOUTPUT == false)
-//         cout << "\t" << "[shell: #" << shelloutput << "; face: #" << faceoutput << "]" << endl;
-//       else {
-//         cout << "\t\t\t<shell>" << shelloutput << "</shell>" << endl;
-//         cout << "\t\t\t<face>" << faceoutput << "</face>" << endl;
-//       }
-//     }
-//     if (messageStr.empty() == false) {
-//       if (XMLOUTPUT == false)
-//         cout << "\t" << messageStr << endl;
-//       else
-//         cout << "\t\t\t<message>" << messageStr << "</message>" << endl;
-//     }
-//     if (XMLOUTPUT == true)
-//       cout << "\t\t</ValidatorMessage>" << endl;
-//   }
-// }
 
 
 int main(int argc, char* const argv[])
@@ -207,9 +122,7 @@ int main(int argc, char* const argv[])
     if (primitives.getValue() == "MS")
       prim3d = MULTISURFACE;
 
-    XMLOUTPUT = outputxml.getValue();
-    USEQIECODES = qie.getValue();
-
+    
     // TODO : redirect clog to a file?
     //    std::streambuf* savedBufferCLOG;
     //    savedBufferCLOG = clog.rdbuf();
@@ -256,17 +169,6 @@ int main(int argc, char* const argv[])
     else
       throw "unknown file type (only GML/XML and POLY accepted)";
 
-    // std::set<int> s;
-    // s.insert(3);
-    // s.insert(3);
-    // s.insert(4);
-
-    // std::set<int> s2;
-    // s2.insert(s.begin(), s.end());
-    // std::cout << s2.size() << std::endl;
-
-    // return 0;
-
     //-- now the validation starts
     for (auto& s : lsSolids)
     {
@@ -277,36 +179,9 @@ int main(int argc, char* const argv[])
         std::clog << "===== Solid valid =====" << std::endl;
     }
 
-   
     //-- print summary of errors
     if (lsSolids.size() > 0)
-    {
-      std::clog << std::endl;
-      std::clog << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-      std::clog << "total # of Solids: " << setw(12) << lsSolids.size() << std::endl;
-      int bValid = 0;
-      for (auto& s : lsSolids)
-        if (s.is_valid() == true)
-          bValid++;
-      std::clog << "# valid: " << setw(22) << bValid << std::endl;
-      std::clog << "# invalid: " << setw(20) << (lsSolids.size() - bValid) << std::endl;
-      std::set<int> allerrs;
-      for (auto& s : lsSolids)
-      {
-        if (s.get_unique_error_codes().size() > 0)
-        {
-          std::set<int> tmp = s.get_unique_error_codes();
-          allerrs.insert(tmp.begin(), tmp.end());
-        }
-      }
-      if (allerrs.size() > 0)
-      {
-        std::clog << "Errors present:" << std::endl;
-        for (auto e : allerrs)
-          std::cout << "  " << e << " --- " << errorcode2description(e) << std::endl;
-      }
-      std::clog << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-    }
+      print_summary_validation(lsSolids);
 
     // TODO : redirect clog to a file?
     //    clog.rdbuf(savedBufferCLOG);
@@ -336,4 +211,32 @@ int main(int argc, char* const argv[])
 }
 
 
+void print_summary_validation(vector<Solid>& lsSolids)
+{
+  std::clog << std::endl;
+  std::clog << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  std::clog << "total # of Solids: " << setw(12) << lsSolids.size() << std::endl;
+  int bValid = 0;
+  for (auto& s : lsSolids)
+    if (s.is_valid() == true)
+      bValid++;
+  std::clog << "# valid: " << setw(22) << bValid << std::endl;
+  std::clog << "# invalid: " << setw(20) << (lsSolids.size() - bValid) << std::endl;
+  std::set<int> allerrs;
+  for (auto& s : lsSolids)
+  {
+    if (s.get_unique_error_codes().size() > 0)
+    {
+      std::set<int> tmp = s.get_unique_error_codes();
+      allerrs.insert(tmp.begin(), tmp.end());
+    }
+  }
+  if (allerrs.size() > 0)
+  {
+    std::clog << "Errors present:" << std::endl;
+    for (auto e : allerrs)
+      std::cout << "  " << e << " --- " << errorcode2description(e) << std::endl;
+  }
+  std::clog << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+}
 
