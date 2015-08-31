@@ -452,23 +452,19 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planari
     triangulate_shell();
     //-- check planarity by normal deviation method (of all triangle)
     std::clog << "--Planarity of surfaces (with normals deviation)" << std::endl;
-    for (unsigned int i = 0; i < _lsTr.size(); i++)
-    {
-      vector< vector<int*> >::iterator it = _lsTr.begin();
-      int j = 0;
-      double deviation;
-      for ( ; it != _lsTr.end(); it++)
-      { 
-        if (is_face_planar_normals(*it, _lsPts, deviation, tol_planarity_normals) == false)
-        //-- second with normals deviation method
-        {
-          std::ostringstream msg;
-          msg << "deviation normals: " << deviation << " (tolerance=" << tol_planarity_normals << ")";
-          this->add_error(204, j, msg.str());
-          isValid = false;
-        }
-        j++;
+    vector< vector<int*> >::iterator it = _lsTr.begin();
+    int j = 0;
+    double deviation;
+    for ( ; it != _lsTr.end(); it++)
+    { 
+      if (is_face_planar_normals(*it, _lsPts, deviation, tol_planarity_normals) == false)
+      {
+        std::ostringstream msg;
+        msg << "deviation normals: " << deviation << " (tolerance=" << tol_planarity_normals << ")";
+        this->add_error(204, j, msg.str());
+        isValid = false;
       }
+      j++;
     }
   }
   _is_valid_2d = isValid;
