@@ -19,3 +19,5 @@ CMakeCache.txt
 cmake_install.cmake
 
 *.pyc
+*.log
+*.report.txt

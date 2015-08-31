@@ -59,20 +59,20 @@ public:
         std::cout << "\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl;
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
-    // TODO: update tclap help 
     std::cout << "EXAMPLES" << std::endl;
     std::cout << "\tval3dity input.gml > report.txt" << std::endl;
-    std::cout << "\t\tValidate all the gml:Solid in input.gml and output report.txt" << std::endl;
+    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs report.txt" << std::endl;
     std::cout << "\tval3dity input.gml --xml > report.xml" << std::endl;
-    std::cout << "\t\tValidate all the gml:Solid in input.gml and output an XML report" << std::endl;
+    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs an XML report" << std::endl;
     std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/py.poly" << std::endl;
-    std::cout << "\t\tValidate the solid formed by the outer shell cube.poly with the inner shell py.poly" << std::endl;
+    std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell py.poly" << std::endl;
+    std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
+    std::cout << "\t\tThe vertices in gml:Solid closer than 0.1unit are snapped together" << std::endl;
     std::cout << "\tval3dity input.gml --planarity_d2p 0.1" << std::endl;
-    std::cout << "\t\tValidates all the solids in input.gml" << std::endl;
-    std::cout << "\t\tand uses a tolerance of 0.1unit (distance point to fitted plane)." << std::endl;
+    std::cout << "\t\tValidates each gml:Solid in input.gml" << std::endl;
+    std::cout << "\t\tand uses a tolerance of 0.1unit (distance point-to-fitted-plane)" << std::endl;
   }
 };
-
 
 
 int main(int argc, char* const argv[])
@@ -82,6 +82,9 @@ int main(int argc, char* const argv[])
 #endif
 
   IOErrors errs;
+  std::streambuf* savedBufferCLOG;
+  std::ofstream mylog;
+
 
   //-- tclap options
   std::vector<std::string> primitivestovalidate;
@@ -97,6 +100,7 @@ int main(int argc, char* const argv[])
     TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one shell)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
+    TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       xmloutput("", "xml", "XML output", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
@@ -109,6 +113,7 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
     cmd.add(primitives);
+    cmd.add(verbose);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.parse( argc, argv );
@@ -119,13 +124,13 @@ int main(int argc, char* const argv[])
     if (primitives.getValue() == "MS")
       prim3d = MULTISURFACE;
 
-    
-    // TODO : redirect clog to a file?
-    //    std::streambuf* savedBufferCLOG;
-    //    savedBufferCLOG = clog.rdbuf();
-    //    std::ofstream mylog;
-    //    mylog.open("/Users/hugo/temp/0.log");
-    //    std::clog.rdbuf(mylog.rdbuf());
+    //-- if verbose == false then log to a file
+    if (verbose.getValue() == false)
+    {
+      savedBufferCLOG = clog.rdbuf();
+      mylog.open("val3dity.log");
+      std::clog.rdbuf(mylog.rdbuf());
+    }
 
     vector<Solid> lsSolids;
 
@@ -166,7 +171,6 @@ int main(int argc, char* const argv[])
     else
       throw "unknown file type (only GML/XML and POLY accepted)";
 
-
     //-- now the validation starts
     for (auto& s : lsSolids)
     {
@@ -178,69 +182,76 @@ int main(int argc, char* const argv[])
     }
         
     //-- outputting report with results
+    std::ofstream thereport;
+    std::string reportpath;
+    if (xmloutput.getValue() == true)
+      reportpath = inputfile.getValue() + ".report.xml";
+    else
+      reportpath = inputfile.getValue() + ".report.txt";
+    thereport.open(reportpath);
     if (xmloutput.getValue() == true)
     {
-      std::stringstream ss;
-      ss << "<val3dity>" << std::endl;
-      ss << "\t<inputFile>" << inputfile.getValue() << "</inputFile>" << std::endl;
-      ss << "\t<primitives>";
+      thereport << "<val3dity>" << std::endl;
+      thereport << "\t<inputFile>" << inputfile.getValue() << "</inputFile>" << std::endl;
+      thereport << "\t<primitives>";
       if (prim3d == SOLID)
-        ss << "gml:Solid";
+        thereport << "gml:Solid";
       else if (prim3d == COMPOSITESURFACE)
-        ss << "gml:CompositeSurface";
+        thereport << "gml:CompositeSurface";
       else
-        ss << "gml:MultiSurface";
-      ss << "</primitives>" << std::endl;
-      ss << "\t<snap_tolerance>" << snap_tolerance.getValue() << "</snap_tolerance>" << std::endl;
-      ss << "\t<planarity_d2p>" << planarity_d2p.getValue() << "</planarity_d2p>" << std::endl;
-      ss << "\t<planarity_n>" << planarity_n.getValue() << "</planarity_n>" << std::endl;
+        thereport << "gml:MultiSurface";
+      thereport << "</primitives>" << std::endl;
+      thereport << "\t<snap_tolerance>" << snap_tolerance.getValue() << "</snap_tolerance>" << std::endl;
+      thereport << "\t<planarity_d2p>" << planarity_d2p.getValue() << "</planarity_d2p>" << std::endl;
+      thereport << "\t<planarity_n>" << planarity_n.getValue() << "</planarity_n>" << std::endl;
       std::time_t t = std::time(nullptr);
       std::tm tm = *std::localtime(&t);
-      ss << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
+      thereport << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
       int bValid = 0;
       for (auto& s : lsSolids)
         if (s.is_valid() == true)
           bValid++;
-      ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
-      ss << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
-      ss << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
+      thereport << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
+      thereport << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
+      thereport << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
       for (auto& s : lsSolids)
-        ss << s.get_report_xml();
-      ss << "</val3dity>" << std::endl;
-      std::cout << ss.str();
+        thereport << s.get_report_xml();
+      thereport << "</val3dity>" << std::endl;
     }
     else
     {
-      std::stringstream ss;
-      ss << "Input File: " << inputfile.getValue() << std::endl;
-      ss << "Primitives: ";
+      thereport << "Input File: " << inputfile.getValue() << std::endl;
+      thereport << "Primitives: ";
       if (prim3d == SOLID)
-        ss << "gml:Solid";
+        thereport << "gml:Solid";
       else if (prim3d == COMPOSITESURFACE)
-        ss << "gml:CompositeSurface";
+        thereport << "gml:CompositeSurface";
       else
-        ss << "gml:MultiSurface";
-      ss << std::endl;
-      ss << "Snap_tolerance: " << snap_tolerance.getValue() << std::endl;
-      ss << "Planarity_d2p: " << planarity_d2p.getValue() << std::endl;
-      ss << "Planarity_n: " << planarity_n.getValue() << std::endl;
+        thereport << "gml:MultiSurface";
+      thereport << std::endl;
+      thereport << "Snap_tolerance: " << snap_tolerance.getValue() << std::endl;
+      thereport << "Planarity_d2p: " << planarity_d2p.getValue() << std::endl;
+      thereport << "Planarity_n: " << planarity_n.getValue() << std::endl;
       std::time_t t = std::time(nullptr);
       std::tm tm = *std::localtime(&t);
-      ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
-      ss << print_summary_validation(lsSolids) << std::endl;
+      thereport << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
+      thereport << print_summary_validation(lsSolids) << std::endl;
       for (auto& s : lsSolids)
-        ss << s.get_report_text();
-      std::cout << ss.str();
+        thereport << s.get_report_text();
     }
+    thereport.close();
       
     //-- print summary of errors
     if (lsSolids.size() > 0)
-      std::clog << print_summary_validation(lsSolids) << std::endl;
+      std::cout << print_summary_validation(lsSolids) << std::endl;
 
-    // TODO : redirect clog to a file?
-    //    clog.rdbuf(savedBufferCLOG);
-    //    mylog.close();
-
+    std::cout << "Full validation report saved to " << reportpath << std::endl;
+    if (verbose.getValue() == false)
+    {
+      clog.rdbuf(savedBufferCLOG);
+      mylog.close();
+    }
+    return(1);
   }
   catch (TCLAP::ArgException &e) {
     std::cout << "ERROR: " << e.error() << " for arg " << e.argId() << std::endl;
@@ -260,8 +271,6 @@ int main(int argc, char* const argv[])
     std::cout << "Aborted." << std::endl;
     return(0);
   }
-  std::clog << "\nSuccessfully terminated." << std::endl;
-  return(1);
 }
 
 

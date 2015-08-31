@@ -158,7 +158,7 @@ is_polyhedron_geometrically_consistent(Shell2* sh)
     K::Point_3 apoint;
     K::Segment_3 asegment;
     if (assign(asegment, re))
-     st << "Segment intersection: " << asegment[0].x() << asegment[0].y() << asegment[0].z() << endl;
+     st << "Segment intersection: " << asegment[0].x() << " " << asegment[0].y() << " " << asegment[0].z() << endl;
     else if (assign(apoint, re))
      st << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
     sh->add_error(306, -1, st.str());

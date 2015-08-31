@@ -212,7 +212,7 @@ Shell2* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath
 
 vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool translatevertices)
 {
-  std::clog << "Reading file: " << ifile << std::endl;
+  std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) {
@@ -222,7 +222,7 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   std::string s = "//" + localise("Solid");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
-  std::clog << "# of gml:Solids found: " << nsolids.size() << std::endl;
+  std::cout << "# of gml:Solids found: " << nsolids.size() << std::endl;
   std::clog << "...parsing the file and building the solids." << std::endl;
 
   //-- build dico of xlinks

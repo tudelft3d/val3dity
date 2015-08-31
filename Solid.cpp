@@ -142,9 +142,7 @@ std::string Solid::get_report_text()
     ss << sh->get_report_text();
   }
   if (this->is_valid() == true)
-    ss << "VALID" << std::endl;
-  else
-    ss << "===== INVALID =====" << std::endl;
+    ss << "\tVALID" << std::endl;
   return ss.str();
 }
 

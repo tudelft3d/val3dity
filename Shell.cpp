@@ -90,10 +90,10 @@ std::string Shell2::get_report_text()
   {
     for (auto& e : _errors[err.first])
     {
-      ss << err.first << " -- " << errorcode2description(err.first) << std::endl;
-      ss << "\tShell: " << this->_id << std::endl;
-      ss << "\tFace: "  << e.first << std::endl;
-      ss << "\tInfo: "  << e.second << std::endl;
+      ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << "\t\tShell: " << this->_id << std::endl;
+      ss << "\t\tFace: "  << e.first << std::endl;
+      ss << "\t\tInfo: "  << e.second << std::endl;
     }
   }
   return ss.str();
