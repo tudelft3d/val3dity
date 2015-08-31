@@ -148,7 +148,7 @@ class Shell:
             else:
                 p = s.find(".//{%s}Polygon" % self.ns['gml'])
             posList = p.findall(".//{%s}posList" % self.ns['gml'])
-            if posList != None:
+            if len(posList) > 0:
                 for pos in posList:
                     coords = pos.text.split()
                     assert(len(coords) % 3 == 0)
