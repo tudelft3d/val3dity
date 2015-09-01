@@ -24,13 +24,11 @@
 */
 
 // ============================================================================
-// TODO: redirect std::clog to a file (XML + plain text)
 // TODO: check Nef unit, crashed with 015.gml 
 // TODO: validation of MultiSurfaces and CompositeSurfaces?  
 // TODO: OBJ input? or OFF?  
 // TODO: Shell2 --> Shell *everywhere*  
 // ============================================================================
-
 
 
 #include "input.h"
@@ -60,12 +58,16 @@ public:
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
     std::cout << "EXAMPLES" << std::endl;
-    std::cout << "\tval3dity input.gml > report.txt" << std::endl;
-    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs report.txt" << std::endl;
-    std::cout << "\tval3dity input.gml --xml > report.xml" << std::endl;
-    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs an XML report" << std::endl;
+    std::cout << "\tval3dity input.gml" << std::endl;
+    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
+    std::cout << "\tval3dity input.gml -otxt report.txt" << std::endl;
+    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in plain text" << std::endl;
+    std::cout << "\tval3dity input.gml -oxml report.xml" << std::endl;
+    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/py.poly" << std::endl;
     std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell py.poly" << std::endl;
+    std::cout << "\tval3dity input.gml --verbose" << std::endl;
+    std::cout << "\t\tAll details of the validation of the solids is printed out" << std::endl;
     std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
     std::cout << "\t\tThe vertices in gml:Solid closer than 0.1unit are snapped together" << std::endl;
     std::cout << "\tval3dity input.gml --planarity_d2p 0.1" << std::endl;
@@ -99,15 +101,15 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one shell)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
+    TCLAP::ValueArg<std::string>           outputxml("", "oxml", "report in XML format", false, "", "string");
+    TCLAP::ValueArg<std::string>           outputtxt("", "otxt", "report in text format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
-    TCLAP::SwitchArg                       xmloutput("", "xml", "XML output", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
     TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
 
-    cmd.add(xmloutput);
     cmd.add(qie);
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
@@ -116,6 +118,8 @@ int main(int argc, char* const argv[])
     cmd.add(verbose);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
+    cmd.add(outputxml);
+    cmd.add(outputtxt);
     cmd.parse( argc, argv );
   
     Primitives3D prim3d = SOLID;
@@ -180,17 +184,16 @@ int main(int argc, char* const argv[])
       else
         std::clog << "===== VALID =====" << std::endl;
     }
-        
-    //-- outputting report with results
-    std::ofstream thereport;
-    std::string reportpath;
-    if (xmloutput.getValue() == true)
-      reportpath = inputfile.getValue() + ".report.xml";
-    else
-      reportpath = inputfile.getValue() + ".report.txt";
-    thereport.open(reportpath);
-    if (xmloutput.getValue() == true)
+
+    //-- print summary of errors
+    if (lsSolids.size() > 0)
+      std::cout << print_summary_validation(lsSolids) << std::endl;        
+    
+    //-- output of validation report
+    if (outputxml.getValue() != "")
     {
+      std::ofstream thereport;
+      thereport.open(outputxml.getValue());
       thereport << "<val3dity>" << std::endl;
       thereport << "\t<inputFile>" << inputfile.getValue() << "</inputFile>" << std::endl;
       thereport << "\t<primitives>";
@@ -217,9 +220,13 @@ int main(int argc, char* const argv[])
       for (auto& s : lsSolids)
         thereport << s.get_report_xml();
       thereport << "</val3dity>" << std::endl;
+      thereport.close();
+      std::cout << "Full validation report saved to " << outputxml.getValue() << std::endl;
     }
-    else
+    else if (outputtxt.getValue() != "")
     {
+      std::ofstream thereport;
+      thereport.open(outputtxt.getValue());
       thereport << "Input File: " << inputfile.getValue() << std::endl;
       thereport << "Primitives: ";
       if (prim3d == SOLID)
@@ -238,14 +245,12 @@ int main(int argc, char* const argv[])
       thereport << print_summary_validation(lsSolids) << std::endl;
       for (auto& s : lsSolids)
         thereport << s.get_report_text();
+      thereport.close();
+      std::cout << "Full validation report saved to " << outputtxt.getValue() << std::endl;
     }
-    thereport.close();
-      
-    //-- print summary of errors
-    if (lsSolids.size() > 0)
-      std::cout << print_summary_validation(lsSolids) << std::endl;
+    else
+      std::cout << "-->The validation report wasn't saved, use option '--oxml' or '--otxt'." << std::endl;
 
-    std::cout << "Full validation report saved to " << reportpath << std::endl;
     if (verbose.getValue() == false)
     {
       clog.rdbuf(savedBufferCLOG);
