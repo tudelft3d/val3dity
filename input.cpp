@@ -26,8 +26,8 @@
 #include "input.h"
 
 
-Shell2*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
-vector<int>   process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs);
+Shell*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
+vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 std::string   localise(std::string s);
 
@@ -122,7 +122,7 @@ std::string localise(std::string s)
 }
 
 
-vector<int> process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs) {
+vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   vector<int> r;
@@ -168,10 +168,10 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell2* sh, IOErrors& errs) {
 }
 
 
-Shell2* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) {
+Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
-  Shell2* sh = new Shell2(id, tol_snap);
+  Shell* sh = new Shell(id, tol_snap);
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
     vector< vector<int> > oneface;
@@ -268,7 +268,7 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
 
 
 
-Shell2* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
+Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -278,7 +278,7 @@ Shell2* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool trans
     errs.add_error(900, "Input file not found.");
     return NULL;
   }
-  Shell2* sh = new Shell2(shellid);  
+  Shell* sh = new Shell(shellid);  
   //-- read the points
   int num, tmpint;
   float tmpfloat;

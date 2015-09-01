@@ -12,11 +12,11 @@
 #include "definitions.h"
 //#include "geomtools.h"
 
-class Shell2
+class Shell
 {
 public:
-  Shell2  (int id = -1, double tol_snap = 0.0);
-  ~Shell2 ();
+  Shell  (int id = -1, double tol_snap = 0.0);
+  ~Shell ();
   
   int    number_points();
   int    number_faces();

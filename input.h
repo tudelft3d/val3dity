@@ -53,7 +53,7 @@ public:
 
 std::string   errorcode2description(int code, bool qie = false);
 vector<Solid> readGMLfile(std::string &ifile, IOErrors& errs, double tol_snap, bool translatevertices = true);
-Shell2*       readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices = true);
+Shell*       readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices = true);
 
 
 #endif

@@ -17,20 +17,20 @@ class Solid
 {
 public:
   Solid();
-  Solid(Shell2* sh);
+  Solid(Shell* sh);
   ~Solid();
   
-  Shell2*                 get_oshell();
-  void                    set_oshell(Shell2* sh);
-  Shell2*                 get_ishell(int i);
-  void                    add_ishell(Shell2* sh);
-  const vector<Shell2*>&  get_shells();
+  Shell*                 get_oshell();
+  void                    set_oshell(Shell* sh);
+  Shell*                 get_ishell(int i);
+  void                    add_ishell(Shell* sh);
+  const vector<Shell*>&  get_shells();
   int                     num_ishells();
   
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
   std::string   get_report_xml();
   std::string   get_report_text();
-  void          add_error(int code, int shell1, int shell2, std::string info);
+  void          add_error(int code, int shell1, int Shell, std::string info);
   std::set<int> get_unique_error_codes();
   std::string   get_poly_representation();
   bool          is_valid();
@@ -40,7 +40,7 @@ public:
   void          set_id(std::string id);
 private:
   std::string     _id;
-  vector<Shell2*> _shells;
+  vector<Shell*> _shells;
   int             _is_valid;
   // std::map<int, vector<std::pair<int, std::string> > > _errors;
 

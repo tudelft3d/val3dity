@@ -26,4 +26,4 @@
 
 
 // Checks for self-intersections between triangles contained in shell
-bool is_polyhedron_geometrically_consistent(Shell2* sh);
+bool is_polyhedron_geometrically_consistent(Shell* sh);

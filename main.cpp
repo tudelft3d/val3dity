@@ -27,7 +27,6 @@
 // TODO: check Nef unit, crashed with 015.gml 
 // TODO: validation of MultiSurfaces and CompositeSurfaces?  
 // TODO: OBJ input? or OFF?  
-// TODO: Shell2 --> Shell *everywhere*  
 // ============================================================================
 
 
@@ -157,14 +156,14 @@ int main(int argc, char* const argv[])
               (extension == "POLY") )
     {
       Solid s;
-      Shell2* sh = readPolyfile(inputfile.getValue(), 0, errs);
+      Shell* sh = readPolyfile(inputfile.getValue(), 0, errs);
       if (errs.has_errors())
         throw "901: INVALID_INPUT_FILE";
       s.set_oshell(sh);
       int sid = 1;
       for (auto ifile : ishellfiles.getValue())
       {
-        Shell2* sh = readPolyfile(ifile, sid, errs);
+        Shell* sh = readPolyfile(ifile, sid, errs);
         if (errs.has_errors())
           throw "901: INVALID_INPUT_FILE";
         s.add_ishell(sh);

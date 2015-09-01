@@ -32,7 +32,7 @@ Solid::Solid()
 }
 
 
-Solid::Solid(Shell2* sh)
+Solid::Solid(Shell* sh)
 {
   _shells.push_back(sh);
   _id = std::to_string(_counter);
@@ -44,13 +44,13 @@ Solid::~Solid()
   // TODO: destructor for Solid, memory-management jongens
 }
 
-Shell2* Solid::get_oshell()
+Shell* Solid::get_oshell()
 {
   return _shells[0];
 }
 
 
-void Solid::set_oshell(Shell2* sh)
+void Solid::set_oshell(Shell* sh)
 {
   if (_shells.empty())
     _shells.push_back(sh);
@@ -59,13 +59,13 @@ void Solid::set_oshell(Shell2* sh)
 }
 
 
-const vector<Shell2*>& Solid::get_shells()
+const vector<Shell*>& Solid::get_shells()
 {
   return _shells;
 }
 
 
-void Solid::add_ishell(Shell2* sh)
+void Solid::add_ishell(Shell* sh)
 {
   _shells.push_back(sh);
 }
@@ -165,7 +165,7 @@ void Solid::set_id(std::string id)
 }
 
 
-void Solid::add_error(int code, int shell1, int shell2, std::string info)
+void Solid::add_error(int code, int shell1, int Shell, std::string info)
 {
   // TODO: how to store these errors? shell-shell numbers?
   // std::pair<int, std::string> a(faceid, info);

@@ -16,7 +16,7 @@
 
 
 
-Shell2::Shell2(int id, double tol_snap)
+Shell::Shell(int id, double tol_snap)
 {
   _id = id;
   _tol_snap = tol_snap;
@@ -24,23 +24,23 @@ Shell2::Shell2(int id, double tol_snap)
   _is_valid_2d = -1;
 }
 
-Shell2::~Shell2()
+Shell::~Shell()
 {
   // TODO: clear memory properly
   _lsPts.clear();
 }
 
-int Shell2::get_id()
+int Shell::get_id()
 {
   return _id;
 }
 
-CgalPolyhedron* Shell2::get_cgal_polyhedron()
+CgalPolyhedron* Shell::get_cgal_polyhedron()
 {
   return _polyhedron;
 }
 
-void Shell2::add_error(int code, int faceid, std::string info)
+void Shell::add_error(int code, int faceid, std::string info)
 {
   std::pair<int, std::string> a(faceid, info);
   _errors[code].push_back(a);
@@ -52,7 +52,7 @@ void Shell2::add_error(int code, int faceid, std::string info)
     std::clog << "\t[" << info << "]" << std::endl;
 }
 
-std::set<int> Shell2::get_unique_error_codes()
+std::set<int> Shell::get_unique_error_codes()
 {
   std::set<int> errs;
   for (auto& err : _errors)
@@ -63,7 +63,7 @@ std::set<int> Shell2::get_unique_error_codes()
 }
 
 
-std::string Shell2::get_report_xml()
+std::string Shell::get_report_xml()
 {
   std::stringstream ss;
   for (auto& err : _errors)
@@ -83,7 +83,7 @@ std::string Shell2::get_report_xml()
 }
 
 
-std::string Shell2::get_report_text()
+std::string Shell::get_report_text()
 {
   std::stringstream ss;
   for (auto& err : _errors)
@@ -100,7 +100,7 @@ std::string Shell2::get_report_text()
 }
 
 
-std::string Shell2::get_poly_representation()
+std::string Shell::get_poly_representation()
 {
   std::ostringstream s;
   //-- points
@@ -131,7 +131,7 @@ std::string Shell2::get_poly_representation()
   return s.str();
 }
 
-int Shell2::add_point(Point3 p)
+int Shell::add_point(Point3 p)
 {
   int pos = -1;
   int cur = 0;
@@ -155,30 +155,30 @@ int Shell2::add_point(Point3 p)
 }
 
 
-void Shell2::add_face(vector< vector<int> > f)
+void Shell::add_face(vector< vector<int> > f)
 {
   _lsFaces.push_back(f);
 }
 
 
-int Shell2::number_points()
+int Shell::number_points()
 {
   return _lsPts.size();
 }
 
 
-int Shell2::number_faces()
+int Shell::number_faces()
 {
   return _lsFaces.size();
 }
 
 
-bool Shell2::is_outer()
+bool Shell::is_outer()
 {
   return (_id == 0);
 }
 
-bool Shell2::triangulate_shell()
+bool Shell::triangulate_shell()
 {
   std::clog << "--Triangulation of each surface" << std::endl;
   //-- read the facets
@@ -255,7 +255,7 @@ bool Shell2::triangulate_shell()
 }
 
 
-bool Shell2::construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum)
+bool Shell::construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum)
 {
   bool isValid = true;
   vector<int> ids = pgnids[0];
@@ -350,7 +350,7 @@ bool Shell2::construct_ct(const vector< vector<int> >& pgnids, const vector<Poly
 }
 
 
-void Shell2::translate_vertices()
+void Shell::translate_vertices()
 {
   vector<Point3>::iterator it = _lsPts.begin();
   K::FT minx = 9e10;
@@ -370,7 +370,7 @@ void Shell2::translate_vertices()
 }
 
 
-bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
+bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "--2D validation of each surface" << std::endl;
   bool isValid = true;
@@ -472,7 +472,7 @@ bool Shell2::validate_2d_primitives(double tol_planarity_d2p, double tol_planari
 }
 
 
-bool Shell2::validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals)
+bool Shell::validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "--- MultiSurface validation ---" << std::endl;
   if (_is_valid_2d == -1)
@@ -487,7 +487,7 @@ bool Shell2::validate_as_multisurface(double tol_planarity_d2p, double tol_plana
 }
 
 
-bool Shell2::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
+bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
   // TODO: not working yet
   std::clog << "--- MultiSurface validation ---" << std::endl;
@@ -495,7 +495,7 @@ bool Shell2::validate_as_compositesurface(double tol_planarity_d2p, double tol_p
 }
 
 
-bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
+bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "----- Shell validation (#" << _id << ") -----" << std::endl;
   if (_is_valid_2d == -1)
@@ -590,7 +590,7 @@ bool Shell2::validate_as_shell(double tol_planarity_d2p, double tol_planarity_no
 }
 
 
-bool Shell2::validate_polygon(vector<Polygon> &lsRings, int polygonid)
+bool Shell::validate_polygon(vector<Polygon> &lsRings, int polygonid)
 {
   // TODO: need to init GEOS and "close" it each time? I guess not...
   initGEOS(NULL, NULL);
@@ -671,7 +671,7 @@ bool Shell2::validate_polygon(vector<Polygon> &lsRings, int polygonid)
   return isvalid;
 }
 
-bool Shell2::has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
+bool Shell::has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
 {
   bool bDuplicates = false;
   vector< vector<int> >::const_iterator itr = theface.begin();
@@ -692,7 +692,7 @@ bool Shell2::has_face_2_consecutive_repeated_pts(const vector< vector<int> >& th
   return bDuplicates;
 }
 
-bool Shell2::has_face_rings_toofewpoints(const vector< vector<int> >& theface)
+bool Shell::has_face_rings_toofewpoints(const vector< vector<int> >& theface)
 {
   bool bErrors = false;
   vector< vector<int> >::const_iterator itr = theface.begin();
