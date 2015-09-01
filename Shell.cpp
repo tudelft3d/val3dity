@@ -11,7 +11,7 @@
 #include "input.h"
 #include "validate_shell.h"
 #include "validate_shell_intersection.h"
-#include <GEOS/geos_c.h>
+#include <geos_c.h>
 #include <sstream>
 
 
