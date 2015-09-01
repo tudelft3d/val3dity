@@ -82,10 +82,9 @@ int main(int argc, char* const argv[])
   std::clog << "***** USING EXACT-EXACT *****" << std::endl;
 #endif
 
-  IOErrors errs;
+  IOErrors ioerrs;
   std::streambuf* savedBufferCLOG;
   std::ofstream mylog;
-
 
   //-- tclap options
   std::vector<std::string> primitivestovalidate;
@@ -143,36 +142,32 @@ int main(int argc, char* const argv[])
          (extension == "xml") ||  
          (extension == "XML") ) 
     {
-      lsSolids = readGMLfile(inputfile.getValue(), errs, snap_tolerance.getValue());
-      if (errs.has_errors())
-        throw "901: INVALID_INPUT_FILE";
+      lsSolids = readGMLfile(inputfile.getValue(), ioerrs, snap_tolerance.getValue());
       if (ishellfiles.getValue().size() > 0)
       {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        throw "No inner shells allowed when GML file used as input.";
+        ioerrs.add_error(900, "No inner shells allowed when GML file used as input.");
       }
     }
     else if ( (extension == "poly") ||
               (extension == "POLY") )
     {
       Solid s;
-      Shell* sh = readPolyfile(inputfile.getValue(), 0, errs);
-      if (errs.has_errors())
-        throw "901: INVALID_INPUT_FILE";
-      s.set_oshell(sh);
-      int sid = 1;
-      for (auto ifile : ishellfiles.getValue())
+      Shell* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+      if (ioerrs.empty() == false)
       {
-        Shell* sh = readPolyfile(ifile, sid, errs);
-        if (errs.has_errors())
-          throw "901: INVALID_INPUT_FILE";
-        s.add_ishell(sh);
-        sid++;
+        s.set_oshell(sh);
+        int sid = 1;
+        for (auto ifile : ishellfiles.getValue())
+        {
+          Shell* sh = readPolyfile(ifile, sid, ioerrs);
+          s.add_ishell(sh);
+          sid++;
+        }
+        lsSolids.push_back(s);
       }
-      lsSolids.push_back(s);
     }
     else
-      throw "unknown file type (only GML/XML and POLY accepted)";
+      ioerrs.add_error(900, "Unknown file type (only GML/XML and POLY accepted)");
 
     //-- now the validation starts
     for (auto& s : lsSolids)
@@ -193,32 +188,39 @@ int main(int argc, char* const argv[])
     {
       std::ofstream thereport;
       thereport.open(outputxml.getValue());
-      thereport << "<val3dity>" << std::endl;
-      thereport << "\t<inputFile>" << inputfile.getValue() << "</inputFile>" << std::endl;
-      thereport << "\t<primitives>";
-      if (prim3d == SOLID)
-        thereport << "gml:Solid";
-      else if (prim3d == COMPOSITESURFACE)
-        thereport << "gml:CompositeSurface";
+      if (ioerrs.empty() == false)
+      {
+        thereport << ioerrs.get_report_xml() << std::endl;
+      }
       else
-        thereport << "gml:MultiSurface";
-      thereport << "</primitives>" << std::endl;
-      thereport << "\t<snap_tolerance>" << snap_tolerance.getValue() << "</snap_tolerance>" << std::endl;
-      thereport << "\t<planarity_d2p>" << planarity_d2p.getValue() << "</planarity_d2p>" << std::endl;
-      thereport << "\t<planarity_n>" << planarity_n.getValue() << "</planarity_n>" << std::endl;
-      std::time_t t = std::time(nullptr);
-      std::tm tm = *std::localtime(&t);
-      thereport << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
-      int bValid = 0;
-      for (auto& s : lsSolids)
-        if (s.is_valid() == true)
-          bValid++;
-      thereport << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
-      thereport << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
-      thereport << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
-      for (auto& s : lsSolids)
-        thereport << s.get_report_xml();
-      thereport << "</val3dity>" << std::endl;
+      {
+        thereport << "<val3dity>" << std::endl;
+        thereport << "\t<inputFile>" << inputfile.getValue() << "</inputFile>" << std::endl;
+        thereport << "\t<primitives>";
+        if (prim3d == SOLID)
+          thereport << "gml:Solid";
+        else if (prim3d == COMPOSITESURFACE)
+          thereport << "gml:CompositeSurface";
+        else
+          thereport << "gml:MultiSurface";
+        thereport << "</primitives>" << std::endl;
+        thereport << "\t<snap_tolerance>" << snap_tolerance.getValue() << "</snap_tolerance>" << std::endl;
+        thereport << "\t<planarity_d2p>" << planarity_d2p.getValue() << "</planarity_d2p>" << std::endl;
+        thereport << "\t<planarity_n>" << planarity_n.getValue() << "</planarity_n>" << std::endl;
+        std::time_t t = std::time(nullptr);
+        std::tm tm = *std::localtime(&t);
+        thereport << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
+        int bValid = 0;
+        for (auto& s : lsSolids)
+          if (s.is_valid() == true)
+            bValid++;
+        thereport << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
+        thereport << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
+        thereport << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
+        for (auto& s : lsSolids)
+          thereport << s.get_report_xml();
+        thereport << "</val3dity>" << std::endl;
+      }
       thereport.close();
       std::cout << "Full validation report saved to " << outputxml.getValue() << std::endl;
     }

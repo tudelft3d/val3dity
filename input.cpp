@@ -31,8 +31,49 @@ vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 std::string   localise(std::string s);
 
-
 /////
+
+bool IOErrors::has_errors()
+{
+  if (_errors.size() == 0)
+    return false;
+  else
+    return true;
+}
+
+
+void IOErrors::add_error(int code, std::string info)
+{
+  _errors[code].push_back(info);
+  std::clog << "--> errors #" << code << " : " << info << std::endl;
+}
+
+std::string IOErrors::get_report_text()
+{
+  std::stringstream ss;
+  for (auto& err : _errors)
+  {
+    ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
+    ss << "\t\tInfo: "  << err.second << std::endl;
+  }
+  return ss.str();
+}
+
+
+std::string IOErrors::get_report_xml()
+{
+  std::stringstream ss;
+  for (auto& err : _errors)
+  {
+    ss << "\t\t<Error>" << std::endl;
+    ss << "\t\t\t<code>" << err.first << "</code>" << std::endl;
+    ss << "\t\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
+    ss << "\t\t\t<info>" << err.second << "</info>" << std::endl;
+    ss << "\t\t</Error>" << std::endl;
+  }
+  return ss.str();
+}
+
 
 std::string errorcode2description(int code, bool qie) {
   if (qie == false) {
@@ -215,7 +256,8 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
   pugi::xml_document doc;
-  if (!doc.load_file(ifile.c_str())) {
+  if (!doc.load_file(ifile.c_str())) 
+  {
     errs.add_error(900, "Input file not found.");
     return lsSolids;
   }
