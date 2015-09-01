@@ -37,18 +37,10 @@
 class IOErrors {
   std::map<int, vector<std::string> >  _errors;
 public:
-  bool has_errors()
-  {
-    if (_errors.size() == 0)
-      return false;
-    else
-      return true;
-  }
-  void add_error(int code, std::string info)
-  {
-    _errors[code].push_back(info);
-    std::clog << "--> errors #" << code << " : " << info << std::endl;
-  }
+  bool has_errors();
+  void add_error(int code, std::string info);
+  std::string get_report_text();
+  std::string get_report_xml();
 };
 
 std::string   errorcode2description(int code, bool qie = false);
