@@ -48,13 +48,17 @@ void IOErrors::add_error(int code, std::string info)
   std::clog << "--> errors #" << code << " : " << info << std::endl;
 }
 
+
 std::string IOErrors::get_report_text()
 {
   std::stringstream ss;
   for (auto& err : _errors)
   {
-    ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
-    ss << "\t\tInfo: "  << err.second << std::endl;
+    for (auto i : err.second)
+    {
+      ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << "\t\tInfo: " << i << std::endl;
+    }
   }
   return ss.str();
 }
@@ -65,11 +69,14 @@ std::string IOErrors::get_report_xml()
   std::stringstream ss;
   for (auto& err : _errors)
   {
-    ss << "\t\t<Error>" << std::endl;
-    ss << "\t\t\t<code>" << err.first << "</code>" << std::endl;
-    ss << "\t\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
-    ss << "\t\t\t<info>" << err.second << "</info>" << std::endl;
-    ss << "\t\t</Error>" << std::endl;
+    for (auto i : err.second)
+    {
+      ss << "\t<Error>" << std::endl;
+      ss << "\t\t<code>" << err.first << "</code>" << std::endl;
+      ss << "\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
+      ss << "\t\t<info>" << i << "</info>" << std::endl;
+      ss << "\t</Error>" << std::endl;
+    }
   }
   return ss.str();
 }
@@ -258,7 +265,7 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) 
   {
-    errs.add_error(900, "Input file not found.");
+    errs.add_error(901, "Input file not found.");
     return lsSolids;
   }
   std::string s = "//" + localise("Solid");
@@ -302,7 +309,6 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
     lsSolids.push_back(sol);
   }
   if (translatevertices == true)
-
   std::clog << "done." << std::endl;
   return lsSolids;
 }
@@ -317,7 +323,7 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool transl
   ifstream infile(ifile.c_str(), ifstream::in);
   if (!infile)
   {
-    errs.add_error(900, "Input file not found.");
+    errs.add_error(901, "Input file not found.");
     return NULL;
   }
   Shell* sh = new Shell(shellid);  
