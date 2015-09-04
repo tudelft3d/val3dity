@@ -26,7 +26,7 @@
 // ============================================================================
 // TODO: check Nef unit, crashed with 015.gml 
 // TODO: validation of MultiSurfaces and CompositeSurfaces?  
-// TODO: OBJ input? or OFF?  
+// TODO: OBJ input? or OFF?  https://github.com/syoyo/tinyobjloader
 // ============================================================================
 
 
@@ -40,10 +40,10 @@
 std::string print_summary_validation(vector<Solid>& lsSolids);
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitives3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
-                      vector<Solid>& lsSolids, IOErrors ioerrs);
+                      vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
 void write_report_text(std::ofstream& ss, std::string ifile, Primitives3D prim3d, 
                        double snap_tolerance, double planarity_d2p, double planarity_n, 
-                       vector<Solid>& lsSolids, IOErrors ioerrs);
+                       vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
 
 
 
@@ -110,6 +110,7 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<std::string>           outputtxt("", "otxt", "report in text format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (default=solid), ie (solid|compositesurface|multisurface)", false, "S", &primVals);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
+    TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
     TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
@@ -121,6 +122,7 @@ int main(int argc, char* const argv[])
     cmd.add(snap_tolerance);
     cmd.add(primitives);
     cmd.add(verbose);
+    cmd.add(onlyinvalid);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(outputxml);
@@ -215,7 +217,8 @@ int main(int argc, char* const argv[])
                        planarity_d2p.getValue(),
                        planarity_n.getValue(),
                        lsSolids,
-                       ioerrs);
+                       ioerrs,
+                       onlyinvalid.getValue());
       thereport.close();
       std::cout << "Full validation report saved to " << outputxml.getValue() << std::endl;
     }
@@ -230,7 +233,8 @@ int main(int argc, char* const argv[])
                         planarity_d2p.getValue(),
                         planarity_n.getValue(),
                         lsSolids,
-                        ioerrs);
+                        ioerrs,
+                        onlyinvalid.getValue());
       thereport.close();
       std::cout << "Full validation report saved to " << outputtxt.getValue() << std::endl;
     }
@@ -292,7 +296,8 @@ void write_report_text(std::ofstream& ss,
                        double planarity_d2p,
                        double planarity_n,
                        vector<Solid>& lsSolids,
-                       IOErrors ioerrs)
+                       IOErrors ioerrs,
+                       bool onlyinvalid)
 {
   ss << "Input File: " << ifile << std::endl;
   ss << "Primitives: ";
@@ -310,8 +315,11 @@ void write_report_text(std::ofstream& ss,
   std::tm tm = *std::localtime(&t);
   ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
   ss << print_summary_validation(lsSolids) << std::endl;
-  for (auto& s : lsSolids)
-    ss << s.get_report_text();
+  for (auto& s : lsSolids) 
+  {
+    if ( !((onlyinvalid == true) && (s.is_valid() == true)) )
+      ss << s.get_report_text();
+  }
 }
 
 
@@ -322,7 +330,8 @@ void write_report_xml(std::ofstream& ss,
                       double planarity_d2p,
                       double planarity_n,
                       vector<Solid>& lsSolids,
-                      IOErrors ioerrs)
+                      IOErrors ioerrs,
+                      bool onlyinvalid)
 {
   ss << "<val3dity>" << std::endl;
   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
@@ -353,8 +362,11 @@ void write_report_xml(std::ofstream& ss,
   }
   else
   {
-    for (auto& s : lsSolids)
-      ss << s.get_report_xml();
+    for (auto& s : lsSolids) 
+    {
+      if ( !((onlyinvalid == true) && (s.is_valid() == true)) )
+        ss << s.get_report_xml();
+    }
   }
   ss << "</val3dity>" << std::endl;
 }
