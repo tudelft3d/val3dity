@@ -233,8 +233,12 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
         break;
       }
     }
-    if (bxlink == true)
-      p = dallpoly[it->node().attribute("xlink:href").value()];
+    if (bxlink == true) {
+      if (dallpoly.count(it->node().attribute("xlink:href").value()) == 1)
+        p = dallpoly[it->node().attribute("xlink:href").value()];
+      else
+        std::cout << "xlink not found" << std::endl;
+    }
     else
     {
       std::string s2 = "./" + localise("Polygon");
@@ -285,8 +289,13 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   map<std::string, pugi::xpath_node> dxlinks;
   s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
-  for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it)
-    dxlinks[it->node().attribute("xlink:href").value()] = dallpoly[it->node().attribute("xlink:href").value()];
+  for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it) {
+    if (dxlinks.count(it->node().attribute("xlink:href").value()) == 1)
+      dxlinks[it->node().attribute("xlink:href").value()] = dallpoly[it->node().attribute("xlink:href").value()];
+    else if (dxlinks.count(it->node().attribute("xlink:href").value()) == 1)
+      std::cout << "oups" << std::endl;
+    
+  }
 
   for(auto& nsolid: nsolids)
   {
