@@ -200,7 +200,7 @@ int main(int argc, char* const argv[])
     int i = 1;
     for (auto& s : lsSolids)
     {
-      if (i % 100 == 0) 
+      if (i % 10 == 0) 
         printProgressBar(100 * (i / double(lsSolids.size())));
       i++;
       std::clog << std::endl << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
@@ -209,6 +209,7 @@ int main(int argc, char* const argv[])
       else
         std::clog << "===== VALID =====" << std::endl;
     }
+    printProgressBar(100);
 
     //-- print summary of errors
     std::cout << "\n" << print_summary_validation(lsSolids) << std::endl;        
