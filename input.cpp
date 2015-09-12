@@ -56,8 +56,8 @@ std::string IOErrors::get_report_text()
   {
     for (auto i : err.second)
     {
-      ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
-      ss << "\t\tInfo: " << i << std::endl;
+      ss << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << "\tInfo: " << i << std::endl;
     }
   }
   return ss.str();
@@ -234,10 +234,10 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
       }
     }
     if (bxlink == true) {
-      if (dallpoly.count(it->node().attribute("xlink:href").value()) == 1)
-        p = dallpoly[it->node().attribute("xlink:href").value()];
-      else
-        std::cout << "xlink not found" << std::endl;
+       std::string k = it->node().attribute("xlink:href").value();
+      if (k[0] == '#')
+        k = k.substr(1);
+      p = dallpoly[k];
     }
     else
     {
@@ -275,26 +275,33 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   std::string s = "//" + localise("Solid");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
+  std::cout << "Parsing the file and building the solids" << std::endl;
   std::cout << "# of gml:Solids found: " << nsolids.size() << std::endl;
-  std::clog << "...parsing the file and building the solids." << std::endl;
 
   //-- build dico of xlinks
   s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
+  if (nallpoly.size() > 0)
+    std::cout << "XLinks found, resolving them..." << std::endl;
   map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
   {
     dallpoly[it->node().attribute("gml:id").value()] = *it;
   }
-  map<std::string, pugi::xpath_node> dxlinks;
+  //-- checking xlinks validity now not to be bitten later
   s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it) {
-    if (dxlinks.count(it->node().attribute("xlink:href").value()) == 1)
-      dxlinks[it->node().attribute("xlink:href").value()] = dallpoly[it->node().attribute("xlink:href").value()];
-    else if (dxlinks.count(it->node().attribute("xlink:href").value()) == 1)
-      std::cout << "oups" << std::endl;
-    
+    std::string k = it->node().attribute("xlink:href").value();
+    if (k[0] == '#')
+      k = k.substr(1);
+    if (dallpoly.count(k) == 0) {
+      std::string r = "One XLink couldn't be resolved (";
+      r += it->node().attribute("xlink:href").value();
+      r += ")";
+      errs.add_error(901, r);
+      return lsSolids;
+    }
   }
 
   for(auto& nsolid: nsolids)
@@ -317,8 +324,7 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
     }
     lsSolids.push_back(sol);
   }
-  if (translatevertices == true)
-  std::clog << "done." << std::endl;
+  std::cout << "Input file correctly parsed without errors." << std::endl;
   return lsSolids;
 }
 
@@ -414,5 +420,23 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool transl
     sh->add_face(pgnids);
   }
   return sh;
+}
+
+void printProgressBar(int percent) {
+  std::string bar;
+  for(int i = 0; i < 50; i++){
+    if( i < (percent / 2)) {
+      bar.replace(i, 1, "=");
+    }
+    else if( i == (percent / 2)) {
+      bar.replace(i, 1, ">");
+    }
+    else{
+      bar.replace(i, 1, " ");
+    }
+  }
+  std::cout << "\r" "[" << bar << "] ";
+  std::cout.width(3);
+  std::cout << percent << "%     " << std::flush;
 }
 

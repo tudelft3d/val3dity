@@ -66,9 +66,9 @@ public:
     std::cout << "EXAMPLES" << std::endl;
     std::cout << "\tval3dity input.gml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -otxt report.txt" << std::endl;
+    std::cout << "\tval3dity input.gml --otxt report.txt" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in plain text" << std::endl;
-    std::cout << "\tval3dity input.gml -oxml report.xml" << std::endl;
+    std::cout << "\tval3dity input.gml --oxml report.xml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/py.poly" << std::endl;
     std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell py.poly" << std::endl;
@@ -104,7 +104,7 @@ int main(int argc, char* const argv[])
   MyOutput my;
   cmd.setOutput(&my);
   try {
-    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one shell)", true, "", "string");
+    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one exterior shell)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           outputxml("", "oxml", "report in XML format", false, "", "string");
     TCLAP::ValueArg<std::string>           outputtxt("", "otxt", "report in text format", false, "", "string");
@@ -152,8 +152,10 @@ int main(int argc, char* const argv[])
          (extension == "XML") ) 
     {
       lsSolids = readGMLfile(inputfile.getValue(), ioerrs, snap_tolerance.getValue());
-      if (ioerrs.has_errors() == true)
-        std::cout << "Input file not found." << std::endl;
+      if (ioerrs.has_errors() == true) {
+        std::cout << "Errors while reading the input file, aborting." << std::endl;
+        std::cout << ioerrs.get_report_text() << std::endl;
+      }
 
       if (ishellfiles.getValue().size() > 0)
       {
@@ -194,8 +196,13 @@ int main(int argc, char* const argv[])
     }
 
     //-- now the validation starts
+    std::cout << "Validating " << lsSolids.size() << " gml:Solids" << std::endl;
+    int i = 1;
     for (auto& s : lsSolids)
     {
+      if (i % 100 == 0) 
+        printProgressBar(100 * (i / double(lsSolids.size())));
+      i++;
       std::clog << std::endl << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
       if (s.validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
         std::clog << "===== INVALID =====" << std::endl;
@@ -204,7 +211,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << print_summary_validation(lsSolids) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsSolids) << std::endl;        
    
     if (outputxml.getValue() != "")
     {
@@ -315,10 +322,17 @@ void write_report_text(std::ofstream& ss,
   std::tm tm = *std::localtime(&t);
   ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
   ss << print_summary_validation(lsSolids) << std::endl;
-  for (auto& s : lsSolids) 
+  if (ioerrs.has_errors() == true)
   {
-    if ( !((onlyinvalid == true) && (s.is_valid() == true)) )
-      ss << s.get_report_text();
+    ss << ioerrs.get_report_text();
+  }
+  else
+  {
+    for (auto& s : lsSolids) 
+    {
+      if ( !((onlyinvalid == true) && (s.is_valid() == true)) )
+        ss << s.get_report_text();
+    }
   }
 }
 
