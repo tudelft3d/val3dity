@@ -35,6 +35,7 @@ public:
   std::string   get_report_xml();
   std::string   get_report_text();
   void          add_error(int code, int faceid, std::string info = "");
+  bool          has_errors();
   std::set<int> get_unique_error_codes();
   void          translate_vertices();
   std::string   get_poly_representation();

@@ -211,7 +211,6 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
       r.push_back(sh->add_point(p));
     }
   }
-  r.pop_back();
   return r;
 }
 
@@ -220,6 +219,7 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
   Shell* sh = new Shell(id, tol_snap);
+  int i = 0;
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
     vector< vector<int> > oneface;
@@ -247,14 +247,25 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
     //-- exterior ring (only 1)
     s = "./" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
-    oneface.push_back(process_gml_ring(ring.node(), sh, errs));
+    vector<int> r = process_gml_ring(ring.node(), sh, errs);
+    if (r.front() != r.back())
+      sh->add_error(103, i);
+    else
+      r.pop_back(); 
+    oneface.push_back(r);
     //-- interior rings
     s = "./" + localise("interior");
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
-      oneface.push_back(process_gml_ring(it->node(), sh, errs));
+      vector<int> r = process_gml_ring(it->node(), sh, errs);
+      if (r.front() != r.back())
+        sh->add_error(103, i);
+      else
+        r.pop_back(); 
+      oneface.push_back(r);
     }
     sh->add_face(oneface);
+    i++;
   }
   if (translatevertices == true)
     sh->translate_vertices();
