@@ -40,6 +40,14 @@ CgalPolyhedron* Shell::get_cgal_polyhedron()
   return _polyhedron;
 }
 
+bool Shell::has_errors()
+{
+  if (_errors.size() == 0)
+    return true;
+  else 
+    return false;
+}
+
 void Shell::add_error(int code, int faceid, std::string info)
 {
   std::pair<int, std::string> a(faceid, info);
@@ -373,7 +381,7 @@ void Shell::translate_vertices()
 bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "--2D validation of each surface" << std::endl;
-  bool isValid = true;
+  bool isValid = this->has_errors();
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
   {
