@@ -109,23 +109,23 @@ class Test_TolerancePlanarity_normals(unittest.TestCase):
 
 
 def validate(file, planartol=0.01):
-    str1 = VAL3DITYEXE + " -xml -planarity_d2p " + str(planartol) + " " + SOLIDFOLDER + file +'.poly'
+    str1 = VAL3DITYEXE + " --planarity_d2p " + str(planartol) + " " + SOLIDFOLDER + file +'.poly'
     # print str1
-    op = subprocess.Popen(str1.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # op = subprocess.Popen(str1.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    op = subprocess.Popen(str1.split(' '), stderr=subprocess.PIPE)
     R = op.poll()
     if R:
         res = op.communicate()
         raise ValueError(res[1])
     re =  op.communicate()[0]
+    print re
     output = []
     if (re != ''):
-        parser = etree.XMLParser(remove_blank_text=True)
-        root = etree.XML("<report>" + re + "</report>", parser)
-        codes = []
-        # msg = []
-        for each in root.findall(".//errorCode"):
-            if output.count(each.text) == 0:
-                output.append(each.text)
+        i = re.find('Errors present')
+        # print re[i+15:]
+        # for each in root.findall(".//errorCode"):
+            # if output.count(each.text) == 0:
+                # output.append(each.text)
     return output
 
 if __name__ == '__main__':
