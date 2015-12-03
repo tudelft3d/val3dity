@@ -27,7 +27,7 @@
 
 
 Shell*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
-vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
+vector<int>  process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 std::string   localise(std::string s);
 
@@ -245,7 +245,7 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
       p = it->node().select_node(s2.c_str());
     }
     //-- exterior ring (only 1)
-    s = "./" + localise("exterior");
+    s = ".//" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
     vector<int> r = process_gml_ring(ring.node(), sh, errs);
     if (r.front() != r.back())
@@ -254,7 +254,7 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
       r.pop_back(); 
     oneface.push_back(r);
     //-- interior rings
-    s = "./" + localise("interior");
+    s = ".//" + localise("interior");
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
       vector<int> r = process_gml_ring(it->node(), sh, errs);
@@ -290,6 +290,7 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   std::cout << "# of gml:Solids found: " << nsolids.size() << std::endl;
 
   //-- build dico of xlinks
+  //-- for <gml:Polygon>
   s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
@@ -299,6 +300,16 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
   {
     dallpoly[it->node().attribute("gml:id").value()] = *it;
   }
+
+  //-- for <gml:OrientableSurface>
+  s = "//" + localise("OrientableSurface") + "[@" + localise("id") + "]";
+  pugi::xpath_node_set nallosurf = doc.select_nodes(s.c_str());
+  // map<std::string, pugi::xpath_node> dallpoly;
+  for (pugi::xpath_node_set::const_iterator it = nallosurf.begin(); it != nallosurf.end(); ++it)
+  {
+    dallpoly[it->node().attribute("gml:id").value()] = *it;
+  }
+
   //-- checking xlinks validity now not to be bitten later
   s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
