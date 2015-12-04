@@ -26,13 +26,6 @@
 #include "input.h"
 
 
-Shell*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
-vector<int>  process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
-
-std::string   localise(std::string s);
-
-/////
-
 bool IOErrors::has_errors()
 {
   if (_errors.size() == 0)
@@ -244,10 +237,16 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
       std::string s2 = "./" + localise("Polygon");
       p = it->node().select_node(s2.c_str());
     }
+
+    bool fliporientation = false;
+    if (std::strncmp(p.node().attribute("orientation").value(), "-", 1) == 0)
+      fliporientation = true;
     //-- exterior ring (only 1)
     s = ".//" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
     vector<int> r = process_gml_ring(ring.node(), sh, errs);
+    if (fliporientation == true) 
+      std::reverse(r.begin(), r.end());
     if (r.front() != r.back())
       sh->add_error(103, i);
     else
@@ -258,6 +257,8 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
       vector<int> r = process_gml_ring(it->node(), sh, errs);
+      if (fliporientation == true) 
+        std::reverse(r.begin(), r.end());
       if (r.front() != r.back())
         sh->add_error(103, i);
       else
