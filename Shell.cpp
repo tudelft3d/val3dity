@@ -521,6 +521,8 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
 //-- 2. Combinatorial consistency
   std::clog << "--Combinatorial consistency" << std::endl;
   _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
+  if (this->has_errors() ==  true)
+    return false;
   if (_polyhedron != NULL)
   {
     if (_polyhedron->is_valid() == true)
@@ -568,6 +570,11 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
       this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
       isValid = false;
     }
+  }
+  else
+  {
+    this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+    isValid = false;
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
   if (isValid == true)
