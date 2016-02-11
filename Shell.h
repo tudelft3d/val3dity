@@ -50,7 +50,6 @@ private:
   std::map<int, vector<std::pair<int, std::string> > > _errors;
 
   double                          _tol_snap;
-  int                             _is_valid;    //-1: not done yet; 0: nope; 1: yes it's valid
   int                             _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
 
   bool triangulate_shell();

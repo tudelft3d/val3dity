@@ -20,7 +20,6 @@ Shell::Shell(int id, double tol_snap)
 {
   _id = id;
   _tol_snap = tol_snap;
-  _is_valid = -1;
   _is_valid_2d = -1;
 }
 
@@ -510,12 +509,10 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)
     return false;
-  bool isValid = true;
 //-- 1. minimum number of faces = 4
   if (_lsTr.size() < 4) 
   {
     this->add_error(301, -1);
-    isValid = false;
     return false;
   }
 //-- 2. Combinatorial consistency
@@ -535,7 +532,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
         {
           //TODO: how to report what face is not connected? a bitch of a problem...
           this->add_error(305, -1);
-          isValid = false;
+          return false;
         }
         else
         {
@@ -552,7 +549,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
               _polyhedron->fill_hole(he);
               _polyhedron->normalize_border();
             }
-            isValid = false;
+            return false;
           }
         }
       }
@@ -561,47 +558,32 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
         if (_polyhedron->keep_largest_connected_components(1) > 0) 
         {
           this->add_error(305, -1, "More than one connected components.");
-          isValid = false;
+          return false;
         }
       }
     }
     else 
     {
       this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
-      isValid = false;
+      return false;
     }
   }
   else
   {
     this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
-    isValid = false;
+    return false;
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
-  if (isValid == true)
-  {
-    std::clog << "--Geometrical consistency" << std::endl;
-    isValid = is_polyhedron_geometrically_consistent(this);
-  }
+  std::clog << "--Geometrical consistency" << std::endl;
+  if (is_polyhedron_geometrically_consistent(this) == false)
+    return false;
 //-- 4. orientation of the normals is outwards or inwards
-  if (isValid == true)
-  {
-    std::clog << "--Orientation of normals" << std::endl;
-    isValid = check_global_orientation_normals_rev2(_polyhedron, this->is_outer());
-    if (isValid == false)
-      this->add_error(308, -1);
+  std::clog << "--Orientation of normals" << std::endl;
+  if (check_global_orientation_normals_rev2(_polyhedron, this->is_outer()) == false) {
+    this->add_error(308, -1);
+    return false;
   }
-  
-  if (isValid == false)
-  {
-    delete _polyhedron;
-    _is_valid = 0;
-  }
-  else
-  {
-    // _polyhedron = P;
-    _is_valid = 1;
-  }
-  return isValid;
+  return true;
 }
 
 
