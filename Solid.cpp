@@ -122,20 +122,20 @@ std::string Solid::get_poly_representation()
 std::string Solid::get_report_xml()
 {
   std::stringstream ss;
-  ss << "\t<Solid>" << std::endl;
+  ss << "\t<Primitive>" << std::endl;
   ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
   for (auto& sh : _shells)
   {
     ss << sh->get_report_xml();
   }
-  ss << "\t</Solid>" << std::endl;
+  ss << "\t</Primitive>" << std::endl;
   return ss.str();
 }
 
 std::string Solid::get_report_text()
 {
   std::stringstream ss;
-  ss << "===== Solid " << this->_id << " =====" << std::endl;
+  ss << "===== Primitive " << this->_id << " =====" << std::endl;
   for (auto& sh : _shells)
   {
     ss << sh->get_report_text();
