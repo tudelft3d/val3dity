@@ -27,10 +27,7 @@ public:
   int    add_point(Point3 p);
   void   add_face(vector< vector<int> > f);
 
-  bool   validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
-  bool   validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals);
-  bool   validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
-  bool   validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
+  bool   validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
 
   std::string   get_report_xml();
   std::string   get_report_text();
@@ -52,6 +49,11 @@ private:
   double                          _tol_snap;
   int                             _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
 
+  bool validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
+  bool validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals);
+  bool validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
+  bool validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
+  
   bool triangulate_shell();
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
   bool validate_polygon(vector<Polygon> &lsRings, int polygonid);

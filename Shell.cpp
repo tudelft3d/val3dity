@@ -490,11 +490,22 @@ bool Shell::validate_as_multisurface(double tol_planarity_d2p, double tol_planar
   }
 }
 
+bool Shell::validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals)
+{
+  if (prim == SOLID)
+    return validate_as_shell(tol_planarity_d2p, tol_planarity_normals);
+  else if (prim == COMPOSITESURFACE)
+    return validate_as_compositesurface(tol_planarity_d2p, tol_planarity_normals);
+  else if (prim == MULTISURFACE)
+    return validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals);
+  else
+    return false;
+}
 
 bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
   // TODO: not working yet
-  std::clog << "--- MultiSurface validation ---" << std::endl;
+  std::clog << "--- CompositeSurface validation ---" << std::endl;
   return validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
 }
 

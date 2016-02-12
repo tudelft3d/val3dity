@@ -73,7 +73,7 @@ typedef enum
   SOLID            = 0,
   COMPOSITESURFACE = 1,
   MULTISURFACE     = 2,
-} Primitives3D;
+} Primitive3D;
 
 
 #endif

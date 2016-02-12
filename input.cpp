@@ -274,7 +274,7 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
 }
 
 
-vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool translatevertices)
+vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -284,11 +284,23 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
     errs.add_error(901, "Input file not found.");
     return lsSolids;
   }
-  std::string s = "//" + localise("Solid");
+  std::string s = "//";
+  if (prim == SOLID)
+    s +=  localise("Solid");
+  else if (prim == COMPOSITESURFACE)
+    s +=  localise("CompositeSurface");
+  else 
+    s +=  localise("MultiSurface");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
-  std::cout << "Parsing the file and building the solids" << std::endl;
-  std::cout << "# of gml:Solids found: " << nsolids.size() << std::endl;
+  std::cout << "Parsing the file..." << std::endl;
+  if (prim == SOLID)
+    std::cout << "# of <gml:Solid> found: ";
+  else if (prim == COMPOSITESURFACE)
+    std::cout << "# of <gml:CompositeSurface> found: ";
+  else 
+    std::cout << "# of <gml:MultiSurface> found: ";
+  std::cout << nsolids.size() << std::endl;
 
   //-- build dico of xlinks
   //-- for <gml:Polygon>

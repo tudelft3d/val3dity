@@ -38,10 +38,10 @@
 
 
 std::string print_summary_validation(vector<Solid>& lsSolids);
-void write_report_xml (std::ofstream& ss, std::string ifile, Primitives3D prim3d, 
+void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
                       vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
-void write_report_text(std::ofstream& ss, std::string ifile, Primitives3D prim3d, 
+void write_report_text(std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                        double snap_tolerance, double planarity_d2p, double planarity_n, 
                        vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
 
@@ -129,7 +129,7 @@ int main(int argc, char* const argv[])
     cmd.add(outputtxt);
     cmd.parse( argc, argv );
   
-    Primitives3D prim3d = SOLID;
+    Primitive3D prim3d = SOLID;
     if (primitives.getValue() == "CS")
       prim3d = COMPOSITESURFACE;
     if (primitives.getValue() == "MS")
@@ -151,7 +151,7 @@ int main(int argc, char* const argv[])
          (extension == "xml") ||  
          (extension == "XML") ) 
     {
-      lsSolids = readGMLfile(inputfile.getValue(), ioerrs, snap_tolerance.getValue());
+      lsSolids = readGMLfile(inputfile.getValue(), prim3d, ioerrs, snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
@@ -196,15 +196,22 @@ int main(int argc, char* const argv[])
     }
 
     //-- now the validation starts
-    std::cout << "Validating " << lsSolids.size() << " gml:Solids" << std::endl;
+    std::cout << "Validating " << lsSolids.size();
+    if (prim3d == SOLID)
+      std::cout << " <gml:Solid>";
+    else if (prim3d == COMPOSITESURFACE)
+      std::cout << " <gml:CompositeSurface>";
+    else 
+      std::cout << " <gml:MultiSurface>";
+    std::cout << std::endl;
     int i = 1;
     for (auto& s : lsSolids)
     {
       if (i % 10 == 0) 
         printProgressBar(100 * (i / double(lsSolids.size())));
       i++;
-      std::clog << std::endl << "===== Validating Solid #" << s.get_id() << " =====" << std::endl;
-      if (s.validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
+      std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
+      if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
         std::clog << "===== INVALID =====" << std::endl;
       else
         std::clog << "===== VALID =====" << std::endl;
@@ -270,7 +277,7 @@ std::string print_summary_validation(vector<Solid>& lsSolids)
   std::stringstream ss;
   ss << std::endl;
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  ss << "total # of Solids: " << setw(12) << lsSolids.size() << std::endl;
+  ss << "total # of Primitives: " << setw(8) << lsSolids.size() << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
     if (s.is_valid() == true)
@@ -299,7 +306,7 @@ std::string print_summary_validation(vector<Solid>& lsSolids)
 
 void write_report_text(std::ofstream& ss,
                        std::string ifile, 
-                       Primitives3D prim3d, 
+                       Primitive3D prim3d, 
                        double snap_tolerance,
                        double planarity_d2p,
                        double planarity_n,
@@ -340,7 +347,7 @@ void write_report_text(std::ofstream& ss,
 
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
-                      Primitives3D prim3d, 
+                      Primitive3D prim3d, 
                       double snap_tolerance,
                       double planarity_d2p,
                       double planarity_n,

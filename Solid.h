@@ -21,13 +21,13 @@ public:
   ~Solid();
   
   Shell*                 get_oshell();
-  void                    set_oshell(Shell* sh);
+  void                   set_oshell(Shell* sh);
   Shell*                 get_ishell(int i);
-  void                    add_ishell(Shell* sh);
+  void                   add_ishell(Shell* sh);
   const vector<Shell*>&  get_shells();
-  int                     num_ishells();
+  int                    num_ishells();
   
-  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  bool          validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
   std::string   get_report_xml();
   std::string   get_report_text();
   void          add_error(int code, int shell1, int Shell, std::string info);
@@ -40,9 +40,8 @@ public:
   void          set_id(std::string id);
 private:
   std::string     _id;
-  vector<Shell*> _shells;
+  vector<Shell*>  _shells;
   int             _is_valid;
-  // std::map<int, vector<std::pair<int, std::string> > > _errors;
 
   bool validate_solid_with_nef();
 };

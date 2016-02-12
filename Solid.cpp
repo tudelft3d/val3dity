@@ -80,13 +80,12 @@ bool Solid::is_valid()
 }
 
 
-// TODO : validate MS, CS to add here
-bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
+bool Solid::validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals)
 {
   bool isValid = true;
   for (auto& sh : _shells)
   {
-    if (sh->validate_as_shell(tol_planarity_d2p, tol_planarity_normals) == false)
+    if (sh->validate(prim, tol_planarity_d2p, tol_planarity_normals) == false) 
       isValid = false;
   }
   if (isValid == true)
