@@ -41,10 +41,7 @@ CgalPolyhedron* Shell::get_cgal_polyhedron()
 
 bool Shell::has_errors()
 {
-  if (_errors.size() == 0)
-    return true;
-  else 
-    return false;
+return !(_errors.empty());
 }
 
 void Shell::add_error(int code, int faceid, std::string info)
@@ -380,7 +377,7 @@ void Shell::translate_vertices()
 bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "--2D validation of each surface" << std::endl;
-  bool isValid = this->has_errors();
+  bool isValid = true;
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
   {
@@ -518,7 +515,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
 //-- 2. Combinatorial consistency
   std::clog << "--Combinatorial consistency" << std::endl;
   _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
-  if (this->has_errors() ==  true)
+  if (this->has_errors() == true)
     return false;
   if (_polyhedron != NULL)
   {
