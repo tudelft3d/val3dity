@@ -44,7 +44,7 @@ private:
   std::string     _id;
   vector<Shell*>  _shells;
   int             _is_valid;
-  std::map<int, vector<std::tuple<int, int, std::string> > > _errors;
+  std::map<int, vector< std::tuple<int, int, std::string> > > _errors;
 
   bool validate_solid_with_nef();
 };
