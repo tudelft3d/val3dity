@@ -10,7 +10,6 @@
 #define __val3dity__Shell__
 
 #include "definitions.h"
-//#include "geomtools.h"
 
 class Shell
 {
@@ -24,10 +23,12 @@ public:
   int    get_id();
   CgalPolyhedron* get_cgal_polyhedron();
   
+  bool   validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
+
+  bool   is_empty();
   int    add_point(Point3 p);
   void   add_face(vector< vector<int> > f);
 
-  bool   validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
 
   std::string   get_report_xml();
   std::string   get_report_text();

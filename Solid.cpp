@@ -6,6 +6,7 @@
 //
 //
 
+#include "input.h"
 #include "Solid.h"
 #include "Shell.h"
 #include <CGAL/Nef_polyhedron_3.h>
@@ -73,16 +74,32 @@ void Solid::add_ishell(Shell* sh)
 
 bool Solid::is_valid()
 {
-  if (_is_valid > 0)
+  if ( (_is_valid > 0) && (this->is_empty() == false) )
     return true;
   else
     return false;
 }
 
 
+bool Solid::is_empty()
+{
+  for (auto& sh : _shells)
+  {
+    if (sh->is_empty() == true)
+      return true;
+  }
+  return false;
+}
+
+
 bool Solid::validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals)
 {
   bool isValid = true;
+  if (this->is_empty() == true)
+  {
+    this->add_error(902, -1, -1, "probably error while parsing GML input");
+    return false;
+  }
   for (auto& sh : _shells)
   {
     if (sh->validate(prim, tol_planarity_d2p, tol_planarity_normals) == false) 
@@ -124,6 +141,18 @@ std::string Solid::get_report_xml()
   std::stringstream ss;
   ss << "\t<Primitive>" << std::endl;
   ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      ss << "\t\t<Error>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
+      ss << "\t\t\t<shell>" << std::get<0>(e) << ";" << std::get<1>(e) << "</shell>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
+      ss << "\t\t</Error>" << std::endl;
+    }
+  }
   for (auto& sh : _shells)
   {
     ss << sh->get_report_xml();
@@ -136,6 +165,16 @@ std::string Solid::get_report_text()
 {
   std::stringstream ss;
   ss << "===== Primitive " << this->_id << " =====" << std::endl;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
+      ss << "\t\tShells: " << std::get<0>(e) << ";" << std::get<1>(e) << std::endl;
+      // ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
+      ss << "\t\tInfo: "  << std::get<2>(e) << std::endl;
+    }
+  }
   for (auto& sh : _shells)
   {
     ss << sh->get_report_text();
@@ -164,13 +203,14 @@ void Solid::set_id(std::string id)
 }
 
 
-void Solid::add_error(int code, int shell1, int Shell, std::string info)
+void Solid::add_error(int code, int shell1, int shell2, std::string info)
 {
-  // TODO: how to store these errors? shell-shell numbers?
-  // std::pair<int, std::string> a(faceid, info);
-  // _errors[code].push_back(a);
-  // std::clog << "--> errors #" << code << " for Shell " << this->_id << std::endl;
-  std::clog << "ADDING SOLID ERROR" << std::endl;
+  std::tuple<int, int, std::string> a(shell1, shell2, info);
+  _errors[code].push_back(a);
+  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
+  if (info.empty() == false)
+    std::clog << "\t[" << info << "]" << std::endl;
 }
 
 

@@ -112,6 +112,7 @@ std::string errorcode2description(int code, bool qie) {
       case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
       case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
       case 901: return string("INVALID_INPUT_FILE"); break;
+      case 902: return string("EMPTY_PRIMITIVE"); break;
       case 999: return string("UNKNOWN_ERROR"); break;
       default:  return string("UNKNOWN_ERROR"); break;
     }
@@ -338,7 +339,6 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
       return lsSolids;
     }
   }
-
   for(auto& nsolid: nsolids)
   {
     //-- exterior shell
@@ -362,8 +362,6 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
   std::cout << "Input file correctly parsed without errors." << std::endl;
   return lsSolids;
 }
-
-
 
 
 Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)

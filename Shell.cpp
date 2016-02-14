@@ -44,9 +44,15 @@ bool Shell::has_errors()
 return !(_errors.empty());
 }
 
+bool Shell::is_empty()
+{
+  return _lsPts.empty();
+}
+
+
 void Shell::add_error(int code, int faceid, std::string info)
 {
-  std::pair<int, std::string> a(faceid, info);
+  std::tuple<int, std::string> a(faceid, info);
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << errorcode2description(code);
   if (faceid != -1)
@@ -92,12 +98,12 @@ std::string Shell::get_report_text()
   std::stringstream ss;
   for (auto& err : _errors)
   {
-    for (auto& e : _errors[err.first])
+    for (auto& e : _errors[std::get<0>(err)])
     {
-      ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
       ss << "\t\tShell: " << this->_id << std::endl;
-      ss << "\t\tFace: "  << e.first << std::endl;
-      ss << "\t\tInfo: "  << e.second << std::endl;
+      ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
+      ss << "\t\tInfo: "  << std::get<1>(e) << std::endl;
     }
   }
   return ss.str();
@@ -490,6 +496,7 @@ bool Shell::validate_as_multisurface(double tol_planarity_d2p, double tol_planar
   }
 }
 
+
 bool Shell::validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals)
 {
   if (prim == SOLID)
@@ -502,11 +509,45 @@ bool Shell::validate(Primitive3D prim, double tol_planarity_d2p, double tol_plan
     return false;
 }
 
+
 bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  // TODO: not working yet
-  std::clog << "--- CompositeSurface validation ---" << std::endl;
-  return validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
+  std::clog << "----- CompositeSurface validation (#" << _id << ") -----" << std::endl;
+  if (_is_valid_2d == -1)
+    validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
+  if (_is_valid_2d == 0)
+    return false;
+//-- 1. Combinatorial consistency
+  std::clog << "--Combinatorial consistency" << std::endl;
+  _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
+  if (this->has_errors() == true)
+    return false;
+  if (_polyhedron != NULL)
+  {
+    if (_polyhedron->is_valid() == true)
+    {
+      if (_polyhedron->keep_largest_connected_components(1) > 0)
+      {
+        this->add_error(305, -1);
+        return false;
+      }
+    }
+    else 
+    {
+      this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+      return false;
+    }
+  }
+  else
+  {
+    this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+    return false;
+  }
+//-- 2. Geometrical consistency (aka intersection tests between faces)
+  std::clog << "--Geometrical consistency" << std::endl;
+  if (is_polyhedron_geometrically_consistent(this) == false)
+    return false;
+  return true;
 }
 
 

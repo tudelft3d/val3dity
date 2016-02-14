@@ -194,29 +194,39 @@ int main(int argc, char* const argv[])
       std::cout << "Unknown file type (only GML/XML and POLY accepted)" << std::endl;
       ioerrs.add_error(901, "Unknown file type (only GML/XML and POLY accepted)");
     }
+    // //-- check if all primitives are non-empty 
+    // //-- (parsing could have failed with "inventive" GML tags)
+    // for (auto& s : lsSolids)
+    // {
+    //   if (s.is_empty() == true) 
+    //     s.add_error(999, -1, -1, "Primitive is empty (error while parsing input?)");
+    // }
 
     //-- now the validation starts
-    std::cout << "Validating " << lsSolids.size();
-    if (prim3d == SOLID)
-      std::cout << " <gml:Solid>";
-    else if (prim3d == COMPOSITESURFACE)
-      std::cout << " <gml:CompositeSurface>";
-    else 
-      std::cout << " <gml:MultiSurface>";
-    std::cout << std::endl;
-    int i = 1;
-    for (auto& s : lsSolids)
+    if ( (lsSolids.empty() == false) && (ioerrs.has_errors() == false) )
     {
-      if (i % 10 == 0) 
-        printProgressBar(100 * (i / double(lsSolids.size())));
-      i++;
-      std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
-      if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
-        std::clog << "===== INVALID =====" << std::endl;
-      else
-        std::clog << "===== VALID =====" << std::endl;
+      std::cout << "Validating " << lsSolids.size();
+      if (prim3d == SOLID)
+        std::cout << " <gml:Solid>";
+      else if (prim3d == COMPOSITESURFACE)
+        std::cout << " <gml:CompositeSurface>";
+      else 
+        std::cout << " <gml:MultiSurface>";
+      std::cout << std::endl;
+      int i = 1;
+      for (auto& s : lsSolids)
+      {
+        if (i % 10 == 0) 
+          printProgressBar(100 * (i / double(lsSolids.size())));
+        i++;
+        std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
+        if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
+          std::clog << "===== INVALID =====" << std::endl;
+        else
+          std::clog << "===== VALID =====" << std::endl;
+      }
+      printProgressBar(100);
     }
-    printProgressBar(100);
 
     //-- print summary of errors
     std::cout << "\n" << print_summary_validation(lsSolids) << std::endl;        
