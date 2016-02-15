@@ -63,5 +63,3 @@ public:
 CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell* sh);
 CgalPolyhedron*   construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter);
-bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter);
-bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter);

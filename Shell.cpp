@@ -633,7 +633,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
     return false;
 //-- 4. orientation of the normals is outwards or inwards
   std::clog << "--Orientation of normals" << std::endl;
-  if (check_global_orientation_normals_rev2(_polyhedron, this->is_outer()) == false) {
+  if (check_global_orientation_normals(_polyhedron, this->is_outer()) == false) {
     this->add_error(308, -1);
     return false;
   }
