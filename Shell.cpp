@@ -512,7 +512,6 @@ bool Shell::validate(Primitive3D prim, double tol_planarity_d2p, double tol_plan
 
 bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "----- CompositeSurface validation (#" << _id << ") -----" << std::endl;
   if (_is_valid_2d == -1)
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)
@@ -526,11 +525,17 @@ bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_pl
   {
     if (_polyhedron->is_valid() == true)
     {
+      std::cout << _polyhedron->size_of_border_edges() << std::endl;
+      std::cout << _polyhedron->size_of_vertices() << std::endl;
+      std::cout << _polyhedron->size_of_facets() << std::endl;
       if (_polyhedron->keep_largest_connected_components(1) > 0)
       {
         this->add_error(305, -1);
         return false;
       }
+      std::cout << _polyhedron->size_of_border_edges() << std::endl;
+      std::cout << _polyhedron->size_of_vertices() << std::endl;
+      std::cout << _polyhedron->size_of_facets() << std::endl;
     }
     else 
     {

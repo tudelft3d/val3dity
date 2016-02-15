@@ -126,6 +126,7 @@ struct Intersect_facets {
   }
 };
 
+
 // is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID)
 bool
 is_polyhedron_geometrically_consistent(Shell* sh)

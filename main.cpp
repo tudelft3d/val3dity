@@ -216,16 +216,19 @@ int main(int argc, char* const argv[])
       int i = 1;
       for (auto& s : lsSolids)
       {
-        if (i % 10 == 0) 
+        if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsSolids.size())));
         i++;
         std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
+        if (s.get_id() == "50")
+          std::cout << "yo" << std::endl;
         if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else
           std::clog << "===== VALID =====" << std::endl;
       }
-      printProgressBar(100);
+      if (verbose.getValue() == false)
+        printProgressBar(100);
     }
 
     //-- print summary of errors
