@@ -29,10 +29,6 @@
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/intersections.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/AABB_polyhedron_triangle_primitive.h>
-//#include <CGAL/AABB_face_graph_triangle_primitive.h>
 
 #include <set>
 #include <list>
