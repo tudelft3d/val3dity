@@ -31,6 +31,7 @@
 
 
 std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d);
+std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d);
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
                       vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
@@ -103,6 +104,7 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<std::string>           outputtxt("", "otxt", "output report in text format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
+    TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE error codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
@@ -115,6 +117,7 @@ int main(int argc, char* const argv[])
     cmd.add(snap_tolerance);
     cmd.add(primitives);
     cmd.add(verbose);
+    cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
@@ -187,13 +190,6 @@ int main(int argc, char* const argv[])
       std::cout << "Unknown file type (only GML/XML and POLY accepted)" << std::endl;
       ioerrs.add_error(901, "Unknown file type (only GML/XML and POLY accepted)");
     }
-    // //-- check if all primitives are non-empty 
-    // //-- (parsing could have failed with "inventive" GML tags)
-    // for (auto& s : lsSolids)
-    // {
-    //   if (s.is_empty() == true) 
-    //     s.add_error(999, -1, -1, "Primitive is empty (error while parsing input?)");
-    // }
 
     //-- now the validation starts
     if ( (lsSolids.empty() == false) && (ioerrs.has_errors() == false) )
@@ -265,6 +261,10 @@ int main(int argc, char* const argv[])
       clog.rdbuf(savedBufferCLOG);
       mylog.close();
     }
+    if (unittests.getValue() == true)
+    {
+      std::cout << "\n" << print_unit_tests(lsSolids, prim3d) << std::endl;
+    }
     return(1);
   }
   catch (TCLAP::ArgException &e) {
@@ -273,8 +273,27 @@ int main(int argc, char* const argv[])
   }
 }
 
-
-
+std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d)
+{
+  std::stringstream ss;
+  std::map<int,int> errors;
+  for (auto& s : lsSolids)
+  {
+    for (auto& code : s.get_unique_error_codes())
+      errors[code] = 0;
+  }
+  if (errors.size() > 0)
+  {
+    ss << "@INVALID ";
+    for (auto e : errors)
+      ss << e.first << " ";
+  }
+  else {
+    ss << "@VALID";
+  }
+  ss << std::endl;
+  return ss.str();
+}
 
 std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d)
 {
@@ -299,7 +318,6 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   ss << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
   ss << " (" << percentage << "%)" << std::endl;
-  std::set<int> allerrs;
   std::map<int,int> errors;
   for (auto& s : lsSolids)
   {
