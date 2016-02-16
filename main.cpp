@@ -23,13 +23,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-// ============================================================================
-// TODO: check Nef unit, crashed with 015.gml 
-// TODO: validation of MultiSurfaces and CompositeSurfaces?  
-// TODO: OBJ input? or OFF?  https://github.com/syoyo/tinyobjloader
-// ============================================================================
-
-
 #include "input.h"
 #include "Shell.h"
 #include "Solid.h"
@@ -37,7 +30,7 @@
 #include <ctime>
 
 
-std::string print_summary_validation(vector<Solid>& lsSolids);
+std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d);
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
                       vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
@@ -230,7 +223,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(lsSolids) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsSolids, prim3d) << std::endl;        
    
     if (outputxml.getValue() != "")
     {
@@ -283,12 +276,20 @@ int main(int argc, char* const argv[])
 
 
 
-std::string print_summary_validation(vector<Solid>& lsSolids)
+std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d)
 {
   std::stringstream ss;
   ss << std::endl;
+  std::string primitives;
+  if (prim3d == SOLID)
+    primitives = "<gml:Solid>";
+  else if (prim3d == COMPOSITESURFACE)
+    primitives = "<gml:CompositeSurface>";
+  else 
+    primitives = "<gml:MultiSurface>";
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  ss << "total # of Primitives: " << setw(8) << lsSolids.size() << std::endl;
+  ss << "Primitives validated: " << primitives << std::endl;
+  ss << "total # of primitives: " << setw(8) << lsSolids.size() << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
     if (s.is_valid() == true)
@@ -310,8 +311,6 @@ std::string print_summary_validation(vector<Solid>& lsSolids)
     for (auto& code : s.get_unique_error_codes())
       errors[code] += 1;
   }
-  // for (auto e : errors)
-  //   std::cout << e.first << " - " << e.second << std::endl;
   if (errors.size() > 0)
   {
     ss << "Errors present:" << std::endl;
@@ -351,7 +350,7 @@ void write_report_text(std::ofstream& ss,
   std::time_t t = std::time(nullptr);
   std::tm tm = *std::localtime(&t);
   ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
-  ss << print_summary_validation(lsSolids) << std::endl;
+  ss << print_summary_validation(lsSolids, prim3d) << std::endl;
   if (ioerrs.has_errors() == true)
   {
     ss << ioerrs.get_report_text();
