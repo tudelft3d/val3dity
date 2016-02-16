@@ -293,12 +293,11 @@ std::string print_summary_validation(vector<Solid>& lsSolids)
   for (auto& s : lsSolids)
     if (s.is_valid() == true)
       bValid++;
-  ss << "# valid: " << setw(22) << bValid << std::endl;
-  float percentage = 100 * ((lsSolids.size() - bValid) / float(lsSolids.size()));
+  int percentage = 100 * ((lsSolids.size() - bValid) / float(lsSolids.size()));
+  ss << "# valid: " << setw(22) << bValid;
+  ss << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
-  if (lsSolids.size() > 1)
-    ss << std::setprecision(0) << std::fixed << " (" << percentage << "%)";
-  ss << std::endl;
+  ss << " (" << percentage << "%)" << std::endl;
   std::set<int> allerrs;
   std::map<int,int> errors;
   for (auto& s : lsSolids)
@@ -317,10 +316,10 @@ std::string print_summary_validation(vector<Solid>& lsSolids)
   {
     ss << "Errors present:" << std::endl;
     for (auto e : errors)
+    {
       ss << "  " << e.first << " --- " << errorcode2description(e.first) << std::endl;
-    ss << "Distribution errors:" << std::endl;
-    for (auto e : errors)
-      ss << "  " << e.first << " --- " << e.second << std::endl;
+      ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
+    }
   }
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
