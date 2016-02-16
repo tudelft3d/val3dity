@@ -294,21 +294,33 @@ std::string print_summary_validation(vector<Solid>& lsSolids)
     if (s.is_valid() == true)
       bValid++;
   ss << "# valid: " << setw(22) << bValid << std::endl;
-  ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid) << std::endl;
+  float percentage = 100 * ((lsSolids.size() - bValid) / float(lsSolids.size()));
+  ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
+  if (lsSolids.size() > 1)
+    ss << std::setprecision(0) << std::fixed << " (" << percentage << "%)";
+  ss << std::endl;
   std::set<int> allerrs;
+  std::map<int,int> errors;
   for (auto& s : lsSolids)
   {
-    if (s.get_unique_error_codes().size() > 0)
-    {
-      std::set<int> tmp = s.get_unique_error_codes();
-      allerrs.insert(tmp.begin(), tmp.end());
-    }
+    for (auto& code : s.get_unique_error_codes())
+      errors[code] = 0;
   }
-  if (allerrs.size() > 0)
+  for (auto& s : lsSolids)
+  {
+    for (auto& code : s.get_unique_error_codes())
+      errors[code] += 1;
+  }
+  // for (auto e : errors)
+  //   std::cout << e.first << " - " << e.second << std::endl;
+  if (errors.size() > 0)
   {
     ss << "Errors present:" << std::endl;
-    for (auto e : allerrs)
-      ss << "  " << e << " --- " << errorcode2description(e) << std::endl;
+    for (auto e : errors)
+      ss << "  " << e.first << " --- " << errorcode2description(e.first) << std::endl;
+    ss << "Distribution errors:" << std::endl;
+    for (auto e : errors)
+      ss << "  " << e.first << " --- " << e.second << std::endl;
   }
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
