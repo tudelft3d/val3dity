@@ -29,10 +29,6 @@
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/intersections.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/AABB_polyhedron_triangle_primitive.h>
-//#include <CGAL/AABB_face_graph_triangle_primitive.h>
 
 #include <set>
 #include <list>
@@ -63,5 +59,3 @@ public:
 CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell* sh);
 CgalPolyhedron*   construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter);
-bool              check_global_orientation_normals_rev(CgalPolyhedron* p, bool bOuter);
-bool              check_global_orientation_normals_rev2(CgalPolyhedron* p, bool bOuter);

@@ -346,8 +346,6 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
     Solid sol;
     if (nsolid.node().attribute("gml:id") != 0)
       sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
-    if (sol.get_id() == "50")
-      std::cout << "yo" << std::endl;
     if (prim == SOLID) 
     {
       std::string s = "./" + localise("exterior");

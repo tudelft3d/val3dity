@@ -220,8 +220,6 @@ int main(int argc, char* const argv[])
           printProgressBar(100 * (i / double(lsSolids.size())));
         i++;
         std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
-        if (s.get_id() == "50")
-          std::cout << "yo" << std::endl;
         if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else

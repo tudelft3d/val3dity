@@ -525,17 +525,11 @@ bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_pl
   {
     if (_polyhedron->is_valid() == true)
     {
-      std::cout << _polyhedron->size_of_border_edges() << std::endl;
-      std::cout << _polyhedron->size_of_vertices() << std::endl;
-      std::cout << _polyhedron->size_of_facets() << std::endl;
       if (_polyhedron->keep_largest_connected_components(1) > 0)
       {
         this->add_error(305, -1);
         return false;
       }
-      std::cout << _polyhedron->size_of_border_edges() << std::endl;
-      std::cout << _polyhedron->size_of_vertices() << std::endl;
-      std::cout << _polyhedron->size_of_facets() << std::endl;
     }
     else 
     {
@@ -552,6 +546,7 @@ bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_pl
   std::clog << "--Geometrical consistency" << std::endl;
   if (is_polyhedron_geometrically_consistent(this) == false)
     return false;
+  // std::cout << _polyhedron << std::endl;
   return true;
 }
 
@@ -633,7 +628,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
     return false;
 //-- 4. orientation of the normals is outwards or inwards
   std::clog << "--Orientation of normals" << std::endl;
-  if (check_global_orientation_normals_rev2(_polyhedron, this->is_outer()) == false) {
+  if (check_global_orientation_normals(_polyhedron, this->is_outer()) == false) {
     this->add_error(308, -1);
     return false;
   }
