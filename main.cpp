@@ -27,7 +27,7 @@
 #include "Shell.h"
 #include "Solid.h"
 #include <tclap/CmdLine.h>
-#include <ctime>
+#include <iomanip>  //-- std::put_time
 
 
 std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d);
@@ -367,7 +367,7 @@ void write_report_text(std::ofstream& ss,
   ss << "Planarity_n: " << planarity_n << std::endl;
   std::time_t t = std::time(nullptr);
   std::tm tm = *std::localtime(&t);
-  ss << "Time: " << put_time(&tm, "%c %Z") << std::endl;
+  ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
   ss << print_summary_validation(lsSolids, prim3d) << std::endl;
   if (ioerrs.has_errors() == true)
   {
@@ -416,7 +416,7 @@ void write_report_xml(std::ofstream& ss,
       bValid++;
   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
   ss << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
-  ss << "\t<time>" << put_time(&tm, "%c %Z") << "</time>" << std::endl;
+  ss << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
   if (ioerrs.has_errors() == true)
   {
     ss << ioerrs.get_report_xml();
