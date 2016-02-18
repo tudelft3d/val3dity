@@ -27,7 +27,7 @@
 #include "Shell.h"
 #include "Solid.h"
 #include <tclap/CmdLine.h>
-#include <iomanip>  //-- std::put_time
+#include <time.h>  
 
 
 std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d);
@@ -365,9 +365,13 @@ void write_report_text(std::ofstream& ss,
   ss << "Snap_tolerance: " << snap_tolerance << std::endl;
   ss << "Planarity_d2p: " << planarity_d2p << std::endl;
   ss << "Planarity_n: " << planarity_n << std::endl;
-  std::time_t t = std::time(nullptr);
-  std::tm tm = *std::localtime(&t);
-  ss << "Time: " << std::put_time(&tm, "%c %Z") << std::endl;
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  ss << "Time: " << buffer << std::endl;
   ss << print_summary_validation(lsSolids, prim3d) << std::endl;
   if (ioerrs.has_errors() == true)
   {
@@ -407,8 +411,6 @@ void write_report_xml(std::ofstream& ss,
   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
-  std::time_t t = std::time(nullptr);
-  std::tm tm = *std::localtime(&t);
   ss << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
@@ -416,7 +418,13 @@ void write_report_xml(std::ofstream& ss,
       bValid++;
   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
   ss << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
-  ss << "\t<time>" << std::put_time(&tm, "%c %Z") << "</time>" << std::endl;
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  ss << "\t<time>" << buffer << "</time>" << std::endl;
   if (ioerrs.has_errors() == true)
   {
     ss << ioerrs.get_report_xml();
