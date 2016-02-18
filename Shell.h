@@ -45,7 +45,7 @@ private:
   vector< vector<int*> >          _lsTr;
   CgalPolyhedron*                 _polyhedron;
 
-  std::map<int, vector<std::pair<int, std::string> > > _errors;
+  std::map<int, vector<std::tuple<int, std::string> > > _errors;
 
   double                          _tol_snap;
   int                             _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid

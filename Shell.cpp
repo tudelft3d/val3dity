@@ -67,7 +67,7 @@ std::set<int> Shell::get_unique_error_codes()
   std::set<int> errs;
   for (auto& err : _errors)
   {
-    errs.insert(err.first);
+    errs.insert(std::get<0>(err));
   }
   return errs;
 }
@@ -78,14 +78,14 @@ std::string Shell::get_report_xml()
   std::stringstream ss;
   for (auto& err : _errors)
   {
-    for (auto& e : _errors[err.first])
+    for (auto& e : _errors[std::get<0>(err)])
     {
       ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << err.first << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
       ss << "\t\t\t<shell>" << this->_id << "</shell>" << std::endl;
-      ss << "\t\t\t<face>" << e.first << "</face>" << std::endl;
-      ss << "\t\t\t<info>" << e.second << "</info>" << std::endl;
+      ss << "\t\t\t<face>" << std::get<0>(e) << "</face>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
       ss << "\t\t</Error>" << std::endl;
     }
   }
