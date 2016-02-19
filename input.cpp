@@ -485,3 +485,44 @@ void printProgressBar(int percent) {
   std::cout << percent << "%     " << std::flush;
 }
 
+
+Shell* readOBJfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
+{
+  std::clog << "Reading file: " << ifile << std::endl;
+  Assimp::Importer importer;
+  const aiScene* scene = importer.ReadFile(ifile, aiProcess_JoinIdenticalVertices);
+  if(!scene) {
+    errs.add_error(901, "Input file not found.");
+    return NULL;
+  }
+  
+  // if (scene->mNumMeshes != 1)
+    // return false;
+    
+  Shell* sh = new Shell(shellid);  
+  aiMesh* m = scene->mMeshes[0];
+
+//-- read the points
+  aiVector3D* vertices = m->mVertices;
+  for (int i = 0; i < m->mNumVertices; i++) {
+    Point3 p(vertices[i][0], vertices[i][1], vertices[i][2]);
+    sh->add_point(p);
+  }
+  //-- translate all vertices to (minx, miny)
+  if (translatevertices == true)
+    sh->translate_vertices();
+
+//-- read the facets
+  aiFace* faces = m->mFaces;
+  unsigned int* indices;
+  for (int i = 0; i < m->mNumFaces; i++) {
+    indices = faces[i].mIndices;
+    vector< vector<int> > pgnids;
+    vector<int> ids(faces[i].mNumIndices);
+    for (int j = 0; j < faces[i].mNumIndices; j++) 
+      ids[j] = indices[j];
+    pgnids.push_back(ids);
+    sh->add_face(pgnids);
+  }
+  return sh;
+}
