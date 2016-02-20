@@ -228,7 +228,7 @@ int main(int argc, char* const argv[])
         std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
         std::clog << "Number shells: " << (s.num_ishells() + 1) << std::endl;
         std::clog << "Number faces: " << s.num_faces() << std::endl;
-        std::clog << "Number vertices: " << s.num_faces() << std::endl;
+        std::clog << "Number vertices: " << s.num_vertices() << std::endl;
         if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else
