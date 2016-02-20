@@ -198,6 +198,18 @@ bool Shell::triangulate_shell()
     // These are the number of rings on this facet
     size_t numf = _lsFaces[i].size();
     vector<int> &idsob = _lsFaces[i][0]; // helpful alias for the outer boundary
+    if ( (numf == 1) && (idsob.size() == 3)) 
+    {
+      vector<int*> oneface;
+      int* tr = new int[3];
+      tr[0] = idsob[0] ;
+      tr[1] = idsob[1];
+      tr[2] = idsob[2];
+      oneface.push_back(tr);
+      _lsTr.push_back(oneface);
+      continue;
+    }
+
     int proj = projection_plane(_lsPts, idsob);
     Vector* v0 = polygon_normal(_lsPts, idsob);
     //-- get projected Polygon
@@ -403,6 +415,11 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
     }
     size_t numf = _lsFaces[i].size();
     vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
+
+    //-- if only 3 pts it's now valid, no need to process further
+    if ( (numf == 1) && (ids.size() == 3)) 
+      continue;
+
     vector< Point3 > allpts;
     vector<int>::const_iterator itp = ids.begin();
     for ( ; itp != ids.end(); itp++)
