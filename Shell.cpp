@@ -171,7 +171,7 @@ void Shell::add_face(vector< vector<int> > f)
 }
 
 
-int Shell::number_points()
+int Shell::number_vertices()
 {
   return _lsPts.size();
 }
@@ -512,6 +512,7 @@ bool Shell::validate(Primitive3D prim, double tol_planarity_d2p, double tol_plan
 
 bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
+  std::clog << "--- CompositeSurface validation ---" << std::endl;
   if (_is_valid_2d == -1)
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)

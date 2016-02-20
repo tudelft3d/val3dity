@@ -486,7 +486,7 @@ void printProgressBar(int percent) {
 }
 
 
-Shell* readOBJfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
+Shell* read3dAssimpfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   Assimp::Importer importer;
@@ -496,8 +496,8 @@ Shell* readOBJfile(std::string &ifile, int shellid, IOErrors& errs, bool transla
     return NULL;
   }
   
-  // if (scene->mNumMeshes != 1)
-    // return false;
+  if (scene->mNumMeshes != 1)
+    std::cout << "MORE THAN ONE MESH" << std::endl;
     
   Shell* sh = new Shell(shellid);  
   aiMesh* m = scene->mMeshes[0];

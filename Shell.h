@@ -17,7 +17,7 @@ public:
   Shell  (int id = -1, double tol_snap = 0.0);
   ~Shell ();
   
-  int    number_points();
+  int    number_vertices();
   int    number_faces();
   bool   is_outer();
   int    get_id();
@@ -28,7 +28,6 @@ public:
   bool   is_empty();
   int    add_point(Point3 p);
   void   add_face(vector< vector<int> > f);
-
 
   std::string   get_report_xml();
   std::string   get_report_text();

@@ -152,7 +152,6 @@ int main(int argc, char* const argv[])
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
       }
-
       if (ishellfiles.getValue().size() > 0)
       {
         std::cout << "No inner shells allowed when GML file used as input." << std::endl;
@@ -185,6 +184,24 @@ int main(int argc, char* const argv[])
           lsSolids.push_back(s);
       }
     }
+    else if ( (extension == "obj") ||
+              (extension == "off") ||
+              (extension == "stl") )
+    {
+      Solid s;
+      Shell* sh = read3dAssimpfile(inputfile.getValue(), 0, ioerrs);
+      if (ioerrs.has_errors() == true) {
+        std::cout << "Errors while reading the input file, aborting." << std::endl;
+        std::cout << ioerrs.get_report_text() << std::endl;
+      }
+      if (ishellfiles.getValue().size() > 0)
+      {
+        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+      }
+      s.set_oshell(sh);
+      lsSolids.push_back(s);
+    }
     else
     {
       std::cout << "Unknown file type (only GML/XML and POLY accepted)" << std::endl;
@@ -209,6 +226,9 @@ int main(int argc, char* const argv[])
           printProgressBar(100 * (i / double(lsSolids.size())));
         i++;
         std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
+        std::clog << "Number shells: " << (s.num_ishells() + 1) << std::endl;
+        std::clog << "Number faces: " << s.num_faces() << std::endl;
+        std::clog << "Number vertices: " << s.num_faces() << std::endl;
         if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else

@@ -27,6 +27,8 @@ public:
   void                   add_ishell(Shell* sh);
   const vector<Shell*>&  get_shells();
   int                    num_ishells();
+  int                    num_faces();
+  int                    num_vertices();
   
   bool          validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
   std::string   get_report_xml();

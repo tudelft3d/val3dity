@@ -142,9 +142,9 @@ std::string Solid::get_report_xml()
   ss << "\t<Primitive>" << std::endl;
   ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
   int nofaces = 0;
-  for (auto& sh : _shells)
-    nofaces =+ sh->number_faces();
-  ss << "\t\t<numberfaces>" << nofaces << "</numberfaces>" << std::endl;
+  ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
+  ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
+  ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -194,6 +194,21 @@ int Solid::num_ishells()
   return (_shells.size() - 1);
 }
 
+int Solid::num_faces()
+{
+  int total = 0;
+  for (auto& sh : _shells)
+    total += sh->number_faces();
+  return total;
+}
+
+int Solid::num_vertices()
+{
+  int total = 0;
+  for (auto& sh : _shells)
+    total += sh->number_vertices();
+  return total;
+}
 
 std::string Solid::get_id()
 {
