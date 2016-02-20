@@ -141,7 +141,6 @@ std::string Solid::get_report_xml()
   std::stringstream ss;
   ss << "\t<Primitive>" << std::endl;
   ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
-  int nofaces = 0;
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
