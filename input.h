@@ -2,7 +2,7 @@
 #define VAL3DITY_INPUT_DEFINITIONS_H
 
 /*
- val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -26,16 +26,33 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-// We are currently only including this to get the definition of polyhedraShell.
-#include "validate.h"
+#include "Shell.h"
+#include "Solid.h"
+#include <fstream>
+#include <string>
+#include "pugixml.hpp"
+#include <assimp/Importer.hpp>    
+#include <assimp/scene.h>         
+#include <assimp/postprocess.h>   
 
 
 
-// -----------------------------------------------------------
-// Usage documentation for this method goes here.
-//
-// Ignore the first value in the array filenames for now...
-void readAllInputShells(vector<string> &arguments, vector<Shell*> &shells, cbf cb, bool translatevertices = true);
-void readAllInputShells_withIDs(vector<string> &arguments, vector<Shell*> &shells, vector<string> &idShells, vector< vector<string> > &idFaces, cbf cb);
+class IOErrors {
+  std::map<int, vector<std::string> >  _errors;
+public:
+  bool has_errors();
+  void add_error(int code, std::string info);
+  std::string get_report_text();
+  std::string get_report_xml();
+};
 
+std::string   errorcode2description(int code, bool qie = false);
+vector<Solid> readGMLfile(std::string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices = true);
+vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translatevertices = true);
+Shell*        readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices = true);
+Shell*        process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
+vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
+
+void          printProgressBar(int percent);
+std::string   localise(std::string s);
 #endif

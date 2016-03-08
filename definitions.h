@@ -2,7 +2,7 @@
 #define VAL3DITY_VALIDATE_DEFS_H
 
 /*
- val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
 */
 
 
-
 // CGAL kernel
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
@@ -40,11 +39,11 @@
 
 
 // STL library
-#include <vector>
 using namespace std;
+#include <vector>
+#include <map>
 
 // CGAL typedefs
-
 #ifdef VAL3DITY_USE_EPECSQRT
 typedef CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt K;
 #else
@@ -69,27 +68,12 @@ typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
 
-// convenience structures:
-//-- the vector of faces, each which has a vector of rings, 
-//-- which is a vector of IDs from vertex pool lsPts
-typedef struct fullPolyhedraShell_tag {
-   vector< Point3 > lsPts;
-   vector< vector< vector<int> > > faces;
-} Shell;
+typedef enum
+{
+  SOLID            = 0,
+  COMPOSITESURFACE = 1,
+  MULTISURFACE     = 2,
+} Primitive3D;
 
-typedef struct triangulatedShell_tag {
-   vector< Point3 > lsPts;
-   vector< vector<int*> > faces;
-} TrShell;
-
-
-// This callback function will be used to both report progress
-// as well as any validity problems that are encountered.
-typedef void (* cbf)(int errorCode,    // 0 means status message, -1 means unknown error
-                     int shellNum, // -1 means unused
-                     int facetNum,     // -1 means unused
-                     std::string messageStr); // optional
-
-std::string errorcode2description(int code);
 
 #endif

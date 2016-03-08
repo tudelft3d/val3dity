@@ -1,6 +1,6 @@
 
 /*
- val3dity - Copyright (c) 2011-2014, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "validate.h"
 
 // Checks for self-intersections between triangles contained in shell
-bool is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID, cbf cb);
+bool is_polyhedron_geometrically_consistent(Shell* sh);
