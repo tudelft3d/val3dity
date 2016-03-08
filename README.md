@@ -26,11 +26,10 @@ To compile val3dity yourself, you first need to install the following free libra
 
 Under Mac we suggest using [Homebrew](http://brew.sh/):
 
-  $ homebrew install cmake 
-  $ homebrew install cgal
-  $ homebrew install geos
-  $ homebrew install assimp
-
+    $ homebrew install cmake 
+    $ homebrew install cgal
+    $ homebrew install geos
+    $ homebrew install assimp
 
 Afterwards run:
 
@@ -51,12 +50,12 @@ For a full report in XML format:
 
     $ ./val3dity myfile.gml --oxml report.xml
 
-Other formats can also be used as input, the volumetric primitives are then validated according to ISO19107 definitions:
+Other formats can also be used as input, the volumetric primitives are then validated according to the ISO19107 definitions:
 
   1. OBJ (a file can contain more than 1 object, each will be validated individually)
   1. OFF
-  1. [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly), there are a several examples of test datasets in the folder `data/poly/`, the `README.txt`
-  1. [all the formats supported by Assimp](http://www.assimp.org/main_features_formats.html) can in theory be used, although I haven't tested them all. OBJ and OFF surely works.
+  1. [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly), there are several examples of test datasets in the folder `data/poly/`, see the `README.txt`
+  1. [all the formats supported by Assimp](http://www.assimp.org/main_features_formats.html) can in theory be used, although I haven't tested them all. OBJ and OFF surely work.
 
 This [FAQ for the web-application](http://geovalidation.bk.tudelft.nl/val3dity/faq) can help answer some questions I believe.
 
