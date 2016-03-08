@@ -60,6 +60,8 @@ public:
     std::cout << "EXAMPLES" << std::endl;
     std::cout << "\tval3dity input.gml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
+    std::cout << "\tval3dity input.obj" << std::endl;
+    std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml -p MS" << std::endl;
     std::cout << "\t\tValidates each gml:MultiSurface in input.gml and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml --oxml report.xml" << std::endl;
@@ -94,7 +96,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "0.95");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "0.96");
   MyOutput my;
   cmd.setOutput(&my);
   try {
