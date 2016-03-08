@@ -112,6 +112,7 @@ std::string errorcode2description(int code, bool qie) {
       case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
       case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
       case 901: return string("INVALID_INPUT_FILE"); break;
+      case 902: return string("EMPTY_PRIMITIVE"); break;
       case 999: return string("UNKNOWN_ERROR"); break;
       default:  return string("UNKNOWN_ERROR"); break;
     }
@@ -274,7 +275,7 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
 }
 
 
-vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool translatevertices)
+vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -284,11 +285,23 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
     errs.add_error(901, "Input file not found.");
     return lsSolids;
   }
-  std::string s = "//" + localise("Solid");
+  std::string s = "//";
+  if (prim == SOLID)
+    s +=  localise("Solid");
+  else if (prim == COMPOSITESURFACE)
+    s +=  localise("CompositeSurface");
+  else 
+    s +=  localise("MultiSurface");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
-  std::cout << "Parsing the file and building the solids" << std::endl;
-  std::cout << "# of gml:Solids found: " << nsolids.size() << std::endl;
+  std::cout << "Parsing the file..." << std::endl;
+  if (prim == SOLID)
+    std::cout << "# of <gml:Solid> found: ";
+  else if (prim == COMPOSITESURFACE)
+    std::cout << "# of <gml:CompositeSurface> found: ";
+  else 
+    std::cout << "# of <gml:MultiSurface> found: ";
+  std::cout << nsolids.size() << std::endl;
 
   //-- build dico of xlinks
   //-- for <gml:Polygon>
@@ -326,32 +339,41 @@ vector<Solid> readGMLfile(string &ifile, IOErrors& errs, double tol_snap, bool t
       return lsSolids;
     }
   }
-
+  
   for(auto& nsolid: nsolids)
   {
     //-- exterior shell
     Solid sol;
     if (nsolid.node().attribute("gml:id") != 0)
       sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
-    std::string s = "./" + localise("exterior");
-    pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-    sol.set_oshell(process_gml_shell(next.node(), 0, dallpoly, tol_snap, errs));
-    //-- interior shells
-    s = "./" + localise("interior");
-    pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
-    int id = 1;
-    for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
+    if (prim == SOLID) 
     {
-      sol.add_ishell(process_gml_shell(it->node(), id, dallpoly, tol_snap, errs));
-      id++;
+      std::string s = "./" + localise("exterior");
+      pugi::xpath_node next = nsolid.node().select_node(s.c_str());
+      sol.set_oshell(process_gml_shell(next.node(), 0, dallpoly, tol_snap, errs));
+      //-- interior shells
+      s = "./" + localise("interior");
+      pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
+      int id = 1;
+      for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
+      {
+        sol.add_ishell(process_gml_shell(it->node(), id, dallpoly, tol_snap, errs));
+        id++;
+      }
+    }
+    else if (prim == COMPOSITESURFACE)
+    {
+      sol.set_oshell(process_gml_shell(nsolid.node(), 0, dallpoly, tol_snap, errs));
+    }
+    else 
+    {
+      sol.set_oshell(process_gml_shell(nsolid.node(), 0, dallpoly, tol_snap, errs));
     }
     lsSolids.push_back(sol);
   }
   std::cout << "Input file correctly parsed without errors." << std::endl;
   return lsSolids;
 }
-
-
 
 
 Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
@@ -463,3 +485,49 @@ void printProgressBar(int percent) {
   std::cout << percent << "%     " << std::flush;
 }
 
+
+vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translatevertices)
+{
+  std::clog << "Reading file: " << ifile << std::endl;
+  vector<Solid> lsSolids;
+  Assimp::Importer importer;
+  const aiScene* scene = importer.ReadFile(ifile, aiProcess_JoinIdenticalVertices);
+  if(!scene) {
+    errs.add_error(901, "Input file not found.");
+    return lsSolids;
+  }
+  
+  if (scene->mNumMeshes != 1)
+    std::cout << "MORE THAN ONE MESH" << std::endl;
+  
+  for (int nomesh = 0; nomesh < scene->mNumMeshes; nomesh++)
+  {
+    Shell* sh = new Shell(0);  
+    aiMesh* m = scene->mMeshes[nomesh];
+    //-- read the points
+    aiVector3D* vertices = m->mVertices;
+    for (int i = 0; i < m->mNumVertices; i++) {
+      Point3 p(vertices[i][0], vertices[i][1], vertices[i][2]);
+      sh->add_point(p);
+    }
+    //-- translate all vertices to (minx, miny)
+    if (translatevertices == true)
+      sh->translate_vertices();
+    //-- read the facets
+    aiFace* faces = m->mFaces;
+    unsigned int* indices;
+    for (int i = 0; i < m->mNumFaces; i++) {
+      indices = faces[i].mIndices;
+      vector< vector<int> > pgnids;
+      vector<int> ids(faces[i].mNumIndices);
+      for (int j = 0; j < faces[i].mNumIndices; j++) 
+        ids[j] = indices[j];
+      pgnids.push_back(ids);
+      sh->add_face(pgnids);
+    }
+    Solid sol;
+    sol.set_oshell(sh);
+    lsSolids.push_back(sol);
+  }
+  return lsSolids;
+}

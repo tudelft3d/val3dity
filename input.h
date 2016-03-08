@@ -2,7 +2,7 @@
 #define VAL3DITY_INPUT_DEFINITIONS_H
 
 /*
- val3dity - Copyright (c) 2011-2015, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -26,12 +26,15 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-// We are currently only including this to get the definition of polyhedraShell.
 #include "Shell.h"
 #include "Solid.h"
-#include "pugixml.hpp"
 #include <fstream>
 #include <string>
+#include "pugixml.hpp"
+#include <assimp/Importer.hpp>    
+#include <assimp/scene.h>         
+#include <assimp/postprocess.h>   
+
 
 
 class IOErrors {
@@ -44,10 +47,11 @@ public:
 };
 
 std::string   errorcode2description(int code, bool qie = false);
-vector<Solid> readGMLfile(std::string &ifile, IOErrors& errs, double tol_snap, bool translatevertices = true);
+vector<Solid> readGMLfile(std::string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices = true);
+vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translatevertices = true);
 Shell*        readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices = true);
-Shell*       process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
-vector<int>  process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
+Shell*        process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
+vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 void          printProgressBar(int percent);
 std::string   localise(std::string s);

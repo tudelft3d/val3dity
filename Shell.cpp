@@ -44,9 +44,15 @@ bool Shell::has_errors()
 return !(_errors.empty());
 }
 
+bool Shell::is_empty()
+{
+  return _lsPts.empty();
+}
+
+
 void Shell::add_error(int code, int faceid, std::string info)
 {
-  std::pair<int, std::string> a(faceid, info);
+  std::tuple<int, std::string> a(faceid, info);
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << errorcode2description(code);
   if (faceid != -1)
@@ -61,7 +67,7 @@ std::set<int> Shell::get_unique_error_codes()
   std::set<int> errs;
   for (auto& err : _errors)
   {
-    errs.insert(err.first);
+    errs.insert(std::get<0>(err));
   }
   return errs;
 }
@@ -72,14 +78,14 @@ std::string Shell::get_report_xml()
   std::stringstream ss;
   for (auto& err : _errors)
   {
-    for (auto& e : _errors[err.first])
+    for (auto& e : _errors[std::get<0>(err)])
     {
       ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << err.first << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
       ss << "\t\t\t<shell>" << this->_id << "</shell>" << std::endl;
-      ss << "\t\t\t<face>" << e.first << "</face>" << std::endl;
-      ss << "\t\t\t<info>" << e.second << "</info>" << std::endl;
+      ss << "\t\t\t<face>" << std::get<0>(e) << "</face>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
       ss << "\t\t</Error>" << std::endl;
     }
   }
@@ -92,12 +98,12 @@ std::string Shell::get_report_text()
   std::stringstream ss;
   for (auto& err : _errors)
   {
-    for (auto& e : _errors[err.first])
+    for (auto& e : _errors[std::get<0>(err)])
     {
-      ss << "\t" << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
       ss << "\t\tShell: " << this->_id << std::endl;
-      ss << "\t\tFace: "  << e.first << std::endl;
-      ss << "\t\tInfo: "  << e.second << std::endl;
+      ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
+      ss << "\t\tInfo: "  << std::get<1>(e) << std::endl;
     }
   }
   return ss.str();
@@ -165,7 +171,7 @@ void Shell::add_face(vector< vector<int> > f)
 }
 
 
-int Shell::number_points()
+int Shell::number_vertices()
 {
   return _lsPts.size();
 }
@@ -192,6 +198,18 @@ bool Shell::triangulate_shell()
     // These are the number of rings on this facet
     size_t numf = _lsFaces[i].size();
     vector<int> &idsob = _lsFaces[i][0]; // helpful alias for the outer boundary
+    if ( (numf == 1) && (idsob.size() == 3)) 
+    {
+      vector<int*> oneface;
+      int* tr = new int[3];
+      tr[0] = idsob[0] ;
+      tr[1] = idsob[1];
+      tr[2] = idsob[2];
+      oneface.push_back(tr);
+      _lsTr.push_back(oneface);
+      continue;
+    }
+
     int proj = projection_plane(_lsPts, idsob);
     Vector* v0 = polygon_normal(_lsPts, idsob);
     //-- get projected Polygon
@@ -397,6 +415,11 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
     }
     size_t numf = _lsFaces[i].size();
     vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
+
+    //-- if only 3 pts it's now valid, no need to process further
+    if ( (numf == 1) && (ids.size() == 3)) 
+      continue;
+
     vector< Point3 > allpts;
     vector<int>::const_iterator itp = ids.begin();
     for ( ; itp != ids.end(); itp++)
@@ -491,11 +514,58 @@ bool Shell::validate_as_multisurface(double tol_planarity_d2p, double tol_planar
 }
 
 
+bool Shell::validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals)
+{
+  if (prim == SOLID)
+    return validate_as_shell(tol_planarity_d2p, tol_planarity_normals);
+  else if (prim == COMPOSITESURFACE)
+    return validate_as_compositesurface(tol_planarity_d2p, tol_planarity_normals);
+  else if (prim == MULTISURFACE)
+    return validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals);
+  else
+    return false;
+}
+
+
 bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  // TODO: not working yet
-  std::clog << "--- MultiSurface validation ---" << std::endl;
-  return validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
+  std::clog << "--- CompositeSurface validation ---" << std::endl;
+  if (_is_valid_2d == -1)
+    validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
+  if (_is_valid_2d == 0)
+    return false;
+//-- 1. Combinatorial consistency
+  std::clog << "--Combinatorial consistency" << std::endl;
+  _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
+  if (this->has_errors() == true)
+    return false;
+  if (_polyhedron != NULL)
+  {
+    if (_polyhedron->is_valid() == true)
+    {
+      if (_polyhedron->keep_largest_connected_components(1) > 0)
+      {
+        this->add_error(305, -1);
+        return false;
+      }
+    }
+    else 
+    {
+      this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+      return false;
+    }
+  }
+  else
+  {
+    this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+    return false;
+  }
+//-- 2. Geometrical consistency (aka intersection tests between faces)
+  std::clog << "--Geometrical consistency" << std::endl;
+  if (is_polyhedron_geometrically_consistent(this) == false)
+    return false;
+  // std::cout << _polyhedron << std::endl;
+  return true;
 }
 
 
@@ -576,7 +646,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
     return false;
 //-- 4. orientation of the normals is outwards or inwards
   std::clog << "--Orientation of normals" << std::endl;
-  if (check_global_orientation_normals_rev2(_polyhedron, this->is_outer()) == false) {
+  if (check_global_orientation_normals(_polyhedron, this->is_outer()) == false) {
     this->add_error(308, -1);
     return false;
   }

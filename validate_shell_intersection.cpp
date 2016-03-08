@@ -27,15 +27,11 @@
 #include "validate_shell.h"
 #include "definitions.h"
 
-#include <CGAL/intersections.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
-#include <CGAL/intersections.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <CGAL/box_intersection_d.h>
 #include <CGAL/Bbox_3.h>
 
-#include<set>
-#include<list>
 
 //-- CGAL stuff
 typedef CgalPolyhedron::HalfedgeDS              HalfedgeDS;
@@ -126,9 +122,8 @@ struct Intersect_facets {
   }
 };
 
-// is_polyhedron_geometrically_consistent(CgalPolyhedron* p, int shellID)
-bool
-is_polyhedron_geometrically_consistent(Shell* sh)
+
+bool is_polyhedron_geometrically_consistent(Shell* sh)
 {
   std::vector<Box> boxes;
   CgalPolyhedron* p = sh->get_cgal_polyhedron();
@@ -146,22 +141,19 @@ is_polyhedron_geometrically_consistent(Shell* sh)
   for ( std::vector<Box>::iterator j = boxes.begin(); j != boxes.end(); ++j){
     box_ptr.push_back( &*j);
   }
-  CGAL::box_self_intersection_d( box_ptr.begin(), box_ptr.end(),
-                                Intersect_facets(), std::ptrdiff_t(2000));
-  
+
+  CGAL::box_self_intersection_d( box_ptr.begin(), box_ptr.end(), Intersect_facets());
   if (gTriangles.empty())
     return true;
   else 
   {
     std::stringstream st;
-    CGAL::Object re = intersection(gTriangles[0], gTriangles[1]);
-    K::Point_3 apoint;
-    K::Segment_3 asegment;
-    if (assign(asegment, re))
-     st << "Segment intersection: " << asegment[0].x() << " " << asegment[0].y() << " " << asegment[0].z() << endl;
-    else if (assign(apoint, re))
-     st << "Point intersection: " << apoint.x() << apoint.y() << apoint.z() << endl;
+    st << "Location: (" 
+       << gTriangles[0].vertex(0).x() << ", " 
+       << gTriangles[0].vertex(0).y() << ", " 
+       << gTriangles[0].vertex(0).z() << ")"; 
     sh->add_error(306, -1, st.str());
+    gTriangles.clear();
     return false;
   }
 }
