@@ -1,15 +1,5 @@
 
-
 project( val3dity )
-
-# C++11
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-if(COMPILER_SUPPORTS_CXX11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-else()
-  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
 
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
@@ -19,6 +9,8 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
     cmake_policy(VERSION 2.6)
   endif()
 endif()
+
+add_definitions(-std=c++11)
 
 set( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true )
  
@@ -62,6 +54,7 @@ if ( NOT ASSIMP_FOUND )
   message(SEND_ERROR "val3dity requires the ASSIMP library")
 endif()
 include_directories( ${ASSIMP_INCLUDE_DIR}, include )
+
 
 # Creating entries for target: val3dity
 # ############################
