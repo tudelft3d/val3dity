@@ -12,18 +12,27 @@ international standards for geographic information. *Computer-Aided Civil and In
 
 ## How do I use val3dity?
 
-It is a command-line program, which we provide as source code, together with makefiles for Mac and Linux. 
-
-For Windows, we do not have binaries at this moment, but you can use the [web interface](http://geovalidation.bk.tudelft.nl/val3dity). 
+It is a command-line program, which we provide as source code, with CMake.
+It's trivial to compile under Mac and Linux.
+For Windows, we do not have binaries at this moment, but compiling should be feasible.
+If not, you can always use the [web interface](http://geovalidation.bk.tudelft.nl/val3dity), which exposes most of the functionalities.
 
 To compile val3dity yourself, you first need to install the following free libraries 
 
+  1. [CMake](http://www.cmake.org)
   1. [CGAL](http://www.cgal.org), 
   1. [GEOS](http://trac.osgeo.org/geos/) 
-  1. [CMake](http://www.cmake.org)
   1. [Assimp](http://www.assimp.org)
 
-Under Mac we suggest using [Homebrew](http://brew.sh/). Afterwards run:
+Under Mac we suggest using [Homebrew](http://brew.sh/):
+
+  $ homebrew install cmake 
+  $ homebrew install cgal
+  $ homebrew install geos
+  $ homebrew install assimp
+
+
+Afterwards run:
 
     $ cmake .
     $ make
