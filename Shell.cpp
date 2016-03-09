@@ -50,13 +50,13 @@ bool Shell::is_empty()
 }
 
 
-void Shell::add_error(int code, int faceid, std::string info)
+void Shell::add_error(int code, std::string faceid, std::string info)
 {
-  std::tuple<int, std::string> a(faceid, info);
+  std::tuple<std::string, std::string> a(faceid, info);
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << errorcode2description(code);
-  if (faceid != -1)
-    std::clog << " (face #" << faceid << ")";
+  if (faceid.empty() == false)
+    std::clog << " (face " << faceid << ")";
   std::clog << std::endl;
   if (info.empty() == false)
     std::clog << "\t[" << info << "]" << std::endl;
@@ -165,9 +165,13 @@ int Shell::add_point(Point3 p)
 }
 
 
-void Shell::add_face(vector< vector<int> > f)
+void Shell::add_face(vector< vector<int> > f, std::string id)
 {
   _lsFaces.push_back(f);
+  if (id.empty() == true)
+    _lsFacesID.push_back(std::to_string(_lsFaces.size()));
+  else
+    _lsFacesID.push_back(id);
 }
 
 
@@ -234,7 +238,7 @@ bool Shell::triangulate_shell()
     vector<int*> oneface;
     if (construct_ct(pgnids, lsRings, oneface, i) == false)
     {
-      this->add_error(999, i, "face does not have an outer boundary.");
+      this->add_error(999, _lsFacesID[i], "face does not have an outer boundary.");
       return false;
     }
     //-- modify orientation of every triangle if necessary
@@ -402,14 +406,14 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
     //-- test for too few points (<3 for a ring)
     if (has_face_rings_toofewpoints(_lsFaces[i]) == true)
     {
-      this->add_error(101, i);
+      this->add_error(101, _lsFacesID[i]);
       isValid = false;
       continue;
     }
     //-- test for 2 repeated consecutive points
     if (has_face_2_consecutive_repeated_pts(_lsFaces[i]) == true)
     {
-      this->add_error(102, i);
+      this->add_error(102, _lsFacesID[i]);
       isValid = false;
       continue;
     }
@@ -441,7 +445,7 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
     {
       std::stringstream msg;
       msg << "distance to fitted plane: " << value << " (tolerance=" << tol_planarity_d2p << ")";
-      this->add_error(203, i, msg.str());
+      this->add_error(203, _lsFacesID[i], msg.str());
       isValid = false;
       continue;
     }
@@ -450,7 +454,7 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
     vector<Polygon> lsRings;
     if (false == create_polygon(_lsPts, ids, pgn, false))
     {
-      this->add_error(104, i, " outer ring self-intersects or is collapsed to a point or a line");
+      this->add_error(104, _lsFacesID[i], " outer ring self-intersects or is collapsed to a point or a line");
       isValid = false;
       continue;
     }
@@ -463,14 +467,14 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
       Polygon pgn;
       if (false == create_polygon(_lsPts, ids2, pgn, false))
       {
-        this->add_error(104, i, "Inner ring self-intersects or is collapsed to a point or a line");
+        this->add_error(104, _lsFacesID[i], "Inner ring self-intersects or is collapsed to a point or a line");
         isValid = false;
         continue;
       }
       lsRings.push_back(pgn);
     }
     //-- use GEOS to validate projected polygon
-    if (!validate_polygon(lsRings, num))
+    if (!validate_polygon(lsRings, _lsFacesID[i]))
       isValid = false;
   }
   if (isValid)
@@ -488,7 +492,7 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
       {
         std::ostringstream msg;
         msg << "deviation normals: " << deviation << " (tolerance=" << tol_planarity_normals << ")";
-        this->add_error(204, j, msg.str());
+        this->add_error(204, _lsFacesID[j], msg.str());
         isValid = false;
       }
       j++;
@@ -545,19 +549,19 @@ bool Shell::validate_as_compositesurface(double tol_planarity_d2p, double tol_pl
     {
       if (_polyhedron->keep_largest_connected_components(1) > 0)
       {
-        this->add_error(305, -1);
+        this->add_error(305);
         return false;
       }
     }
     else 
     {
-      this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+      this->add_error(300, "", "Something went wrong during construction of the shell, reason is unknown.");
       return false;
     }
   }
   else
   {
-    this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+    this->add_error(300, "", "Something went wrong during construction of the shell, reason is unknown.");
     return false;
   }
 //-- 2. Geometrical consistency (aka intersection tests between faces)
@@ -579,7 +583,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
 //-- 1. minimum number of faces = 4
   if (_lsTr.size() < 4) 
   {
-    this->add_error(301, -1);
+    this->add_error(301);
     return false;
   }
 //-- 2. Combinatorial consistency
@@ -598,7 +602,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
         if (_polyhedron->keep_largest_connected_components(1) > 0)
         {
           //TODO: how to report what face is not connected? a bitch of a problem...
-          this->add_error(305, -1);
+          this->add_error(305);
           return false;
         }
         else
@@ -611,7 +615,7 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
             while (_polyhedron->size_of_border_edges() > 0) {
               CgalPolyhedron::Halfedge_handle he = ++(_polyhedron->border_halfedges_begin());
               st << "Location hole: " << he->vertex()->point();
-              this->add_error(302, -1, st.str());
+              this->add_error(302, "", st.str());
               st.str("");
               _polyhedron->fill_hole(he);
               _polyhedron->normalize_border();
@@ -624,20 +628,20 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
       {
         if (_polyhedron->keep_largest_connected_components(1) > 0) 
         {
-          this->add_error(305, -1, "More than one connected components.");
+          this->add_error(305, "", "More than one connected components.");
           return false;
         }
       }
     }
     else 
     {
-      this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+      this->add_error(300, "", "Something went wrong during construction of the shell, reason is unknown.");
       return false;
     }
   }
   else
   {
-    this->add_error(300, -1, "Something went wrong during construction of the shell, reason is unknown.");
+    this->add_error(300, "", "Something went wrong during construction of the shell, reason is unknown.");
     return false;
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
@@ -647,14 +651,14 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
 //-- 4. orientation of the normals is outwards or inwards
   std::clog << "--Orientation of normals" << std::endl;
   if (check_global_orientation_normals(_polyhedron, this->is_outer()) == false) {
-    this->add_error(308, -1);
+    this->add_error(308);
     return false;
   }
   return true;
 }
 
 
-bool Shell::validate_polygon(vector<Polygon> &lsRings, int polygonid)
+bool Shell::validate_polygon(vector<Polygon> &lsRings, std::string polygonid)
 {
   // TODO: need to init GEOS and "close" it each time? I guess not...
   initGEOS(NULL, NULL);

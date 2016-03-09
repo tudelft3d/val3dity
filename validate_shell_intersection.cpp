@@ -152,7 +152,7 @@ bool is_polyhedron_geometrically_consistent(Shell* sh)
        << gTriangles[0].vertex(0).x() << ", " 
        << gTriangles[0].vertex(0).y() << ", " 
        << gTriangles[0].vertex(0).z() << ")"; 
-    sh->add_error(306, -1, st.str());
+    sh->add_error(306, "", st.str());
     gTriangles.clear();
     return false;
   }
