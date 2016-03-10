@@ -136,12 +136,18 @@ bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon
       pgn.push_back(Point2(p.y(), p.z()));
   }
   
-  if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
+  if (!pgn.is_simple()) { //-- CGAL polygon requires that a polygon be simple to test orientation
+    std::clog << "IS_SIMPLE" << std::endl;
     return false;
-  if (pgn.orientation() == CGAL::COLLINEAR)
+  }
+  if (pgn.orientation() == CGAL::COLLINEAR) {
+    std::clog << "IS_SIMPLE" << std::endl;
     return false;
-  if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
+  }
+  if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) ) {
+    std::clog << "IS_SIMPLE" << std::endl;
     pgn.reverse_orientation();
+  }
   return true;
 }
 
