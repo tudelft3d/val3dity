@@ -294,21 +294,24 @@ int main(int argc, char* const argv[])
 
 std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d)
 {
+  int bValid = 0;
   std::stringstream ss;
   std::map<int,int> errors;
   for (auto& s : lsSolids)
   {
+    if (s.is_valid() == true)
+      bValid++;
     for (auto& code : s.get_unique_error_codes())
       errors[code] = 0;
   }
   if (errors.size() > 0)
   {
-    ss << "@INVALID ";
+    ss << "@INVALID " << lsSolids.size() << " " << (lsSolids.size() - bValid) << " ";
     for (auto e : errors)
       ss << e.first << " ";
   }
   else {
-    ss << "@VALID";
+    ss << "@VALID " << lsSolids.size() << " " << (lsSolids.size() - bValid);
   }
   ss << std::endl;
   return ss.str();
