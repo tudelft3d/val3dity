@@ -335,7 +335,11 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   for (auto& s : lsSolids)
     if (s.is_valid() == true)
       bValid++;
-  int percentage = 100 * ((lsSolids.size() - bValid) / float(lsSolids.size()));
+  int percentage;
+  if (lsSolids.size() == 0)
+    percentage = 0;
+  else
+    percentage = 100 * ((lsSolids.size() - bValid) / float(lsSolids.size()));
   ss << "# valid: " << setw(22) << bValid;
   ss << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
