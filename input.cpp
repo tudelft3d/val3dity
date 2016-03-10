@@ -249,7 +249,7 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
     if (fliporientation == true) 
       std::reverse(r.begin(), r.end());
     if (r.front() != r.back())
-      sh->add_error(103, i);
+      sh->add_error(103, p.node().attribute("gml:id").value());
     else
       r.pop_back(); 
     oneface.push_back(r);
@@ -261,12 +261,12 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
       if (fliporientation == true) 
         std::reverse(r.begin(), r.end());
       if (r.front() != r.back())
-        sh->add_error(103, i);
+        sh->add_error(103, p.node().attribute("gml:id").value());
       else
         r.pop_back(); 
       oneface.push_back(r);
     }
-    sh->add_face(oneface);
+    sh->add_face(oneface, p.node().attribute("gml:id").value());
     i++;
   }
   if (translatevertices == true)
@@ -428,7 +428,7 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool transl
     //-- read oring (there's always one and only one)
     infile >> numpt;
     if (numpt == -1) {
-      sh->add_error(103, i);
+      sh->add_error(103, std::to_string(i));
       continue;
     }
     vector<int> ids(numpt);
@@ -446,7 +446,7 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool transl
     {
       infile >> numpt;
       if (numpt == -1) {
-        sh->add_error(103, i);
+        sh->add_error(103, std::to_string(i));
         continue;
       }
       vector<int> ids(numpt);

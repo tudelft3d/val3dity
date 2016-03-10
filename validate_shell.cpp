@@ -68,7 +68,7 @@ void ConstructShell<HDS>::operator()( HDS& hds)
   if (isValid)
   {
     if (B.check_unconnected_vertices() == true) {
-      sh->add_error(309, -1, "");
+      sh->add_error(309);
       B.remove_unconnected_vertices();
     }
   }
@@ -86,7 +86,7 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
     for ( ; itF2 != itF->end(); itF2++)
     {
       int* a = *itF2;
-      add_one_face(B, a[0], a[1], a[2], faceID);
+      add_one_face(B, a[0], a[1], a[2], std::to_string(faceID));
     }
     faceID++;
   }
@@ -302,7 +302,7 @@ bool ConstructShell<HDS>::is_connected(int* tr, bool* halfedges)
 }
 
 template <class HDS>
-void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID)
+void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, std::string faceID)
 {
   std::vector< std::size_t> faceids(3);        
   faceids[0] = i0;
@@ -317,9 +317,9 @@ void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HD
     faceids[1] = i2;
     faceids[2] = i1;
     if (B.test_facet(faceids.begin(), faceids.end()))
-      sh->add_error(307, faceID, "");
+      sh->add_error(307, faceID);
     else
-      sh->add_error(304, faceID, ""); //-- >2 surfaces incident to an edge: non-manifold
+      sh->add_error(304, faceID); //-- >2 surfaces incident to an edge: non-manifold
   }
   return ;
 } 

@@ -52,7 +52,7 @@ public:
   void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B);
   bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected);
   bool is_connected(int* tr, bool* halfedges);
-  void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, int faceID) ;
+  void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, std::string faceID) ;
 };
 
 
