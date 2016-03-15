@@ -191,17 +191,18 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
     }
     std::string buf;
     std::stringstream ss(pl.node().child_value());
-    std::vector<std::string> tokens;
+    std::vector<std::string> coords;
     while (ss >> buf)
-      tokens.push_back(buf);
-    if (tokens.size() % 3 != 0)
+      coords.push_back(buf);
+    if (coords.size() % 3 != 0)
     {
       errs.add_error(901, "Error: <gml:posList> has bad coordinates.");
       return r;
     }
-    for (auto it = tokens.begin(); it != tokens.end(); it++)
+    for (int i = 0; i < coords.size(); i += 3)
     {
-      Point3 p(std::stod(*it), std::stod(*++it), std::stod(*++it));
+      Point3 p(std::stod(coords[i]), std::stod(coords[i+1]), std::stod(coords[i+2]));
+      std::clog << p << std::endl;
       r.push_back(sh->add_point(p));
     }
   }
