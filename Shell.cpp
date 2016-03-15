@@ -233,7 +233,9 @@ bool Shell::triangulate_shell()
     }
 
     int proj = projection_plane(_lsPts, idsob);
-    Vector* v0 = polygon_normal(_lsPts, idsob);
+    Vector v0; 
+    polygon_normal(_lsPts, idsob, v0);
+
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
@@ -264,22 +266,21 @@ bool Shell::triangulate_shell()
     if (proj == 2)
     {
       Vector n(0, 0, 1);
-      if ( (*v0*n) < 0)
+      if ( (v0*n) < 0)
         invert = true;
     }
     else if (proj == 1)
     {
       Vector n(0, 1, 0);
-      if ( (*v0*n) > 0)
+      if ( (v0*n) > 0)
         invert = true;
     }
     else if(proj == 0)
     {
       Vector n(1, 0, 0);
-      if ( (*v0*n) < 0)
+      if ( (v0*n) < 0)
         invert = true;
     }
-    delete v0;
     if ( invert == true ) //-- invert
     {
       vector<int*>::iterator it3 = oneface.begin();
@@ -396,6 +397,7 @@ bool Shell::construct_ct(const vector< vector<int> >& pgnids, const vector<Polyg
 
 void Shell::translate_vertices()
 {
+  std::clog << "TRANSLATING VERTICES" << std::endl;
   vector<Point3>::iterator it = _lsPts.begin();
   K::FT minx = 9e10;
   K::FT miny = 9e10;

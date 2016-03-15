@@ -53,26 +53,24 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
   return isPlanar;
 }
 
+
 int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
 {
-  Vector* pnormal = polygon_normal(lsPts, ids);
-  K::FT TOL(1e-12); //-- tolerance, TODO: can users change this one?
-  if (CGAL::compare(sqrt(pnormal->squared_length()), TOL) != CGAL::LARGER)
-    return -1;
-  //-- normalise the normal
-  *pnormal = *pnormal / sqrt(pnormal->squared_length());
-  // need to use K::FT instead of double to ensure compilation under core level 4
-  K::FT a = abs(*pnormal * Vector(1.0, 0.0, 0.0));//yz
-  K::FT b = abs(*pnormal * Vector(0.0, 1.0, 0.0));//xz
-  K::FT c = abs(*pnormal * Vector(0.0, 0.0, 1.0));//xy
-  K::FT m = max(max(a, b), c);
-  delete pnormal;
-  if (CGAL::compare(a, m) == CGAL::EQUAL)
-    return 0;//yz
-  else if (CGAL::compare(b, m) == CGAL::EQUAL)
-    return 1;//xz
-  else
-    return 2;//xy
+  Vector n;
+  polygon_normal(lsPts, ids, n);
+  double maxcomp = abs(n.x());
+  int proj = 0;
+  if (abs(n.y()) > maxcomp)
+  {
+    maxcomp = abs(n.y());
+    proj = 1;
+  }
+  if (abs(n.z()) > maxcomp)
+  {
+    maxcomp = abs(n.z());
+    proj = 2;
+  }
+  return proj;
 }
 
 
@@ -85,45 +83,21 @@ bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 }
 
 
-Vector* polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids)
+bool polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids, Vector &n) 
 {
-  //-- Newell' method
-  //translate all the points to the origin to enhance the stability
-  Vector centPt(0.0, 0.0, 0.0);
-  vector<Point3>::const_iterator it_pt = lsPts.begin();
-  for (; it_pt != lsPts.end(); it_pt++)
-  {
-    centPt = centPt + ((*it_pt)-CGAL::ORIGIN);
-  }
-  centPt = centPt/lsPts.size();
-  //
-  vector<Point3> newPts;
-  it_pt = lsPts.begin();
-  for (; it_pt != lsPts.end(); it_pt++)
-  {
-    newPts.push_back(*it_pt-centPt);
-  }
-  //
-  vector<int>::const_iterator it = ids.begin();
-  Point3 vert (newPts[*(ids.end()-1)]);
-  Vector* pnormal = new Vector(0.0, 0.0, 0.0);
-  for (;it!=ids.end();it++)
-  {
-    Vector next ((vert.z() + newPts[*it].z()) * (vert.y() - newPts[*it].y()),
-                 (vert.x() + newPts[*it].x()) * (vert.z() - newPts[*it].z()),
-                 (vert.y() + newPts[*it].y()) * (vert.x() - newPts[*it].x()));
-    *pnormal = *pnormal + next;
-    vert = newPts[*it];
-  }
-  return pnormal;
-}
+  vector<Point3> pts;
+  for (auto& i : ids) 
+    pts.push_back(lsPts[i]);
+  CgalPolyhedron::Plane_3 plane;
+  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>()); 
+  n = plane.orthogonal_vector();
+  return true;
+}  
 
 
 bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient)
 {
   int proj = projection_plane(lsPts, ids);
-  if (proj == -1) //-- polygon self-intersects or is collapsed to a point or a polyline
-    return false;
   vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
   {
