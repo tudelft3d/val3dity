@@ -202,7 +202,6 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
     for (int i = 0; i < coords.size(); i += 3)
     {
       Point3 p(std::stod(coords[i]), std::stod(coords[i+1]), std::stod(coords[i+2]));
-      std::clog << p << std::endl;
       r.push_back(sh->add_point(p));
     }
   }

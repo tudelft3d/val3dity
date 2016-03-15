@@ -375,7 +375,6 @@ bool Shell::construct_ct(const vector< vector<int> >& pgnids, const vector<Polyg
 
 void Shell::translate_vertices()
 {
-  std::clog << "TRANSLATING VERTICES" << std::endl;
   vector<Point3>::iterator it = _lsPts.begin();
   K::FT minx = 9e10;
   K::FT miny = 9e10;
