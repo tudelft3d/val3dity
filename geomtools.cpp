@@ -91,11 +91,12 @@ bool polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids, Vecto
   CgalPolyhedron::Plane_3 plane;
   linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>()); 
   n = plane.orthogonal_vector();
+  // Vector order = CGAL::unit_normal()
   return true;
 }  
 
 
-bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn, bool ccworient)
+bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn)
 {
   int proj = projection_plane(lsPts, ids);
   vector<int>::const_iterator it = ids.begin();
@@ -114,8 +115,6 @@ bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon
     return false;
   if (pgn.orientation() == CGAL::COLLINEAR)
     return false;
-  if ( (ccworient == true) && (pgn.is_counterclockwise_oriented() == false) )
-    pgn.reverse_orientation();
   return true;
 }
 

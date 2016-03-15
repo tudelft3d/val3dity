@@ -239,18 +239,27 @@ bool Shell::triangulate_shell()
     //-- get projected Polygon
     Polygon pgn;
     vector<Polygon> lsRings;
-    create_polygon(_lsPts, idsob, pgn, true);
+    create_polygon(_lsPts, idsob, pgn);
+    //-- all polygons should be cw for Triangle
+    //-- if reversed then re-reversed later
+    bool reversed = false;
+    if (pgn.is_counterclockwise_oriented() == false) {
+      pgn.reverse_orientation();
+      reversed = true;
+    }
     lsRings.push_back(pgn);
     vector< vector<int> > pgnids;
     pgnids.push_back(idsob);
-    
     //-- check for irings
     for (int j = 1; j < static_cast<int>(numf); j++)
     {
       vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected Polygon
       Polygon pgn;
-      create_polygon(_lsPts, ids2, pgn, true);
+      create_polygon(_lsPts, ids2, pgn);
+      if (pgn.is_counterclockwise_oriented() == false) {
+        pgn.reverse_orientation();
+      }
       lsRings.push_back(pgn);
       pgnids.push_back(ids2);
     }
@@ -261,27 +270,7 @@ bool Shell::triangulate_shell()
       this->add_error(999, _lsFacesID[i], "face does not have an outer boundary.");
       return false;
     }
-    //-- modify orientation of every triangle if necessary
-    bool invert = false;
-    if (proj == 2)
-    {
-      Vector n(0, 0, 1);
-      if ( (v0*n) < 0)
-        invert = true;
-    }
-    else if (proj == 1)
-    {
-      Vector n(0, 1, 0);
-      if ( (v0*n) > 0)
-        invert = true;
-    }
-    else if(proj == 0)
-    {
-      Vector n(1, 0, 0);
-      if ( (v0*n) < 0)
-        invert = true;
-    }
-    if ( invert == true ) //-- invert
+    if (reversed == true) //-- reversed back to keep orientation of original surface
     {
       vector<int*>::iterator it3 = oneface.begin();
       int tmp;
@@ -472,7 +461,7 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
     //-- get projected oring
     Polygon pgn;
     vector<Polygon> lsRings;
-    if (false == create_polygon(_lsPts, ids, pgn, false))
+    if (false == create_polygon(_lsPts, ids, pgn))
     {
       this->add_error(104, _lsFacesID[i], " outer ring self-intersects or is collapsed to a point or a line");
       isValid = false;
@@ -485,7 +474,7 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
       vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected iring
       Polygon pgn;
-      if (false == create_polygon(_lsPts, ids2, pgn, false))
+      if (false == create_polygon(_lsPts, ids2, pgn))
       {
         this->add_error(104, _lsFacesID[i], "Inner ring self-intersects or is collapsed to a point or a line");
         isValid = false;
