@@ -335,18 +335,7 @@ bool Shell::construct_ct(const vector< vector<int> >& pgnids, const vector<Polyg
       it2++;
     }
     ct.insert_constraint(v0,firstv);
-  }
-  //-- validation of the face itself
-  //-- if the CT introduced new points, then there are irings intersectings either oring or other irings
-  //-- which is not allowed
-  // TODO: is this true? not 100% I think, and can be removed since caught later with GEOS
-  // if (numpts < ct.number_of_vertices())
-  // {
-  //   std::stringstream ss;
-  //   ss << "Intersection(s) between rings of the face #" << faceNum << ".";
-  //   (*_cb)(0, -1, -1, ss.str());
-  //   isValid = false;
-  // }  
+  } 
   //-- fetch all the triangles forming the polygon (with holes)
   CT::Finite_faces_iterator fi = ct.finite_faces_begin();
   for( ; fi != ct.finite_faces_end(); fi++)
