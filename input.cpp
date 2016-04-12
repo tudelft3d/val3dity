@@ -209,7 +209,8 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
 }
 
 
-Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) {
+Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) 
+{
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
   Shell* sh = new Shell(id, tol_snap);
@@ -238,7 +239,9 @@ Shell* process_gml_shell(pugi::xml_node n, int id, map<std::string, pugi::xpath_
       std::string s2 = "./" + localise("Polygon");
       p = it->node().select_node(s2.c_str());
     }
-
+    if (p == NULL)
+      continue;
+    
     bool fliporientation = false;
     if (std::strncmp(p.node().attribute("orientation").value(), "-", 1) == 0)
       fliporientation = true;
@@ -350,24 +353,24 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
     {
       std::string s = "./" + localise("exterior");
       pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-      sol.set_oshell(process_gml_shell(next.node(), 0, dallpoly, tol_snap, errs));
+      sol.set_oshell(process_gml_compositesurface(next.node(), 0, dallpoly, tol_snap, errs));
       //-- interior shells
       s = "./" + localise("interior");
       pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
       int id = 1;
       for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
       {
-        sol.add_ishell(process_gml_shell(it->node(), id, dallpoly, tol_snap, errs));
+        sol.add_ishell(process_gml_compositesurface(it->node(), id, dallpoly, tol_snap, errs));
         id++;
       }
     }
     else if (prim == COMPOSITESURFACE)
     {
-      sol.set_oshell(process_gml_shell(nsolid.node(), 0, dallpoly, tol_snap, errs));
+      sol.set_oshell(process_gml_compositesurface(nsolid.node(), 0, dallpoly, tol_snap, errs));
     }
     else 
     {
-      sol.set_oshell(process_gml_shell(nsolid.node(), 0, dallpoly, tol_snap, errs));
+      sol.set_oshell(process_gml_compositesurface(nsolid.node(), 0, dallpoly, tol_snap, errs));
     }
     lsSolids.push_back(sol);
   }
