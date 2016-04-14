@@ -221,6 +221,7 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
     bool bxlink = false;
     pugi::xml_node tmpnode = it->node();
     pugi::xpath_node p;
+    bool fliporientation = false;
     for (pugi::xml_attribute attr = tmpnode.first_attribute(); attr; attr = attr.next_attribute())
     {
       if (strcmp(attr.value(), "xlink:href") != 0) {
@@ -228,21 +229,55 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
         break;
       }
     }
-    if (bxlink == true) {
-       std::string k = it->node().attribute("xlink:href").value();
+    if (bxlink == true) 
+    {
+      std::string k = it->node().attribute("xlink:href").value();
       if (k[0] == '#')
         k = k.substr(1);
       p = dallpoly[k];
     }
     else
     {
-      std::string s2 = "./" + localise("Polygon");
-      p = it->node().select_node(s2.c_str());
+      for (pugi::xml_node child : it->node().children()) 
+      {
+        if (std::string(child.name()).find("Polygon") != std::string::npos) {
+          p = child;
+          break;
+        }
+        else if (std::string(child.name()).find("OrientableSurface") != std::string::npos) {
+          std::cout << "OrientableSurface" << std::endl;
+          if (std::strncmp(child.attribute("orientation").value(), "-", 1) == 0)
+            fliporientation = true;
+          for (pugi::xml_node child2 : child.children()) 
+          {
+            if (std::string(child2.name()).find("baseSurface") != std::string::npos) 
+            {
+              std::cout << "baseSurface found" << std::endl;
+              std::cout << child2.attribute("xlink:href").value() << std::endl;
+              std::string k = child2.attribute("xlink:href").value();
+              if (k[0] == '#')
+                k = k.substr(1);
+              p = dallpoly[k];
+              break;
+            }
+          }
+          break;
+        }
+        else if (std::string(child.name()).find("CompositeSurface") != std::string::npos) {
+//          p = NULL;
+          break;
+        }
+        else {
+          errs.add_error(901, "Error: That order of gml tags is not supported (or invalid).");
+          return NULL;
+        }
+      }
     }
-    if (p == NULL)
+
+    //-- this is to handle CompositeSurfaces part of MultiSurfaces
+    if (p == NULL) 
       continue;
     
-    bool fliporientation = false;
     if (std::strncmp(p.node().attribute("orientation").value(), "-", 1) == 0)
       fliporientation = true;
     //-- exterior ring (only 1)
