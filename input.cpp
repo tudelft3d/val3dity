@@ -186,8 +186,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
     pugi::xpath_node pl = n.select_node(s.c_str());
     if (pl == NULL)
     {
-      errs.add_error(901, "Error: GML way to represent gml:Polygon not handled.");
-      return r;
+      throw 901;
     }
     std::string buf;
     std::stringstream ss(pl.node().child_value());
@@ -245,15 +244,12 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
           break;
         }
         else if (std::string(child.name()).find("OrientableSurface") != std::string::npos) {
-          std::cout << "OrientableSurface" << std::endl;
           if (std::strncmp(child.attribute("orientation").value(), "-", 1) == 0)
             fliporientation = true;
           for (pugi::xml_node child2 : child.children()) 
           {
             if (std::string(child2.name()).find("baseSurface") != std::string::npos) 
             {
-              std::cout << "baseSurface found" << std::endl;
-              std::cout << child2.attribute("xlink:href").value() << std::endl;
               std::string k = child2.attribute("xlink:href").value();
               if (k[0] == '#')
                 k = k.substr(1);
@@ -263,13 +259,10 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
           }
           break;
         }
-        else if (std::string(child.name()).find("CompositeSurface") != std::string::npos) {
-//          p = NULL;
+        else if (std::string(child.name()).find("CompositeSurface") != std::string::npos) 
           break;
-        }
         else {
-          errs.add_error(901, "Error: That order of gml tags is not supported (or invalid).");
-          return NULL;
+          throw 901;
         }
       }
     }

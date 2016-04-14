@@ -149,15 +149,23 @@ int main(int argc, char* const argv[])
          (extension == "xml") ||  
          (extension == "XML") ) 
     {
-      lsSolids = readGMLfile(inputfile.getValue(), prim3d, ioerrs, snap_tolerance.getValue());
-      if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
-      }
-      if (ishellfiles.getValue().size() > 0)
+      try
       {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+        lsSolids = readGMLfile(inputfile.getValue(), prim3d, ioerrs, snap_tolerance.getValue());
+        if (ioerrs.has_errors() == true) {
+          std::cout << "Errors while reading the input file, aborting." << std::endl;
+          std::cout << ioerrs.get_report_text() << std::endl;
+        }
+        if (ishellfiles.getValue().size() > 0)
+        {
+          std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+          ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+        }
+      }
+      catch (int e)
+      {
+        if (e == 901)
+          ioerrs.add_error(901, "Invalid GML structure, or that particular (twisted and obscure) construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues");
       }
     }
     else if ( (extension == "poly") ||
@@ -317,6 +325,7 @@ std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d)
   return ss.str();
 }
 
+
 std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d)
 {
   std::stringstream ss;
@@ -341,7 +350,10 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   else
     percentage = 100 * ((lsSolids.size() - bValid) / float(lsSolids.size()));
   ss << "# valid: " << setw(22) << bValid;
-  ss << " (" << 100 - percentage << "%)" << std::endl;
+  if (lsSolids.size() == 0)
+    ss << " (" << 0 << "%)" << std::endl;
+  else
+    ss << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
   ss << " (" << percentage << "%)" << std::endl;
   std::map<int,int> errors;
