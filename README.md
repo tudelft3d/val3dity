@@ -13,21 +13,19 @@ For `CompositeSurfaces`, the surface formed by the polygons must be a 2-manifold
 
 For `MultiSurfaces`, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar?
 
-
-
 Most of the details are available in this scientific article:
 
 > Ledoux, Hugo (2013). On the validation of solids represented with the
 international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
 
-# Web application
+## Web application
 
 If you're running Windows and/or you don't want to go through the troubles of compiling, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
 You upload your file to our server and get a validation report back.
 We delete the file as soon as it has been validated; files are limited to 50MB.
 
 
-## How do I compile anduse val3dity?
+## How do I compile and use val3dity?
 
 It is a command-line program, which we provide as source code, with CMake.
 It's trivial to compile under Mac and Linux.
@@ -84,17 +82,17 @@ Validating one primitive in OBJ as a MultiSurface (`-p MS` option) will validate
 See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dity/faq) for more details.
 
 
-# Configurations
+## Options for validating
 
-It is possible to define some tolerances for the planarity of surfaces with the flag `--planarity_n 0.1` which would mean that the points representing a surface should be at a maximum distance of 0.1m (or units, val3dity doesn't reproject or perform any change to the input coordinates) to a plane fitted with least-square adjustment to the points.
+It is possible to define some tolerances for the planarity of surfaces with the flag `--planarity_n 0.1` which would mean that the points representing a surface should be at a maximum distance of 0.1m (or units, val3dity doesn't reproject the input coordinates) to a plane fitted with least-square adjustment to the points.
 
 Similarly, the input points in a GML files are snapped together using a tolerance, which can be changed with `--snap_tolerance XX`.
 
-# Error reported 
+## Error reported 
 
 (a description of each error is available [here](https://github.com/tudelft3d/val3dity/blob/master/errors_description/errors_description.md))
 
-## Ring level
+### Ring level
 
   * 101: TOO_FEW_POINTS
   * 102: CONSECUTIVE_POINTS_SAME
@@ -103,7 +101,7 @@ Similarly, the input points in a GML files are snapped together using a toleranc
   * 105: COLLAPSED_TO_LINE
 
 
-## POLYGON level
+### POLYGON level
 
   * 201: INTERSECTION_RINGS
   * 202: DUPLICATED_RINGS
@@ -115,7 +113,7 @@ Similarly, the input points in a GML files are snapped together using a toleranc
   * 208: ORIENTATION_RINGS_SAME
 
 
-## SHELL level
+### SHELL level
 
   * 301: TOO_FEW_POLYGONS
   * 302: NOT_CLOSED
@@ -128,14 +126,14 @@ Similarly, the input points in a GML files are snapped together using a toleranc
   * 309: VERTICES_NOT_USED 
 
 
-## SOLID level
+### SOLID level
 
-  * 401:  SHELLS_FACE_ADJACENT
-  * 402:  SHELL_INTERIOR_INTERSECT
-  * 403:  INNER_SHELL_OUTSIDE_OUTER
-  * 404:  INTERIOR_OF_SHELL_NOT_CONNECTED
+  * 401: SHELLS_FACE_ADJACENT
+  * 402: SHELL_INTERIOR_INTERSECT
+  * 403: INNER_SHELL_OUTSIDE_OUTER
+  * 404: INTERIOR_OF_SHELL_NOT_CONNECTED
 
-## OTHERS
+### OTHERS
 
   * 901: INVALID_INPUT_FILE
   * 902: EMPTY_PRIMITIVE
