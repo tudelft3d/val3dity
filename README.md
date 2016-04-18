@@ -1,28 +1,33 @@
 # val3dity
 
-Validation of solids according to the international standard ISO 19107.
+Validation of 3D primitives (Solids, CompositeSurfaces and MultiSurfaces)  according to the international standard ISO 19107.
 
-The validation of a solid is performed hierarchically, ie first every surface is validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc), and finally the interactions between the shells are analysed.
+The validation is performed hierarchically, ie first every surface is validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc), and finally the interactions between the shells are analysed.
 
 Most of the details are available in this scientific article:
 
 > Ledoux, Hugo (2013). On the validation of solids represented with the
 international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
 
+# Web application
 
-## How do I use val3dity?
+If you're running Windows and/or you don't want to go through the troubles of compiling, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
+You upload your file to our server and get a validation report back.
+We delete the file as soon as it has been validated; files are limited to 50MB.
+
+
+## How do I compile anduse val3dity?
 
 It is a command-line program, which we provide as source code, with CMake.
 It's trivial to compile under Mac and Linux.
-For Windows, we do not have binaries at this moment, but compiling should be feasible.
-If not, you can always use the [web interface](http://geovalidation.bk.tudelft.nl/val3dity), which exposes most of the functionalities.
+For Windows, we do not offer binaries at this moment, but compiling it is easily possible with the CMake.
 
-To compile val3dity yourself, you first need to install the following free libraries 
+To compile val3dity yourself, you first need to install the following free libraries:
 
-  1. [CMake](http://www.cmake.org)
   1. [CGAL](http://www.cgal.org), 
   1. [GEOS](http://trac.osgeo.org/geos/) 
   1. [Assimp](http://www.assimp.org)
+  1. [CMake](http://www.cmake.org)
 
 Under Mac we suggest using [Homebrew](http://brew.sh/):
 
@@ -46,23 +51,26 @@ To validate all the solids in a GML or CityGML file:
 
 Each `<gml:Solid>` in the file will be individually validated and a summary report will be output. 
 
+To validate all the MultiSurfaces in a GML or CityGML file:
+
+    $ ./val3dity myfile.gml -p MS
+
 For a full report in XML format:
 
-    $ ./val3dity myfile.gml --oxml report.xml
+    $ ./val3dity myfile.gml --oxml myreport.xml
 
-Other formats can also be used as input, the volumetric primitives are then validated according to the ISO19107 definitions:
+Other formats can also be used as input, the 3D primitives will then validated according to the ISO19107 definitions:
 
   1. OBJ (a file can contain more than 1 object, each will be validated individually)
   1. OFF
   1. [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly), there are several examples of test datasets in the folder `data/poly/`, see the `README.txt`
   1. [all the formats supported by Assimp](http://www.assimp.org/main_features_formats.html) can in theory be used, although I haven't tested them all. OBJ and OFF surely work.
 
-This [FAQ for the web-application](http://geovalidation.bk.tudelft.nl/val3dity/faq) can help answer some questions I believe.
+In a OBJ/OFF/STL file, each primitive will be validated according to the ISO 19107 rules. 
+Observe that OBJ/OFF/STL have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
+Validating one primitive in OBJ as a MultiSurface (`-p MS` option) will validate individually each surface according to the ISO 19107 rules, without ensuring that they form a 2-manifold.
 
-
-# Web-application
-
-If you're running Windows and/or you don't want to go through the troubles of compiling, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). It takes as input a GML file (of any flavour, including CityGML for instance) containing one or more `<gml:Solids>`.
+See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dity/faq) for more details.
 
 
 # Configurations
