@@ -1,8 +1,19 @@
 # val3dity
 
-Validation of 3D primitives (Solids, CompositeSurfaces and MultiSurfaces)  according to the international standard ISO 19107.
+Validation of 3D primitives according to the international standard ISO 19107.
 
-The validation is performed hierarchically, ie first every surface is validated in 2D (with [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc), and finally the interactions between the shells are analysed.
+Its main aim is the 3D primitives of GML (`Solids`, `CompositeSurfaces`, or `MultiSurfaces`), but it can be used to validate any 3D primitive. 
+It accepts as input any GML files (or one of the formats built upon it, such as CityGML), OBJ, OFF, and [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
+It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107 (all the rest is ignored). 
+
+For `Solids`, the validation is performed hierarchically, ie first every polygon (embedded in 3D) is validated (by projecting it to a 2D plane and using [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc), and finally the interactions between the shells are analysed. 
+This means that if a polygon of your solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
+
+For `CompositeSurfaces`, the surface formed by the polygons must be a 2-manifold.
+
+For `MultiSurfaces`, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar?
+
+
 
 Most of the details are available in this scientific article:
 
