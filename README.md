@@ -2,7 +2,7 @@
 
 Validation of 3D primitives according to the international standard ISO 19107.
 
-Its main aim is the 3D primitives of GML (`Solids`, `CompositeSurfaces`, or `MultiSurfaces`), but it can be used to validate any 3D primitive. 
+Its main aim is the 3D primitives of GML (`<gml:Solid>`, `<gml:CompositeSurface>`, or `<gml:MultiSurface>`), but it can be used to validate any 3D primitive. 
 It accepts as input any GML files (or one of the formats built upon it, such as CityGML), OBJ, OFF, and [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
 It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107 (all the rest is ignored). 
 
@@ -76,8 +76,9 @@ Other formats can also be used as input, the 3D primitives will then validated a
   1. [all the formats supported by Assimp](http://www.assimp.org/main_features_formats.html) can in theory be used, although I haven't tested them all. OBJ and OFF surely work.
 
 In a OBJ/OFF/STL file, each primitive will be validated according to the ISO 19107 rules. 
-Observe that OBJ/OFF/STL have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
+Observe that OBJ/OFF/STL files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in OBJ as a MultiSurface (`-p MS` option) will validate individually each surface according to the ISO 19107 rules, without ensuring that they form a 2-manifold.
+Validating it as a solid with verify whether the primitive is a 2-manifold, whether it is closed/watertight and whether all normals are pointing outwards.
 
 See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dity/faq) for more details.
 
