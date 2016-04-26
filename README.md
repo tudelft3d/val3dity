@@ -22,18 +22,19 @@ international standards for geographic information. *Computer-Aided Civil and In
 
 If you're running Windows and/or you don't want to go through the troubles of compiling, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
 You upload your file to our server and get a validation report back.
-We delete the file as soon as it has been validated; files are limited to 50MB.
+We delete the file as soon as it has been validated.
+However, a file is limited to 50MB.
 
 
 ## How do I compile and use val3dity?
 
 It is a command-line program, which we provide as source code, with CMake.
 It's trivial to compile under Mac and Linux.
-For Windows, we do not offer binaries at this moment, but compiling it is easily possible with the CMake.
+For Windows, we do not offer binaries at this moment, but compiling it is possible with the CMake.
 
 To compile val3dity yourself, you first need to install the following free libraries:
 
-  1. [CGAL](http://www.cgal.org), 
+  1. [CGAL](http://www.cgal.org)
   1. [GEOS](http://trac.osgeo.org/geos/) 
   1. [Assimp](http://www.assimp.org)
   1. [CMake](http://www.cmake.org)
@@ -78,6 +79,7 @@ Other formats can also be used as input, the 3D primitives will then validated a
 In a OBJ/OFF/STL file, each primitive will be validated according to the ISO 19107 rules. 
 Observe that OBJ/OFF/STL files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in OBJ as a MultiSurface (`-p MS` option) will validate individually each surface according to the ISO 19107 rules, without ensuring that they form a 2-manifold.
+If your OBJ contains only be triangles (often the case), then using the option `-p MS` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (error `309: VERTICES_NOT_USED`) and collapsed triangles.
 Validating it as a solid with verify whether the primitive is a 2-manifold, whether it is closed/watertight and whether all normals are pointing outwards.
 
 See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dity/faq) for more details.
@@ -85,9 +87,12 @@ See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dit
 
 ## Options for validating
 
-It is possible to define some tolerances for the planarity of surfaces with the flag `--planarity_n 0.1` which would mean that the points representing a surface should be at a maximum distance of 0.1m (or units, val3dity doesn't reproject the input coordinates) to a plane fitted with least-square adjustment to the points.
+It is possible to define 2 tolerances for the planarity of surfaces with the flags 
 
-Similarly, the input points in a GML files are snapped together using a tolerance, which can be changed with `--snap_tolerance XX`.
+  1. `--planarity_d2s` the distance between every point forming a surface and a plane is less than a given tolerance (eg 1cm, which is the default).
+  1. `--planarity_n` the surface is triangulated and the normal of each triangle must not deviate more than than a certain usef-defined tolerance (eg 1 degree, which is the default).
+
+Similarly, the input points in a GML files are snapped together using a tolerance, which can be changed with `--snap_tolerance` (default is 1mm)
 
 ## Error reported 
 
