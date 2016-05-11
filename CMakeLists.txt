@@ -66,3 +66,5 @@ add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} ${ASSIMP_LIBRARIES})
 
+# Have the option to properly install val3dity to the system 
+install(TARGETS val3dity DESTINATION bin)
