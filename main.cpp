@@ -211,8 +211,16 @@ int main(int argc, char* const argv[])
     }
     else
     {
-      std::cout << "Unknown file type (only GML/XML and POLY accepted)" << std::endl;
-      ioerrs.add_error(901, "Unknown file type (only GML/XML and POLY accepted)");
+      lsSolids = read3dAssimpfile(inputfile.getValue(), ioerrs);
+      if (ioerrs.has_errors() == true) {
+        std::cout << "Errors while reading the input file, aborting." << std::endl;
+        std::cout << ioerrs.get_report_text() << std::endl;
+      }
+      if (ishellfiles.getValue().size() > 0)
+      {
+        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+      }
     }
 
     //-- now the validation starts
