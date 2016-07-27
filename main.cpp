@@ -219,6 +219,10 @@ int main(int argc, char* const argv[])
       }
     }
 
+    //-- translate all vertices to avoid potential problems
+    for (auto& s : lsSolids)
+      s.translate_vertices();
+    
     //-- now the validation starts
     if ( (lsSolids.empty() == false) && (ioerrs.has_errors() == false) )
     {

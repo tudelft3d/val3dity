@@ -35,6 +35,8 @@ typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
 typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
 typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
 
+typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
+
 //-- to keep track of all gml:Solids in a GML file
 int Solid::_counter = 0;
 
@@ -102,6 +104,24 @@ bool Solid::is_empty()
       return true;
   }
   return false;
+}
+
+
+void Solid::translate_vertices()
+{
+  double minx = 9e10;
+  double miny = 9e10;
+  for (auto& sh : _shells)
+  {
+    double tx, ty;
+    sh->get_min_bbox(tx, ty);
+    if (tx < minx)
+      minx = tx;
+    if (ty < miny)
+      miny = ty;
+  }
+  for (auto& sh : _shells)
+    sh->translate_vertices(minx, miny);
 }
 
 
@@ -265,22 +285,31 @@ bool Solid::validate_solid_with_nef()
     nefs.push_back(onef);
   }
 
-
-  vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
-  Nef_polyhedron nef(*nefsIt);
-  std::clog << "# vertices:" << nefsIt->number_of_vertices() << std::endl;
+  Nef_polyhedron nef(nefs[0]);
+  std::clog << "# vertices:" << nef.number_of_vertices() << std::endl;
   std::clog << "before:" << nef.number_of_volumes() << std::endl;
-  nefsIt++;
+  Nef_polyhedron::Vertex_const_iterator yo = nef.vertices_begin();
+  while (yo != nef.vertices_end())
+  {
+    std::clog << yo->point() << std::endl;
+    yo++;
+  }
   int numvol = 2;
   bool success = true;
-  for ( ; nefsIt != nefs.end(); nefsIt++) 
+  for (int i = 1; i < nefs.size(); i++) 
   {
-    std::clog << "# vertices:" << nefsIt->number_of_vertices() << std::endl;
-    std::clog << "valid:" << nefsIt->is_valid() << std::endl;
-    nef -= (*nefsIt);
+    std::clog << "# vertices:" << nefs[i].number_of_vertices() << std::endl;
+    std::clog << "valid:" << nefs[i].is_valid() << std::endl;
+    nef = nef - nefs[i];
     nef.regularization();
     std::clog << "after:" << nef.number_of_volumes() << std::endl;
-
+    std::clog << "# vertices nef:" << nef.number_of_vertices() << std::endl;
+    yo = nef.vertices_begin();
+    while (yo != nef.vertices_end())
+    {
+      std::clog << yo->point() << std::endl;
+      yo++;
+    }
     numvol++;
     if (nef.number_of_volumes() != numvol)
     {
@@ -288,99 +317,99 @@ bool Solid::validate_solid_with_nef()
       break;
     }
   }
-  if (success == false) //-- the Nef is not valid, pairwise testing to see what's wrong
-  {
-    isValid = false;
-//-- start with oshell<-->ishells
-    nefsIt = nefs.begin();
-    nefsIt++;
-    int no = 1;
-    for ( ; nefsIt != nefs.end(); nefsIt++) 
-    {
-      nef.clear();
-      nef += *(nefs.begin());
-      nef -= *nefsIt;
-      nef.regularization(); 
-      if (nef.number_of_volumes() != 3)
-      {
-        if (nef.number_of_volumes() > 3)
-        {
-          //-- check if ishell is a subset of oshell
-          if ((*nefsIt <= nefs[0]) == true)
-            this->add_error(404, 0, no, "");
-          else
-          {
-            this->add_error(402, 0, no, "");
-            this->add_error(404, 0, no, "");
-          }
-        }
-        else //-- nef.number_of_volumes() < 3
-        {
-          //-- perform union
-          nef.clear();
-          nef += *(nefs.begin());
-          nef += *nefsIt;
-          nef.regularization();
-          if (nef.number_of_volumes() == 3)
-            this->add_error(403, -1, -1, "");
-          else
-          {
-            if ((*nefsIt <= nefs[0]) == true)
-              this->add_error(401, 0, no, "");
-            else
-            {
-              nef.clear();
-              nef = nefs[0].intersection(nefsIt->interior());
-              nef.regularization();
-              if (nef.is_empty() == true)
-              {
-                this->add_error(401, 0, no, "");
-                this->add_error(403, 0, no, "");
-              }
-              else
-                this->add_error(402, 0, no, "");
-            }
-          }
-        }
-      }
-    no++;
-    }
+//   if (success == false) //-- the Nef is not valid, pairwise testing to see what's wrong
+//   {
+//     isValid = false;
+// //-- start with oshell<-->ishells
+//     nefsIt = nefs.begin();
+//     nefsIt++;
+//     int no = 1;
+//     for ( ; nefsIt != nefs.end(); nefsIt++) 
+//     {
+//       nef.clear();
+//       nef += *(nefs.begin());
+//       nef -= *nefsIt;
+//       nef.regularization(); 
+//       if (nef.number_of_volumes() != 3)
+//       {
+//         if (nef.number_of_volumes() > 3)
+//         {
+//           //-- check if ishell is a subset of oshell
+//           if ((*nefsIt <= nefs[0]) == true)
+//             this->add_error(404, 0, no, "");
+//           else
+//           {
+//             this->add_error(402, 0, no, "");
+//             this->add_error(404, 0, no, "");
+//           }
+//         }
+//         else //-- nef.number_of_volumes() < 3
+//         {
+//           //-- perform union
+//           nef.clear();
+//           nef += *(nefs.begin());
+//           nef += *nefsIt;
+//           nef.regularization();
+//           if (nef.number_of_volumes() == 3)
+//             this->add_error(403, -1, -1, "");
+//           else
+//           {
+//             if ((*nefsIt <= nefs[0]) == true)
+//               this->add_error(401, 0, no, "");
+//             else
+//             {
+//               nef.clear();
+//               nef = nefs[0].intersection(nefsIt->interior());
+//               nef.regularization();
+//               if (nef.is_empty() == true)
+//               {
+//                 this->add_error(401, 0, no, "");
+//                 this->add_error(403, 0, no, "");
+//               }
+//               else
+//                 this->add_error(402, 0, no, "");
+//             }
+//           }
+//         }
+//       }
+//     no++;
+//     }
 
-//-- then check ishell<-->ishell interactions
-    nefsIt = nefs.begin();
-    nefsIt++;
-    vector<Nef_polyhedron>::iterator nefsIt2;
-    no = 1;
-    int no2;
-    for ( ; nefsIt != nefs.end(); nefsIt++)
-    {
-      nefsIt2 = nefsIt;
-      nefsIt2++;
-      no2 = no + 1;
-      for ( ; nefsIt2 != nefs.end(); nefsIt2++)
-      {
-        nef.clear();
-        nef += *nefsIt;
-        nef += *nefsIt2;
-        nef.regularization();
-        if (nef.number_of_volumes() > 3)
-          this->add_error(402, no, no2, "Both shells completely overlap");
-        else if (nef.number_of_volumes() < 3)
-        {
-          //-- either they are face adjacent or overlap
-          nef.clear();
-          nef = nefsIt->interior();
-          nef = nef.intersection(nefsIt2->interior());
-          nef.regularization();
-          if (nef.is_empty() == true)
-            this->add_error(401, no, no2, "");
-          else
-            this->add_error(402, no, no2, "");
-        }
-        no2++;
-      }
-      no++;
-    }
-  }
+// //-- then check ishell<-->ishell interactions
+//     nefsIt = nefs.begin();
+//     nefsIt++;
+//     vector<Nef_polyhedron>::iterator nefsIt2;
+//     no = 1;
+//     int no2;
+//     for ( ; nefsIt != nefs.end(); nefsIt++)
+//     {
+//       nefsIt2 = nefsIt;
+//       nefsIt2++;
+//       no2 = no + 1;
+//       for ( ; nefsIt2 != nefs.end(); nefsIt2++)
+//       {
+//         nef.clear();
+//         nef += *nefsIt;
+//         nef += *nefsIt2;
+//         nef.regularization();
+//         if (nef.number_of_volumes() > 3)
+//           this->add_error(402, no, no2, "Both shells completely overlap");
+//         else if (nef.number_of_volumes() < 3)
+//         {
+//           //-- either they are face adjacent or overlap
+//           nef.clear();
+//           nef = nefsIt->interior();
+//           nef = nef.intersection(nefsIt2->interior());
+//           nef.regularization();
+//           if (nef.is_empty() == true)
+//             this->add_error(401, no, no2, "");
+//           else
+//             this->add_error(402, no, no2, "");
+//         }
+//         no2++;
+//       }
+//       no++;
+//     }
+//   }
   return isValid;
 }

@@ -373,7 +373,7 @@ bool Shell::construct_ct(const vector< vector<int> >& pgnids, const vector<Polyg
 }
 
 
-void Shell::translate_vertices()
+void Shell::get_min_bbox(double& x, double& y)
 {
   vector<Point3>::iterator it = _lsPts.begin();
   K::FT minx = 9e10;
@@ -385,6 +385,14 @@ void Shell::translate_vertices()
     if (it->y() < miny)
       miny = it->y();
   }
+  x = minx;
+  y = miny;
+}
+
+
+void Shell::translate_vertices(double minx, double miny)
+{
+  vector<Point3>::iterator it = _lsPts.begin();
   for (it = _lsPts.begin(); it != _lsPts.end(); it++)
   {
     Point3 tp(CGAL::to_double(it->x() - minx), CGAL::to_double(it->y() - miny), CGAL::to_double(it->z()));

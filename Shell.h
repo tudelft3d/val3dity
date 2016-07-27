@@ -36,6 +36,7 @@ public:
   
   int    number_vertices();
   int    number_faces();
+  void   get_min_bbox(double& x, double& y);
   bool   is_outer();
   int    get_id();
   CgalPolyhedron* get_cgal_polyhedron();
@@ -51,7 +52,7 @@ public:
   void          add_error(int code, std::string faceid = "", std::string info = "");
   bool          has_errors();
   std::set<int> get_unique_error_codes();
-  void          translate_vertices();
+  void          translate_vertices(double minx, double miny);
   std::string   get_poly_representation();
   
 private:

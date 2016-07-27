@@ -47,10 +47,10 @@ public:
 };
 
 std::string   errorcode2description(int code, bool qie = false);
-vector<Solid> readGMLfile(std::string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices = true);
-vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translatevertices = true);
-Shell*        readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices = true);
-Shell*        process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices = true);
+vector<Solid> readGMLfile(std::string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap);
+vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs);
+Shell*        readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
+Shell*        process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 void          printProgressBar(int percent);

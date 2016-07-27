@@ -208,7 +208,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
 }
 
 
-Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) 
+Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
@@ -300,13 +300,11 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
     sh->add_face(oneface, p.node().attribute("gml:id").value());
     i++;
   }
-  if (translatevertices == true)
-    sh->translate_vertices();
   return sh;
 }
 
 
-vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices)
+vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -407,7 +405,7 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
 }
 
 
-Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
+Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -437,9 +435,6 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool transl
     infile >> tmpint >> p;
     sh->add_point(p);
   }
-  //-- translate all vertices to (minx, miny)
-  if (translatevertices == true)
-    sh->translate_vertices();
   //-- read the facets
   infile >> num >> tmpint;
   int numf, numpt, numholes;
@@ -517,7 +512,7 @@ void printProgressBar(int percent) {
 }
 
 
-vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translatevertices)
+vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -541,9 +536,6 @@ vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translat
       Point3 p(vertices[i][0], vertices[i][1], vertices[i][2]);
       sh->add_point(p);
     }
-    //-- translate all vertices to (minx, miny)
-    if (translatevertices == true)
-      sh->translate_vertices();
     //-- read the facets
     aiFace* faces = m->mFaces;
     unsigned int* indices;

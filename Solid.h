@@ -48,6 +48,7 @@ public:
   int                    num_vertices();
   
   bool          validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
+  void          translate_vertices();
   std::string   get_report_xml();
   std::string   get_report_text();
   void          add_error(int code, int shell1, int shell2, std::string info);
