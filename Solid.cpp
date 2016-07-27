@@ -250,35 +250,37 @@ bool Solid::validate_solid_with_nef()
 {
   if (this->num_ishells() == 0)
     return true;
-  vector<CgalPolyhedron*> polyhedra;
-  for (auto& sh : this->get_shells())
-    polyhedra.push_back(sh->get_cgal_polyhedron());
     
   bool isValid = true;
   std::stringstream st;
-  std::clog << "----------" << std::endl << "--Inspection interactions between the " << polyhedra.size() << " shells" << std::endl;
+  std::clog << "----------" << std::endl << "--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   vector<Nef_polyhedron> nefs;
-  vector<CgalPolyhedron*>::const_iterator polyhedraIt;
-  for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
+  for (auto& sh : this->get_shells())
   {
     //-- convert to an EPEC Polyhedron so that convertion to Nef is possible
     CgalPolyhedronE pe;
-    typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
-    Polyhedron_convert polyhedron_converter(**polyhedraIt);
+    Polyhedron_convert polyhedron_converter(*(sh->get_cgal_polyhedron()));
     pe.delegate(polyhedron_converter);
     Nef_polyhedron onef(pe);
     nefs.push_back(onef);
   }
+
+
   vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
-  Nef_polyhedron nef;
-  nef += (*nefsIt);
+  Nef_polyhedron nef(*nefsIt);
+  std::clog << "# vertices:" << nefsIt->number_of_vertices() << std::endl;
+  std::clog << "before:" << nef.number_of_volumes() << std::endl;
   nefsIt++;
   int numvol = 2;
   bool success = true;
   for ( ; nefsIt != nefs.end(); nefsIt++) 
   {
+    std::clog << "# vertices:" << nefsIt->number_of_vertices() << std::endl;
+    std::clog << "valid:" << nefsIt->is_valid() << std::endl;
     nef -= (*nefsIt);
     nef.regularization();
+    std::clog << "after:" << nef.number_of_volumes() << std::endl;
+
     numvol++;
     if (nef.number_of_volumes() != numvol)
     {
