@@ -81,10 +81,6 @@ public:
 
 int main(int argc, char* const argv[])
 {
-#ifdef VAL3DITY_USE_EPECSQRT
-  std::clog << "***** USING EXACT-EXACT *****" << std::endl;
-#endif
-
   IOErrors ioerrs;
   std::streambuf* savedBufferCLOG;
   std::ofstream mylog;

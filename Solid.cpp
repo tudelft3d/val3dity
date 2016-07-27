@@ -29,15 +29,11 @@
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+#include <CGAL/Polyhedron_copy_3.h>
 
-#ifdef VAL3DITY_USE_EPECSQRT
-  typedef CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt Ke;
-#else
-  typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
-  typedef CGAL::Polyhedron_3<Ke>                              PolyhedronExact;
-#endif
-
-typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
+typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
+typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
+typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
 
 //-- to keep track of all gml:Solids in a GML file
 int Solid::_counter = 0;
