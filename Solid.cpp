@@ -285,38 +285,55 @@ bool Solid::validate_solid_with_nef()
     nefs.push_back(onef);
   }
 
-  Nef_polyhedron nef(nefs[0]);
-  std::clog << "# vertices:" << nef.number_of_vertices() << std::endl;
-  std::clog << "before:" << nef.number_of_volumes() << std::endl;
-  Nef_polyhedron::Vertex_const_iterator yo = nef.vertices_begin();
-  while (yo != nef.vertices_end())
-  {
-    std::clog << yo->point() << std::endl;
-    yo++;
-  }
-  int numvol = 2;
   bool success = true;
+  
+  //-- test axiom #1 from the paper
+  Nef_polyhedron nef;
   for (int i = 1; i < nefs.size(); i++) 
   {
-    std::clog << "# vertices:" << nefs[i].number_of_vertices() << std::endl;
-    std::clog << "valid:" << nefs[i].is_valid() << std::endl;
+    nef = !nefs[0] * nefs[i];
+    if (nef.is_empty() == false)
+    {
+      success = false;
+      std::cout << ">>>>>AXIOM 1" << std::endl;
+    }
+  }
+
+  //-- test axiom #2 from the paper
+  nef.clear();
+  for (int i = 1; i < nefs.size(); i++) 
+  {
+    for (int j = (i + 1); j < nefs.size(); j++) 
+    {
+      nef = nefs[i] * nefs[j];
+      if (nef.number_of_volumes() > 0)
+      {
+        success = false;
+        std::cout << ">>>>>AXIOM 2" << std::endl;
+      }
+    }
+  }
+  
+  //-- test axiom #3 from the paper
+  nef.clear();
+  nef += nefs[0];
+  int numvol = 2;
+  for (int i = 1; i < nefs.size(); i++) 
+  {
     nef = nef - nefs[i];
     nef.regularization();
-    std::clog << "after:" << nef.number_of_volumes() << std::endl;
-    std::clog << "# vertices nef:" << nef.number_of_vertices() << std::endl;
-    yo = nef.vertices_begin();
-    while (yo != nef.vertices_end())
-    {
-      std::clog << yo->point() << std::endl;
-      yo++;
-    }
     numvol++;
     if (nef.number_of_volumes() != numvol)
     {
       success = false;
+      std::cout << ">>>>>AXIOM 3" << std::endl;
       break;
     }
   }
+
+
+
+
 //   if (success == false) //-- the Nef is not valid, pairwise testing to see what's wrong
 //   {
 //     isValid = false;
