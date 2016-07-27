@@ -261,18 +261,13 @@ bool Solid::validate_solid_with_nef()
   vector<CgalPolyhedron*>::const_iterator polyhedraIt;
   for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
   {
-#ifdef VAL3DITY_USE_EPECSQRT
-     Nef_polyhedron onef(**polyhedraIt);
-#else
-     std::stringstream offrep (stringstream::in | stringstream::out);
-     offrep << **polyhedraIt;
-     PolyhedronExact pe;
-     offrep >> pe;
-     Nef_polyhedron onef(pe);
-//    std::cout << "convertion to exact polyhedron done." << std::endl;
-#endif
-
-     nefs.push_back(onef);
+    //-- convert to an EPEC Polyhedron so that convertion to Nef is possible
+    CgalPolyhedronE pe;
+    typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
+    Polyhedron_convert polyhedron_converter(**polyhedraIt);
+    pe.delegate(polyhedron_converter);
+    Nef_polyhedron onef(pe);
+    nefs.push_back(onef);
   }
   vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
   Nef_polyhedron nef;
