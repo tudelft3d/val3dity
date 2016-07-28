@@ -89,7 +89,7 @@ This ring is for instance invalid:
 
 ![](figs/205.png)
 
-| 206: HOLE_OUTSIDE |
+| 206: INNER_RING_OUTSIDE |
 |:--- |
 | One or more interior ring(s) is(are) located completely outside the exterior ring. If the interior ring intersects the exterior ring, then error 201 should be returned. |
 
@@ -151,25 +151,32 @@ The left solid is invalid, while the right one is valid (since the hole is fille
 |:--- |
 | If one polygon is used to construct a shell, its exterior ring must be oriented in such as way that when viewed from outside the shell the points are ordered counterclockwise. |
 
-| 308 -- ALL_POLYGONS_WRONG_ORIENTATION |
-|:--- |
-| If all the polygons have the wrong orientation (as defined in 307), ie they all point inwards. |
-
 
 # SOLID
 
-| 401 -- SHELLS_FACE_ADJACENT |
-|:--- |
-| 2+ shells are sharing (part of) a face. That is, these could be unioned into one shell. |
+  * 401: INTERSECTION_SHELLS
+  * 402: DUPLICATED_SHELLS
+  * 403: INNER_SHELL_OUTSIDE
+  * 404: INTERIOR_DISCONNECTED
+  * 405: WRONG_ORIENTATION_SHELL
 
-| 402 -- SHELL_INTERIOR_INTERSECT |
-|:--- |
-| The interior of 2+ shells intersects. |
 
-| 403 -- INNER_SHELL_OUTSIDE_OUTER |
+| 401 -- INTERSECTION_SHELLS |
+|:--- |
+| The interior of 2 shells intersects or they share a face, which is not allowed |
+
+| 402 -- DUPLICATED_SHELLS |
+|:--- |
+| Two shells are identical. |
+
+| 403 -- INNER_SHELL_OUTSIDE |
 |:--- |
 | One or more interior shells are completely located outside the exterior shell. Conceptually the same as 206. |
 
-| 404 -- INTERIOR_OF_SHELL_NOT_CONNECTED |
+| 404 -- INTERIOR_DISCONNECTED |
 |:--- |
 | Conceptually the same as 205: the configuration of the interior shells makes the interior of the solid disconnected. |
+
+| 405 -- WRONG_ORIENTATION_SHELL |
+|:--- |
+| The polygon/surfaces forming an outer shell should have their normals pointing outwards, and for an interior shell inwards. Conceptually the same as 208. |
