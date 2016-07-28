@@ -92,7 +92,7 @@ std::string errorcode2description(int code, bool qie) {
       case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
       case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
       case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
-      case 206: return string("HOLE_OUTSIDE"); break;
+      case 206: return string("INNER_RING_OUTSIDE"); break;
       case 207: return string("INNER_RINGS_NESTED"); break;
       case 208: return string("ORIENTATION_RINGS_SAME"); break;
       //-- SHELL
@@ -106,11 +106,12 @@ std::string errorcode2description(int code, bool qie) {
       case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
       case 308: return string("ALL_POLYGONS_WRONG_ORIENTATION"); break;
       case 309: return string("VERTICES_NOT_USED"); break;
-      //--SOLID
-      case 401: return string("SHELLS_FACE_ADJACENT"); break;
-      case 402: return string("INTERSECTION_SHELLS"); break;
-      case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
-      case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
+      //-- SOLID
+      case 401: return string("INTERSECTION_SHELLS"); break;
+      case 402: return string("DUPLICATED_SHELLS"); break;
+      case 403: return string("INNER_SHELL_OUTSIDE"); break;
+      case 404: return string("INTERIOR_DISCONNECTED"); break;
+      //-- OTHERS
       case 901: return string("INVALID_INPUT_FILE"); break;
       case 902: return string("EMPTY_PRIMITIVE"); break;
       case 999: return string("UNKNOWN_ERROR"); break;
