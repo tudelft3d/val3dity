@@ -145,12 +145,13 @@ std::string errorcode2description(int code, bool qie) {
       case 305: return string("GE_S_SEPARATE_PARTS"); break;
       case 306: return string("GE_S_SELF_INTERSECTION"); break;
       case 307: return string("GE_S_POLYGON_WRONG_ORIENTATION"); break;
-      case 308: return string("GE_S_ALL_POLYGONS_WRONG_ORIENTATION"); break;
       //--SOLID
-      case 401: return string("GE_SO_SHELLS_FACE_ADJACENT"); break;
-      case 402: return string("GE_SO_INTERSECTION_SHELLS"); break;
-      case 403: return string("GE_SO_INNER_SHELL_OUTSIDE_OUTER"); break;
+      case 401: return string("GE_SO_INTERSECTION_SHELLS"); break;
+      case 402: return string("GE_SO_DUPLICATED_SHELLS"); break;
+      case 403: return string("GE_SO_INNER_SHELL_OUTSIDE"); break;
       case 404: return string("GE_SO_INTERIOR_DISCONNECTED"); break;
+      case 405: return string("GE_SO_WRONG_ORIENTATION_SHELL"); break;
+      //-- OTHERS
       case 901: return string("INVALID_INPUT_FILE"); break;
       case 999: return string("UNKNOWN_ERROR"); break;
       default:  return string("UNKNOWN_ERROR"); break;
