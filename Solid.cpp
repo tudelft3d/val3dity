@@ -26,6 +26,7 @@
 #include "input.h"
 #include "Solid.h"
 #include "Shell.h"
+#include "validate_shell.h"
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
@@ -190,7 +191,12 @@ std::string Solid::get_report_xml()
       ss << "\t\t<Error>" << std::endl;
       ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
       ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
+      if (std::get<0>(e) == -1)
+        ss << "\t\t\t<shell>-1</shell>" << std::endl;
+      else if (std::get<1>(e) == -1)
+        ss << "\t\t\t<shell>" << std::get<0>(e) << "</shell>" << std::endl;
+      else
+        ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
       ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
       ss << "\t\t</Error>" << std::endl;
     }
@@ -212,8 +218,12 @@ std::string Solid::get_report_text()
     for (auto& e : _errors[std::get<0>(err)])
     {
       ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
-      ss << "\t\tShells: " << std::get<0>(e) << "--" << std::get<1>(e) << std::endl;
-      // ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
+      if (std::get<0>(e) == -1)
+        ss << "\t\tShells: -1" << std::endl;
+      else if (std::get<1>(e) == -1)
+        ss << "\t\tShells: " << std::get<0>(e) << std::endl;
+      else
+        ss << "\t\tShells: " << std::get<0>(e) << "--" << std::get<1>(e) << std::endl;
       ss << "\t\tInfo: "  << std::get<2>(e) << std::endl;
     }
   }
@@ -265,7 +275,10 @@ void Solid::add_error(int code, int shell1, int shell2, std::string info)
   std::tuple<int, int, std::string> a(shell1, shell2, info);
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << errorcode2description(code);
-  std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
+  if (shell2 == -1)
+    std::clog << " (shell: #" << shell1 << ")" << std::endl;
+  else
+    std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
   if (info.empty() == false)
     std::clog << "\t[" << info << "]" << std::endl;
 }
@@ -273,12 +286,26 @@ void Solid::add_error(int code, int shell1, int shell2, std::string info)
 
 bool Solid::validate_solid_with_nef()
 {
+  bool isValid = true;
+  std::clog << "----- Solid validation -----" << std::endl;
+  //-- check orientation of the normals is outwards or inwards
+  std::clog << "--Global orientation of normals" << std::endl;
+  int i = 0;
+  for (auto& sh : this->get_shells())
+  {
+    if (check_global_orientation_normals(sh->get_cgal_polyhedron(), sh->is_outer()) == false) 
+    {
+      this->add_error(405, i, -1, "");
+      isValid = false;
+    }
+    i++;
+  }
+  if (isValid == false)
+    return false;
+
   if (this->num_ishells() == 0)
     return true;
     
-  bool isValid = true;
-  std::stringstream st;
-  std::clog << "----- Solid validation -----" << std::endl;
   std::clog << "--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
@@ -304,7 +331,7 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg;
         msg << "Inner shell (#" << i << ") is completely outside the outer shell (#0))";
-        this->add_error(403, 0, i, msg.str());
+        this->add_error(403, i, -1, msg.str());
         isValid = false;
       }
       else
