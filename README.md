@@ -14,7 +14,7 @@ For `CompositeSurfaces`, the surface formed by the polygons must be a 2-manifold
 
 For `MultiSurfaces`, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar?
 
-Most of the details are available in this scientific article:
+Most of the details are available in this scientific article, (if you use val3dity for scientific purposes please cite this article):
 
 > Ledoux, Hugo (2013). On the validation of solids represented with the
 international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
