@@ -31,6 +31,8 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <CGAL/Polyhedron_copy_3.h>
 
+//-- Nef requires EPEC (exact-predicates & exact-construction) and thus diff kernels
+ //-- Polyhedron are converted when they are valid
 typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
 typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
 typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
