@@ -66,8 +66,8 @@ public:
     std::cout << "\t\tValidates each gml:MultiSurface in input.gml and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml --oxml report.xml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
-    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/py.poly" << std::endl;
-    std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell py.poly" << std::endl;
+    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
+    std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl;
     std::cout << "\tval3dity input.gml --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation of the solids is printed out" << std::endl;
     std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
@@ -81,10 +81,6 @@ public:
 
 int main(int argc, char* const argv[])
 {
-#ifdef VAL3DITY_USE_EPECSQRT
-  std::clog << "***** USING EXACT-EXACT *****" << std::endl;
-#endif
-
   IOErrors ioerrs;
   std::streambuf* savedBufferCLOG;
   std::ofstream mylog;
@@ -96,7 +92,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "1.0");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "1.1");
   MyOutput my;
   cmd.setOutput(&my);
   try {
@@ -223,6 +219,10 @@ int main(int argc, char* const argv[])
       }
     }
 
+    //-- translate all vertices to avoid potential problems
+    for (auto& s : lsSolids)
+      s.translate_vertices();
+    
     //-- now the validation starts
     if ( (lsSolids.empty() == false) && (ioerrs.has_errors() == false) )
     {

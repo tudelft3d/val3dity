@@ -92,7 +92,7 @@ std::string errorcode2description(int code, bool qie) {
       case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
       case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
       case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
-      case 206: return string("HOLE_OUTSIDE"); break;
+      case 206: return string("INNER_RING_OUTSIDE"); break;
       case 207: return string("INNER_RINGS_NESTED"); break;
       case 208: return string("ORIENTATION_RINGS_SAME"); break;
       //-- SHELL
@@ -104,13 +104,14 @@ std::string errorcode2description(int code, bool qie) {
       case 305: return string("SEPARATE_PARTS"); break;
       case 306: return string("SHELL_SELF_INTERSECTION"); break;
       case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
-      case 308: return string("ALL_POLYGONS_WRONG_ORIENTATION"); break;
       case 309: return string("VERTICES_NOT_USED"); break;
-      //--SOLID
-      case 401: return string("SHELLS_FACE_ADJACENT"); break;
-      case 402: return string("INTERSECTION_SHELLS"); break;
-      case 403: return string("INNER_SHELL_OUTSIDE_OUTER"); break;
-      case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
+      //-- SOLID
+      case 401: return string("INTERSECTION_SHELLS"); break;
+      case 402: return string("DUPLICATED_SHELLS"); break;
+      case 403: return string("INNER_SHELL_OUTSIDE"); break;
+      case 404: return string("INTERIOR_DISCONNECTED"); break;
+      case 405: return string("WRONG_ORIENTATION_SHELL"); break;
+      //-- OTHERS
       case 901: return string("INVALID_INPUT_FILE"); break;
       case 902: return string("EMPTY_PRIMITIVE"); break;
       case 999: return string("UNKNOWN_ERROR"); break;
@@ -144,12 +145,13 @@ std::string errorcode2description(int code, bool qie) {
       case 305: return string("GE_S_SEPARATE_PARTS"); break;
       case 306: return string("GE_S_SELF_INTERSECTION"); break;
       case 307: return string("GE_S_POLYGON_WRONG_ORIENTATION"); break;
-      case 308: return string("GE_S_ALL_POLYGONS_WRONG_ORIENTATION"); break;
       //--SOLID
-      case 401: return string("GE_SO_SHELLS_FACE_ADJACENT"); break;
-      case 402: return string("GE_SO_INTERSECTION_SHELLS"); break;
-      case 403: return string("GE_SO_INNER_SHELL_OUTSIDE_OUTER"); break;
+      case 401: return string("GE_SO_INTERSECTION_SHELLS"); break;
+      case 402: return string("GE_SO_DUPLICATED_SHELLS"); break;
+      case 403: return string("GE_SO_INNER_SHELL_OUTSIDE"); break;
       case 404: return string("GE_SO_INTERIOR_DISCONNECTED"); break;
+      case 405: return string("GE_SO_WRONG_ORIENTATION_SHELL"); break;
+      //-- OTHERS
       case 901: return string("INVALID_INPUT_FILE"); break;
       case 999: return string("UNKNOWN_ERROR"); break;
       default:  return string("UNKNOWN_ERROR"); break;
@@ -208,7 +210,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
 }
 
 
-Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs, bool translatevertices) 
+Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
@@ -300,13 +302,11 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
     sh->add_face(oneface, p.node().attribute("gml:id").value());
     i++;
   }
-  if (translatevertices == true)
-    sh->translate_vertices();
   return sh;
 }
 
 
-vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap, bool translatevertices)
+vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -407,7 +407,7 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
 }
 
 
-Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool translatevertices)
+Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -437,9 +437,6 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs, bool transl
     infile >> tmpint >> p;
     sh->add_point(p);
   }
-  //-- translate all vertices to (minx, miny)
-  if (translatevertices == true)
-    sh->translate_vertices();
   //-- read the facets
   infile >> num >> tmpint;
   int numf, numpt, numholes;
@@ -517,7 +514,7 @@ void printProgressBar(int percent) {
 }
 
 
-vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translatevertices)
+vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -541,9 +538,6 @@ vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs, bool translat
       Point3 p(vertices[i][0], vertices[i][1], vertices[i][2]);
       sh->add_point(p);
     }
-    //-- translate all vertices to (minx, miny)
-    if (translatevertices == true)
-      sh->translate_vertices();
     //-- read the facets
     aiFace* faces = m->mFaces;
     unsigned int* indices;

@@ -26,18 +26,19 @@
 #include "input.h"
 #include "Solid.h"
 #include "Shell.h"
+#include "validate_shell.h"
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+#include <CGAL/Polyhedron_copy_3.h>
 
-#ifdef VAL3DITY_USE_EPECSQRT
-  typedef CGAL::Exact_predicates_exact_constructions_kernel_with_sqrt Ke;
-#else
-  typedef CGAL::Exact_predicates_exact_constructions_kernel   Ke;
-  typedef CGAL::Polyhedron_3<Ke>                              PolyhedronExact;
-#endif
+//-- Nef requires EPEC (exact-predicates & exact-construction) and thus diff kernels
+ //-- Polyhedron are converted when they are valid
+typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
+typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
+typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
 
-typedef CGAL::Nef_polyhedron_3<Ke>                          Nef_polyhedron;
+typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
 
 //-- to keep track of all gml:Solids in a GML file
 int Solid::_counter = 0;
@@ -59,7 +60,11 @@ Solid::Solid(Shell* sh)
 
 Solid::~Solid()
 {
-  // TODO: destructor for Solid, memory-management jongens
+  // std::clog << "DESTRUCTOR SOLIDS" << std::endl;
+  // for (auto& sh : _shells)
+  // {
+    // delete sh;
+  // }
 }
 
 Shell* Solid::get_oshell()
@@ -106,6 +111,24 @@ bool Solid::is_empty()
       return true;
   }
   return false;
+}
+
+
+void Solid::translate_vertices()
+{
+  double minx = 9e10;
+  double miny = 9e10;
+  for (auto& sh : _shells)
+  {
+    double tx, ty;
+    sh->get_min_bbox(tx, ty);
+    if (tx < minx)
+      minx = tx;
+    if (ty < miny)
+      miny = ty;
+  }
+  for (auto& sh : _shells)
+    sh->translate_vertices(minx, miny);
 }
 
 
@@ -168,7 +191,12 @@ std::string Solid::get_report_xml()
       ss << "\t\t<Error>" << std::endl;
       ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
       ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<shell>" << std::get<0>(e) << ";" << std::get<1>(e) << "</shell>" << std::endl;
+      if (std::get<0>(e) == -1)
+        ss << "\t\t\t<shell>-1</shell>" << std::endl;
+      else if (std::get<1>(e) == -1)
+        ss << "\t\t\t<shell>" << std::get<0>(e) << "</shell>" << std::endl;
+      else
+        ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
       ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
       ss << "\t\t</Error>" << std::endl;
     }
@@ -190,8 +218,12 @@ std::string Solid::get_report_text()
     for (auto& e : _errors[std::get<0>(err)])
     {
       ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
-      ss << "\t\tShells: " << std::get<0>(e) << ";" << std::get<1>(e) << std::endl;
-      // ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
+      if (std::get<0>(e) == -1)
+        ss << "\t\tShells: -1" << std::endl;
+      else if (std::get<1>(e) == -1)
+        ss << "\t\tShells: " << std::get<0>(e) << std::endl;
+      else
+        ss << "\t\tShells: " << std::get<0>(e) << "--" << std::get<1>(e) << std::endl;
       ss << "\t\tInfo: "  << std::get<2>(e) << std::endl;
     }
   }
@@ -243,150 +275,129 @@ void Solid::add_error(int code, int shell1, int shell2, std::string info)
   std::tuple<int, int, std::string> a(shell1, shell2, info);
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << errorcode2description(code);
-  std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
+  if (shell2 == -1)
+    std::clog << " (shell: #" << shell1 << ")" << std::endl;
+  else
+    std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
   if (info.empty() == false)
     std::clog << "\t[" << info << "]" << std::endl;
 }
 
 
-// bool validate_solid_with_nef(vector<CgalPolyhedron*> &polyhedra, cbf cb)
 bool Solid::validate_solid_with_nef()
 {
+  bool isValid = true;
+  std::clog << "----- Solid validation -----" << std::endl;
+  //-- check orientation of the normals is outwards or inwards
+  std::clog << "--Global orientation of normals" << std::endl;
+  int i = 0;
+  for (auto& sh : this->get_shells())
+  {
+    if (check_global_orientation_normals(sh->get_cgal_polyhedron(), sh->is_outer()) == false) 
+    {
+      this->add_error(405, i, -1, "");
+      isValid = false;
+    }
+    i++;
+  }
+  if (isValid == false)
+    return false;
+
   if (this->num_ishells() == 0)
     return true;
-  vector<CgalPolyhedron*> polyhedra;
-  for (auto& sh : this->get_shells())
-    polyhedra.push_back(sh->get_cgal_polyhedron());
     
-  bool isValid = true;
-  std::stringstream st;
-  std::clog << "----------" << std::endl << "--Inspection interactions between the " << polyhedra.size() << " shells" << std::endl;
+  std::clog << "--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   vector<Nef_polyhedron> nefs;
-  vector<CgalPolyhedron*>::const_iterator polyhedraIt;
-  for (polyhedraIt = polyhedra.begin(); polyhedraIt != polyhedra.end(); polyhedraIt++)
+  for (auto& sh : this->get_shells())
   {
-#ifdef VAL3DITY_USE_EPECSQRT
-     Nef_polyhedron onef(**polyhedraIt);
-#else
-     std::stringstream offrep (stringstream::in | stringstream::out);
-     offrep << **polyhedraIt;
-     PolyhedronExact pe;
-     offrep >> pe;
-     Nef_polyhedron onef(pe);
-//    std::cout << "convertion to exact polyhedron done." << std::endl;
-#endif
-
-     nefs.push_back(onef);
+    //-- convert to an EPEC Polyhedron so that convertion to Nef is possible
+    CgalPolyhedronE pe;
+    Polyhedron_convert polyhedron_converter(*(sh->get_cgal_polyhedron()));
+    pe.delegate(polyhedron_converter);
+    Nef_polyhedron onef(pe);
+    nefs.push_back(onef);
   }
-  vector<Nef_polyhedron>::iterator nefsIt = nefs.begin();
+
+  //-- test axiom #1 from the paper, Sect 4.5:
+  //-- https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf
   Nef_polyhedron nef;
-  nef += (*nefsIt);
-  nefsIt++;
-  int numvol = 2;
-  bool success = true;
-  for ( ; nefsIt != nefs.end(); nefsIt++) 
+  for (int i = 1; i < nefs.size(); i++) 
   {
-    nef -= (*nefsIt);
-    nef.regularization();
-    numvol++;
-    if (nef.number_of_volumes() != numvol)
+    nef = !nefs[0] * nefs[i];
+    if (nef.is_empty() == false)
     {
-      success = false;
-      break;
+      nef = nefs[0] * nefs[i];
+      if (nef.is_empty() == true)
+      {
+        std::stringstream msg;
+        msg << "Inner shell (#" << i << ") is completely outside the outer shell (#0))";
+        this->add_error(403, i, -1, msg.str());
+        isValid = false;
+      }
+      else
+      {
+        this->add_error(401, 0, i, "");
+        isValid = false; 
+      }
+    }
+    else
+    {
+      nef = nefs[0] - nefs[i];
+      if (nef.number_of_volumes() < 3)
+      {
+        this->add_error(401, 0, i, "");
+        isValid = false; 
+      }
     }
   }
-  if (success == false) //-- the Nef is not valid, pairwise testing to see what's wrong
-  {
-    isValid = false;
-//-- start with oshell<-->ishells
-    nefsIt = nefs.begin();
-    nefsIt++;
-    int no = 1;
-    for ( ; nefsIt != nefs.end(); nefsIt++) 
-    {
-      nef.clear();
-      nef += *(nefs.begin());
-      nef -= *nefsIt;
-      nef.regularization(); 
-      if (nef.number_of_volumes() != 3)
-      {
-        if (nef.number_of_volumes() > 3)
-        {
-          //-- check if ishell is a subset of oshell
-          if ((*nefsIt <= nefs[0]) == true)
-            this->add_error(404, 0, no, "");
-          else
-          {
-            this->add_error(402, 0, no, "");
-            this->add_error(404, 0, no, "");
-          }
-        }
-        else //-- nef.number_of_volumes() < 3
-        {
-          //-- perform union
-          nef.clear();
-          nef += *(nefs.begin());
-          nef += *nefsIt;
-          nef.regularization();
-          if (nef.number_of_volumes() == 3)
-            this->add_error(403, -1, -1, "");
-          else
-          {
-            if ((*nefsIt <= nefs[0]) == true)
-              this->add_error(401, 0, no, "");
-            else
-            {
-              nef.clear();
-              nef = nefs[0].intersection(nefsIt->interior());
-              nef.regularization();
-              if (nef.is_empty() == true)
-              {
-                this->add_error(401, 0, no, "");
-                this->add_error(403, 0, no, "");
-              }
-              else
-                this->add_error(402, 0, no, "");
-            }
-          }
-        }
-      }
-    no++;
-    }
 
-//-- then check ishell<-->ishell interactions
-    nefsIt = nefs.begin();
-    nefsIt++;
-    vector<Nef_polyhedron>::iterator nefsIt2;
-    no = 1;
-    int no2;
-    for ( ; nefsIt != nefs.end(); nefsIt++)
+  //-- test axiom #2 from the paper 
+  nef.clear();
+  for (int i = 1; i < nefs.size(); i++) 
+  {
+    for (int j = (i + 1); j < nefs.size(); j++) 
     {
-      nefsIt2 = nefsIt;
-      nefsIt2++;
-      no2 = no + 1;
-      for ( ; nefsIt2 != nefs.end(); nefsIt2++)
+      //-- 1. are they the same?
+      if (nefs[i] == nefs[j])
       {
-        nef.clear();
-        nef += *nefsIt;
-        nef += *nefsIt2;
-        nef.regularization();
-        if (nef.number_of_volumes() > 3)
-          this->add_error(402, no, no2, "Both shells completely overlap");
-        else if (nef.number_of_volumes() < 3)
-        {
-          //-- either they are face adjacent or overlap
-          nef.clear();
-          nef = nefsIt->interior();
-          nef = nef.intersection(nefsIt2->interior());
-          nef.regularization();
-          if (nef.is_empty() == true)
-            this->add_error(401, no, no2, "");
-          else
-            this->add_error(402, no, no2, "");
-        }
-        no2++;
+        this->add_error(402, i, j, "");
+        isValid = false;
+        continue;
       }
-      no++;
+      //-- 2. intersection
+      nef = nefs[i] * nefs[j];
+      if (nef.number_of_volumes() > 1)
+      {
+        this->add_error(401, i, j, "");
+        isValid = false;
+        continue;
+      }
+      //-- 3. union
+      nef = nefs[i] + nefs[j];
+      if (nef.number_of_volumes() < 3)
+      {
+        this->add_error(401, i, j, "");
+        isValid = false;
+        continue;
+      }
+    }
+  }
+  //-- test axiom #3 from the paper
+  if (isValid == true)
+  {
+    nef.clear();
+    nef += nefs[0];
+    int numvol = 2;
+    for (int i = 1; i < nefs.size(); i++) 
+    {
+      nef = nef - nefs[i];
+      numvol++;
+      if (nef.number_of_volumes() != numvol)
+      {
+        this->add_error(404, -1, -1, "");
+        isValid = false;
+        break;
+      }
     }
   }
   return isValid;
