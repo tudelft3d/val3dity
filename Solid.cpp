@@ -212,7 +212,7 @@ std::string Solid::get_report_text()
     for (auto& e : _errors[std::get<0>(err)])
     {
       ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
-      ss << "\t\tShells: " << std::get<0>(e) << ";" << std::get<1>(e) << std::endl;
+      ss << "\t\tShells: " << std::get<0>(e) << "--" << std::get<1>(e) << std::endl;
       // ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
       ss << "\t\tInfo: "  << std::get<2>(e) << std::endl;
     }
