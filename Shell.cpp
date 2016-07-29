@@ -427,7 +427,13 @@ bool Shell::validate_2d_primitives(double tol_planarity_d2p, double tol_planarit
 
     //-- if only 3 pts it's now valid, no need to process further
     if ( (numf == 1) && (ids.size() == 3)) 
+    {
+      if (CGAL::collinear(_lsPts[ids[0]], _lsPts[ids[1]], _lsPts[ids[2]]) == true) {
+        this->add_error(104, _lsFacesID[i], " outer ring (a triangle) is collapsed to a point or a line");
+        isValid = false;
+      }
       continue;
+    }
 
     vector< Point3 > allpts;
     vector<int>::const_iterator itp = ids.begin();
