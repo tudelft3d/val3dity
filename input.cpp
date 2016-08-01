@@ -514,6 +514,127 @@ void printProgressBar(int percent) {
 }
 
 
+vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
+{
+  std::clog << "Reading file: " << ifile << std::endl;
+  ifstream infile(ifile.c_str(), ifstream::in);
+  vector<Solid> lsSolids;
+  if (!infile)
+  {
+    errs.add_error(901, "Input file not found.");
+    return lsSolids;
+  }
+
+  Shell* sh; 
+  std::string l;
+  std::string type;
+  while (std::getline(infile, l)) {
+    std::istringstream iss(l);
+    if (l.substr(0, 2) == "v ") {
+      // std::clog << "v" << std::endl;
+      Point3 p;
+      iss >> p;
+      sh->add_point(p);
+    }
+    else if (l.substr(0, 2) == "o ") {
+      std::clog << "NEW OBJECT" << std::endl;
+      sh = new Shell(0);
+    }
+    else if (l.substr(0, 2) == "f ") {
+      // std::clog << "f" << std::endl;
+      std::string tmp;
+      iss >> tmp;
+      do 
+      {
+        iss >> tmp;
+        // std::clog << tmp << std::endl;
+      } while (iss);
+    }
+  }
+
+  return lsSolids;
+} 
+
+  
+//   Shell* sh = new Shell(shellid);  
+//   //-- read the points
+//   int num, tmpint;
+//   float tmpfloat;
+//   infile >> num >> tmpint >> tmpint >> tmpint;
+//   vector< Point3 >::iterator iPoint3;
+//   //-- read first line to decide if 0- or 1-based indexing
+//   bool zerobased = true;
+//   Point3 p;
+//   infile >> tmpint >> p;
+//   sh->add_point(p);
+//   if (tmpint == 1)
+//     zerobased = false;
+//   //-- process other vertices
+//   for (int i = 1; i < num; i++)
+//   {
+//     Point3 p;
+//     infile >> tmpint >> p;
+//     sh->add_point(p);
+//   }
+//   //-- read the facets
+//   infile >> num >> tmpint;
+//   int numf, numpt, numholes;
+//   string s;
+//   for (int i = 0; i < num; i++)
+//   {
+//     numholes = 0;
+//     infile >> numf;
+//     while(true) {
+//       if (infile.peek() == '\n')
+//         break;
+//       else if (infile.peek() == ' ')
+//         infile.ignore();
+//       else
+//         infile >> numholes;
+//     }
+//     //-- read oring (there's always one and only one)
+//     infile >> numpt;
+//     if (numpt == -1) {
+//       sh->add_error(103, std::to_string(i));
+//       continue;
+//     }
+//     vector<int> ids(numpt);
+//     for (int k = 0; k < numpt; k++)
+//       infile >> ids[k];
+//     if (zerobased == false)
+//     {
+//       for (int k = 0; k < numpt; k++)
+//         ids[k] = (ids[k] - 1);      
+//     }
+//     vector< vector<int> > pgnids;
+//     pgnids.push_back(ids);
+//     //-- check for irings
+//     for (int j = 1; j < numf; j++)
+//     {
+//       infile >> numpt;
+//       if (numpt == -1) {
+//         sh->add_error(103, std::to_string(i));
+//         continue;
+//       }
+//       vector<int> ids(numpt);
+//       for (int l = 0; l < numpt; l++)
+//         infile >> ids[l];
+//       if (zerobased == false)
+//       {
+//         for (int k = 0; k < numpt; k++)
+//           ids[k] = (ids[k] - 1);      
+//       }
+//       pgnids.push_back(ids);
+//     }
+//     //-- skip the line about points defining holes (if present)
+//     for (int j = 0; j < numholes; j++)
+//       infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
+//     sh->add_face(pgnids);
+//   }
+//   return lsSolids;
+// }
+
+
 vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;

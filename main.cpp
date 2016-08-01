@@ -191,10 +191,9 @@ int main(int argc, char* const argv[])
       }
     }
     else if ( (extension == "obj") ||
-              (extension == "off") ||
-              (extension == "stl") )
+              (extension == "OBJ") )
     {
-      lsSolids = read3dAssimpfile(inputfile.getValue(), ioerrs);
+      lsSolids = readOBJfile(inputfile.getValue(), ioerrs);
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
@@ -207,16 +206,8 @@ int main(int argc, char* const argv[])
     }
     else
     {
-      lsSolids = read3dAssimpfile(inputfile.getValue(), ioerrs);
-      if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
-      }
-      if (ishellfiles.getValue().size() > 0)
-      {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
-      }
+      std::cout << "File type not supported. Abort." << std::endl;
+      ioerrs.add_error(901, "File type not supported");
     }
 
     //-- translate all vertices to avoid potential problems
