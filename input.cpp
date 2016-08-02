@@ -535,9 +535,7 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
   } 
   Shell* sh = new Shell();
   std::string l;
-  std::vector<int> duplicatedindices;
-  // std::unordered_map< std::string, std::tuple<int, Point3*> > uniquev;
-  std::unordered_map< std::string, int > uniquev;
+  std::unordered_map< std::string, std::tuple<int, Point3*> > uniquev;
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
@@ -545,17 +543,10 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
       Point3 *p = new Point3();
       std::string tmp;
       iss >> tmp >> *p;
+      allvertices.push_back(p);
       auto pos = uniquev.find(get_coords_key(p));
       if (pos == uniquev.end()) 
-      {
-        uniquev[get_coords_key(p)] = uniquev.size();
-        allvertices.push_back(p); 
-        duplicatedindices.push_back(uniquev.size() - 1);
-      }
-      else 
-      {
-        duplicatedindices.push_back(pos->second);
-      }
+        uniquev[get_coords_key(p)] = std::make_tuple(uniquev.size(), p); 
     }
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
@@ -576,9 +567,12 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
         iss >> tmp;
         if (tmp.empty() == false) {
           std::size_t k = tmp.find("/");
-          int pos = duplicatedindices[std::stoi(tmp.substr(0, k)) - 1];
-          ids.push_back(pos);
-          sh->add_point(*allvertices[pos]);
+          Point3* tp = allvertices[std::stoi(tmp.substr(0, k))];
+          auto pos = uniquev[get_coords_key(tp));
+          if (pos == uniquev.end()) 
+            uniquev[get_coords_key(p)] = std::make_tuple(uniquev.size(), p); 
+          // ids.push_back(duplicatedindices[std::stoi(tmp.substr(0, pos)) - 1]);
+          // ids.push_back(duplicatedindices[std::stoi(tmp.substr(0, pos)) - 1]);
         }
       }
       vector< vector<int> > pgnids;
