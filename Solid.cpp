@@ -163,6 +163,10 @@ std::set<int> Solid::get_unique_error_codes()
     std::set<int> errsh = sh->get_unique_error_codes();
     errs.insert(errsh.begin(), errsh.end());
   }
+  for (auto& e : _errors)
+  {
+    errs.insert(std::get<0>(e));
+  }
   return errs;
 }
 
