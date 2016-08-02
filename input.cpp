@@ -24,6 +24,7 @@
 */
 
 #include "input.h"
+#include <unordered_map>
 
 
 bool IOErrors::has_errors()
@@ -514,6 +515,14 @@ void printProgressBar(int percent) {
 }
 
 
+std::string get_coords_key(Point3* p)
+{
+  int tol = 1000;
+  std::string s = std::to_string(int64(p->x() * tol)) + std::to_string(int64(p->y() * tol)) + std::to_string(int64(p->z() * tol));
+  return s;
+}
+
+
 vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;
@@ -527,14 +536,26 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
   Shell* sh = new Shell();
   std::string l;
   std::vector<int> duplicatedindices;
+  // std::unordered_map< std::string, std::tuple<int, Point3*> > uniquev;
+  std::unordered_map< std::string, int > uniquev;
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
       Point3 *p = new Point3();
       std::string tmp;
-      iss >> tmp >> p;
-      duplicatedindices.push_back(sh->add_point(*p));
+      iss >> tmp >> *p;
+      auto pos = uniquev.find(get_coords_key(p));
+      if (pos == uniquev.end()) 
+      {
+        uniquev[get_coords_key(p)] = uniquev.size();
+        allvertices.push_back(p); 
+        duplicatedindices.push_back(uniquev.size() - 1);
+      }
+      else 
+      {
+        duplicatedindices.push_back(pos->second);
+      }
     }
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
@@ -554,8 +575,10 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
         tmp.clear();
         iss >> tmp;
         if (tmp.empty() == false) {
-          std::size_t pos = tmp.find("/");
-          ids.push_back(duplicatedindices[std::stoi(tmp.substr(0, pos)) - 1]);
+          std::size_t k = tmp.find("/");
+          int pos = duplicatedindices[std::stoi(tmp.substr(0, k)) - 1];
+          ids.push_back(pos);
+          sh->add_point(*allvertices[pos]);
         }
       }
       vector< vector<int> > pgnids;

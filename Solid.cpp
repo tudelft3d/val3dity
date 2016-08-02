@@ -137,7 +137,7 @@ bool Solid::validate(Primitive3D prim, double tol_planarity_d2p, double tol_plan
   bool isValid = true;
   if (this->is_empty() == true)
   {
-    this->add_error(902, -1, -1, "probably error while parsing GML input");
+    this->add_error(902, -1, -1, "probably error while parsing the input");
     return false;
   }
   for (auto& sh : _shells)

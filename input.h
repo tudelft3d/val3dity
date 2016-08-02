@@ -46,6 +46,8 @@ public:
   std::string get_report_xml();
 };
 
+
+
 std::string   errorcode2description(int code, bool qie = false);
 vector<Solid> readGMLfile(std::string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap);
 vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs);
@@ -56,4 +58,7 @@ vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 void          printProgressBar(int percent);
 std::string   localise(std::string s);
+std::string   get_coords_key(Point3* p);
+
+
 #endif
