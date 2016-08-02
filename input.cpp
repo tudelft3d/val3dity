@@ -526,13 +526,15 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
   } 
   Shell* sh = new Shell();
   std::string l;
+  std::vector<int> duplicatedindices;
+  std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
-      Point3 p;
+      Point3 *p = new Point3();
       std::string tmp;
       iss >> tmp >> p;
-      sh->add_point(p);
+      duplicatedindices.push_back(sh->add_point(*p));
     }
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
@@ -553,7 +555,7 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
         iss >> tmp;
         if (tmp.empty() == false) {
           std::size_t pos = tmp.find("/");
-          ids.push_back(std::stoi(tmp.substr(0, pos)) - 1);
+          ids.push_back(duplicatedindices[std::stoi(tmp.substr(0, pos)) - 1]);
         }
       }
       vector< vector<int> > pgnids;
