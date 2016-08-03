@@ -523,7 +523,7 @@ std::string get_coords_key(Point3* p)
 }
 
 
-vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
+vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
@@ -533,7 +533,7 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return lsSolids;
   } 
-  Shell* sh = new Shell(0);
+  Shell* sh = new Shell(0, tol_snap);
   std::string l;
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
@@ -551,7 +551,7 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
         Solid sol;
         sol.set_oshell(sh);
         lsSolids.push_back(sol);
-        sh = new Shell();
+        sh = new Shell(0, tol_snap);
       }
     }
     else if (l.substr(0, 2) == "f ") {

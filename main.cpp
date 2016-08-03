@@ -193,7 +193,7 @@ int main(int argc, char* const argv[])
     else if ( (extension == "obj") ||
               (extension == "OBJ") )
     {
-      lsSolids = readOBJfile(inputfile.getValue(), ioerrs);
+      lsSolids = readOBJfile(inputfile.getValue(), ioerrs, snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
@@ -219,11 +219,11 @@ int main(int argc, char* const argv[])
     {
       std::cout << "Validating " << lsSolids.size();
       if (prim3d == SOLID)
-        std::cout << " <gml:Solid>";
+        std::cout << " Solid";
       else if (prim3d == COMPOSITESURFACE)
-        std::cout << " <gml:CompositeSurface>";
+        std::cout << " CompositeSurface";
       else 
-        std::cout << " <gml:MultiSurface>";
+        std::cout << " MultiSurface";
       std::cout << std::endl;
       int i = 1;
       for (auto& s : lsSolids)
