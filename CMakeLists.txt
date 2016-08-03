@@ -47,14 +47,6 @@ endif()
 
 include_directories( ${GEOS_INCLUDE_DIR}, include )
 
-# ASSIMP
-set( ASSIMP_DIR .)
-find_package( ASSIMP )
-if ( NOT ASSIMP_FOUND )
-  message(SEND_ERROR "val3dity requires the ASSIMP library")
-endif()
-include_directories( ${ASSIMP_INCLUDE_DIR}, include )
-
 
 # Creating entries for target: val3dity
 # ############################
@@ -64,7 +56,7 @@ add_executable( val3dity input.cpp pugixml.cpp geomtools.cpp Shell.cpp Solid.cpp
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} ${ASSIMP_LIBRARIES})
+target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY})
 
 # Have the option to properly install val3dity to the system 
 install(TARGETS val3dity DESTINATION bin)
