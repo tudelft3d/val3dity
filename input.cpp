@@ -552,11 +552,19 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
       {
         tmp.clear();
         iss >> tmp;
+        if (tmp.compare("\\") == 0) {
+          std::clog << "oups" << std::endl;
+          std::getline(infile, l);
+          iss.str(l);
+//          iss >> tmp;
+          continue;
+        }
         if (tmp.empty() == false) {
           std::size_t k = tmp.find("/");
           Point3* tp = allvertices[std::stoi(tmp.substr(0, k)) - 1];
           r.push_back(sh->add_point(*tp));
         }
+        
       }
       vector< vector<int> > pgnids;
       pgnids.push_back(r);
