@@ -331,11 +331,11 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   ss << std::endl;
   std::string primitives;
   if (prim3d == SOLID)
-    primitives = "<gml:Solid>";
+    primitives = "Solid";
   else if (prim3d == COMPOSITESURFACE)
-    primitives = "<gml:CompositeSurface>";
+    primitives = "CompositeSurface";
   else 
-    primitives = "<gml:MultiSurface>";
+    primitives = "MultiSurface";
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
   ss << "Primitives validated: " << primitives << std::endl;
   ss << "total # of primitives: " << setw(8) << lsSolids.size() << std::endl;

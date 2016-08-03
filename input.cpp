@@ -24,8 +24,6 @@
 */
 
 #include "input.h"
-#include <unordered_map>
-
 
 bool IOErrors::has_errors()
 {
@@ -515,14 +513,6 @@ void printProgressBar(int percent) {
 }
 
 
-std::string get_coords_key(Point3* p)
-{
-  int tol = 1000;
-  std::string s = std::to_string(int64(p->x() * tol)) + std::to_string(int64(p->y() * tol)) + std::to_string(int64(p->z() * tol));
-  return s;
-}
-
-
 vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
 {
   std::clog << "Reading file: " << ifile << std::endl;
@@ -576,6 +566,9 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
   Solid sol;
   sol.set_oshell(sh);
   lsSolids.push_back(sol);
+  for (auto& each : allvertices)
+    delete each;
+  allvertices.clear();
   return lsSolids;
 } 
 

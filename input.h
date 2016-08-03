@@ -31,9 +31,6 @@
 #include <fstream>
 #include <string>
 #include "pugixml.hpp"
-#include <assimp/Importer.hpp>    
-#include <assimp/scene.h>         
-#include <assimp/postprocess.h>   
 
 
 
@@ -57,7 +54,5 @@ vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
 void          printProgressBar(int percent);
 std::string   localise(std::string s);
-std::string   get_coords_key(Point3* p);
-
 
 #endif

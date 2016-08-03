@@ -33,7 +33,6 @@
 #include <sstream>
 
 
-
 Shell::Shell(int id, double tol_snap)
 {
   _id = id;
@@ -159,27 +158,26 @@ std::string Shell::get_poly_representation()
   return s.str();
 }
 
+
+std::string Shell::get_coords_key(Point3* p)
+{
+  int tol = int(1 / _tol_snap);
+  std::string s = std::to_string(int64(p->x() * tol)) + std::to_string(int64(p->y() * tol)) + std::to_string(int64(p->z() * tol));
+  return s;
+}
+
+
 int Shell::add_point(Point3 p)
 {
-  int pos = -1;
-  int cur = 0;
-  for (auto &itr : _lsPts)
-  {
-    // std::clog << "---" << itr << std::endl;
-    if (cmpPoint3(p, itr, _tol_snap) == true)
-    {
-      pos = cur;
-      break;
-    }
-    cur++;
-  }
-  if (pos == -1)
+  auto it = _dPts.find(get_coords_key(&p));
+  if (it == _dPts.end()) 
   {
     _lsPts.push_back(p);
+    _dPts[get_coords_key(&p)] = (_lsPts.size() - 1); 
     return (_lsPts.size() - 1);
+
   }
-  else
-    return pos;
+  return it->second;
 }
 
 
