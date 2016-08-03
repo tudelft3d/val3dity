@@ -293,7 +293,7 @@ bool Solid::validate_solid_with_nef()
   int i = 0;
   for (auto& sh : this->get_shells())
   {
-    if (check_global_orientation_normals(sh->get_cgal_polyhedron(), sh->is_outer()) == false) 
+    if (check_global_orientation_normals(sh->get_cgal_polyhedron(), i == 0) == false) 
     {
       this->add_error(405, i, -1, "");
       isValid = false;

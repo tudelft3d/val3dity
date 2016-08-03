@@ -37,7 +37,6 @@ public:
   int    number_vertices();
   int    number_faces();
   void   get_min_bbox(double& x, double& y);
-  bool   is_outer();
   int    get_id();
   CgalPolyhedron* get_cgal_polyhedron();
   

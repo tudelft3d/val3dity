@@ -205,11 +205,6 @@ int Shell::number_faces()
 }
 
 
-bool Shell::is_outer()
-{
-  return (_id == 0);
-}
-
 bool Shell::triangulate_shell()
 {
   std::clog << "--Triangulation of each surface" << std::endl;
