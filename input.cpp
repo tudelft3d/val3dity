@@ -533,9 +533,8 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return lsSolids;
   } 
-  Shell* sh = new Shell();
+  Shell* sh = new Shell(0);
   std::string l;
-  std::unordered_map< std::string, std::tuple<int, Point3*> > uniquev;
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
@@ -544,9 +543,7 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
       std::string tmp;
       iss >> tmp >> *p;
       allvertices.push_back(p);
-      auto pos = uniquev.find(get_coords_key(p));
-      if (pos == uniquev.end()) 
-        uniquev[get_coords_key(p)] = std::make_tuple(uniquev.size(), p); 
+      sh->add_point(*p);
     }
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
@@ -558,7 +555,7 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
       }
     }
     else if (l.substr(0, 2) == "f ") {
-      vector<int> ids;
+      vector<int> r;
       std::string tmp;
       iss >> tmp;
       while (iss)
@@ -567,16 +564,12 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs)
         iss >> tmp;
         if (tmp.empty() == false) {
           std::size_t k = tmp.find("/");
-          Point3* tp = allvertices[std::stoi(tmp.substr(0, k))];
-          auto pos = uniquev[get_coords_key(tp));
-          if (pos == uniquev.end()) 
-            uniquev[get_coords_key(p)] = std::make_tuple(uniquev.size(), p); 
-          // ids.push_back(duplicatedindices[std::stoi(tmp.substr(0, pos)) - 1]);
-          // ids.push_back(duplicatedindices[std::stoi(tmp.substr(0, pos)) - 1]);
+          Point3* tp = allvertices[std::stoi(tmp.substr(0, k)) - 1];
+          r.push_back(sh->add_point(*tp));
         }
       }
       vector< vector<int> > pgnids;
-      pgnids.push_back(ids);
+      pgnids.push_back(r);
       sh->add_face(pgnids);
     }
   }
