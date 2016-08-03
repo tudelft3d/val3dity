@@ -145,7 +145,7 @@ bool Solid::validate(Primitive3D prim, double tol_planarity_d2p, double tol_plan
     if (sh->validate(prim, tol_planarity_d2p, tol_planarity_normals) == false) 
       isValid = false;
   }
-  if (isValid == true)
+  if ( (isValid == true) && (prim == SOLID) )
   {
     if (validate_solid_with_nef() == false)
       isValid = false;
