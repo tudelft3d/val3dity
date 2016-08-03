@@ -25,7 +25,6 @@
 
 #include "input.h"
 
-
 bool IOErrors::has_errors()
 {
   if (_errors.size() == 0)
@@ -514,45 +513,63 @@ void printProgressBar(int percent) {
 }
 
 
-vector<Solid> read3dAssimpfile(std::string &ifile, IOErrors& errs)
+vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
 {
-  std::clog << "Reading file: " << ifile << std::endl;
+  std::cout << "Reading file: " << ifile << std::endl;
+  std::ifstream infile(ifile.c_str(), std::ifstream::in);
   vector<Solid> lsSolids;
-  Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(ifile, aiProcess_JoinIdenticalVertices);
-  if(!scene) {
+  if (!infile)
+  {
     errs.add_error(901, "Input file not found.");
     return lsSolids;
   }
-  
-  if (scene->mNumMeshes != 1)
-    std::cout << "MORE THAN ONE MESH" << std::endl;
-  
-  for (int nomesh = 0; nomesh < scene->mNumMeshes; nomesh++)
-  {
-    Shell* sh = new Shell(0);  
-    aiMesh* m = scene->mMeshes[nomesh];
-    //-- read the points
-    aiVector3D* vertices = m->mVertices;
-    for (int i = 0; i < m->mNumVertices; i++) {
-      Point3 p(vertices[i][0], vertices[i][1], vertices[i][2]);
-      sh->add_point(p);
+  std::cout << "Parsing the file..." << std::endl; 
+  Shell* sh = new Shell(0, tol_snap);
+  std::string l;
+  std::vector<Point3*> allvertices;
+  while (std::getline(infile, l)) {
+    std::istringstream iss(l);
+    if (l.substr(0, 2) == "v ") {
+      Point3 *p = new Point3();
+      std::string tmp;
+      iss >> tmp >> *p;
+      allvertices.push_back(p);
     }
-    //-- read the facets
-    aiFace* faces = m->mFaces;
-    unsigned int* indices;
-    for (int i = 0; i < m->mNumFaces; i++) {
-      indices = faces[i].mIndices;
+    else if (l.substr(0, 2) == "o ") {
+      if (sh->is_empty() == false)
+      {
+        Solid sol;
+        sol.set_oshell(sh);
+        lsSolids.push_back(sol);
+        sh = new Shell(0, tol_snap);
+      }
+    }
+    else if (l.substr(0, 2) == "f ") {
+      vector<int> r;
+      std::string tmp;
+      iss >> tmp;
+      while (iss)
+      {
+        tmp.clear();
+        iss >> tmp;
+        if (tmp.empty() == false) {
+          std::size_t k = tmp.find("/");
+          Point3* tp = allvertices[std::stoi(tmp.substr(0, k)) - 1];
+          r.push_back(sh->add_point(*tp));
+        }
+      }
       vector< vector<int> > pgnids;
-      vector<int> ids(faces[i].mNumIndices);
-      for (int j = 0; j < faces[i].mNumIndices; j++) 
-        ids[j] = indices[j];
-      pgnids.push_back(ids);
+      pgnids.push_back(r);
       sh->add_face(pgnids);
     }
-    Solid sol;
-    sol.set_oshell(sh);
-    lsSolids.push_back(sol);
   }
+  Solid sol;
+  sol.set_oshell(sh);
+  lsSolids.push_back(sol);
+  for (auto& each : allvertices)
+    delete each;
+  allvertices.clear();
   return lsSolids;
-}
+} 
+
+  

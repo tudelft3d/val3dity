@@ -191,10 +191,9 @@ int main(int argc, char* const argv[])
       }
     }
     else if ( (extension == "obj") ||
-              (extension == "off") ||
-              (extension == "stl") )
+              (extension == "OBJ") )
     {
-      lsSolids = read3dAssimpfile(inputfile.getValue(), ioerrs);
+      lsSolids = readOBJfile(inputfile.getValue(), ioerrs, snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
@@ -207,16 +206,8 @@ int main(int argc, char* const argv[])
     }
     else
     {
-      lsSolids = read3dAssimpfile(inputfile.getValue(), ioerrs);
-      if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
-      }
-      if (ishellfiles.getValue().size() > 0)
-      {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
-      }
+      std::cout << "File type not supported. Abort." << std::endl;
+      ioerrs.add_error(901, "File type not supported");
     }
 
     //-- translate all vertices to avoid potential problems
@@ -228,11 +219,11 @@ int main(int argc, char* const argv[])
     {
       std::cout << "Validating " << lsSolids.size();
       if (prim3d == SOLID)
-        std::cout << " <gml:Solid>";
+        std::cout << " Solid";
       else if (prim3d == COMPOSITESURFACE)
-        std::cout << " <gml:CompositeSurface>";
+        std::cout << " CompositeSurface";
       else 
-        std::cout << " <gml:MultiSurface>";
+        std::cout << " MultiSurface";
       std::cout << std::endl;
       int i = 1;
       for (auto& s : lsSolids)
@@ -340,11 +331,11 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   ss << std::endl;
   std::string primitives;
   if (prim3d == SOLID)
-    primitives = "<gml:Solid>";
+    primitives = "Solid";
   else if (prim3d == COMPOSITESURFACE)
-    primitives = "<gml:CompositeSurface>";
+    primitives = "CompositeSurface";
   else 
-    primitives = "<gml:MultiSurface>";
+    primitives = "MultiSurface";
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
   ss << "Primitives validated: " << primitives << std::endl;
   ss << "total # of primitives: " << setw(8) << lsSolids.size() << std::endl;

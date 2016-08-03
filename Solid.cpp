@@ -137,7 +137,7 @@ bool Solid::validate(Primitive3D prim, double tol_planarity_d2p, double tol_plan
   bool isValid = true;
   if (this->is_empty() == true)
   {
-    this->add_error(902, -1, -1, "probably error while parsing GML input");
+    this->add_error(902, -1, -1, "probably error while parsing the input");
     return false;
   }
   for (auto& sh : _shells)
@@ -297,7 +297,7 @@ bool Solid::validate_solid_with_nef()
   int i = 0;
   for (auto& sh : this->get_shells())
   {
-    if (check_global_orientation_normals(sh->get_cgal_polyhedron(), sh->is_outer()) == false) 
+    if (check_global_orientation_normals(sh->get_cgal_polyhedron(), i == 0) == false) 
     {
       this->add_error(405, i, -1, "");
       isValid = false;

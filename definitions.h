@@ -61,6 +61,7 @@ typedef CGAL::Constrained_triangulation_2<K, TDS, Itag>           CTa;
 typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
 
+typedef long long int64;
 
 typedef enum
 {

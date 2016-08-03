@@ -27,6 +27,7 @@
 #define __val3dity__Shell__
 
 #include "definitions.h"
+#include <unordered_map>
 
 class Shell
 {
@@ -37,7 +38,6 @@ public:
   int    number_vertices();
   int    number_faces();
   void   get_min_bbox(double& x, double& y);
-  bool   is_outer();
   int    get_id();
   CgalPolyhedron* get_cgal_polyhedron();
   
@@ -56,14 +56,15 @@ public:
   std::string   get_poly_representation();
   
 private:
-  int                             _id;
-  vector<Point3>                  _lsPts;
-  vector< vector< vector<int> > > _lsFaces;
-  vector<std::string>             _lsFacesID;
-  vector< vector<int*> >          _lsTr;
-  CgalPolyhedron*                 _polyhedron;
-  double                          _tol_snap;
-  int                             _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
+  int                                     _id;
+  vector<Point3>                          _lsPts;
+  std::unordered_map< std::string, int >  _dPts;
+  vector< vector< vector<int> > >         _lsFaces;
+  vector<std::string>                     _lsFacesID;
+  vector< vector<int*> >                  _lsTr;
+  CgalPolyhedron*                         _polyhedron;
+  double                                  _tol_snap;
+  int                                     _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
 
   std::map<int, vector<std::tuple<std::string, std::string> > > _errors;
 
@@ -72,6 +73,7 @@ private:
   bool validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
   bool validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
   
+  std::string get_coords_key(Point3* p);
   bool triangulate_shell();
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);
   bool validate_polygon(vector<Polygon> &lsRings, std::string polygonid);
