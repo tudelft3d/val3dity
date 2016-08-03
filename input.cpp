@@ -515,14 +515,15 @@ void printProgressBar(int percent) {
 
 vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
 {
-  std::clog << "Reading file: " << ifile << std::endl;
+  std::cout << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
   vector<Solid> lsSolids;
   if (!infile)
   {
     errs.add_error(901, "Input file not found.");
     return lsSolids;
-  } 
+  }
+  std::cout << "Parsing the file..." << std::endl; 
   Shell* sh = new Shell(0, tol_snap);
   std::string l;
   std::vector<Point3*> allvertices;
@@ -533,7 +534,6 @@ vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap)
       std::string tmp;
       iss >> tmp >> *p;
       allvertices.push_back(p);
-      sh->add_point(*p);
     }
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)

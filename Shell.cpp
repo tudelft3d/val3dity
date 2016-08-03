@@ -63,7 +63,7 @@ return !(_errors.empty());
 
 bool Shell::is_empty()
 {
-  return _lsPts.empty();
+  return (_lsPts.empty() || _lsFaces.empty());
 }
 
 
