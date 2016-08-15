@@ -36,9 +36,6 @@ std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d);
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
                       vector<Solid*>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
-void write_report_text(std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
-                       double snap_tolerance, double planarity_d2p, double planarity_n, 
-                       vector<Solid*>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
 
 
 
@@ -100,7 +97,6 @@ int main(int argc, char* const argv[])
     TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one exterior shell)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           outputxml("", "oxml", "output report in XML format", false, "", "string");
-    TCLAP::ValueArg<std::string>           outputtxt("", "otxt", "output report in text format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
     TCLAP::SwitchArg                       buildings("B", "Buildings", "report uses the CityGML Buildings", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
@@ -123,7 +119,6 @@ int main(int argc, char* const argv[])
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(outputxml);
-    cmd.add(outputtxt);
     cmd.parse( argc, argv );
   
     Primitive3D prim3d = SOLID;
@@ -281,23 +276,7 @@ int main(int argc, char* const argv[])
       thereport.close();
       std::cout << "Full validation report saved to " << outputxml.getValue() << std::endl;
     }
-    if (outputtxt.getValue() != "")
-    {
-      std::ofstream thereport;
-      thereport.open(outputtxt.getValue());
-      write_report_text(thereport, 
-                        inputfile.getValue(),
-                        prim3d, 
-                        snap_tolerance.getValue(),
-                        planarity_d2p.getValue(),
-                        planarity_n.getValue(),
-                        lsSolids,
-                        ioerrs,
-                        onlyinvalid.getValue());
-      thereport.close();
-      std::cout << "Full validation report saved to " << outputtxt.getValue() << std::endl;
-    }
-    if ( (outputtxt.getValue() == "") && (outputxml.getValue() == "") ) 
+    if (outputxml.getValue() == "")
       std::cout << "-->The validation report wasn't saved, use option '--oxml' or '--otxt'." << std::endl;
 
     if (verbose.getValue() == false)
@@ -396,51 +375,6 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
   }
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
-}
-
-
-void write_report_text(std::ofstream& ss,
-                       std::string ifile, 
-                       Primitive3D prim3d, 
-                       double snap_tolerance,
-                       double planarity_d2p,
-                       double planarity_n,
-                       vector<Solid*>& lsSolids,
-                       IOErrors ioerrs,
-                       bool onlyinvalid)
-{
-  ss << "Input File: " << ifile << std::endl;
-  ss << "Primitives: ";
-  if (prim3d == SOLID)
-    ss << "gml:Solid";
-  else if (prim3d == COMPOSITESURFACE)
-    ss << "gml:CompositeSurface";
-  else
-    ss << "gml:MultiSurface";
-  ss << std::endl;
-  ss << "Snap_tolerance: " << snap_tolerance << std::endl;
-  ss << "Planarity_d2p: " << planarity_d2p << std::endl;
-  ss << "Planarity_n: " << planarity_n << std::endl;
-  std::time_t rawtime;
-  struct tm * timeinfo;
-  std::time (&rawtime);
-  timeinfo = std::localtime ( &rawtime );
-  char buffer[80];
-  std::strftime(buffer, 80, "%c %Z", timeinfo);
-  ss << "Time: " << buffer << std::endl;
-  ss << print_summary_validation(lsSolids, prim3d) << std::endl;
-  if (ioerrs.has_errors() == true)
-  {
-    ss << ioerrs.get_report_text();
-  }
-  else
-  {
-    for (auto& s : lsSolids) 
-    {
-      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
-        ss << s->get_report_text();
-    }
-  }
 }
 
 
