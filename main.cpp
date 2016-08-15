@@ -101,6 +101,7 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<std::string>           outputxml("", "oxml", "output report in XML format", false, "", "string");
     TCLAP::ValueArg<std::string>           outputtxt("", "otxt", "output report in text format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
+    TCLAP::SwitchArg                       buildings("B", "Buildings", "report uses the CityGML Buildings", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
@@ -114,6 +115,7 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
     cmd.add(primitives);
+    cmd.add(buildings);
     cmd.add(verbose);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
@@ -147,7 +149,12 @@ int main(int argc, char* const argv[])
     {
       try
       {
-        lsSolids = readGMLfile(inputfile.getValue(), prim3d, ioerrs, snap_tolerance.getValue());
+        lsSolids = readGMLfile(inputfile.getValue(), 
+                               prim3d, 
+                               buildings.getValue(), 
+                               ioerrs, 
+                               snap_tolerance.getValue()
+                              );
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;

@@ -304,8 +304,9 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
   return sh;
 }
 
+void process_gml_solid(Solid* s, IOErrors& errs, double tol_snap)
 
-vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, double tol_snap)
+vector<Solid> readGMLfile(string &ifile, Primitive3D prim, bool focusbuildings, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   vector<Solid> lsSolids;
@@ -315,34 +316,46 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
     errs.add_error(901, "Input file not found.");
     return lsSolids;
   }
+
   std::string s = "//";
   if (prim == SOLID)
-    s +=  localise("Solid");
+   s +=  localise("Solid");
   else if (prim == COMPOSITESURFACE)
-    s +=  localise("CompositeSurface");
+   s +=  localise("CompositeSurface");
   else 
-    s +=  localise("MultiSurface");
+   s +=  localise("MultiSurface");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
   std::cout << "Parsing the file..." << std::endl;
   if (prim == SOLID)
-    std::cout << "# of <gml:Solid> found: ";
+   std::cout << "# of <gml:Solid> found: ";
   else if (prim == COMPOSITESURFACE)
-    std::cout << "# of <gml:CompositeSurface> found: ";
+   std::cout << "# of <gml:CompositeSurface> found: ";
   else 
-    std::cout << "# of <gml:MultiSurface> found: ";
+   std::cout << "# of <gml:MultiSurface> found: ";
   std::cout << nsolids.size() << std::endl;
+
+  //-- CityGML Buildings
+  pugi::xpath_node_set nbuildings;
+  if (focusbuildings == true) 
+  {
+    s = "//" + localise("Building");
+    // std::string s1 = "//" + localise("Building") + "//" + localise("BuildingPart") + "//" + localise("Solid");
+    myquery(s1.c_str());
+    nbuildings = myquery.evaluate_node_set(doc);
+    std::cout << "# of CityGML Buildings found: " << nbuildings.size() << std::endl;
+  }
 
   //-- build dico of xlinks
   //-- for <gml:Polygon>
   s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
-    std::cout << "XLinks found, resolving them..." << std::endl;
+   std::cout << "XLinks found, resolving them..." << std::endl;
   map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
   {
-    dallpoly[it->node().attribute("gml:id").value()] = *it;
+   dallpoly[it->node().attribute("gml:id").value()] = *it;
   }
 
   //-- for <gml:OrientableSurface>
@@ -351,59 +364,61 @@ vector<Solid> readGMLfile(string &ifile, Primitive3D prim, IOErrors& errs, doubl
   // map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallosurf.begin(); it != nallosurf.end(); ++it)
   {
-    dallpoly[it->node().attribute("gml:id").value()] = *it;
+   dallpoly[it->node().attribute("gml:id").value()] = *it;
   }
 
   //-- checking xlinks validity now not to be bitten later
   s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it) {
-    std::string k = it->node().attribute("xlink:href").value();
-    if (k[0] == '#')
-      k = k.substr(1);
-    if (dallpoly.count(k) == 0) {
-      std::string r = "One XLink couldn't be resolved (";
-      r += it->node().attribute("xlink:href").value();
-      r += ")";
-      errs.add_error(901, r);
-      return lsSolids;
-    }
+   std::string k = it->node().attribute("xlink:href").value();
+   if (k[0] == '#')
+     k = k.substr(1);
+   if (dallpoly.count(k) == 0) {
+     std::string r = "One XLink couldn't be resolved (";
+     r += it->node().attribute("xlink:href").value();
+     r += ")";
+     errs.add_error(901, r);
+     return lsSolids;
+   }
   }
-  
-  for(auto& nsolid: nsolids)
-  {
-    //-- exterior shell
-    Solid sol;
-    if (nsolid.node().attribute("gml:id") != 0)
-      sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
-    if (prim == SOLID) 
-    {
-      std::string s = "./" + localise("exterior");
-      pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-      sol.set_oshell(process_gml_compositesurface(next.node(), 0, dallpoly, tol_snap, errs));
-      //-- interior shells
-      s = "./" + localise("interior");
-      pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
-      int id = 1;
-      for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
-      {
-        sol.add_ishell(process_gml_compositesurface(it->node(), id, dallpoly, tol_snap, errs));
-        id++;
-      }
-    }
-    else if (prim == COMPOSITESURFACE)
-    {
-      sol.set_oshell(process_gml_compositesurface(nsolid.node(), 0, dallpoly, tol_snap, errs));
-    }
-    else 
-    {
-      sol.set_oshell(process_gml_compositesurface(nsolid.node(), 0, dallpoly, tol_snap, errs));
-    }
-    lsSolids.push_back(sol);
-  }
-  std::cout << "Input file correctly parsed without errors." << std::endl;
-  return lsSolids;
+ 
+//  for(auto& nsolid: nsolids)
+//  {
+//    //-- exterior shell
+//    Solid sol;
+//    if (nsolid.node().attribute("gml:id") != 0)
+//      sol.set_id(std::string(nsolid.node().attribute("gml:id").value()));
+//    if (prim == SOLID) 
+//    {
+//      std::string s = "./" + localise("exterior");
+//      pugi::xpath_node next = nsolid.node().select_node(s.c_str());
+//      sol.set_oshell(process_gml_compositesurface(next.node(), 0, dallpoly, tol_snap, errs));
+//      //-- interior shells
+//      s = "./" + localise("interior");
+//      pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
+//      int id = 1;
+//      for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
+//      {
+//        sol.add_ishell(process_gml_compositesurface(it->node(), id, dallpoly, tol_snap, errs));
+//        id++;
+//      }
+//    }
+//    else if (prim == COMPOSITESURFACE)
+//    {
+//      sol.set_oshell(process_gml_compositesurface(nsolid.node(), 0, dallpoly, tol_snap, errs));
+//    }
+//    else 
+//    {
+//      sol.set_oshell(process_gml_compositesurface(nsolid.node(), 0, dallpoly, tol_snap, errs));
+//    }
+//    lsSolids.push_back(sol);
+//  }
+
+ std::cout << "Input file correctly parsed without errors." << std::endl;
+ return lsSolids;
 }
+
 
 
 Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
