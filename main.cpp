@@ -248,6 +248,11 @@ int main(int argc, char* const argv[])
         std::clog << "Number shells: " << (s->num_ishells() + 1) << std::endl;
         std::clog << "Number faces: " << s->num_faces() << std::endl;
         std::clog << "Number vertices: " << s->num_vertices() << std::endl;
+        if (s->get_id_building().empty() == false)
+          std::clog << "Building: " << s->get_id_building() << std::endl;
+        if (s->get_id_buildingpart().empty() == false)
+          std::clog << "BuildingPart: " << s->get_id_buildingpart() << std::endl;
+
         if (s->validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else

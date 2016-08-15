@@ -48,6 +48,8 @@ Solid::Solid()
   _id = std::to_string(_counter);
   _counter++;
   _is_valid = -1;
+  _id_building = "";
+  _id_buildingpart = "";
 }
 
 
@@ -56,6 +58,8 @@ Solid::Solid(Shell* sh)
   _shells.push_back(sh);
   _id = std::to_string(_counter);
   _counter++;
+  _id_building = "";
+  _id_buildingpart = "";
 }
 
 Solid::~Solid()

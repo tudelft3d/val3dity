@@ -341,17 +341,41 @@ Solid* process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, map<std::str
 void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   std::string id_building;
+  std::string id_buildingpart;
   if (nbuilding.node().attribute("gml:id") != 0)
     id_building = std::string(nbuilding.node().attribute("gml:id").value());
   else
     id_building = "";
-  std::string s = ".//" + localise("Solid");
-  pugi::xpath_node_set nsolids = nbuilding.node().select_nodes(s.c_str());
-  for (auto& nsolid : nsolids)
+  std::string s1 = ".//" + localise("BuildingPart");
+  std::string s2 = ".//" + localise("Solid");
+  pugi::xpath_node_set nbps = nbuilding.node().select_nodes(s1.c_str());
+  if (nbps.empty() == false)
   {
-    Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
-    sol->set_id_building(id_building);
-    lsSolids.push_back(sol);
+    for (auto& nbp : nbps)
+    {
+      if (nbp.node().attribute("gml:id") != 0)
+        id_buildingpart = std::string(nbp.node().attribute("gml:id").value());
+      else
+        id_buildingpart = "";
+      pugi::xpath_node_set nsolids = nbp.node().select_nodes(s2.c_str());
+      for (auto& nsolid : nsolids)
+      {
+        Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
+        sol->set_id_building(id_building);
+        sol->set_id_buildingpart(id_buildingpart);
+        lsSolids.push_back(sol);
+      }
+    }
+  }
+  else
+  {
+    pugi::xpath_node_set nsolids = nbuilding.node().select_nodes(s2.c_str());
+    for (auto& nsolid : nsolids)
+    {
+      Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
+      sol->set_id_building(id_building);
+      lsSolids.push_back(sol);
+    }
   }
 }
 
