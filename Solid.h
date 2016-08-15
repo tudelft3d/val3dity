@@ -47,6 +47,11 @@ public:
   int                    num_faces();
   int                    num_vertices();
   
+  std::string            get_id_building();
+  void                   set_id_building(std::string id);
+  std::string            get_id_buildingpart();
+  void                   set_id_buildingpart(std::string id);
+  
   bool          validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
   void          translate_vertices();
   std::string   get_report_xml();
@@ -62,8 +67,11 @@ public:
   void          set_id(std::string id);
 private:
   std::string     _id;
+  std::string     _id_building;
+  std::string     _id_buildingpart;
   vector<Shell*>  _shells;
   int             _is_valid;
+
   std::map<int, vector< std::tuple<int, int, std::string> > > _errors;
 
   bool validate_solid_with_nef();

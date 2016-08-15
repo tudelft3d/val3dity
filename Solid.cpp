@@ -113,6 +113,26 @@ bool Solid::is_empty()
   return false;
 }
 
+std::string Solid::get_id_building()
+{
+  return _id_building;
+}
+
+void Solid::set_id_building(std::string id)
+{
+  _id_building = id;
+}
+
+std::string Solid::get_id_buildingpart()
+{
+  return _id_buildingpart;
+}
+
+void Solid::set_id_buildingpart(std::string id)
+{
+  _id_buildingpart = id;
+}
+
 
 void Solid::translate_vertices()
 {
@@ -188,6 +208,10 @@ std::string Solid::get_report_xml()
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
+  if (_id_building.empty() == false)
+  {
+    ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
+  }
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
