@@ -416,7 +416,6 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
     s = "//" + localise("Building");
     nbuildings = doc.select_nodes(s.c_str());
     std::cout << "# of CityGML Buildings found: " << nbuildings.size() << std::endl;
-    // std::string s1 = "//" + localise("Building") + "//" + localise("BuildingPart") + "//" + localise("Solid");
   }
 
   //-- build dico of xlinks

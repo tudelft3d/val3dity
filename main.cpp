@@ -30,7 +30,7 @@
 #include <time.h>  
 
 
-std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d);
+std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings);
 std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d);
 
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
@@ -258,7 +258,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(lsSolids, prim3d) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsSolids, prim3d, buildings.getValue()) << std::endl;        
    
     if (outputxml.getValue() != "")
     {
@@ -323,7 +323,7 @@ std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d)
 }
 
 
-std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d)
+std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -353,6 +353,32 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
     ss << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
   ss << " (" << percentage << "%)" << std::endl;
+
+  //-- Building overview
+  if (buildings == true)
+  {
+    ss << "- - - " << std::endl;
+    std::map<std::string, vector<Solid*> > dBuildings;
+    for (auto& s : lsSolids)
+      dBuildings[s->get_id_building()].push_back(s);
+    ss << "Buildings validated: " << setw(10) << dBuildings.size() << std::endl;
+    int bInvalid = 0;
+    for (auto b : dBuildings)
+    {
+      vector<Solid*> solids = b.second;
+      for (auto& sol : b.second)
+      {
+        if (sol->is_valid() == false)
+        {
+          bInvalid++;
+          break;
+        }
+      }
+    }
+    ss << "Buildings valid: " << setw(14) << bValid << std::endl;
+  }
+
+  //-- overview of errors
   std::map<int,int> errors;
   for (auto& s : lsSolids)
   {
