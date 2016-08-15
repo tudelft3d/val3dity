@@ -46,9 +46,9 @@ public:
 
 
 std::string   errorcode2description(int code, bool qie = false);
-vector<Solid> readOBJfile(std::string &ifile, IOErrors& errs, double tol_snap);
+void          readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& errs, double tol_snap);
 Shell*        readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
-vector<Solid> readGMLfile(std::string &ifile, Primitive3D prim, bool focusbuildings, IOErrors& errs, double tol_snap);
+void          readGMLfile(std::vector<Solid*>& lsSolids, std::string &ifile, Primitive3D prim, bool focusbuildings, IOErrors& errs, double tol_snap);
 void          process_gml_solid(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 Shell*        process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);

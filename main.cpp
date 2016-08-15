@@ -30,14 +30,15 @@
 #include <time.h>  
 
 
-std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d);
-std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d);
+std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d);
+std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d);
+
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
-                      vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
+                      vector<Solid*>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
 void write_report_text(std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
                        double snap_tolerance, double planarity_d2p, double planarity_n, 
-                       vector<Solid>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
+                       vector<Solid*>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
 
 
 
@@ -139,7 +140,7 @@ int main(int argc, char* const argv[])
       std::clog.rdbuf(mylog.rdbuf());
     }
 
-    vector<Solid> lsSolids;
+    vector<Solid*> lsSolids;
 
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") ||  
@@ -149,12 +150,13 @@ int main(int argc, char* const argv[])
     {
       try
       {
-        lsSolids = readGMLfile(inputfile.getValue(), 
-                               prim3d, 
-                               buildings.getValue(), 
-                               ioerrs, 
-                               snap_tolerance.getValue()
-                              );
+        readGMLfile(lsSolids,
+                    inputfile.getValue(), 
+                    prim3d, 
+                    buildings.getValue(), 
+                    ioerrs, 
+                    snap_tolerance.getValue()
+                   );
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
@@ -174,13 +176,13 @@ int main(int argc, char* const argv[])
     else if ( (extension == "poly") ||
               (extension == "POLY") )
     {
-      Solid s;
+      Solid* s = new Solid;
       Shell* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
       if (ioerrs.has_errors() == true)
         std::cout << "Input file not found." << std::endl;
       else
       {
-        s.set_oshell(sh);
+        s->set_oshell(sh);
         int sid = 1;
         for (auto ifile : ishellfiles.getValue())
         {
@@ -189,7 +191,7 @@ int main(int argc, char* const argv[])
             std::cout << "Input file inner shell not found." << std::endl;
           else
           {
-            s.add_ishell(sh);
+            s->add_ishell(sh);
             sid++;
           }
         }
@@ -200,7 +202,11 @@ int main(int argc, char* const argv[])
     else if ( (extension == "obj") ||
               (extension == "OBJ") )
     {
-      lsSolids = readOBJfile(inputfile.getValue(), ioerrs, snap_tolerance.getValue());
+      readOBJfile(lsSolids,
+                  inputfile.getValue(), 
+                  ioerrs, 
+                  snap_tolerance.getValue()
+                 );
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
@@ -219,7 +225,7 @@ int main(int argc, char* const argv[])
 
     //-- translate all vertices to avoid potential problems
     for (auto& s : lsSolids)
-      s.translate_vertices();
+      s->translate_vertices();
     
     //-- now the validation starts
     if ( (lsSolids.empty() == false) && (ioerrs.has_errors() == false) )
@@ -238,11 +244,11 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsSolids.size())));
         i++;
-        std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
-        std::clog << "Number shells: " << (s.num_ishells() + 1) << std::endl;
-        std::clog << "Number faces: " << s.num_faces() << std::endl;
-        std::clog << "Number vertices: " << s.num_vertices() << std::endl;
-        if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
+        std::clog << std::endl << "===== Validating Primitive #" << s->get_id() << " =====" << std::endl;
+        std::clog << "Number shells: " << (s->num_ishells() + 1) << std::endl;
+        std::clog << "Number faces: " << s->num_faces() << std::endl;
+        std::clog << "Number vertices: " << s->num_vertices() << std::endl;
+        if (s->validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else
           std::clog << "===== VALID =====" << std::endl;
@@ -306,16 +312,17 @@ int main(int argc, char* const argv[])
   }
 }
 
-std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d)
+
+std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d)
 {
   int bValid = 0;
   std::stringstream ss;
   std::map<int,int> errors;
   for (auto& s : lsSolids)
   {
-    if (s.is_valid() == true)
+    if (s->is_valid() == true)
       bValid++;
-    for (auto& code : s.get_unique_error_codes())
+    for (auto& code : s->get_unique_error_codes())
       errors[code] = 0;
   }
   if (errors.size() > 0)
@@ -332,7 +339,7 @@ std::string print_unit_tests(vector<Solid>& lsSolids, Primitive3D prim3d)
 }
 
 
-std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d)
+std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -348,7 +355,7 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   ss << "total # of primitives: " << setw(8) << lsSolids.size() << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
-    if (s.is_valid() == true)
+    if (s->is_valid() == true)
       bValid++;
   int percentage;
   if (lsSolids.size() == 0)
@@ -365,12 +372,12 @@ std::string print_summary_validation(vector<Solid>& lsSolids, Primitive3D prim3d
   std::map<int,int> errors;
   for (auto& s : lsSolids)
   {
-    for (auto& code : s.get_unique_error_codes())
+    for (auto& code : s->get_unique_error_codes())
       errors[code] = 0;
   }
   for (auto& s : lsSolids)
   {
-    for (auto& code : s.get_unique_error_codes())
+    for (auto& code : s->get_unique_error_codes())
       errors[code] += 1;
   }
   if (errors.size() > 0)
@@ -393,7 +400,7 @@ void write_report_text(std::ofstream& ss,
                        double snap_tolerance,
                        double planarity_d2p,
                        double planarity_n,
-                       vector<Solid>& lsSolids,
+                       vector<Solid*>& lsSolids,
                        IOErrors ioerrs,
                        bool onlyinvalid)
 {
@@ -425,8 +432,8 @@ void write_report_text(std::ofstream& ss,
   {
     for (auto& s : lsSolids) 
     {
-      if ( !((onlyinvalid == true) && (s.is_valid() == true)) )
-        ss << s.get_report_text();
+      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
+        ss << s->get_report_text();
     }
   }
 }
@@ -438,7 +445,7 @@ void write_report_xml(std::ofstream& ss,
                       double snap_tolerance,
                       double planarity_d2p,
                       double planarity_n,
-                      vector<Solid>& lsSolids,
+                      vector<Solid*>& lsSolids,
                       IOErrors ioerrs,
                       bool onlyinvalid)
 {
@@ -458,7 +465,7 @@ void write_report_xml(std::ofstream& ss,
   ss << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
-    if (s.is_valid() == true)
+    if (s->is_valid() == true)
       bValid++;
   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
   ss << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
@@ -477,8 +484,8 @@ void write_report_xml(std::ofstream& ss,
   {
     for (auto& s : lsSolids) 
     {
-      if ( !((onlyinvalid == true) && (s.is_valid() == true)) )
-        ss << s.get_report_xml();
+      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
+        ss << s->get_report_xml();
     }
   }
   ss << "</val3dity>" << std::endl;
