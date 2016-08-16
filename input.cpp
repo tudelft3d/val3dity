@@ -380,7 +380,7 @@ void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, 
 }
 
 
-void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim, bool buildings, IOErrors& errs, double tol_snap)
+void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim, bool buildings, IOErrors& errs, double tol_snap, int& nobuildings)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
@@ -415,6 +415,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
   {
     s = "//" + localise("Building");
     nbuildings = doc.select_nodes(s.c_str());
+    nobuildings = nbuildings.size();
     std::cout << "# of CityGML Buildings found: " << nbuildings.size() << std::endl;
   }
 

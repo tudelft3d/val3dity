@@ -30,7 +30,7 @@
 #include <time.h>  
 
 
-std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings);
+std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings, int& nobuildings);
 std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d);
 
 void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
@@ -136,6 +136,7 @@ int main(int argc, char* const argv[])
     }
 
     vector<Solid*> lsSolids;
+    int nobuildings;
 
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") ||  
@@ -150,7 +151,8 @@ int main(int argc, char* const argv[])
                     prim3d, 
                     buildings.getValue(), 
                     ioerrs, 
-                    snap_tolerance.getValue()
+                    snap_tolerance.getValue(),
+                    nobuildings
                    );
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
@@ -258,7 +260,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(lsSolids, prim3d, buildings.getValue()) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsSolids, prim3d, buildings.getValue(), nobuildings) << std::endl;        
    
     if (outputxml.getValue() != "")
     {
@@ -323,7 +325,7 @@ std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d)
 }
 
 
-std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings)
+std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings, int& nobuildings)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -336,12 +338,12 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
     primitives = "MultiSurface";
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
   ss << "Primitives validated: " << primitives << std::endl;
-  ss << "total # of primitives: " << setw(8) << lsSolids.size() << std::endl;
+  ss << "Total # of primitives: " << setw(8) << lsSolids.size() << std::endl;
   int bValid = 0;
   for (auto& s : lsSolids)
     if (s->is_valid() == true)
       bValid++;
-  int percentage;
+  float percentage;
   if (lsSolids.size() == 0)
     percentage = 0;
   else
@@ -350,34 +352,47 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
   if (lsSolids.size() == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
-    ss << " (" << 100 - percentage << "%)" << std::endl;
+    ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (lsSolids.size() - bValid);
-  ss << " (" << percentage << "%)" << std::endl;
-
+  ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   //-- Building overview
   if (buildings == true)
   {
-    ss << "- - - " << std::endl;
     std::map<std::string, vector<Solid*> > dBuildings;
     for (auto& s : lsSolids)
       dBuildings[s->get_id_building()].push_back(s);
-    ss << "Buildings validated: " << setw(10) << dBuildings.size() << std::endl;
-    int bInvalid = 0;
-    for (auto b : dBuildings)
+    ss << "+++++" << std::endl;
+    ss << "Total # of Buildings: " << setw(9) << dBuildings.size() << std::endl;
+    if (dBuildings.size() == 0)
     {
-      vector<Solid*> solids = b.second;
-      for (auto& sol : b.second)
+      ss << "# valid: "   << setw(22) << 0 << " (0.0%)" << std::endl;
+      ss << "# invalid: " << setw(20) << 0 << " (0.0%)" << std::endl;
+    }  
+    else
+    {
+      int bInvalid = 0;
+      for (auto b : dBuildings)
       {
-        if (sol->is_valid() == false)
+        for (auto& sol : b.second)
         {
-          bInvalid++;
-          break;
+          if (sol->is_valid() == false)
+          {
+            bInvalid++;
+            break;
+          }
         }
       }
+      percentage = 100 * ((dBuildings.size() - bInvalid) / float(dBuildings.size()));
+      ss << "# valid: "   << setw(22) << (dBuildings.size() - bInvalid);
+      ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+      ss << "# invalid: " << setw(20) << bInvalid;
+      ss << std::fixed << setprecision(1) << " (" << (100 - percentage) << "%)" << std::endl;
     }
-    ss << "Buildings valid: " << setw(14) << bValid << std::endl;
-  }
+    if (dBuildings.size() != nobuildings)
+      ss << "(if the number of buildings is 0 then make sure" << std::endl;
+      ss << "these are stored in the primitives you are validating)" << std::endl;
 
+  }
   //-- overview of errors
   std::map<int,int> errors;
   for (auto& s : lsSolids)
@@ -392,6 +407,7 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
   }
   if (errors.size() > 0)
   {
+    ss << "+++++" << std::endl;
     ss << "Errors present:" << std::endl;
     for (auto e : errors)
     {
