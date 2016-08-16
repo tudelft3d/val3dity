@@ -389,9 +389,16 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
       ss << std::fixed << setprecision(1) << " (" << (100 - percentage) << "%)" << std::endl;
     }
     if (dBuildings.size() != nobuildings)
-      ss << "(if the number of buildings is 0 then make sure" << std::endl;
-      ss << "these are stored in the primitives you are validating)" << std::endl;
-
+    {
+      ss << "(the Buildings are not stored with ";
+      if (prim3d == SOLID)
+        ss << "gml:Solid";
+      else if (prim3d == COMPOSITESURFACE)
+        ss << "gml:CompositeSurface";
+      else 
+        ss << "gml:MultiSurface";
+      ss << ")" << std::endl;
+    }
   }
   //-- overview of errors
   std::map<int,int> errors;

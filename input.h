@@ -50,7 +50,7 @@ void          readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOE
 Shell*        readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
 void          readGMLfile(std::vector<Solid*>& lsSolids, std::string &ifile, Primitive3D prim, bool buildings, IOErrors& errs, double tol_snap, int& nobuildings);
 void          process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-Solid*        process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Solid*        process_gml_prim3d(pugi::xpath_node nsolid, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 Shell*        process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 vector<int>   process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs);
 
