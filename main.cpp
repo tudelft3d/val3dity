@@ -62,7 +62,7 @@ public:
     std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml -p MS" << std::endl;
     std::cout << "\t\tValidates each gml:MultiSurface in input.gml and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml --oxml report.xml" << std::endl;
+    std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
     std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl;
@@ -90,7 +90,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "1.1");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "1.2");
   MyOutput my;
   cmd.setOutput(&my);
   try {
