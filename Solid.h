@@ -34,7 +34,7 @@
 class Solid
 {
 public:
-  Solid();
+  Solid(InputTypes inputtype = OTHER);
   Solid(Shell* sh);
   ~Solid();
   
@@ -70,6 +70,7 @@ private:
   std::string     _id_buildingpart;
   vector<Shell*>  _shells;
   int             _is_valid;
+  InputTypes      _inputtype;
 
   std::map<int, vector< std::tuple<int, int, std::string> > > _errors;
 

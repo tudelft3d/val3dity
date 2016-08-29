@@ -70,5 +70,12 @@ typedef enum
   MULTISURFACE     = 2,
 } Primitive3D;
 
+typedef enum
+{
+  GML   = 0,
+  OBJ   = 1,
+  POLY  = 2,
+  OTHER = 3,
+} InputTypes;
 
 #endif

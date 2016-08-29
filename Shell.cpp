@@ -38,6 +38,7 @@ Shell::Shell(int id, double tol_snap)
   _id = id;
   _tol_snap = tol_snap;
   _is_valid_2d = -1;
+  _vertices_added = 0;
 }
 
 Shell::~Shell()
@@ -166,16 +167,30 @@ std::string Shell::get_coords_key(Point3* p)
   return s;
 }
 
+bool Shell::were_vertices_merged_during_parsing()
+{
+  if (this->number_vertices() == this->_vertices_added)
+    return false;
+  else 
+    return true;
+}
+
+
+int Shell::get_number_parsed_vertices()
+{
+  return _vertices_added;
+}
+
 
 int Shell::add_point(Point3 p)
 {
+  _vertices_added += 1;
   auto it = _dPts.find(get_coords_key(&p));
   if (it == _dPts.end()) 
   {
     _lsPts.push_back(p);
     _dPts[get_coords_key(&p)] = (_lsPts.size() - 1); 
     return (_lsPts.size() - 1);
-
   }
   return it->second;
 }
