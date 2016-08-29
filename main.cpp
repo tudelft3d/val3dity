@@ -96,7 +96,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one exterior shell)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
-    TCLAP::ValueArg<std::string>           outputxml("", "oxml", "output report in XML format", false, "", "string");
+    TCLAP::ValueArg<std::string>           report("r", "report", "output report in XML format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
     TCLAP::SwitchArg                       buildings("B", "Buildings", "report uses the CityGML Buildings", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
@@ -118,7 +118,7 @@ int main(int argc, char* const argv[])
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
-    cmd.add(outputxml);
+    cmd.add(report);
     cmd.parse( argc, argv );
   
     Primitive3D prim3d = SOLID;
@@ -138,11 +138,21 @@ int main(int argc, char* const argv[])
     vector<Solid*> lsSolids;
     int nobuildings;
 
+    InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
-    if ( (extension == "gml") ||  
-         (extension == "GML") ||  
-         (extension == "xml") ||  
-         (extension == "XML") ) 
+    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
+      inputtype = GML;
+    else if ( (extension == "poly") || (extension == "POLY") ) 
+      inputtype = POLY;
+    else if ( (extension == "obj") || (extension == "OBJ") ) 
+      inputtype = OBJ;
+    if (inputtype == OTHER)
+    {
+      std::cout << "File type not supported. Abort." << std::endl;
+      ioerrs.add_error(901, "File type not supported");
+    }
+
+    if (inputtype == GML)
     {
       try
       {
@@ -170,8 +180,7 @@ int main(int argc, char* const argv[])
           ioerrs.add_error(901, "Invalid GML structure, or that particular (twisted and obscure) construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues");
       }
     }
-    else if ( (extension == "poly") ||
-              (extension == "POLY") )
+    else if (inputtype == POLY)
     {
       Solid* s = new Solid;
       Shell* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
@@ -196,8 +205,7 @@ int main(int argc, char* const argv[])
           lsSolids.push_back(s);
       }
     }
-    else if ( (extension == "obj") ||
-              (extension == "OBJ") )
+    else if (inputtype == OBJ)
     {
       readOBJfile(lsSolids,
                   inputfile.getValue(), 
@@ -213,11 +221,6 @@ int main(int argc, char* const argv[])
         std::cout << "No inner shells allowed when GML file used as input." << std::endl;
         ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
       }
-    }
-    else
-    {
-      std::cout << "File type not supported. Abort." << std::endl;
-      ioerrs.add_error(901, "File type not supported");
     }
 
     //-- translate all vertices to avoid potential problems
@@ -245,7 +248,7 @@ int main(int argc, char* const argv[])
         std::clog << "Number shells: " << (s->num_ishells() + 1) << std::endl;
         std::clog << "Number faces: " << s->num_faces() << std::endl;
         std::clog << "Number vertices: " << s->num_vertices() << std::endl;
-        if ( (extension == "obj") || (extension == "OBJ") ) 
+        if (inputtype == OBJ) 
         {
           Shell* sh = s->get_oshell();
           if (sh->were_vertices_merged_during_parsing() == true)
@@ -271,10 +274,10 @@ int main(int argc, char* const argv[])
     //-- print summary of errors
     std::cout << "\n" << print_summary_validation(lsSolids, prim3d, buildings.getValue(), nobuildings) << std::endl;        
    
-    if (outputxml.getValue() != "")
+    if (report.getValue() != "")
     {
       std::ofstream thereport;
-      thereport.open(outputxml.getValue());
+      thereport.open(report.getValue());
       write_report_xml(thereport, 
                        inputfile.getValue(),
                        prim3d, 
@@ -285,10 +288,10 @@ int main(int argc, char* const argv[])
                        ioerrs,
                        onlyinvalid.getValue());
       thereport.close();
-      std::cout << "Full validation report saved to " << outputxml.getValue() << std::endl;
+      std::cout << "Full validation report saved to " << report.getValue() << std::endl;
     }
-    if (outputxml.getValue() == "")
-      std::cout << "-->The validation report wasn't saved, use option '--oxml' or '--otxt'." << std::endl;
+    if (report.getValue() == "")
+      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
 
     if (verbose.getValue() == false)
     {

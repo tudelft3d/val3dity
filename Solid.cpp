@@ -43,13 +43,14 @@ typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Pol
 //-- to keep track of all gml:Solids in a GML file
 int Solid::_counter = 0;
 
-Solid::Solid()
+Solid::Solid(InputTypes inputtype)
 {
   _id = std::to_string(_counter);
   _counter++;
   _is_valid = -1;
   _id_building = "";
   _id_buildingpart = "";
+  _inputtype = inputtype;
 }
 
 
@@ -212,6 +213,12 @@ std::string Solid::get_report_xml()
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
+  if (this->_inputtype == OBJ)
+  {
+    Shell* sh = this->get_oshell();
+    if (sh->were_vertices_merged_during_parsing() == true)
+      ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
+  }
   if (_id_building.empty() == false)
     ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
   if (_id_buildingpart.empty() == false)

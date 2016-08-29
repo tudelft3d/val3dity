@@ -608,7 +608,7 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
       {
-        Solid* sol = new Solid;
+        Solid* sol = new Solid(OBJ);
         sol->set_oshell(sh);
         lsSolids.push_back(sol);
         sh = new Shell(0, tol_snap);
@@ -639,7 +639,7 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
       sh->add_face(pgnids);
     }
   }
-  Solid* s = new Solid;
+  Solid* s = new Solid(OBJ);
   s->set_oshell(sh);
   lsSolids.push_back(s);
   for (auto& each : allvertices)
