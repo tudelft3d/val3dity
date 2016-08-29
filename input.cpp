@@ -623,10 +623,8 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
         tmp.clear();
         iss >> tmp;
         if (tmp.compare("\\") == 0) {
-          std::clog << "oups" << std::endl;
           std::getline(infile, l);
           iss.str(l);
-//          iss >> tmp;
           continue;
         }
         if (tmp.empty() == false) {

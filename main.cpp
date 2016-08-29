@@ -241,6 +241,7 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsSolids.size())));
         i++;
+<<<<<<< Updated upstream
         std::clog << std::endl << "===== Validating Primitive #" << s->get_id() << " =====" << std::endl;
         std::clog << "Number shells: " << (s->num_ishells() + 1) << std::endl;
         std::clog << "Number faces: " << s->num_faces() << std::endl;
@@ -251,6 +252,23 @@ int main(int argc, char* const argv[])
           std::clog << "BuildingPart: " << s->get_id_buildingpart() << std::endl;
 
         if (s->validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
+=======
+        std::clog << std::endl << "===== Validating Primitive #" << s.get_id() << " =====" << std::endl;
+        std::clog << "Number shells: " << (s.num_ishells() + 1) << std::endl;
+        std::clog << "Number faces: " << s.num_faces() << std::endl;
+        std::clog << "Number vertices: " << s.num_vertices() << std::endl;
+        if ( (extension == "obj") || (extension == "OBJ") ) 
+        {
+          Shell* sh = s.get_oshell();
+          if (sh->were_vertices_merged_during_parsing() == true)
+          {
+            std::clog << "-->" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << " duplicate vertices were merged" << std::endl;
+            std::clog << "-->" << "tolerance applied was " << snap_tolerance.getValue() << std::endl;
+          }
+
+        }
+        if (s.validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
+>>>>>>> Stashed changes
           std::clog << "===== INVALID =====" << std::endl;
         else
           std::clog << "===== VALID =====" << std::endl;
