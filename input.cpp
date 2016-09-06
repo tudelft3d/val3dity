@@ -426,7 +426,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
   s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
-   std::cout << "XLinks found, resolving them..." << std::endl;
+   std::cout << "XLinks found, resolving them..." << std::flush;
   map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
   {
@@ -441,7 +441,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
    dallpoly[it->node().attribute("gml:id").value()] = *it;
   }
 
-  //-- checking xlinks validity now not to be bitten later
+  //-- checking xlinks validity now, not to be bitten later
   s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it) 
@@ -458,6 +458,8 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
       return;
     }
   }
+  if (nallpoly.size() > 0)
+    std::cout << "done." << std::endl;
   if (buildings == true) 
   {
     for (auto& nbuilding: nbuildings)

@@ -55,13 +55,15 @@ public:
         std::cout << "\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl;
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
-    std::cout << "EXAMPLES" << std::endl;
+    std::cout << "==SOME EXAMPLES==" << std::endl;
     std::cout << "\tval3dity input.gml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
+    std::cout << "\tval3dity input.gml -B" << std::endl;
+    std::cout << "\t\tsame as previous, but reporting considers Buildings for reporting" << std::endl;
     std::cout << "\tval3dity input.obj" << std::endl;
     std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -p MS" << std::endl;
-    std::cout << "\t\tValidates each gml:MultiSurface in input.gml and outputs a summary" << std::endl;
+    std::cout << "\tval3dity input.gml -B -p MS" << std::endl;
+    std::cout << "\t\tValidates each building represented with gml:MultiSurface and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
@@ -94,11 +96,11 @@ int main(int argc, char* const argv[])
   MyOutput my;
   cmd.setOutput(&my);
   try {
-    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (several gml:Solids possible) or POLY (one exterior shell)", true, "", "string");
-    TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only) (more than one possible)", false, "string");
+    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (containing several solids/objects), OBJ or POLY (one exterior shell only)", true, "", "string");
+    TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only; more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           report("r", "report", "output report in XML format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
-    TCLAP::SwitchArg                       buildings("B", "Buildings", "report uses the CityGML Buildings", false);
+    TCLAP::SwitchArg                       buildings("B", "Buildings", "report considers the CityGML Buildings", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
@@ -402,7 +404,8 @@ std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3
     }
     if (dBuildings.size() != nobuildings)
     {
-      ss << "(the Buildings are not stored with ";
+      ss << "(file contains " << nobuildings << " Buildings in total)" << std::endl;
+      ss << "(but " << dBuildings.size() << " are stored with ";
       if (prim3d == SOLID)
         ss << "gml:Solid";
       else if (prim3d == COMPOSITESURFACE)
