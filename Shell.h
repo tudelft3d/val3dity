@@ -54,6 +54,8 @@ public:
   std::set<int> get_unique_error_codes();
   void          translate_vertices(double minx, double miny);
   std::string   get_poly_representation();
+  bool          were_vertices_merged_during_parsing();
+  int           get_number_parsed_vertices();
   
 private:
   int                                     _id;
@@ -65,6 +67,7 @@ private:
   CgalPolyhedron*                         _polyhedron;
   double                                  _tol_snap;
   int                                     _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
+  int                                     _vertices_added;
 
   std::map<int, vector<std::tuple<std::string, std::string> > > _errors;
 

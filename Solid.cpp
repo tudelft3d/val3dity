@@ -43,11 +43,14 @@ typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Pol
 //-- to keep track of all gml:Solids in a GML file
 int Solid::_counter = 0;
 
-Solid::Solid()
+Solid::Solid(InputTypes inputtype)
 {
   _id = std::to_string(_counter);
   _counter++;
   _is_valid = -1;
+  _id_building = "";
+  _id_buildingpart = "";
+  _inputtype = inputtype;
 }
 
 
@@ -56,6 +59,8 @@ Solid::Solid(Shell* sh)
   _shells.push_back(sh);
   _id = std::to_string(_counter);
   _counter++;
+  _id_building = "";
+  _id_buildingpart = "";
 }
 
 Solid::~Solid()
@@ -111,6 +116,26 @@ bool Solid::is_empty()
       return true;
   }
   return false;
+}
+
+std::string Solid::get_id_building()
+{
+  return _id_building;
+}
+
+void Solid::set_id_building(std::string id)
+{
+  _id_building = id;
+}
+
+std::string Solid::get_id_buildingpart()
+{
+  return _id_buildingpart;
+}
+
+void Solid::set_id_buildingpart(std::string id)
+{
+  _id_buildingpart = id;
 }
 
 
@@ -188,6 +213,16 @@ std::string Solid::get_report_xml()
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
+  if (this->_inputtype == OBJ)
+  {
+    Shell* sh = this->get_oshell();
+    if (sh->were_vertices_merged_during_parsing() == true)
+      ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
+  }
+  if (_id_building.empty() == false)
+    ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
+  if (_id_buildingpart.empty() == false)
+    ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -210,33 +245,6 @@ std::string Solid::get_report_xml()
     ss << sh->get_report_xml();
   }
   ss << "\t</Primitive>" << std::endl;
-  return ss.str();
-}
-
-std::string Solid::get_report_text()
-{
-  std::stringstream ss;
-  ss << "===== Primitive " << this->_id << " =====" << std::endl;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
-      if (std::get<0>(e) == -1)
-        ss << "\t\tShells: -1" << std::endl;
-      else if (std::get<1>(e) == -1)
-        ss << "\t\tShells: " << std::get<0>(e) << std::endl;
-      else
-        ss << "\t\tShells: " << std::get<0>(e) << "--" << std::get<1>(e) << std::endl;
-      ss << "\t\tInfo: "  << std::get<2>(e) << std::endl;
-    }
-  }
-  for (auto& sh : _shells)
-  {
-    ss << sh->get_report_text();
-  }
-  if (this->is_valid() == true)
-    ss << "\tVALID" << std::endl;
   return ss.str();
 }
 
