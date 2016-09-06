@@ -252,10 +252,21 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
             if (std::string(child2.name()).find("baseSurface") != std::string::npos) 
             {
               std::string k = child2.attribute("xlink:href").value();
-              if (k[0] == '#')
-                k = k.substr(1);
-              p = dallpoly[k];
-              break;
+              if (k != "")
+              {
+                if (k[0] == '#')
+                  k = k.substr(1);
+                p = dallpoly[k];
+                break;
+              }
+              for (pugi::xml_node child3 : child2.children())
+              {
+                if (std::string(child3.name()).find("Polygon") != std::string::npos)
+                {
+                  p = child;
+                  break;
+                }
+              }
             }
           }
           break;
