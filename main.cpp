@@ -129,17 +129,6 @@ int main(int argc, char* const argv[])
     if (primitives.getValue() == "MS")
       prim3d = MULTISURFACE;
 
-    //-- if verbose == false then log to a file
-    if (verbose.getValue() == false)
-    {
-      savedBufferCLOG = clog.rdbuf();
-      mylog.open("val3dity.log");
-      std::clog.rdbuf(mylog.rdbuf());
-    }
-
-    vector<Solid*> lsSolids;
-    int nobuildings;
-
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
@@ -154,6 +143,24 @@ int main(int argc, char* const argv[])
       ioerrs.add_error(901, "File type not supported");
     }
 
+    bool usebuildings = buildings.getValue();    
+    if ( (inputtype != GML) && (buildings.getValue() == true) )
+    {
+      std::cout << "Ignoring flag '-B/--Buildings' for OBJ and POLY files" << std::endl;
+      usebuildings = false;
+    }
+
+    //-- if verbose == false then log to a file
+    if (verbose.getValue() == false)
+    {
+      savedBufferCLOG = clog.rdbuf();
+      mylog.open("val3dity.log");
+      std::clog.rdbuf(mylog.rdbuf());
+    }
+
+    vector<Solid*> lsSolids;
+    int nobuildings;
+
     if (inputtype == GML)
     {
       try
@@ -161,7 +168,7 @@ int main(int argc, char* const argv[])
         readGMLfile(lsSolids,
                     inputfile.getValue(), 
                     prim3d, 
-                    buildings.getValue(), 
+                    usebuildings, 
                     ioerrs, 
                     snap_tolerance.getValue(),
                     nobuildings
@@ -274,7 +281,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(lsSolids, prim3d, buildings.getValue(), nobuildings) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsSolids, prim3d, usebuildings, nobuildings) << std::endl;        
    
     if (report.getValue() != "")
     {
