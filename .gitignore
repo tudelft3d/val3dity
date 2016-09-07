@@ -21,3 +21,15 @@ cmake_install.cmake
 *.pyc
 *.log
 *.report.txt
+
+# Visual studio files
+vs_build/.vs
+*.VC.opendb
+*.VC.db
+*.exe
+*.ilk
+*.pdb
+*.vcxproj.user
+*.lib
+x64/
+x86/
