@@ -100,7 +100,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;..\..\boost_1_60_0;..\..\CGAL-4.8\include;..\..\CGAL-4.8\bin\include;..\..\CGAL-4.8\auxiliary\gmp\include;..\..\CGAL-4.8\build\include;..\..\assimp-3.2\include;C:\OSGeo4W64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\boost_1_60_0;..\..\CGAL-4.8\include;..\..\CGAL-4.8\bin\include;..\..\CGAL-4.8\auxiliary\gmp\include;..\..\CGAL-4.8\build\include;C:\OSGeo4W64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -110,7 +110,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;..\..\boost_1_60_0;..\..\CGAL-4.8\include;..\..\CGAL-4.8\bin\include;..\..\CGAL-4.8\auxiliary\gmp\include;..\..\CGAL-4.8\build\include;..\..\assimp-3.2\include;C:\OSGeo4W64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\boost_1_60_0;..\..\CGAL-4.8\include;..\..\CGAL-4.8\bin\include;..\..\CGAL-4.8\auxiliary\gmp\include;..\..\CGAL-4.8\build\include;C:\OSGeo4W64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -162,11 +162,6 @@
     <ClInclude Include="..\Solid.h" />
     <ClInclude Include="..\validate_shell.h" />
     <ClInclude Include="..\validate_shell_intersection.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\assimp-3.2\vs_build\assimp.vcxproj">
-      <Project>{7a042954-9c47-38b3-bdad-e2e0a56616eb}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
