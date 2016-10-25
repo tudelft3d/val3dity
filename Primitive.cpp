@@ -10,9 +10,9 @@
 
 
 Primitive::Primitive() {
-
+  _id_building = "";
+  _id_buildingpart = "";
 }
-
 
 
 std::string Primitive::get_id_building()
