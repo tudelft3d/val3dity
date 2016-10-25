@@ -19,9 +19,9 @@ public:
               MultiSolid(); 
 
   bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
-  std::string get_report_xml();
   bool        is_valid();
   bool        is_empty();
+  std::string get_report_xml();
 
   bool        add_solid(Solid* s);
   int         num_solids();

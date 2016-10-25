@@ -48,8 +48,6 @@ Solid::Solid(InputTypes inputtype)
   _id = std::to_string(_counter);
   _counter++;
   _is_valid = -1;
-  _id_building = "";
-  _id_buildingpart = "";
   _inputtype = inputtype;
 }
 
@@ -59,8 +57,6 @@ Solid::Solid(Shell* sh)
   _shells.push_back(sh);
   _id = std::to_string(_counter);
   _counter++;
-  _id_building = "";
-  _id_buildingpart = "";
 }
 
 Solid::~Solid()
@@ -116,26 +112,6 @@ bool Solid::is_empty()
       return true;
   }
   return false;
-}
-
-std::string Solid::get_id_building()
-{
-  return _id_building;
-}
-
-void Solid::set_id_building(std::string id)
-{
-  _id_building = id;
-}
-
-std::string Solid::get_id_buildingpart()
-{
-  return _id_buildingpart;
-}
-
-void Solid::set_id_buildingpart(std::string id)
-{
-  _id_buildingpart = id;
 }
 
 
