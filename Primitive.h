@@ -23,15 +23,14 @@ public:
   virtual std::string   get_report_xml() = 0;
   // virtual void          translate_vertices() = 0;
 
-  std::string           get_id_building();
-  void                  set_id_building(std::string id);
-  std::string           get_id_buildingpart();
-  void                  set_id_buildingpart(std::string id);
+  void                  add_error(int code, std::string faceid, std::string info);
+  std::set<int>         get_unique_error_codes();
 
 protected:
+  std::string   _id;
 
-  std::string     _id_building;
-  std::string     _id_buildingpart;
+  std::map<int, vector< std::tuple<std::string, std::string> > > _errors;
+
 };
 
 

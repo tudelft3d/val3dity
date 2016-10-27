@@ -9,7 +9,6 @@
 #ifndef Building_h
 #define Building_h
 
-
 #include "definitions.h"
 
 class Building

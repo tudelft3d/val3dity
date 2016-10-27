@@ -10,27 +10,32 @@
 
 
 Primitive::Primitive() {
-  _id_building = "";
-  _id_buildingpart = "";
 }
 
 
-std::string Primitive::get_id_building()
+
+
+void Primitive::add_error(int code, std::string faceid, std::string info)
 {
-  return _id_building;
+  std::tuple<std::string, std::string> a(faceid, info);
+  _errors[code].push_back(a);
+  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  if (faceid.empty() == false)
+    std::clog << " (id: " << faceid << ")";
+  std::clog << std::endl;
+  if (info.empty() == false)
+    std::clog << "\t[" << info << "]" << std::endl;
 }
 
-void Primitive::set_id_building(std::string id)
+std::set<int> Primitive::get_unique_error_codes()
 {
-  _id_building = id;
+  std::set<int> errs;
+  for (auto& err : _errors)
+  {
+    errs.insert(std::get<0>(err));
+  }
+  return errs;
 }
 
-std::string Primitive::get_id_buildingpart()
-{
-  return _id_buildingpart;
-}
 
-void Primitive::set_id_buildingpart(std::string id)
-{
-  _id_buildingpart = id;
-}
+
