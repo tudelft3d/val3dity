@@ -16,15 +16,16 @@
 class CompositeSolid : public Primitive 
 {
 public:
-              CompositeSolid(); 
+                CompositeSolid(); 
 
-  bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
-  std::string get_report_xml();
-  bool        is_valid();
-  bool        is_empty();
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  std::string   get_report_xml();
+  bool          is_valid();
+  bool          is_empty();
+  std::set<int> get_unique_error_codes();
 
-  bool        add_solid(Solid* s);
-  int         num_solids();
+  bool          add_solid(Solid* s);
+  int           num_solids();
 
 protected:
   std::vector<Solid*> _lsSolids;

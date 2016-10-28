@@ -21,10 +21,11 @@ public:
   virtual bool          is_valid() = 0;
   virtual bool          is_empty() = 0;
   virtual std::string   get_report_xml() = 0;
+  virtual std::set<int> get_unique_error_codes();
+
   // virtual void          translate_vertices() = 0;
 
   void                  add_error(int code, std::string faceid, std::string info);
-  std::set<int>         get_unique_error_codes();
 
 protected:
   std::string   _id;
