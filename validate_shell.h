@@ -24,7 +24,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "Shell.h"
+#include "Surface.h"
 #include <CGAL/intersections.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/intersections.h>
@@ -39,7 +39,7 @@ class ConstructShell : public CGAL::Modifier_base<HDS> {
   vector< vector<int*> > *faces;
   vector<Point3> *lsPts;
   int _width;
-  Shell* sh;
+  Surface* sh;
 public:
   bool isValid;
   ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, Shell* sh)

@@ -123,7 +123,7 @@ struct Intersect_facets {
 };
 
 
-bool is_polyhedron_geometrically_consistent(Shell* sh)
+bool is_polyhedron_geometrically_consistent(Surface* sh)
 {
   std::vector<Box> boxes;
   CgalPolyhedron* p = sh->get_cgal_polyhedron();

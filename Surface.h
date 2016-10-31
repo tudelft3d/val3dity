@@ -18,14 +18,17 @@ public:
   Surface  (int id = -1, double tol_snap = 0.0);
   ~Surface ();
   
+  bool validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals);
+  bool validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
+  
+  bool is_shell(double tol_planarity_d2p, double tol_planarity_normals);
+
+  CgalPolyhedron* get_cgal_polyhedron();
+
   int    number_vertices();
   int    number_faces();
   void   get_min_bbox(double& x, double& y);
   int    get_id();
-  
-  CgalPolyhedron* get_cgal_polyhedron();
-  
-  bool   validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals);
 
   bool   is_empty();
   int    add_point(Point3 p);
@@ -38,6 +41,7 @@ public:
   std::set<int> get_unique_error_codes();
   void          translate_vertices(double minx, double miny);
   std::string   get_poly_representation();
+
   bool          were_vertices_merged_during_parsing();
   int           get_number_parsed_vertices();
   
@@ -54,12 +58,9 @@ private:
   int                                     _vertices_added;
 
   std::map<int, vector<std::tuple<std::string, std::string> > > _errors;
-
-  bool validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
-  bool validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals);
-  bool validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
-  bool validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
   
+  bool validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
+  bool validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
   std::string get_coords_key(Point3* p);
   bool triangulate_shell();
   bool construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum);

@@ -23,7 +23,8 @@ public:
   bool        is_valid();
   bool        is_empty();
 
-  bool        add_surface(Surface* s);
+  bool        set_surface(Surface* s);
+  Surface*    get_surface();
 
 protected:
   Surface* _surface;

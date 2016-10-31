@@ -36,7 +36,7 @@ typedef CgalPolyhedron::Facet_const_iterator    Facet_const_iterator;
 typedef CgalPolyhedron::Facet_const_handle      Facet_const_handle;
 
 
-CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell* sh)
+CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Surface* sh)
 {
   CgalPolyhedron* P = new CgalPolyhedron();
   ConstructShell<HalfedgeDS> s(lsTr, lsPts, sh);
