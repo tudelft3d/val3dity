@@ -165,7 +165,7 @@ std::string localise(std::string s)
 }
 
 
-vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
+vector<int> process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   vector<int> r;
@@ -209,11 +209,11 @@ vector<int> process_gml_ring(pugi::xml_node n, Shell* sh, IOErrors& errs) {
 }
 
 
-Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
+Surface* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
-  Shell* sh = new Shell(id, tol_snap);
+  Surface* sh = new Surface(id, tol_snap);
   int i = 0;
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
@@ -316,7 +316,7 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
 }
 
 
-Solid* process_gml_prim3d(pugi::xpath_node nsolid, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+Solid* process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   //-- exterior shell
   Solid* sol = new Solid;
@@ -373,7 +373,7 @@ void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, 
       pugi::xpath_node_set nsolids = nbp.node().select_nodes(s2.c_str());
       for (auto& nsolid : nsolids)
       {
-        Solid* sol = process_gml_prim3d(nsolid, prim, dallpoly, tol_snap, errs);
+        Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
         sol->set_id_building(id_building);
         sol->set_id_buildingpart(id_buildingpart);
         lsSolids.push_back(sol);
@@ -385,7 +385,7 @@ void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, 
     pugi::xpath_node_set nsolids = nbuilding.node().select_nodes(s2.c_str());
     for (auto& nsolid : nsolids)
     {
-      Solid* sol = process_gml_prim3d(nsolid, prim, dallpoly, tol_snap, errs);
+      Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
       sol->set_id_building(id_building);
       lsSolids.push_back(sol);
     }
@@ -490,7 +490,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
 }
 
 
-Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
+Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::clog << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -500,7 +500,7 @@ Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return NULL;
   }
-  Shell* sh = new Shell(shellid);  
+  Surface* sh = new Surface(shellid);  
   //-- read the points
   int num, tmpint;
   float tmpfloat;
@@ -607,7 +607,7 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
     return;
   }
   std::cout << "Parsing the file..." << std::endl; 
-  Shell* sh = new Shell(0, tol_snap);
+  Surface* sh = new Surface(0, tol_snap);
   std::string l;
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
@@ -624,7 +624,7 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
         Solid* sol = new Solid(OBJ);
         sol->set_oshell(sh);
         lsSolids.push_back(sol);
-        sh = new Shell(0, tol_snap);
+        sh = new Surface(0, tol_snap);
       }
     }
     else if (l.substr(0, 2) == "f ") {
