@@ -211,7 +211,7 @@ int main(int argc, char* const argv[])
           }
         }
         if (ioerrs.has_errors() == false)
-          lsSolids.push_back(s);
+          lsPrimitives.push_back(s);
       }
     }
     else if (inputtype == OBJ)
@@ -282,7 +282,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(lsPrimitives, prim3d, usebuildings, nobuildings) << std::endl;        
+//    std::cout << "\n" << print_summary_validation(lsPrimitives, prim3d, usebuildings, nobuildings) << std::endl;        
    
     // if (report.getValue() != "")
     // {
@@ -309,10 +309,10 @@ int main(int argc, char* const argv[])
       clog.rdbuf(savedBufferCLOG);
       mylog.close();
     }
-    if (unittests.getValue() == true)
-    {
-      std::cout << "\n" << print_unit_tests(lsSolids, prim3d, usebuildings) << std::endl;
-    }
+//    if (unittests.getValue() == true)
+//    {
+//      std::cout << "\n" << print_unit_tests(lsSolids, prim3d, usebuildings) << std::endl;
+//    }
     return(1);
   }
   catch (TCLAP::ArgException &e) {
@@ -322,52 +322,52 @@ int main(int argc, char* const argv[])
 }
 
 
-std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d, bool usebuildings)
-{
-  int bValid = 0;
-  std::stringstream ss;
-  std::map<int,int> errors;
-  for (auto& s : lsSolids)
-  {
-    if (s->is_valid() == true)
-      bValid++;
-    for (auto& code : s->get_unique_error_codes())
-      errors[code] = 0;
-  }
-  //-- Building overview
-  std::map<std::string, vector<Solid*> > dBuildings;
-  int buildingInvalid = 0;
-  if (usebuildings == true)
-  {
-    for (auto& s : lsSolids)
-      dBuildings[s->get_id_building()].push_back(s);
-    // ss << "Total # of Buildings: " << setw(9) << dBuildings.size() << std::endl;
-    for (auto b : dBuildings)
-    {
-      for (auto& sol : b.second)
-      {
-        if (sol->is_valid() == false)
-        {
-          buildingInvalid++;
-          break;
-        }
-      }
-    }
-  }
-  if (errors.size() > 0)
-  {
-    ss << "@INVALID " << lsSolids.size() << " " << (lsSolids.size() - bValid) << " ";
-    ss << dBuildings.size() << " " << buildingInvalid << " ";
-    for (auto e : errors)
-      ss << e.first << " ";
-  }
-  else {
-    ss << "@VALID " << lsSolids.size() << " " << (lsSolids.size() - bValid) << " ";
-    ss << dBuildings.size() << " " << buildingInvalid;
-  }
-  ss << std::endl;
-  return ss.str();
-}
+//std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d, bool usebuildings)
+//{
+//  int bValid = 0;
+//  std::stringstream ss;
+//  std::map<int,int> errors;
+//  for (auto& s : lsSolids)
+//  {
+//    if (s->is_valid() == true)
+//      bValid++;
+//    for (auto& code : s->get_unique_error_codes())
+//      errors[code] = 0;
+//  }
+//  //-- Building overview
+//  std::map<std::string, vector<Solid*> > dBuildings;
+//  int buildingInvalid = 0;
+//  if (usebuildings == true)
+//  {
+//    for (auto& s : lsSolids)
+//      dBuildings[s->get_id_building()].push_back(s);
+//    // ss << "Total # of Buildings: " << setw(9) << dBuildings.size() << std::endl;
+//    for (auto b : dBuildings)
+//    {
+//      for (auto& sol : b.second)
+//      {
+//        if (sol->is_valid() == false)
+//        {
+//          buildingInvalid++;
+//          break;
+//        }
+//      }
+//    }
+//  }
+//  if (errors.size() > 0)
+//  {
+//    ss << "@INVALID " << lsSolids.size() << " " << (lsSolids.size() - bValid) << " ";
+//    ss << dBuildings.size() << " " << buildingInvalid << " ";
+//    for (auto e : errors)
+//      ss << e.first << " ";
+//  }
+//  else {
+//    ss << "@VALID " << lsSolids.size() << " " << (lsSolids.size() - bValid) << " ";
+//    ss << dBuildings.size() << " " << buildingInvalid;
+//  }
+//  ss << std::endl;
+//  return ss.str();
+//}
 
 
 // std::string print_summary_validation(vector<Solid*>& lsSolids, Primitive3D prim3d, bool buildings, int& nobuildings)

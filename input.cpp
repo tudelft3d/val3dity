@@ -374,8 +374,8 @@ void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, 
       for (auto& nsolid : nsolids)
       {
         Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
-        sol->set_id_building(id_building);
-        sol->set_id_buildingpart(id_buildingpart);
+//        sol->set_id_building(id_building);
+//        sol->set_id_buildingpart(id_buildingpart);
         lsSolids.push_back(sol);
       }
     }
@@ -386,7 +386,7 @@ void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, 
     for (auto& nsolid : nsolids)
     {
       Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
-      sol->set_id_building(id_building);
+//      sol->set_id_building(id_building);
       lsSolids.push_back(sol);
     }
   }
@@ -482,7 +482,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
   {
     for(auto& nsolid: nsolids)
     {
-      Solid* sol = process_gml_prim3d(nsolid, prim, dallpoly, tol_snap, errs);
+      Solid* sol = process_gml_solid(nsolid, prim, dallpoly, tol_snap, errs);
       lsSolids.push_back(sol);
     }
   }
@@ -621,7 +621,8 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
       {
-        Solid* sol = new Solid(OBJ);
+//        Solid* sol = new Solid(OBJ);
+        Solid* sol = new Solid();
         sol->set_oshell(sh);
         lsSolids.push_back(sol);
         sh = new Surface(0, tol_snap);
@@ -652,7 +653,8 @@ void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& er
       sh->add_face(pgnids);
     }
   }
-  Solid* s = new Solid(OBJ);
+//  Solid* s = new Solid(OBJ);
+  Solid* s = new Solid();
   s->set_oshell(sh);
   lsSolids.push_back(s);
   for (auto& each : allvertices)

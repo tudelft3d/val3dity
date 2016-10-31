@@ -42,7 +42,7 @@ class ConstructShell : public CGAL::Modifier_base<HDS> {
   Surface* sh;
 public:
   bool isValid;
-  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, Shell* sh)
+  ConstructShell(vector< vector<int*> > *faces, vector<Point3> *lsPts, Surface* sh)
     :faces(faces), lsPts(lsPts), sh(sh), isValid(true), _width(static_cast<int>(lsPts->size()))
   {
   }
@@ -56,6 +56,6 @@ public:
 };
 
 
-CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell* sh);
+CgalPolyhedron*   construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Surface* sh);
 CgalPolyhedron*   construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter);

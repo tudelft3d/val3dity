@@ -37,6 +37,11 @@ bool CompositeSolid::is_valid() {
 }
 
 
+std::string CompositeSolid::get_id() {
+  return _id;
+}
+
+
 bool CompositeSolid::is_empty() {
   return _lsSolids.empty();
 }
@@ -53,5 +58,5 @@ bool CompositeSolid::add_solid(Solid* s) {
 }
 
 int CompositeSolid::num_solids() {
-  return _lsSolids.count();
+  return _lsSolids.size();
 }

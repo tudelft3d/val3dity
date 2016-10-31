@@ -27,6 +27,10 @@ bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals
   return isValid;
 }
 
+std::string MultiSolid::get_id() {
+  return _id;
+}
+
 
 bool MultiSolid::is_valid() {
   return _is_valid;

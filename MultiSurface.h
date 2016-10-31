@@ -16,12 +16,13 @@
 class MultiSurface : public Primitive 
 {
 public:
-              MultiSurface(); 
+              MultiSurface(std::string id = ""); 
 
   bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
   std::string get_report_xml();
   bool        is_valid();
   bool        is_empty();
+  std::string get_id();
 
   int         number_surfaces();
   bool        set_surface(Surface* s);
