@@ -23,6 +23,7 @@ public:
   bool        is_valid();
   bool        is_empty();
 
+  int         number_surfaces();
   bool        set_surface(Surface* s);
   Surface*    get_surface();
 
