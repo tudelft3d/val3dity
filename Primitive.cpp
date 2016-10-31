@@ -15,13 +15,13 @@ Primitive::Primitive() {
 
 
 
-void Primitive::add_error(int code, std::string faceid, std::string info)
+void Primitive::add_error(int code, std::string whichgeoms, std::string info)
 {
-  std::tuple<std::string, std::string> a(faceid, info);
+  std::tuple<std::string, std::string> a(whichgeoms, info);
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << errorcode2description(code);
-  if (faceid.empty() == false)
-    std::clog << " (id: " << faceid << ")";
+  if (whichgeoms.empty() == false)
+    std::clog << " (id: " << whichgeoms << ")";
   std::clog << std::endl;
   if (info.empty() == false)
     std::clog << "\t[" << info << "]" << std::endl;

@@ -16,7 +16,7 @@
 class MultiSolid : public Primitive 
 {
 public:
-              MultiSolid(); 
+              MultiSolid(std::string id = ""); 
 
   bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
   bool        is_valid();

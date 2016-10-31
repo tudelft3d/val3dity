@@ -25,11 +25,11 @@ public:
 
   // virtual void          translate_vertices() = 0;
 
-  void                  add_error(int code, std::string faceid, std::string info);
+  void                  add_error(int code, std::string whichgeoms, std::string info);
 
 protected:
   std::string   _id;
-
+  int           _is_valid; 
   std::map<int, vector< std::tuple<std::string, std::string> > > _errors;
 
 };

@@ -25,7 +25,7 @@
 
 #include "input.h"
 #include "Solid.h"
-#include "Shell.h"
+#include "Surface.h"
 #include "validate_shell.h"
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
@@ -40,24 +40,12 @@ typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
 
 typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
 
-//-- to keep track of all gml:Solids in a GML file
-int Solid::_counter = 0;
-
-Solid::Solid(InputTypes inputtype)
+Solid::Solid(std::string id)
 {
-  _id = std::to_string(_counter);
-  _counter++;
+  _id = id;
   _is_valid = -1;
-  _inputtype = inputtype;
 }
 
-
-Solid::Solid(Shell* sh)
-{
-  _shells.push_back(sh);
-  _id = std::to_string(_counter);
-  _counter++;
-}
 
 Solid::~Solid()
 {
@@ -68,13 +56,13 @@ Solid::~Solid()
   // }
 }
 
-Shell* Solid::get_oshell()
+Surface* Solid::get_oshell()
 {
   return _shells[0];
 }
 
 
-void Solid::set_oshell(Shell* sh)
+void Solid::set_oshell(Surface* sh)
 {
   if (_shells.empty())
     _shells.push_back(sh);
@@ -83,13 +71,13 @@ void Solid::set_oshell(Shell* sh)
 }
 
 
-const vector<Shell*>& Solid::get_shells()
+const vector<Surface*>& Solid::get_shells()
 {
   return _shells;
 }
 
 
-void Solid::add_ishell(Shell* sh)
+void Solid::add_ishell(Surface* sh)
 {
   _shells.push_back(sh);
 }
@@ -133,20 +121,20 @@ void Solid::translate_vertices()
 }
 
 
-bool Solid::validate(Primitive3D prim, double tol_planarity_d2p, double tol_planarity_normals)
+bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
   bool isValid = true;
   if (this->is_empty() == true)
   {
-    this->add_error(902, -1, -1, "probably error while parsing the input");
+    this->add_error(902, "", "probably error while parsing the input");
     return false;
   }
   for (auto& sh : _shells)
   {
-    if (sh->validate(prim, tol_planarity_d2p, tol_planarity_normals) == false) 
+    if (sh->validate_as_shell(tol_planarity_d2p, tol_planarity_normals) == false) 
       isValid = false;
   }
-  if ( (isValid == true) && (prim == SOLID) )
+  if (isValid == true) 
   {
     if (validate_solid_with_nef() == false)
       isValid = false;
@@ -189,16 +177,16 @@ std::string Solid::get_report_xml()
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
-  if (this->_inputtype == OBJ)
-  {
-    Shell* sh = this->get_oshell();
-    if (sh->were_vertices_merged_during_parsing() == true)
-      ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
-  }
-  if (_id_building.empty() == false)
-    ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
-  if (_id_buildingpart.empty() == false)
-    ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
+  // if (this->_inputtype == OBJ)
+  // {
+  //   Surface* sh = this->get_oshell();
+  //   if (sh->were_vertices_merged_during_parsing() == true)
+  //     ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
+  // }
+  // if (_id_building.empty() == false)
+  //   ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
+  // if (_id_buildingpart.empty() == false)
+  //   ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])

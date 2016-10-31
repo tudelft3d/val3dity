@@ -28,7 +28,7 @@
 
 #include "Primitive.h"
 #include "definitions.h"
-#include "Shell.h"
+#include "Surface.h"
 
 #include <tuple>
 
@@ -36,36 +36,31 @@
 class Solid : public Primitive
 {
 public:
-  Solid(InputTypes inputtype = OTHER);
-  Solid(Shell* sh);
+  Solid(std::string id = "");
   ~Solid();
   
-  Shell*                 get_oshell();
-  void                   set_oshell(Shell* sh);
-  Shell*                 get_ishell(int i);
-  void                   add_ishell(Shell* sh);
-  const vector<Shell*>&  get_shells();
-  int                    num_ishells();
-  int                    num_faces();
-  int                    num_vertices();
-  
+  Surface*                 get_oshell();
+  void                     set_oshell(Surface* sh);
+  Surface*                 get_ishell(int i);
+  void                     add_ishell(Surface* sh);
+  const vector<Surface*>&  get_shells();
+
+  int                      num_ishells();
+  int                      num_faces();
+  int                      num_vertices();
  
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
   void          translate_vertices();
   std::string   get_report_xml();
-  void          add_error(int code, int shell1, int shell2, std::string info);
   std::set<int> get_unique_error_codes();
   std::string   get_poly_representation();
   bool          is_valid();
   bool          is_empty();
   
-  static int    _counter;
   std::string   get_id();
   void          set_id(std::string id);
 protected:
-  vector<Shell*>  _shells;
-  int             _is_valid;
-  InputTypes      _inputtype;
+  vector<Surface*>  _shells;
 
   std::map<int, vector< std::tuple<int, int, std::string> > > _errors;
 
