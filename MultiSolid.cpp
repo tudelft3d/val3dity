@@ -9,7 +9,6 @@
 #include "MultiSolid.h"
 
 
-
 MultiSolid::MultiSolid(std::string id) {
   _id = id;
   _is_valid = -1;
@@ -30,7 +29,7 @@ bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals
 
 
 bool MultiSolid::is_valid() {
-  return is_valid;
+  return _is_valid;
 }
 
 
@@ -40,7 +39,8 @@ bool MultiSolid::is_empty() {
 
 
 std::string MultiSolid::get_report_xml() {
-
+  // TODO: xml report
+  return "<EMPTY>";
 }
 
 bool MultiSolid::add_solid(Solid* s) {
