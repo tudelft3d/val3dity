@@ -9,7 +9,12 @@
 #ifndef Primitive_h
 #define Primitive_h
 
-#include "definitions.h"
+
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+
 
 class Primitive
 {
@@ -21,17 +26,18 @@ public:
   virtual bool          is_valid() = 0;
   virtual bool          is_empty() = 0;
   virtual std::string   get_report_xml() = 0;
-  virtual std::string   get_id() = 0;
-  virtual std::set<int> get_unique_error_codes();
 
   // virtual void          translate_vertices() = 0;
 
+  std::string           get_id();
   void                  add_error(int code, std::string whichgeoms, std::string info);
+  std::set<int>         get_unique_error_codes();
 
 protected:
   std::string   _id;
   int           _is_valid; 
-  std::map<int, vector< std::tuple<std::string, std::string> > > _errors;
+
+  std::map<int, std::vector< std::tuple<std::string, std::string> > > _errors;
 
 };
 

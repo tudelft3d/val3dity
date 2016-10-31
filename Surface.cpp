@@ -179,7 +179,7 @@ int Surface::add_point(Point3 p)
 }
 
 
-void Surface::add_face(vector< vector<int> > f, std::string id)
+void Surface::add_face(std::vector< std::vector<int> > f, std::string id)
 {
   _lsFaces.push_back(f);
   if (id.empty() == true)
@@ -210,10 +210,10 @@ bool Surface::triangulate_shell()
   {
     // These are the number of rings on this facet
     size_t numf = _lsFaces[i].size();
-    vector<int> &idsob = _lsFaces[i][0]; // helpful alias for the outer boundary
+    std::vector<int> &idsob = _lsFaces[i][0]; // helpful alias for the outer boundary
     if ( (numf == 1) && (idsob.size() == 3)) 
     {
-      vector<int*> oneface;
+      std::vector<int*> oneface;
       int* tr = new int[3];
       tr[0] = idsob[0] ;
       tr[1] = idsob[1];
@@ -229,7 +229,7 @@ bool Surface::triangulate_shell()
 
     //-- get projected Polygon
     Polygon pgn;
-    vector<Polygon> lsRings;
+    std::vector<Polygon> lsRings;
     create_polygon(_lsPts, idsob, pgn);
     //-- all polygons should be cw for Triangle
     //-- if reversed then re-reversed later
@@ -239,12 +239,12 @@ bool Surface::triangulate_shell()
       reversed = true;
     }
     lsRings.push_back(pgn);
-    vector< vector<int> > pgnids;
+    std::vector< std::vector<int> > pgnids;
     pgnids.push_back(idsob);
     //-- check for irings
     for (int j = 1; j < static_cast<int>(numf); j++)
     {
-      vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
+      std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected Polygon
       Polygon pgn;
       create_polygon(_lsPts, ids2, pgn);
@@ -255,7 +255,7 @@ bool Surface::triangulate_shell()
       pgnids.push_back(ids2);
     }
     //-- get projected CT
-    vector<int*> oneface;
+    std::vector<int*> oneface;
     if (construct_ct(pgnids, lsRings, oneface, i) == false)
     {
       this->add_error(999, _lsFacesID[i], "face does not have an outer boundary.");
@@ -263,7 +263,7 @@ bool Surface::triangulate_shell()
     }
     if (reversed == true) //-- reversed back to keep orientation of original surface
     {
-      vector<int*>::iterator it3 = oneface.begin();
+      std::vector<int*>::iterator it3 = oneface.begin();
       int tmp;
       int* id;
       for ( ; it3 != oneface.end(); it3++)
@@ -280,13 +280,13 @@ bool Surface::triangulate_shell()
 }
 
 
-bool Surface::construct_ct(const vector< vector<int> >& pgnids, const vector<Polygon>& lsRings, vector<int*>& oneface, int faceNum)
+bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum)
 {
   bool isValid = true;
-  vector<int> ids = pgnids[0];
+  std::vector<int> ids = pgnids[0];
   int proj = projection_plane(_lsPts, ids);
   CT ct;
-  vector< vector<int> >::const_iterator it = pgnids.begin();
+  std::vector< std::vector<int> >::const_iterator it = pgnids.begin();
   size_t numpts = 0;
   for ( ; it != pgnids.end(); it++)
   {
@@ -294,8 +294,8 @@ bool Surface::construct_ct(const vector< vector<int> >& pgnids, const vector<Pol
   }
   for ( it = pgnids.begin(); it != pgnids.end(); it++)
   {
-    vector<Point2> pts2d;
-    vector<int>::const_iterator it2 = it->begin();
+    std::vector<Point2> pts2d;
+    std::vector<int>::const_iterator it2 = it->begin();
     for ( ; it2 != it->end(); it2++)
     {
       Point3 p1  = _lsPts[*it2];
@@ -306,7 +306,7 @@ bool Surface::construct_ct(const vector< vector<int> >& pgnids, const vector<Pol
       else
         pts2d.push_back( Point2(p1.y(), p1.z()) );
     }
-    vector<Point2>::const_iterator itPt;
+    std::vector<Point2>::const_iterator itPt;
     CT::Vertex_handle v0;
     CT::Vertex_handle v1;
     CT::Vertex_handle firstv;
@@ -339,7 +339,7 @@ bool Surface::construct_ct(const vector< vector<int> >& pgnids, const vector<Pol
       inside = false;
     else
     {
-      vector<Polygon>::const_iterator itpgn = lsRings.begin();
+      std::vector<Polygon>::const_iterator itpgn = lsRings.begin();
       itpgn++;
       for ( ; itpgn != lsRings.end(); itpgn++)   //-- check irings
       {
@@ -366,7 +366,7 @@ bool Surface::construct_ct(const vector< vector<int> >& pgnids, const vector<Pol
 
 void Surface::get_min_bbox(double& x, double& y)
 {
-  vector<Point3>::iterator it = _lsPts.begin();
+  std::vector<Point3>::iterator it = _lsPts.begin();
   K::FT minx = 9e10;
   K::FT miny = 9e10;
   for ( ; it != _lsPts.end(); it++)
@@ -383,7 +383,7 @@ void Surface::get_min_bbox(double& x, double& y)
 
 void Surface::translate_vertices(double minx, double miny)
 {
-  vector<Point3>::iterator it = _lsPts.begin();
+  std::vector<Point3>::iterator it = _lsPts.begin();
   for (it = _lsPts.begin(); it != _lsPts.end(); it++)
   {
     Point3 tp(CGAL::to_double(it->x() - minx), CGAL::to_double(it->y() - miny), CGAL::to_double(it->z()));
@@ -414,7 +414,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       continue;
     }
     size_t numf = _lsFaces[i].size();
-    vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
+    std::vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
 
     //-- if only 3 pts it's now valid, no need to process further
     if ( (numf == 1) && (ids.size() == 3)) 
@@ -426,8 +426,8 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       continue;
     }
 
-    vector< Point3 > allpts;
-    vector<int>::const_iterator itp = ids.begin();
+    std::vector< Point3 > allpts;
+    std::vector<int>::const_iterator itp = ids.begin();
     for ( ; itp != ids.end(); itp++)
     {
       allpts.push_back(_lsPts[*itp]);
@@ -435,8 +435,8 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     //-- irings
     for (int j = 1; j < static_cast<int>(numf); j++)
     {
-      vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
-      vector<int>::const_iterator itp2 = ids2.begin();
+      std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
+      std::vector<int>::const_iterator itp2 = ids2.begin();
       for ( ; itp2 != ids2.end(); itp2++)
       {
         allpts.push_back(_lsPts[*itp2]);
@@ -453,7 +453,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     }
     //-- get projected oring
     Polygon pgn;
-    vector<Polygon> lsRings;
+    std::vector<Polygon> lsRings;
     if (false == create_polygon(_lsPts, ids, pgn))
     {
       this->add_error(104, _lsFacesID[i], " outer ring self-intersects or is collapsed to a point or a line");
@@ -464,7 +464,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     //-- check for irings
     for (int j = 1; j < static_cast<int>(numf); j++)
     {
-      vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
+      std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected iring
       Polygon pgn;
       if (false == create_polygon(_lsPts, ids2, pgn))
@@ -485,7 +485,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     triangulate_shell();
     //-- check planarity by normal deviation method (of all triangle)
     std::clog << "--Planarity of surfaces (with normals deviation)" << std::endl;
-    vector< vector<int*> >::iterator it = _lsTr.begin();
+    std::vector< std::vector<int*> >::iterator it = _lsTr.begin();
     int j = 0;
     double deviation;
     for ( ; it != _lsTr.end(); it++)
@@ -647,7 +647,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
 }
 
 
-bool Surface::validate_polygon(vector<Polygon> &lsRings, std::string polygonid)
+bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid)
 {
   // TODO: need to init GEOS and "close" it each time? I guess not...
   initGEOS(NULL, NULL);
@@ -658,7 +658,7 @@ bool Surface::validate_polygon(vector<Polygon> &lsRings, std::string polygonid)
   if (lsRings.size() > 1)
   {
     CGAL::Orientation ooring = lsRings[0].orientation();
-    vector<Polygon>::iterator it = lsRings.begin();
+    std::vector<Polygon>::iterator it = lsRings.begin();
     it++;
     for ( ; it != lsRings.end(); it++)
     {
@@ -676,7 +676,7 @@ bool Surface::validate_polygon(vector<Polygon> &lsRings, std::string polygonid)
   stringstream wkt;
   wkt << setprecision(15);
   wkt << "POLYGON(";
-  vector<Polygon>::iterator it = lsRings.begin();
+  std::vector<Polygon>::iterator it = lsRings.begin();
   //-- oring
   wkt << "(";
   Polygon::Vertex_iterator vit = it->vertices_begin();
@@ -728,10 +728,10 @@ bool Surface::validate_polygon(vector<Polygon> &lsRings, std::string polygonid)
   return isvalid;
 }
 
-bool Surface::has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface)
+bool Surface::has_face_2_consecutive_repeated_pts(const std::vector< std::vector<int> >& theface)
 {
   bool bDuplicates = false;
-  vector< vector<int> >::const_iterator itr = theface.begin();
+  std::vector< std::vector<int> >::const_iterator itr = theface.begin();
   for ( ; itr != theface.end(); itr++) {
     size_t numv = itr->size();
     //-- first-last not the same (they are not in GML format anymore)
@@ -749,10 +749,10 @@ bool Surface::has_face_2_consecutive_repeated_pts(const vector< vector<int> >& t
   return bDuplicates;
 }
 
-bool Surface::has_face_rings_toofewpoints(const vector< vector<int> >& theface)
+bool Surface::has_face_rings_toofewpoints(const std::vector< std::vector<int> >& theface)
 {
   bool bErrors = false;
-  vector< vector<int> >::const_iterator itr = theface.begin();
+  std::vector< std::vector<int> >::const_iterator itr = theface.begin();
   for ( ; itr != theface.end(); itr++) {
     if (itr->size() < 3) {
       bErrors = true;

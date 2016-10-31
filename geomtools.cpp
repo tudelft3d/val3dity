@@ -28,7 +28,7 @@
 #include <CGAL/linear_least_squares_fitting_3.h>
 
 
-bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, float tolerance)
+bool is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance)
 {
   if (pts.size() == 3) {
     return true;
@@ -38,7 +38,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
   linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>());  
 
   //-- test distance to that plane for each point
-  vector<Point3>::const_iterator it = pts.begin();
+  std::vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
   for ( ; it != pts.end(); it++)
   {
@@ -54,7 +54,7 @@ bool is_face_planar_distance2plane(const vector<Point3> &pts, double& value, flo
 }
 
 
-int projection_plane(const vector< Point3 > &lsPts, const vector<int> &ids)
+int projection_plane(const std::vector< Point3 > &lsPts, const std::vector<int> &ids)
 {
   Vector n;
   polygon_normal(lsPts, ids, n);
@@ -83,9 +83,9 @@ bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 }
 
 
-bool polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids, Vector &n) 
+bool polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &ids, Vector &n)
 {
-  vector<Point3> pts;
+  std::vector<Point3> pts;
   for (auto& i : ids) 
     pts.push_back(lsPts[i]);
   CgalPolyhedron::Plane_3 plane;
@@ -96,10 +96,10 @@ bool polygon_normal(const vector< Point3 > &lsPts, const vector<int> &ids, Vecto
 }  
 
 
-bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon &pgn)
+bool create_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn)
 {
   int proj = projection_plane(lsPts, ids);
-  vector<int>::const_iterator it = ids.begin();
+  std::vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
   {
     Point3 p = lsPts[*it];
@@ -118,9 +118,9 @@ bool create_polygon(const vector<Point3>& lsPts, const vector<int>& ids, Polygon
   return true;
 }
 
-bool is_face_planar_normals(const vector<int*> &trs, const vector<Point3>& lsPts, double& value, float angleTolerance)
+bool is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance)
 {
-  vector<int*>::const_iterator ittr = trs.begin();
+  std::vector<int*>::const_iterator ittr = trs.begin();
   int* a = *ittr;
   Vector v0 = unit_normal( lsPts[a[0]], lsPts[a[1]], lsPts[a[2]]);
   ittr++;

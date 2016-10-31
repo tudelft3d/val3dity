@@ -38,9 +38,9 @@
 
 
 // STL library
-using namespace std;
-#include <vector>
-#include <map>
+// using namespace std;
+// #include <vector>
+// #include <map>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 

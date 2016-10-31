@@ -13,7 +13,10 @@ Primitive::Primitive() {
 }
 
 
-
+std::string  Primitive::get_id()
+{
+  return _id;
+}
 
 void Primitive::add_error(int code, std::string whichgeoms, std::string info)
 {

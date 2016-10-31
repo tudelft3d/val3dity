@@ -23,9 +23,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
-#include "input.h"
 #include "Solid.h"
-#include "Surface.h"
+#include "input.h"
 #include "validate_shell.h"
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
@@ -144,21 +143,6 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 }
 
 
-std::set<int> Solid::get_unique_error_codes()
-{
-  std::set<int> errs;
-  for (auto& sh : _shells)
-  {
-    std::set<int> errsh = sh->get_unique_error_codes();
-    errs.insert(errsh.begin(), errsh.end());
-  }
-  for (auto& e : _errors)
-  {
-    errs.insert(std::get<0>(e));
-  }
-  return errs;
-}
-
 std::string Solid::get_poly_representation()
 {
   std::ostringstream s;
@@ -194,10 +178,8 @@ std::string Solid::get_report_xml()
       ss << "\t\t<Error>" << std::endl;
       ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
       ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      if (std::get<0>(e) == -1)
+      if (std::get<0>(e) == "")
         ss << "\t\t\t<shell>-1</shell>" << std::endl;
-      else if (std::get<1>(e) == -1)
-        ss << "\t\t\t<shell>" << std::get<0>(e) << "</shell>" << std::endl;
       else
         ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
       ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
@@ -234,30 +216,12 @@ int Solid::num_vertices()
   return total;
 }
 
-std::string Solid::get_id()
-{
-  return _id;
-}
-
 
 void Solid::set_id(std::string id)
 {
   _id = id;
 }
 
-
-void Solid::add_error(int code, int shell1, int shell2, std::string info)
-{
-  std::tuple<int, int, std::string> a(shell1, shell2, info);
-  _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
-  if (shell2 == -1)
-    std::clog << " (shell: #" << shell1 << ")" << std::endl;
-  else
-    std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
-  if (info.empty() == false)
-    std::clog << "\t[" << info << "]" << std::endl;
-}
 
 
 bool Solid::validate_solid_with_nef()
@@ -271,7 +235,7 @@ bool Solid::validate_solid_with_nef()
   {
     if (check_global_orientation_normals(sh->get_cgal_polyhedron(), i == 0) == false) 
     {
-      this->add_error(405, i, -1, "");
+      this->add_error(405, "i", "");
       isValid = false;
     }
     i++;
@@ -307,12 +271,14 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg;
         msg << "Inner shell (#" << i << ") is completely outside the outer shell (#0))";
-        this->add_error(403, i, -1, msg.str());
+        this->add_error(403, "i", msg.str());
         isValid = false;
       }
       else
       {
-        this->add_error(401, 0, i, "");
+        std::stringstream ss;
+        ss << 0 << "--" << i;
+        this->add_error(401, ss.str(), "");
         isValid = false; 
       }
     }
@@ -321,7 +287,9 @@ bool Solid::validate_solid_with_nef()
       nef = nefs[0] - nefs[i];
       if (nef.number_of_volumes() < 3)
       {
-        this->add_error(401, 0, i, "");
+        std::stringstream ss;
+        ss << 0 << "--" << i;
+        this->add_error(401, ss.str(), "");
         isValid = false; 
       }
     }
@@ -336,7 +304,9 @@ bool Solid::validate_solid_with_nef()
       //-- 1. are they the same?
       if (nefs[i] == nefs[j])
       {
-        this->add_error(402, i, j, "");
+        std::stringstream ss;
+        ss << i << "--" << j;
+        this->add_error(402, ss.str(), "");
         isValid = false;
         continue;
       }
@@ -344,7 +314,9 @@ bool Solid::validate_solid_with_nef()
       nef = nefs[i] * nefs[j];
       if (nef.number_of_volumes() > 1)
       {
-        this->add_error(401, i, j, "");
+        std::stringstream ss;
+        ss << i << "--" << j;
+        this->add_error(401, ss.str(), "");
         isValid = false;
         continue;
       }
@@ -352,7 +324,9 @@ bool Solid::validate_solid_with_nef()
       nef = nefs[i] + nefs[j];
       if (nef.number_of_volumes() < 3)
       {
-        this->add_error(401, i, j, "");
+        std::stringstream ss;
+        ss << 0 << "--" << i;
+        this->add_error(401, ss.str(), "");
         isValid = false;
         continue;
       }
@@ -370,7 +344,7 @@ bool Solid::validate_solid_with_nef()
       numvol++;
       if (nef.number_of_volumes() != numvol)
       {
-        this->add_error(404, -1, -1, "");
+        this->add_error(404, "", "");
         isValid = false;
         break;
       }

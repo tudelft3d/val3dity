@@ -25,10 +25,6 @@ bool MultiSurface::is_valid() {
   return _is_valid;
 }
 
-std::string MultiSurface::get_id() {
-  return _id;
-}
-
 bool MultiSurface::is_empty() {
   return _surface->is_empty();
 }

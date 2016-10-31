@@ -52,17 +52,13 @@ public:
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
   void          translate_vertices();
   std::string   get_report_xml();
-  std::set<int> get_unique_error_codes();
   std::string   get_poly_representation();
   bool          is_valid();
   bool          is_empty();
   
-  std::string   get_id();
   void          set_id(std::string id);
 protected:
   vector<Surface*>  _shells;
-
-  std::map<int, vector< std::tuple<int, int, std::string> > > _errors;
 
   bool validate_solid_with_nef();
 };

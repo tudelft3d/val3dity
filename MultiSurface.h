@@ -22,7 +22,6 @@ public:
   std::string get_report_xml();
   bool        is_valid();
   bool        is_empty();
-  std::string get_id();
 
   int         number_surfaces();
   bool        set_surface(Surface* s);

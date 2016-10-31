@@ -6,9 +6,14 @@
 //
 //
 
+#include "Solid.h"
 #include "CompositeSolid.h"
 
-CompositeSolid::CompositeSolid(std::string id) {
+
+
+
+CompositeSolid::CompositeSolid(std::string id)
+{
   _id = id;
   _is_valid = -1;
 }
@@ -36,10 +41,6 @@ bool CompositeSolid::is_valid() {
   return _is_valid;
 }
 
-
-std::string CompositeSolid::get_id() {
-  return _id;
-}
 
 
 bool CompositeSolid::is_empty() {
