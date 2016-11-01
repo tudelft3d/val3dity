@@ -25,7 +25,8 @@
 
 #include "input.h"
 #include "Primitive.h"
-#include "Shell.h"
+#include "Building.h"
+#include "Surface.h"
 #include "Solid.h"
 #include <tclap/CmdLine.h>
 #include <time.h>  
@@ -88,9 +89,11 @@ int main(int argc, char* const argv[])
 
   //-- tclap options
   std::vector<std::string> primitivestovalidate;
-  primitivestovalidate.push_back("S");  
-  primitivestovalidate.push_back("CS");   
-  primitivestovalidate.push_back("MS");   
+  primitivestovalidate.push_back("Solid");  
+  primitivestovalidate.push_back("MultiSolid");  
+  primitivestovalidate.push_back("CompositeSolid");  
+  primitivestovalidate.push_back("MultiSurface");   
+  primitivestovalidate.push_back("CompositeSurface");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
   TCLAP::CmdLine cmd("Allowed options", ' ', "1.2");
@@ -100,8 +103,8 @@ int main(int argc, char* const argv[])
     TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (containing several solids/objects), OBJ or POLY (one exterior shell only)", true, "", "string");
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only; more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           report("r", "report", "output report in XML format", false, "", "string");
-    TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <S|CS|MS> (Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
-    TCLAP::SwitchArg                       buildings("B", "Buildings", "report considers the CityGML Buildings", false);
+    TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
+    TCLAP::SwitchArg                       buildings("B", "Buildings", "validate only CityGML Buildings", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
@@ -125,10 +128,14 @@ int main(int argc, char* const argv[])
     cmd.parse( argc, argv );
   
     Primitive3D prim3d = SOLID;
-    if (primitives.getValue() == "CS")
-      prim3d = COMPOSITESURFACE;
-    if (primitives.getValue() == "MS")
+    if (primitives.getValue() == "CompositeSolid")
+      prim3d = COMPOSITESOLID;
+    else if (primitives.getValue() == "MultiSolid")
+      prim3d = MULTISOLID;
+    else if (primitives.getValue() == "MultiSurface")
       prim3d = MULTISURFACE;
+    else if (primitives.getValue() == "CompositeSurface")
+      prim3d = COMPOSITESURFACE;
 
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
@@ -147,7 +154,7 @@ int main(int argc, char* const argv[])
     bool usebuildings = buildings.getValue();    
     if ( (inputtype != GML) && (buildings.getValue() == true) )
     {
-      std::cout << "Ignoring flag '-B/--Buildings' for OBJ and POLY files" << std::endl;
+      std::cout << "Ignoring flag '-B/--Buildings' for non-CityGML files" << std::endl;
       usebuildings = false;
     }
 
@@ -160,20 +167,19 @@ int main(int argc, char* const argv[])
     }
 
     std::vector<Primitive*> lsPrimitives;
-    int nobuildings;
+    std::vector<Building*> lsBuildings;
 
     if (inputtype == GML)
     {
       try
       {
-        readGMLfile(lsPrimitives,
-                    inputfile.getValue(), 
-                    prim3d, 
-                    usebuildings, 
-                    ioerrs, 
-                    snap_tolerance.getValue(),
-                    nobuildings
-                   );
+        if (usebuildings == false)
+          readGMLfile_primitives(inputfile.getValue(), 
+                                 lsPrimitives,
+                                 prim3d, 
+                                 ioerrs, 
+                                 snap_tolerance.getValue());
+        // else
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
@@ -190,31 +196,31 @@ int main(int argc, char* const argv[])
           ioerrs.add_error(901, "Invalid GML structure, or that particular (twisted and obscure) construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues");
       }
     }
-//    else if (inputtype == POLY)
-//    {
-//      Solid* s = new Solid;
-//      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
-//      if (ioerrs.has_errors() == true)
-//        std::cout << "Input file not found." << std::endl;
-//      else
-//      {
-//        s->set_oshell(sh);
-//        int sid = 1;
-//        for (auto ifile : ishellfiles.getValue())
-//        {
-//          Surface* sh = readPolyfile(ifile, sid, ioerrs);
-//          if (ioerrs.has_errors() == true)
-//            std::cout << "Input file inner shell not found." << std::endl;
-//          else
-//          {
-//            s->add_ishell(sh);
-//            sid++;
-//          }
-//        }
-//        if (ioerrs.has_errors() == false)
-//          lsPrimitives.push_back(s);
-//      }
-//    }
+   else if (inputtype == POLY)
+   {
+     Solid* s = new Solid;
+     Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+     if (ioerrs.has_errors() == true)
+       std::cout << "Input file not found." << std::endl;
+     else
+     {
+       s->set_oshell(sh);
+       int sid = 1;
+       for (auto ifile : ishellfiles.getValue())
+       {
+         Surface* sh = readPolyfile(ifile, sid, ioerrs);
+         if (ioerrs.has_errors() == true)
+           std::cout << "Input file inner shell not found." << std::endl;
+         else
+         {
+           s->add_ishell(sh);
+           sid++;
+         }
+       }
+       if (ioerrs.has_errors() == false)
+         lsPrimitives.push_back(s);
+     }
+   }
 //    else if (inputtype == OBJ)
 //    {
 //      readOBJfile(lsPrimitives,
@@ -233,8 +239,8 @@ int main(int argc, char* const argv[])
 //      }
 //    }
 
-    //-- translate all vertices to avoid potential problems
     // TODO : translate? tricky with CompositeSolid
+    //-- translate all vertices to avoid potential problems
     // for (auto& s : lsSolids)
       // s->translate_vertices();
     
@@ -255,24 +261,10 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsPrimitives.size())));
         i++;
-        std::clog << std::endl << "===== Validating Primitive #" << s->get_id() << " =====" << std::endl;
-        // std::clog << "Number shells: " << (s->num_ishells() + 1) << std::endl;
-        // std::clog << "Number faces: " << s->num_faces() << std::endl;
-        // std::clog << "Number vertices: " << s->num_vertices() << std::endl;
-        // if (inputtype == OBJ) 
-        // {
-        //   Shell* sh = s->get_oshell();
-        //   if (sh->were_vertices_merged_during_parsing() == true)
-        //   {
-        //     std::clog << "-->" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << " duplicate vertices were merged" << std::endl;
-        //     std::clog << "-->" << "tolerance applied was " << snap_tolerance.getValue() << std::endl;
-        //   }
-        // }
-        // if (s->get_id_building().empty() == false)
-        //   std::clog << "Building: " << s->get_id_building() << std::endl;
-        // if (s->get_id_buildingpart().empty() == false)
-        //   std::clog << "BuildingPart: " << s->get_id_buildingpart() << std::endl;
-
+        std::clog << std::endl << "===== Validating Primitive " << s->get_id() << " =====" << std::endl;
+        std::clog << s->get_type() << std::endl;
+        if (s->get_id() != "")
+          std::clog << "ID: " << s->get_id() << std::endl;
         if (s->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else

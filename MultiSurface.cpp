@@ -24,6 +24,11 @@ bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_norma
 }
 
 
+std::string MultiSurface::get_type() 
+{
+  return "MultiSurface";
+}
+
 bool MultiSurface::is_valid() {
   return _is_valid;
 }

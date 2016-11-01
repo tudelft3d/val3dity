@@ -28,19 +28,17 @@ Solid::Solid(std::string id)
 
 
 Solid::~Solid()
-{
-  // std::clog << "DESTRUCTOR SOLIDS" << std::endl;
-  // for (auto& sh : _shells)
-  // {
-    // delete sh;
-  // }
-}
+{}
 
 Surface* Solid::get_oshell()
 {
   return _shells[0];
 }
 
+std::string Solid::get_type() 
+{
+  return "Solid";
+}
 
 void Solid::set_oshell(Surface* sh)
 {
@@ -136,44 +134,40 @@ std::string Solid::get_poly_representation()
 
 std::string Solid::get_report_xml()
 {
-  // std::stringstream ss;
-  // ss << "\t<Primitive>" << std::endl;
-  // ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
-  // ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
-  // ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
-  // ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
-  // // if (this->_inputtype == OBJ)
-  // // {
-  // //   Surface* sh = this->get_oshell();
-  // //   if (sh->were_vertices_merged_during_parsing() == true)
-  // //     ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
-  // // }
-  // // if (_id_building.empty() == false)
-  // //   ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
-  // // if (_id_buildingpart.empty() == false)
-  // //   ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
-  // for (auto& err : _errors)
+  std::stringstream ss;
+  ss << "\t<Solid" << std::endl;
+  ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
+  ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
+  ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
+  // if (this->_inputtype == OBJ)
   // {
-  //   for (auto& e : _errors[std::get<0>(err)])
-  //   {
-  //     ss << "\t\t<Error>" << std::endl;
-  //     ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-  //     ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-  //     if (std::get<0>(e) == "")
-  //       ss << "\t\t\t<shell>-1</shell>" << std::endl;
-  //     else
-  //       ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
-  //     ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
-  //     ss << "\t\t</Error>" << std::endl;
-  //   }
+  //   Surface* sh = this->get_oshell();
+  //   if (sh->were_vertices_merged_during_parsing() == true)
+  //     ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
   // }
-  // for (auto& sh : _shells)
-  // {
-  //   ss << sh->get_report_xml();
-  // }
-  // ss << "\t</Primitive>" << std::endl;
-  // return ss.str();
-  return "";
+  // if (_id_building.empty() == false)
+  //   ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
+  // if (_id_buildingpart.empty() == false)
+  //   ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      ss << "\t\t<Error>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
+      ss << "\t\t\t<shell>" << std::get<0>(e) << "</shell>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
+      ss << "\t\t</Error>" << std::endl;
+    }
+  }
+  for (auto& sh : _shells)
+  {
+    ss << sh->get_report_xml();
+  }
+  ss << "\t</Solid>" << std::endl;
+  return ss.str();
 }
 
 

@@ -26,6 +26,7 @@ public:
   bool        is_valid();
   bool        is_empty();
   std::string get_report_xml();
+  std::string get_type();
 
   bool        add_solid(Solid* s);
   int         num_solids();

@@ -26,6 +26,7 @@ public:
   virtual bool          is_valid() = 0;
   virtual bool          is_empty() = 0;
   virtual std::string   get_report_xml() = 0;
+  virtual std::string   get_type() = 0;
 
   // virtual void          translate_vertices() = 0;
 

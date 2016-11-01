@@ -37,10 +37,7 @@
 #include <CGAL/Polygon_2.h>
 
 
-// STL library
 using namespace std;
-// #include <vector>
-// #include <map>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 
@@ -66,8 +63,10 @@ typedef long long int64;
 typedef enum
 {
   SOLID            = 0,
-  COMPOSITESURFACE = 1,
-  MULTISURFACE     = 2,
+  COMPOSITESOLID   = 1,
+  MULTISOLID       = 2,
+  COMPOSITESURFACE = 3,
+  MULTISURFACE     = 4,
 } Primitive3D;
 
 typedef enum

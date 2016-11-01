@@ -19,9 +19,13 @@ CompositeSolid::CompositeSolid(std::string id)
 
 
 CompositeSolid::~CompositeSolid()
-{
-}
+{}
 
+
+std::string CompositeSolid::get_type() 
+{
+  return "CompositeSolid";
+}
 
 bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_normals) 
 {

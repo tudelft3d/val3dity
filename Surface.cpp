@@ -84,7 +84,7 @@ std::string Surface::get_report_xml()
       ss << "\t\t<Error>" << std::endl;
       ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
       ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<shell>" << this->_id << "</shell>" << std::endl;
+      ss << "\t\t\t<id>" << this->_id << "</id>" << std::endl;
       ss << "\t\t\t<face>" << std::get<0>(e) << "</face>" << std::endl;
       ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
       ss << "\t\t</Error>" << std::endl;
