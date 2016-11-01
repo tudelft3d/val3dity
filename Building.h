@@ -9,7 +9,7 @@
 #ifndef Building_h
 #define Building_h
 
-#include "definitions.h"
+
 #include "Primitive.h"
 
 class BuildingPart
@@ -25,6 +25,8 @@ public:
 
   std::string   get_id();
   void          set_id(std::string id);
+
+  void          add_primitive(Primitive* p);
 
 protected:
   std::string                _id;
@@ -44,11 +46,16 @@ public:
   
   std::string   get_id();
   void          set_id(std::string id);
+
+  void          add_primitive(Primitive* p);
+  
+  void          add_buildingpart(BuildingPart* bp);
+  bool          has_parts();
   
 protected:
   std::string                _id;
-  std::vector<BuildingPart*> _lsBP;
   std::vector<Primitive*>    _lsPrimitives;
+  std::vector<BuildingPart*> _lsBP;
 };
 
 
