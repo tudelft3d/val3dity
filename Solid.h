@@ -27,10 +27,10 @@
 #define __val3dity__Solid__
 
 #include "Primitive.h"
-#include "definitions.h"
 #include "Surface.h"
 
-#include <tuple>
+#include <vector>
+#include <string>
 
 
 class Solid : public Primitive
@@ -43,7 +43,8 @@ public:
   void                     set_oshell(Surface* sh);
   Surface*                 get_ishell(int i);
   void                     add_ishell(Surface* sh);
-  const vector<Surface*>&  get_shells();
+  
+  const std::vector<Surface*>&  get_shells();
 
   int                      num_ishells();
   int                      num_faces();
@@ -56,9 +57,8 @@ public:
   bool          is_valid();
   bool          is_empty();
   
-  void          set_id(std::string id);
 protected:
-  vector<Surface*>  _shells;
+  std::vector<Surface*>  _shells;
 
   bool validate_solid_with_nef();
 };

@@ -36,7 +36,7 @@
 
 
 class IOErrors {
-  std::map<int, vector<std::string> >  _errors;
+  std::map<int, std::vector<std::string> >  _errors;
 public:
   bool        has_errors();
   void        add_error(int code, std::string info);
@@ -50,9 +50,9 @@ std::string   errorcode2description(int code, bool qie = false);
 void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
 Surface*      readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
 void          readGMLfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, Primitive3D prim, bool buildings, IOErrors& errs, double tol_snap, int& nobuildings);
-void          process_gml_building(vector<Primitive*>& lsPrimitives, pugi::xpath_node nbuilding, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-Solid*        process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-Surface*      process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+void          process_gml_building(std::vector<Primitive*>& lsPrimitives, pugi::xpath_node nbuilding, Primitive3D prim, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Solid*        process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Surface*      process_gml_compositesurface(pugi::xml_node n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 vector<int>   process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs);
 
 void          printProgressBar(int percent);

@@ -9,14 +9,18 @@
 #ifndef CompositeSolid_h
 #define CompositeSolid_h
 
-#include "definitions.h"
 #include "Primitive.h"
 #include "Solid.h"
+
+#include <string>
+#include <vector>
+
 
 class MultiSolid : public Primitive 
 {
 public:
               MultiSolid(std::string id = ""); 
+              ~MultiSolid(); 
 
   bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
   bool        is_valid();

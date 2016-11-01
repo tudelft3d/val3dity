@@ -11,6 +11,8 @@
 
 
 #include "Primitive.h"
+#include <string>
+#include <vector>
 
 class BuildingPart
 {

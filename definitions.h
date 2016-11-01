@@ -38,7 +38,7 @@
 
 
 // STL library
-// using namespace std;
+using namespace std;
 // #include <vector>
 // #include <map>
 

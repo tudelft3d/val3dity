@@ -9,9 +9,13 @@
 #include "MultiSolid.h"
 
 
+
 MultiSolid::MultiSolid(std::string id) {
   _id = id;
   _is_valid = -1;
+}
+
+MultiSolid::~MultiSolid() {
 }
 
 
@@ -50,5 +54,5 @@ bool MultiSolid::add_solid(Solid* s) {
 
 
 int MultiSolid::num_solids() {
-  return _lsSolids.count();
+  return _lsSolids.size();
 }

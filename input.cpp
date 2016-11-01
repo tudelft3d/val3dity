@@ -168,7 +168,7 @@ std::string localise(std::string s)
 vector<int> process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
-  vector<int> r;
+  std::vector<int> r;
   if (npos.size() > 0) //-- <gml:pos> used
   {
     for (pugi::xpath_node_set::const_iterator it = npos.begin(); it != npos.end(); ++it) {
@@ -209,7 +209,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs) {
 }
 
 
-Surface* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
+Surface* process_gml_compositesurface(pugi::xml_node n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
@@ -217,7 +217,7 @@ Surface* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string,
   int i = 0;
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
-    vector< vector<int> > oneface;
+    std::vector< std::vector<int> > oneface;
     bool bxlink = false;
     pugi::xml_node tmpnode = it->node();
     pugi::xpath_node p;
@@ -288,7 +288,7 @@ Surface* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string,
     //-- exterior ring (only 1)
     s = ".//" + localise("exterior");
     pugi::xpath_node ring = p.node().select_node(s.c_str());
-    vector<int> r = process_gml_ring(ring.node(), sh, errs);
+    std::vector<int> r = process_gml_ring(ring.node(), sh, errs);
     if (fliporientation == true) 
       std::reverse(r.begin(), r.end());
     if (r.front() != r.back())
@@ -300,7 +300,7 @@ Surface* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string,
     s = ".//" + localise("interior");
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
-      vector<int> r = process_gml_ring(it->node(), sh, errs);
+      std::vector<int> r = process_gml_ring(it->node(), sh, errs);
       if (fliporientation == true) 
         std::reverse(r.begin(), r.end());
       if (r.front() != r.back())
@@ -316,7 +316,7 @@ Surface* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string,
 }
 
 
-Solid* process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+Solid* process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   //-- exterior shell
   Solid* sol = new Solid;
@@ -345,7 +345,7 @@ Solid* process_gml_solid(pugi::xpath_node nsolid, Primitive3D prim, map<std::str
 }
 
 
-void process_gml_building(vector<Primitive*>& lsSolids, pugi::xpath_node nbuilding, Primitive3D prim, map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+void process_gml_building(vector<Primitive*>& lsSolids, pugi::xpath_node nbuilding, Primitive3D prim, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   std::string id_building;
   std::string id_buildingpart;
@@ -438,7 +438,7 @@ void readGMLfile(std::vector<Primitive*>& lsSolids, string &ifile, Primitive3D p
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
    std::cout << "XLinks found, resolving them..." << std::flush;
-  map<std::string, pugi::xpath_node> dallpoly;
+  std::map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
   {
    dallpoly[it->node().attribute("gml:id").value()] = *it;
@@ -446,7 +446,7 @@ void readGMLfile(std::vector<Primitive*>& lsSolids, string &ifile, Primitive3D p
   //-- for <gml:OrientableSurface>
   s = "//" + localise("OrientableSurface") + "[@" + localise("id") + "]";
   pugi::xpath_node_set nallosurf = doc.select_nodes(s.c_str());
-  // map<std::string, pugi::xpath_node> dallpoly;
+  // std::map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallosurf.begin(); it != nallosurf.end(); ++it)
   {
    dallpoly[it->node().attribute("gml:id").value()] = *it;
@@ -505,7 +505,7 @@ Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
   int num, tmpint;
   float tmpfloat;
   infile >> num >> tmpint >> tmpint >> tmpint;
-  vector< Point3 >::iterator iPoint3;
+  std::vector< Point3 >::iterator iPoint3;
   //-- read first line to decide if 0- or 1-based indexing
   bool zerobased = true;
   Point3 p;
@@ -542,7 +542,7 @@ Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
       sh->add_error(103, std::to_string(i));
       continue;
     }
-    vector<int> ids(numpt);
+    std::vector<int> ids(numpt);
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
     if (zerobased == false)
@@ -550,7 +550,7 @@ Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
       for (int k = 0; k < numpt; k++)
         ids[k] = (ids[k] - 1);      
     }
-    vector< vector<int> > pgnids;
+    std::vector< std::vector<int> > pgnids;
     pgnids.push_back(ids);
     //-- check for irings
     for (int j = 1; j < numf; j++)
@@ -560,7 +560,7 @@ Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
         sh->add_error(103, std::to_string(i));
         continue;
       }
-      vector<int> ids(numpt);
+      std::vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
         infile >> ids[l];
       if (zerobased == false)
@@ -629,7 +629,7 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
       }
     }
     else if (l.substr(0, 2) == "f ") {
-      vector<int> r;
+      std::vector<int> r;
       std::string tmp;
       iss >> tmp;
       while (iss)
@@ -648,7 +648,7 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
         }
         
       }
-      vector< vector<int> > pgnids;
+      std::vector< std::vector<int> > pgnids;
       pgnids.push_back(r);
       sh->add_face(pgnids);
     }

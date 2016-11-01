@@ -7,8 +7,9 @@
 //
 
 #include "Building.h"
+#include <iostream>
 
-Building::Building();
+Building::Building()
 {}
 
 
@@ -23,7 +24,7 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
 
 void Building::add_primitive(Primitive* p)
 {
-  _lsPrimitives.push_back();
+  _lsPrimitives.push_back(p);
 }
 
 
@@ -71,7 +72,7 @@ void Building::set_id(std::string id)
 //----------------------------------------------------------------
 //----------------------------------------------------------------
 
-BuildingPart::BuildingPart();
+BuildingPart::BuildingPart()
 {}
 
 
@@ -86,7 +87,7 @@ bool BuildingPart::validate(double tol_planarity_d2p, double tol_planarity_norma
 
 void BuildingPart::add_primitive(Primitive* p)
 {
-  _lsPrimitives.push_back();
+  _lsPrimitives.push_back(p);
 }
 
 

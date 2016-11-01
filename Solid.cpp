@@ -1,31 +1,10 @@
-/*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
- 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Redistributions in binary form must reproduce the above copyright
-       notice, this list of conditions and the following disclaimer in the
-       documentation and/or other materials provided with the distribution.
-     * Neither the name of the authors nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- DISCLAIMED. IN NO EVENT SHALL HUGO LEDOUX BE LIABLE FOR ANY
- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-*/
 
 #include "Solid.h"
+#include "definitions.h"
+
 #include "input.h"
 #include "validate_shell.h"
+
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
@@ -38,6 +17,8 @@ typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
 typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
 
 typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
+
+
 
 Solid::Solid(std::string id)
 {
@@ -70,7 +51,7 @@ void Solid::set_oshell(Surface* sh)
 }
 
 
-const vector<Surface*>& Solid::get_shells()
+const std::vector<Surface*>& Solid::get_shells()
 {
   return _shells;
 }
@@ -155,43 +136,44 @@ std::string Solid::get_poly_representation()
 
 std::string Solid::get_report_xml()
 {
-  std::stringstream ss;
-  ss << "\t<Primitive>" << std::endl;
-  ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
-  ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
-  ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
-  ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
-  // if (this->_inputtype == OBJ)
+  // std::stringstream ss;
+  // ss << "\t<Primitive>" << std::endl;
+  // ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  // ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
+  // ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
+  // ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
+  // // if (this->_inputtype == OBJ)
+  // // {
+  // //   Surface* sh = this->get_oshell();
+  // //   if (sh->were_vertices_merged_during_parsing() == true)
+  // //     ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
+  // // }
+  // // if (_id_building.empty() == false)
+  // //   ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
+  // // if (_id_buildingpart.empty() == false)
+  // //   ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
+  // for (auto& err : _errors)
   // {
-  //   Surface* sh = this->get_oshell();
-  //   if (sh->were_vertices_merged_during_parsing() == true)
-  //     ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
+  //   for (auto& e : _errors[std::get<0>(err)])
+  //   {
+  //     ss << "\t\t<Error>" << std::endl;
+  //     ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+  //     ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
+  //     if (std::get<0>(e) == "")
+  //       ss << "\t\t\t<shell>-1</shell>" << std::endl;
+  //     else
+  //       ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
+  //     ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
+  //     ss << "\t\t</Error>" << std::endl;
+  //   }
   // }
-  // if (_id_building.empty() == false)
-  //   ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
-  // if (_id_buildingpart.empty() == false)
-  //   ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      if (std::get<0>(e) == "")
-        ss << "\t\t\t<shell>-1</shell>" << std::endl;
-      else
-        ss << "\t\t\t<shell>" << std::get<0>(e) << "--" << std::get<1>(e) << "</shell>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<2>(e) << "</info>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  for (auto& sh : _shells)
-  {
-    ss << sh->get_report_xml();
-  }
-  ss << "\t</Primitive>" << std::endl;
-  return ss.str();
+  // for (auto& sh : _shells)
+  // {
+  //   ss << sh->get_report_xml();
+  // }
+  // ss << "\t</Primitive>" << std::endl;
+  // return ss.str();
+  return "";
 }
 
 
@@ -217,13 +199,6 @@ int Solid::num_vertices()
 }
 
 
-void Solid::set_id(std::string id)
-{
-  _id = id;
-}
-
-
-
 bool Solid::validate_solid_with_nef()
 {
   bool isValid = true;
@@ -247,7 +222,7 @@ bool Solid::validate_solid_with_nef()
     return true;
     
   std::clog << "--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
-  vector<Nef_polyhedron> nefs;
+  std::vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {
     //-- convert to an EPEC Polyhedron so that convertion to Nef is possible

@@ -36,7 +36,7 @@ typedef CgalPolyhedron::Facet_const_iterator    Facet_const_iterator;
 typedef CgalPolyhedron::Facet_const_handle      Facet_const_handle;
 
 
-CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Surface* sh)
+CgalPolyhedron* construct_CgalPolyhedron_incremental(std::vector< std::vector<int*> > *lsTr, std::vector<Point3> *lsPts, Surface* sh)
 {
   CgalPolyhedron* P = new CgalPolyhedron();
   ConstructShell<HalfedgeDS> s(lsTr, lsPts, sh);
@@ -59,7 +59,7 @@ void ConstructShell<HDS>::operator()( HDS& hds)
   typedef typename HDS::Halfedge_handle heH;
   CGAL::Polyhedron_incremental_builder_3<HDS> B(hds, false);
   B.begin_surface((*lsPts).size(), (*faces).size());
-  vector<Point3>::const_iterator itPt = lsPts->begin();
+  std::vector<Point3>::const_iterator itPt = lsPts->begin();
   for ( ; itPt != lsPts->end(); itPt++)
   { 
     B.add_vertex( Point(itPt->x(), itPt->y(), itPt->z()));
@@ -78,11 +78,11 @@ void ConstructShell<HDS>::operator()( HDS& hds)
 template <class HDS>
 void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B)
 {
-  vector< vector<int*> >::const_iterator itF = faces->begin();
+  std::vector< std::vector<int*> >::const_iterator itF = faces->begin();
   int faceID = 0;
   for ( ; itF != faces->end(); itF++)
   {
-    vector<int*>::const_iterator itF2 = itF->begin();
+    std::vector<int*>::const_iterator itF2 = itF->begin();
     for ( ; itF2 != itF->end(); itF2++)
     {
       int* a = *itF2;
@@ -101,12 +101,12 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
 //      halfedges[i] = false;
 //    
 //    //-- start with the first face (not only 1st triangle, first original face)
-//    vector< vector<int*> >::const_iterator itF = faces->begin();
-//    vector<int*>::const_iterator itF2 = itF->begin();
+//    std::vector< std::vector<int*> >::const_iterator itF = faces->begin();
+//    std::vector<int*>::const_iterator itF2 = itF->begin();
 //    for ( ; itF2 != itF->end(); itF2++)
 //    {
 //      int* a = *itF2;
-//      std::vector< std::size_t> faceids(3);        
+//      std::std::vector< std::size_t> faceids(3);        
 //      faceids[0] = a[0];
 //      faceids[1] = a[1];
 //      faceids[2] = a[2];
@@ -125,7 +125,7 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
 //      for ( ; itF2 != itF->end(); itF2++)
 //      {
 //        int* a = *itF2;
-//        std::vector< std::size_t> faceids(3);        
+//        std::std::vector< std::size_t> faceids(3);        
 //        faceids[0] = a[0];
 //        faceids[1] = a[1];
 //        faceids[2] = a[2];
@@ -149,7 +149,7 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
 //      for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
 //      {
 //        int* a = *it1;
-//        std::vector< std::size_t> faceids(3);        
+//        std::std::vector< std::size_t> faceids(3);        
 //        faceids[0] = a[0];
 //        faceids[1] = a[1];
 //        faceids[2] = a[2];
@@ -194,10 +194,10 @@ void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_in
   
   //-- build one flat list of the triangular faces, for convenience
   list<int*> trFaces;
-  vector< vector<int*> >::const_iterator itF = faces->begin();
+  std::vector< std::vector<int*> >::const_iterator itF = faces->begin();
   for ( ; itF != faces->end(); itF++)
   {
-    vector<int*>::const_iterator itF2 = itF->begin();
+    std::vector<int*>::const_iterator itF2 = itF->begin();
     for ( ; itF2 != itF->end(); itF2++)
     {
       int* a = *itF2;
@@ -252,7 +252,7 @@ bool ConstructShell<HDS>::try_to_add_face(CGAL::Polyhedron_incremental_builder_3
   for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
   {
     int* a = *it1;
-    std::vector< std::size_t> faceids(3);        
+    std::vector< std::size_t> faceids(3);
     faceids[0] = a[0];
     faceids[1] = a[1];
     faceids[2] = a[2];
@@ -304,7 +304,7 @@ bool ConstructShell<HDS>::is_connected(int* tr, bool* halfedges)
 template <class HDS>
 void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, std::string faceID)
 {
-  std::vector< std::size_t> faceids(3);        
+  std::vector< std::size_t> faceids(3);
   faceids[0] = i0;
   faceids[1] = i1;
   faceids[2] = i2;
@@ -408,23 +408,23 @@ bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter)
 }
 
 
-CgalPolyhedron* construct_CgalPolyhedron_batch(const vector< vector<int*> >&lsTr, const vector<Point3>& lsPts)
+CgalPolyhedron* construct_CgalPolyhedron_batch(const std::vector< std::vector<int*> >&lsTr, const std::vector<Point3>& lsPts)
 {
   //-- construct the 2-manifold, using the "batch" way
   stringstream offrep (stringstream::in | stringstream::out);
-  vector< vector<int*> >::const_iterator it = lsTr.begin();
+  std::vector< std::vector<int*> >::const_iterator it = lsTr.begin();
   size_t noFaces = 0;
   for ( ; it != lsTr.end(); it++)
     noFaces += it->size();
   offrep << "OFF" << endl << lsPts.size() << " " << noFaces << " 0" << endl;
 
-  vector<Point3>::const_iterator itPt = lsPts.begin();
+  std::vector<Point3>::const_iterator itPt = lsPts.begin();
   for ( ; itPt != lsPts.end(); itPt++)
     offrep << *itPt << endl;
 
   for (it = lsTr.begin(); it != lsTr.end(); it++)
   {
-    vector<int*>::const_iterator it2 = it->begin();
+    std::vector<int*>::const_iterator it2 = it->begin();
     for ( ; it2 != it->end(); it2++)
     {
       int* tmp = *it2;

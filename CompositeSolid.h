@@ -9,21 +9,23 @@
 #ifndef CompositeSolid_h
 #define CompositeSolid_h
 
-#include "definitions.h"
 #include "Primitive.h"
+#include "Solid.h"
 
+#include <vector>
+#include <string>
 
-class Solid;
 
 class CompositeSolid : public Primitive 
 {
 public:
                 CompositeSolid(std::string id = ""); 
+                ~CompositeSolid(); 
 
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
-  std::string   get_report_xml();
   bool          is_valid();
   bool          is_empty();
+  std::string   get_report_xml();
 
   bool          add_solid(Solid* s);
   int           num_solids();

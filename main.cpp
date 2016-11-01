@@ -24,6 +24,7 @@
 */
 
 #include "input.h"
+#include "Primitive.h"
 #include "Shell.h"
 #include "Solid.h"
 #include <tclap/CmdLine.h>
@@ -158,7 +159,7 @@ int main(int argc, char* const argv[])
       std::clog.rdbuf(mylog.rdbuf());
     }
 
-    vector<Primitive*> lsPrimitives;
+    std::vector<Primitive*> lsPrimitives;
     int nobuildings;
 
     if (inputtype == GML)
@@ -189,48 +190,48 @@ int main(int argc, char* const argv[])
           ioerrs.add_error(901, "Invalid GML structure, or that particular (twisted and obscure) construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues");
       }
     }
-    else if (inputtype == POLY)
-    {
-      Solid* s = new Solid;
-      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
-      if (ioerrs.has_errors() == true)
-        std::cout << "Input file not found." << std::endl;
-      else
-      {
-        s->set_oshell(sh);
-        int sid = 1;
-        for (auto ifile : ishellfiles.getValue())
-        {
-          Surface* sh = readPolyfile(ifile, sid, ioerrs);
-          if (ioerrs.has_errors() == true)
-            std::cout << "Input file inner shell not found." << std::endl;
-          else
-          {
-            s->add_ishell(sh);
-            sid++;
-          }
-        }
-        if (ioerrs.has_errors() == false)
-          lsPrimitives.push_back(s);
-      }
-    }
-    else if (inputtype == OBJ)
-    {
-      readOBJfile(lsPrimitives,
-                  inputfile.getValue(), 
-                  ioerrs, 
-                  snap_tolerance.getValue()
-                 );
-      if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
-      }
-      if (ishellfiles.getValue().size() > 0)
-      {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
-      }
-    }
+//    else if (inputtype == POLY)
+//    {
+//      Solid* s = new Solid;
+//      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+//      if (ioerrs.has_errors() == true)
+//        std::cout << "Input file not found." << std::endl;
+//      else
+//      {
+//        s->set_oshell(sh);
+//        int sid = 1;
+//        for (auto ifile : ishellfiles.getValue())
+//        {
+//          Surface* sh = readPolyfile(ifile, sid, ioerrs);
+//          if (ioerrs.has_errors() == true)
+//            std::cout << "Input file inner shell not found." << std::endl;
+//          else
+//          {
+//            s->add_ishell(sh);
+//            sid++;
+//          }
+//        }
+//        if (ioerrs.has_errors() == false)
+//          lsPrimitives.push_back(s);
+//      }
+//    }
+//    else if (inputtype == OBJ)
+//    {
+//      readOBJfile(lsPrimitives,
+//                  inputfile.getValue(), 
+//                  ioerrs, 
+//                  snap_tolerance.getValue()
+//                 );
+//      if (ioerrs.has_errors() == true) {
+//        std::cout << "Errors while reading the input file, aborting." << std::endl;
+//        std::cout << ioerrs.get_report_text() << std::endl;
+//      }
+//      if (ishellfiles.getValue().size() > 0)
+//      {
+//        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+//        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+//      }
+//    }
 
     //-- translate all vertices to avoid potential problems
     // TODO : translate? tricky with CompositeSolid

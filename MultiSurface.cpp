@@ -7,6 +7,7 @@
 //
 
 #include "MultiSurface.h"
+#include "Primitive.h"
 
 
 MultiSurface::MultiSurface(std::string id) {
@@ -14,8 +15,10 @@ MultiSurface::MultiSurface(std::string id) {
   _is_valid = -1;
 }
 
+MultiSurface::~MultiSurface() {
+}
 
-bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals) 
+bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
   return _surface->validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals);
 }
