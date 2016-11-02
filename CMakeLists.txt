@@ -51,7 +51,7 @@ include_directories( ${GEOS_INCLUDE_DIR}, include )
 # Creating entries for target: val3dity
 # ############################
 
-add_executable( val3dity input.cpp pugixml.cpp geomtools.cpp Primitive.cpp Surface.cpp Solid.cpp CompositeSolid.cpp MultiSolid.cpp Surface.cpp validate_shell.cpp validate_shell_intersection.cpp Building.cpp main.cpp )
+add_executable( val3dity input.cpp pugixml.cpp geomtools.cpp Primitive.cpp Surface.cpp Solid.cpp CompositeSolid.cpp MultiSolid.cpp Surface.cpp MultiSurface.cpp validate_shell.cpp validate_shell_intersection.cpp Building.cpp main.cpp )
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 
