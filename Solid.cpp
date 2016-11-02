@@ -135,7 +135,7 @@ std::string Solid::get_poly_representation()
 std::string Solid::get_report_xml()
 {
   std::stringstream ss;
-  ss << "\t<Solid" << std::endl;
+  ss << "\t<Solid>" << std::endl;
   if (this->get_id() != "")
     ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
   else

@@ -28,7 +28,7 @@ public:
   std::string get_report_xml();
   std::string get_type();
 
-  int         number_surfaces();
+  int         number_faces();
   bool        set_surface(Surface* s);
   Surface*    get_surface();
 

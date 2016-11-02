@@ -8,6 +8,7 @@
 
 #include "MultiSurface.h"
 #include "Primitive.h"
+#include "input.h"
 
 
 MultiSurface::MultiSurface(std::string id) {
@@ -39,12 +40,32 @@ bool MultiSurface::is_empty() {
 
 
 std::string MultiSurface::get_report_xml() {
-  // TODO: xml report
-  return "<EMPTY>";
-}
+  std::stringstream ss;
+  ss << "\t<MultiSurface>" << std::endl;
+  if (this->get_id() != "")
+    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  else
+    ss << "\t\t<id>none</id>" << std::endl;
+  ss << "\t\t<numberfaces>" << this->number_faces() << "</numberfaces>" << std::endl;
+  // ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      ss << "\t\t<Error>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
+      ss << "\t\t\t<faces>" << std::get<0>(e) << "</faces>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
+      ss << "\t\t</Error>" << std::endl;
+    }
+  }
+  ss << _surface->get_report_xml();
+  ss << "\t</MultiSurface>" << std::endl;
+  return ss.str();}
 
 
-int MultiSurface::number_surfaces() 
+int MultiSurface::number_faces() 
 {
   return _surface->number_faces();
 }

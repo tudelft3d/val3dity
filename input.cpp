@@ -25,6 +25,7 @@
 
 #include "input.h"
 
+
 bool IOErrors::has_errors()
 {
   if (_errors.size() == 0)
@@ -209,7 +210,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs) {
 }
 
 
-Surface* process_gml_compositesurface(pugi::xml_node n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
+Surface* process_gml_compositesurface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
@@ -336,6 +337,18 @@ Solid* process_gml_solid(const pugi::xpath_node& nsolid, std::map<std::string, p
   }
   return sol;
 }
+
+
+MultiSurface* process_gml_multisurface(const pugi::xpath_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+{
+  MultiSurface* ms = new MultiSurface;
+  if (nms.node().attribute("gml:id") != 0)
+    ms->set_id(std::string(nms.node().attribute("gml:id").value()));
+  Surface* s = process_gml_compositesurface(nms.node(), 0, dallpoly, tol_snap, errs);
+  ms->set_surface(s);
+  return ms;
+}
+
 
 // Solid* process_gml_solid(pugi::xpath_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 // {
@@ -467,7 +480,6 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
     if (prim == SOLID)
     {
       Solid* sol = process_gml_solid(nprim, dallpoly, tol_snap, errs);
-//      (nprim, dallpoly, tol_snap, errs);
       lsPrimitives.push_back(sol);
     }
     // else if (prim == COMPOSITESOLID)
@@ -476,9 +488,11 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
     // else if (prim == MULTISOLID)
     // {
     // }
-    // else if (prim == MULTISURFACE)
-    // {
-    // }
+    else if (prim == MULTISURFACE)
+    {
+      MultiSurface* ms = process_gml_multisurface(nprim, dallpoly, tol_snap, errs);
+      lsPrimitives.push_back(ms);
+    }
     // else if (prim == COMPOSITESURFACE)
     // {
     // }

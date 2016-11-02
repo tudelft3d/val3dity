@@ -246,35 +246,41 @@ int main(int argc, char* const argv[])
       // s->translate_vertices();
     
     //-- now the validation starts
-    if ( (lsPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
+    if (usebuildings == true) 
     {
-      std::cout << "Validating " << lsPrimitives.size();
-      if (prim3d == SOLID)
-        std::cout << " Solid";
-      else if (prim3d == COMPOSITESURFACE)
-        std::cout << " CompositeSurface";
-      else 
-        std::cout << " MultiSurface";
-      std::cout << std::endl;
-      int i = 1;
-      for (auto& s : lsPrimitives)
-      {
-        if ( (i % 10 == 0) && (verbose.getValue() == false) )
-          printProgressBar(100 * (i / double(lsPrimitives.size())));
-        i++;
-        std::clog << std::endl << "===== Validating Primitive " << s->get_id() << " =====" << std::endl;
-        std::clog << s->get_type() << std::endl;
-        if (s->get_id() != "")
-          std::clog << "ID: " << s->get_id() << std::endl;
-        if (s->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
-          std::clog << "===== INVALID =====" << std::endl;
-        else
-          std::clog << "===== VALID =====" << std::endl;
-      }
-      if (verbose.getValue() == false)
-        printProgressBar(100);
+      std::cout << "BUILDINGS AVLIDATION" << std::endl;
     }
-
+    else 
+    {
+      if ( (lsPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
+      {
+        std::cout << "Validating " << lsPrimitives.size();
+        if (prim3d == SOLID)
+          std::cout << " Solid";
+        else if (prim3d == COMPOSITESURFACE)
+          std::cout << " CompositeSurface";
+        else 
+          std::cout << " MultiSurface";
+        std::cout << std::endl;
+        int i = 1;
+        for (auto& s : lsPrimitives)
+        {
+          if ( (i % 10 == 0) && (verbose.getValue() == false) )
+            printProgressBar(100 * (i / double(lsPrimitives.size())));
+          i++;
+          std::clog << std::endl << "===== Validating Primitive " << s->get_id() << " =====" << std::endl;
+          std::clog << s->get_type() << std::endl;
+          if (s->get_id() != "")
+            std::clog << "ID: " << s->get_id() << std::endl;
+          if (s->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
+            std::clog << "===== INVALID =====" << std::endl;
+          else
+            std::clog << "===== VALID =====" << std::endl;
+        }
+        if (verbose.getValue() == false)
+          printProgressBar(100);
+      }
+    }
     //-- print summary of errors
     if (usebuildings == true)
       std::cout << "\n" << print_summary_validation(lsBuildings) << std::endl;        
