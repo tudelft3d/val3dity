@@ -21,7 +21,8 @@ MultiSurface::~MultiSurface() {
 
 bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  return _surface->validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals);
+  _is_valid = _surface->validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals);
+  return _is_valid;
 }
 
 
@@ -75,6 +76,13 @@ bool MultiSurface::set_surface(Surface* s)
 {
   _surface = s;
   return true;
+}
+
+std::set<int> MultiSurface::get_unique_error_codes() {
+  std::set<int> errs = Primitive::get_unique_error_codes();
+  std::set<int> tmp = _surface->get_unique_error_codes();
+  errs.insert(tmp.begin(), tmp.end());
+  return errs;
 }
 
 

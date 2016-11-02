@@ -28,9 +28,10 @@ public:
   std::string get_report_xml();
   std::string get_type();
 
-  int         number_faces();
-  bool        set_surface(Surface* s);
-  Surface*    get_surface();
+  int           number_faces();
+  bool          set_surface(Surface* s);
+  Surface*      get_surface();
+  std::set<int> get_unique_error_codes();
 
 protected:
   Surface* _surface;
