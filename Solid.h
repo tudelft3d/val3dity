@@ -57,6 +57,7 @@ public:
   bool          is_valid();
   bool          is_empty();
   std::string   get_type();
+  std::set<int> get_unique_error_codes();
   
 protected:
   std::vector<Surface*>  _shells;

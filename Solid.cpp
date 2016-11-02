@@ -136,7 +136,10 @@ std::string Solid::get_report_xml()
 {
   std::stringstream ss;
   ss << "\t<Solid" << std::endl;
-  ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  if (this->get_id() != "")
+    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  else
+    ss << "\t\t<id>none</id>" << std::endl;
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
@@ -168,6 +171,16 @@ std::string Solid::get_report_xml()
   }
   ss << "\t</Solid>" << std::endl;
   return ss.str();
+}
+
+
+std::set<int> Solid::get_unique_error_codes() {
+  std::set<int> errs = Primitive::get_unique_error_codes();
+  for (auto& sh : _shells) {
+    std::set<int> tmp = sh->get_unique_error_codes();
+    errs.insert(tmp.begin(), tmp.end());
+  }
+  return errs;
 }
 
 

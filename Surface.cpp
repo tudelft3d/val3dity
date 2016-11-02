@@ -84,7 +84,7 @@ std::string Surface::get_report_xml()
       ss << "\t\t<Error>" << std::endl;
       ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
       ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<id>" << this->_id << "</id>" << std::endl;
+      ss << "\t\t\t<shell_number>" << this->_id << "</shell_number>" << std::endl;
       ss << "\t\t\t<face>" << std::get<0>(e) << "</face>" << std::endl;
       ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
       ss << "\t\t</Error>" << std::endl;
@@ -570,7 +570,7 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
 
 bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "----- Surface validation (#" << _id << ") -----" << std::endl;
+  std::clog << "----- Shell validation (#" << _id << ") -----" << std::endl;
   if (_is_valid_2d == -1)
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)
