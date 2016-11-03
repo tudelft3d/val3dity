@@ -170,7 +170,7 @@ std::string localise(std::string s)
 
 
 vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs) {
-  std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
+  std::string s = "./" + NS["gml"] + "LinearRing" + "/" + NS["gml"] + "pos";
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   std::vector<int> r;
   if (npos.size() > 0) //-- <gml:pos> used
@@ -187,7 +187,7 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
   }
   else //-- <gml:posList> used
   {
-    std::string s = "./" + localise("LinearRing") + "/" + localise("posList");
+    std::string s = "./" + NS["gml"] + "LinearRing" + "/" + NS["gml"] + "posList";
     pugi::xpath_node pl = n.select_node(s.c_str());
     if (pl == NULL)
     {
@@ -215,7 +215,7 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
 
 Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
-  std::string s = ".//" + localise("surfaceMember");
+  std::string s = ".//" + NS["gml"] + "surfaceMember";
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
   Surface* sh = new Surface(id, tol_snap);
   int i = 0;
@@ -290,7 +290,7 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
     if (std::strncmp(p.node().attribute("orientation").value(), "-", 1) == 0)
       fliporientation = true;
     //-- exterior ring (only 1)
-    s = ".//" + localise("exterior");
+    s = ".//" + NS["gml"] + "exterior";
     pugi::xpath_node ring = p.node().select_node(s.c_str());
     std::vector<int> r = process_gml_ring(ring.node(), sh, errs);
     if (fliporientation == true) 
@@ -306,7 +306,7 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
       r.pop_back(); 
     oneface.push_back(r);
     //-- interior rings
-    s = ".//" + localise("interior");
+    s = ".//" + NS["gml"] + "interior";
     pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
       std::vector<int> r = process_gml_ring(it->node(), sh, errs);
@@ -336,11 +336,11 @@ Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pug
   Solid* sol = new Solid;
   if (nsolid.attribute("gml:id") != 0)
     sol->set_id(std::string(nsolid.attribute("gml:id").value()));
-  std::string s = "./" + localise("exterior");
+  std::string s = "./" + NS["gml"] + "exterior";
   pugi::xpath_node next = nsolid.select_node(s.c_str());
   sol->set_oshell(process_gml_surface(next.node(), 0, dallpoly, tol_snap, errs));
   //-- interior shells
-  s = "./" + localise("interior");
+  s = "./" + NS["gml"] + "interior";
   pugi::xpath_node_set nint = nsolid.select_nodes(s.c_str());
   int id = 1;
   for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
@@ -657,19 +657,19 @@ void readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildin
 
 void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs)
 {
-  std::string s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
+  std::string s = "//" + NS["gml"] + "Polygon" + "[@" + NS["gml"] + "id]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
    std::cout << "XLinks found, resolving them..." << std::flush;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
     dallpoly[it->node().attribute("gml:id").value()] = *it;
   //-- for <gml:OrientableSurface>
-  s = "//" + localise("OrientableSurface") + "[@" + localise("id") + "]";
+  s = "//" + NS["gml"] + "OrientableSurface" + "[@" + NS["gml"] + "id" + "]";
   pugi::xpath_node_set nallosurf = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nallosurf.begin(); it != nallosurf.end(); ++it)
     dallpoly[it->node().attribute("gml:id").value()] = *it;
   //-- checking xlinks validity now, not to be bitten later
-  s = "//" + localise("surfaceMember") + "[@" + localise("href") + "]";
+  s = "//" + NS["gml"] + "surfaceMember" + "[@" + NS["gml"] + "href" + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it) 
   {
