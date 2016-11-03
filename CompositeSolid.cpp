@@ -45,8 +45,12 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
 }
 
 
-bool CompositeSolid::is_valid() {
-  return _is_valid;
+int CompositeSolid::is_valid()
+{
+  if ( (_is_valid == 1) && (this->is_empty() == false) && (_errors.empty() == true) )
+    return 1;
+  else
+    return _is_valid;
 }
 
 

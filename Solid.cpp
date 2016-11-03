@@ -61,12 +61,20 @@ void Solid::add_ishell(Surface* sh)
 }
 
 
-bool Solid::is_valid()
+int Solid::is_valid()
 {
-  if ( (_is_valid > 0) && (this->is_empty() == false) )
-    return true;
+  for (auto& sh : _shells)
+  {
+    if (sh->has_errors() == true)
+    {
+      _is_valid = 0;
+      return 0;
+    }
+  }
+  if ( (_is_valid == 1) && (this->is_empty() == false) )
+    return 1;
   else
-    return false;
+    return _is_valid;
 }
 
 
@@ -101,6 +109,10 @@ void Solid::translate_vertices()
 
 bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
+  if (this->is_valid() == 0)
+  {
+    return false;
+  }
   bool isValid = true;
   if (this->is_empty() == true)
   {

@@ -21,8 +21,18 @@ MultiSurface::~MultiSurface() {
 
 bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  _is_valid = _surface->validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals);
-  return _is_valid;
+  if (this->is_valid() == 0)
+    return false;
+  if (_surface->validate_as_multisurface(tol_planarity_d2p, tol_planarity_normals) == true) 
+  {
+    _is_valid = 1;
+    return true;
+  }
+  else
+  {
+    _is_valid = 0;
+    return false;
+  }
 }
 
 
@@ -31,8 +41,16 @@ std::string MultiSurface::get_type()
   return "MultiSurface";
 }
 
-bool MultiSurface::is_valid() {
-  return _is_valid;
+int MultiSurface::is_valid() {
+  if (_surface->has_errors() == true)
+  {
+    _is_valid = 0;
+    return 0;
+  }
+  if ( (_is_valid == 1) && (this->is_empty() == false) )
+    return 1;
+  else
+    return _is_valid;
 }
 
 bool MultiSurface::is_empty() {

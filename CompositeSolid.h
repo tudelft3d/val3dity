@@ -23,7 +23,7 @@ public:
                 ~CompositeSolid(); 
 
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
-  bool          is_valid();
+  int           is_valid();
   bool          is_empty();
   std::string   get_report_xml();
   std::string   get_type();

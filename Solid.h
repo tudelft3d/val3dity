@@ -54,7 +54,7 @@ public:
   void          translate_vertices();
   std::string   get_report_xml();
   std::string   get_poly_representation();
-  bool          is_valid();
+  int           is_valid();
   bool          is_empty();
   std::string   get_type();
   std::set<int> get_unique_error_codes();

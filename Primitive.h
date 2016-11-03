@@ -23,7 +23,7 @@ public:
   ~Primitive ();
 
   virtual bool          validate(double tol_planarity_d2p, double tol_planarity_normals) = 0;
-  virtual bool          is_valid() = 0;
+  virtual int           is_valid() = 0;
   virtual bool          is_empty() = 0;
   virtual std::string   get_report_xml() = 0;
   virtual std::string   get_type() = 0;

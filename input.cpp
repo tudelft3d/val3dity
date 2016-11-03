@@ -210,7 +210,7 @@ vector<int> process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs) {
 }
 
 
-Surface* process_gml_compositesurface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
+Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
 {
   std::string s = ".//" + localise("surfaceMember");
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
@@ -317,34 +317,34 @@ Surface* process_gml_compositesurface(const pugi::xml_node& n, int id, std::map<
 }
 
 
-Solid* process_gml_solid(const pugi::xpath_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   //-- exterior shell
   Solid* sol = new Solid;
-  if (nsolid.node().attribute("gml:id") != 0)
-    sol->set_id(std::string(nsolid.node().attribute("gml:id").value()));
+  if (nsolid.attribute("gml:id") != 0)
+    sol->set_id(std::string(nsolid.attribute("gml:id").value()));
   std::string s = "./" + localise("exterior");
-  pugi::xpath_node next = nsolid.node().select_node(s.c_str());
-  sol->set_oshell(process_gml_compositesurface(next.node(), 0, dallpoly, tol_snap, errs));
+  pugi::xpath_node next = nsolid.select_node(s.c_str());
+  sol->set_oshell(process_gml_surface(next.node(), 0, dallpoly, tol_snap, errs));
   //-- interior shells
   s = "./" + localise("interior");
-  pugi::xpath_node_set nint = nsolid.node().select_nodes(s.c_str());
+  pugi::xpath_node_set nint = nsolid.select_nodes(s.c_str());
   int id = 1;
   for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it)
   {
-    sol->add_ishell(process_gml_compositesurface(it->node(), id, dallpoly, tol_snap, errs));
+    sol->add_ishell(process_gml_surface(it->node(), id, dallpoly, tol_snap, errs));
     id++;
   }
   return sol;
 }
 
 
-MultiSurface* process_gml_multisurface(const pugi::xpath_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   MultiSurface* ms = new MultiSurface;
-  if (nms.node().attribute("gml:id") != 0)
-    ms->set_id(std::string(nms.node().attribute("gml:id").value()));
-  Surface* s = process_gml_compositesurface(nms.node(), 0, dallpoly, tol_snap, errs);
+  if (nms.attribute("gml:id") != 0)
+    ms->set_id(std::string(nms.attribute("gml:id").value()));
+  Surface* s = process_gml_surface(nms, 0, dallpoly, tol_snap, errs);
   ms->set_surface(s);
   return ms;
 }
@@ -479,7 +479,7 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
   {
     if (prim == SOLID)
     {
-      Solid* sol = process_gml_solid(nprim, dallpoly, tol_snap, errs);
+      Solid* sol = process_gml_solid(nprim.node(), dallpoly, tol_snap, errs);
       lsPrimitives.push_back(sol);
     }
     // else if (prim == COMPOSITESOLID)
@@ -490,7 +490,7 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
     // }
     else if (prim == MULTISURFACE)
     {
-      MultiSurface* ms = process_gml_multisurface(nprim, dallpoly, tol_snap, errs);
+      MultiSurface* ms = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
       lsPrimitives.push_back(ms);
     }
     // else if (prim == COMPOSITESURFACE)
