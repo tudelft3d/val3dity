@@ -50,6 +50,7 @@ public:
 
   void          add_primitive(Primitive* p);
   std::set<int> get_unique_error_codes();
+  int           get_number_primitives();
   
   void          add_buildingpart(BuildingPart* bp);
   bool          has_parts();

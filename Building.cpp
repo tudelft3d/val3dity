@@ -35,6 +35,12 @@ void Building::add_primitive(Primitive* p)
 }
 
 
+int Building::get_number_primitives()
+{
+  return _lsPrimitives.size();
+}
+
+
 std::set<int> Building::get_unique_error_codes()
 {
   std::set<int> errs;

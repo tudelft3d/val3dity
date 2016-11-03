@@ -463,21 +463,27 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings)
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
   ss << "Total # of Buildings: " << setw(8) << lsBuildings.size() << std::endl;
   int bValid = 0;
+  int countPrim = 0;
   for (auto& s : lsBuildings)
+  {
     if (s->is_valid() == true)
       bValid++;
+    countPrim += s->get_number_primitives();
+  }
   float percentage;
   if (lsBuildings.size() == 0)
     percentage = 0;
   else
     percentage = 100 * ((lsBuildings.size() - bValid) / float(lsBuildings.size()));
-  ss << "# valid: " << setw(22) << bValid;
+  ss << "# valid: " << setw(21) << bValid;
   if (lsBuildings.size() == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << (lsBuildings.size() - bValid);
+  ss << "# invalid: " << setw(19) << (lsBuildings.size() - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  ss << "+++++" << std::endl;
+  ss << "Total # Primitives: " << setw(10) << countPrim << std::endl;
   //-- overview of errors
   std::map<int,int> errors;
   for (auto& b : lsBuildings)

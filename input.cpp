@@ -334,12 +334,32 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
   Building* b = new Building;
   if (nbuilding.attribute("gml:id") != 0)
     b->set_id(std::string(nbuilding.attribute("gml:id").value()));
-  std::string s = ".//" + NS["gml"] + "Solid";
-  pugi::xpath_node_set nset = nbuilding.select_nodes(s.c_str());
+  
+  //--
+  std::string s;
+  pugi::xpath_node_set nset;
+  s = ".//" + NS["gml"] + "CompositeSolid";
+  nset = nbuilding.select_nodes(s.c_str());
+  std::clog << "Validate CompositeSolid" << std::endl;
+  if (nset.size() > 0)
+    return b;
+  
+  s = ".//" + NS["gml"] + "Solid";
+  nset = nbuilding.select_nodes(s.c_str());
   for(auto& n: nset)
   {
     Solid* sol = process_gml_solid(n.node(), dallpoly, tol_snap, errs);
     b->add_primitive(sol);
+  }
+  if (nset.size() > 0)
+    return b;
+
+  s = ".//" + NS["gml"] + "MultiSurface";
+  nset = nbuilding.select_nodes(s.c_str());
+  for(auto& n: nset)
+  {
+    MultiSurface* ms = process_gml_multisurface(n.node(), dallpoly, tol_snap, errs);
+    b->add_primitive(ms);
   }
   return b;
 }
