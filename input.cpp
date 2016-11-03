@@ -25,6 +25,9 @@
 
 #include "input.h"
 
+//-- XML namespaces map
+std::map<std::string, std::string> NS; 
+
 
 bool IOErrors::has_errors()
 {
@@ -446,32 +449,43 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
     errs.add_error(901, "Input file not found.");
     return;
   }
+  //-- parse namespace
+  pugi::xml_node ncm = doc.first_child();
+  std::string vcitygml;
+  get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
+
+  if (NS.count("gml") == 0)
+  {
+    errs.add_error(901, "Input file does not have the GML namespace.");
+    return;
+  }
+
   //-- Primitives parsing and counting
-  std::string s = "//";
+  std::string s = "//" + NS["gml"];
   std::string sprim;
   if (prim == SOLID)
   {
-    s += localise("Solid");
+    s += "Solid";
     sprim = "<gml:Solid>";
   }
   else if (prim == COMPOSITESOLID)
   {
-    s += localise("CompositeSolid");
+    s += "CompositeSolid";
     sprim = "<gml:CompositeSolid>";
   }
   else if (prim == MULTISOLID)
   {
-    s += localise("MultiSolid");
+    s += "MultiSolid";
     sprim = "<gml:MultiSolid>";
   }
   else if (prim == MULTISURFACE)
   {
-    s += localise("MultiSurface");
+    s += "MultiSurface";
     sprim = "<gml:MultiSurface>";
   }
   else if (prim == COMPOSITESURFACE)
   {
-    s += localise("CompositeSurface");
+    s += "CompositeSurface";
     sprim = "<gml:CompositeSurface>";
   }
 
@@ -510,6 +524,136 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
   std::cout << "Input file correctly parsed without errors." << std::endl;
 }
 
+
+void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
+  vcitygml = "";
+  for (pugi::xml_attribute attr = root.first_attribute(); attr; attr = attr.next_attribute()) {
+    std::string name = attr.name();
+    if (name.find("xmlns") != std::string::npos) {
+      // std::cout << attr.name() << "=" << attr.value() << std::endl;
+      std::string value = attr.value();
+      std::string sns;
+      if (value.find("http://www.opengis.net/citygml/0") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v0.4";
+      }
+      else if (value.find("http://www.opengis.net/citygml/1") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v1.0";
+      }
+      else if (value.find("http://www.opengis.net/citygml/2") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v2.0";
+      }
+      else if (value.find("http://www.opengis.net/gml") != std::string::npos)
+        sns = "gml";
+      else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)
+        sns = "building";
+      else if (value.find("http://www.opengis.net/citygml/relief") != std::string::npos)
+        sns = "dem";
+      else if (value.find("http://www.opengis.net/citygml/vegetation") != std::string::npos)
+        sns = "veg";
+      else if (value.find("http://www.opengis.net/citygml/waterbody") != std::string::npos)
+        sns = "wtr";
+      else if (value.find("http://www.opengis.net/citygml/landuse") != std::string::npos)
+        sns = "luse";
+      else if (value.find("http://www.opengis.net/citygml/transportation") != std::string::npos)
+        sns = "tran";      
+      else if (value.find("http://www.opengis.net/citygml/cityfurniture") != std::string::npos)
+        sns = "frn";      
+      else if (value.find("http://www.opengis.net/citygml/appearance") != std::string::npos)
+        sns = "app";      
+      else if (value.find("http://www.w3.org/1999/xlink") != std::string::npos)
+        sns = "xlink";
+      else
+        sns = "";
+      if (sns != "") {
+        size_t pos = name.find(":");
+        if (pos == std::string::npos) 
+          NS[sns] = "";
+        else 
+          NS[sns] = name.substr(pos + 1) + ":";
+      }    
+    }
+  }
+}
+
+
+void readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap)
+{
+  // std::cout << "Reading file: " << ifile << std::endl;
+  // pugi::xml_document doc;
+  // if (!doc.load_file(ifile.c_str())) 
+  // {
+  //   errs.add_error(901, "Input file not found.");
+  //   return;
+  // }
+
+
+
+//  //-- Primitives parsing and counting
+//  std::string s = "//";
+//  std::string sprim;
+//  if (prim == SOLID)
+//  {
+//    s += localise("Solid");
+//    sprim = "<gml:Solid>";
+//  }
+//  else if (prim == COMPOSITESOLID)
+//  {
+//    s += localise("CompositeSolid");
+//    sprim = "<gml:CompositeSolid>";
+//  }
+//  else if (prim == MULTISOLID)
+//  {
+//    s += localise("MultiSolid");
+//    sprim = "<gml:MultiSolid>";
+//  }
+//  else if (prim == MULTISURFACE)
+//  {
+//    s += localise("MultiSurface");
+//    sprim = "<gml:MultiSurface>";
+//  }
+//  else if (prim == COMPOSITESURFACE)
+//  {
+//    s += localise("CompositeSurface");
+//    sprim = "<gml:CompositeSurface>";
+//  }
+//
+//  pugi::xpath_query myquery(s.c_str());
+//  pugi::xpath_node_set nprims = myquery.evaluate_node_set(doc);
+//  std::cout << "Parsing the file..." << std::endl;
+//  std::cout << "# of " << sprim << " found: ";
+//  std::cout << nprims.size() << std::endl;
+//
+//  //-- build dico of xlinks for <gml:Polygon>
+//  std::map<std::string, pugi::xpath_node> dallpoly;
+//  build_dico_xlinks(doc, dallpoly, errs);
+//
+//  for(auto& nprim: nprims)
+//  {
+//    if (prim == SOLID)
+//    {
+//      Solid* sol = process_gml_solid(nprim.node(), dallpoly, tol_snap, errs);
+//      lsPrimitives.push_back(sol);
+//    }
+//    // else if (prim == COMPOSITESOLID)
+//    // {
+//    // }
+//    // else if (prim == MULTISOLID)
+//    // {
+//    // }
+//    else if (prim == MULTISURFACE)
+//    {
+//      MultiSurface* ms = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
+//      lsPrimitives.push_back(ms);
+//    }
+//    // else if (prim == COMPOSITESURFACE)
+//    // {
+//    // }
+//  }
+//  std::cout << "Input file correctly parsed without errors." << std::endl;
+}
 
 void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs)
 {

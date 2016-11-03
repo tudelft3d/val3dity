@@ -47,13 +47,17 @@ public:
 };
 
 
+//--
+
+void          readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
+void          readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
+void          get_namespaces(pugi::xml_node& root, std::string& vcitygml);
+
 
 std::string   errorcode2description(int code, bool qie = false);
 void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
 Surface*      readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
 
-// void          readGMLfile(std::string &ifile, std::vector<Primitive*>& lsPrimitives, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
-void          readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 
 Solid*        process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);

@@ -180,7 +180,12 @@ int main(int argc, char* const argv[])
                                  prim3d, 
                                  ioerrs, 
                                  snap_tolerance.getValue());
-        // else
+        else
+          readGMLfile_buildings(inputfile.getValue(), 
+                                lsBuildings,
+                                ioerrs, 
+                                snap_tolerance.getValue());
+
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
