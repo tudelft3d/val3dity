@@ -19,7 +19,14 @@ Building::~Building()
 bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
   std::clog << "VALIDATING BUILDING" << std::endl;
-  return true;
+  bool isvalid = true;
+  for (auto& p : _lsPrimitives)
+  {
+    if (p->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+      isvalid = false;
+  }
+  _is_valid = isvalid;
+  return isvalid;
 }
 
 void Building::add_primitive(Primitive* p)
@@ -27,6 +34,17 @@ void Building::add_primitive(Primitive* p)
   _lsPrimitives.push_back(p);
 }
 
+
+std::set<int> Building::get_unique_error_codes()
+{
+  std::set<int> errs;
+  for (auto& p : _lsPrimitives)
+  {
+    std::set<int> tmp = p->get_unique_error_codes();
+    errs.insert(tmp.begin(), tmp.end());
+  }
+  return errs;
+}
 
 void Building::add_buildingpart(BuildingPart* bp)
 {
@@ -42,7 +60,7 @@ bool Building::has_parts()
 
 bool Building::is_valid()
 {
-  return true;
+  return _is_valid;
 }
 
 

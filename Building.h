@@ -9,7 +9,6 @@
 #ifndef Building_h
 #define Building_h
 
-
 #include "Primitive.h"
 #include <string>
 #include <vector>
@@ -50,12 +49,14 @@ public:
   void          set_id(std::string id);
 
   void          add_primitive(Primitive* p);
+  std::set<int> get_unique_error_codes();
   
   void          add_buildingpart(BuildingPart* bp);
   bool          has_parts();
   
 protected:
   std::string                _id;
+  int                        _is_valid;
   std::vector<Primitive*>    _lsPrimitives;
   std::vector<BuildingPart*> _lsBP;
 };

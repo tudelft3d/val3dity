@@ -329,6 +329,21 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
   return sh;
 }
 
+Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+{
+  Building* b = new Building;
+  if (nbuilding.attribute("gml:id") != 0)
+    b->set_id(std::string(nbuilding.attribute("gml:id").value()));
+  std::string s = ".//" + NS["gml"] + "Solid";
+  pugi::xpath_node_set nset = nbuilding.select_nodes(s.c_str());
+  for(auto& n: nset)
+  {
+    Solid* sol = process_gml_solid(n.node(), dallpoly, tol_snap, errs);
+    b->add_primitive(sol);
+  }
+  return b;
+}
+
 
 Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
@@ -350,6 +365,7 @@ Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pug
   }
   return sol;
 }
+
 
 
 MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
@@ -581,79 +597,42 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
 
 void readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap)
 {
-  // std::cout << "Reading file: " << ifile << std::endl;
-  // pugi::xml_document doc;
-  // if (!doc.load_file(ifile.c_str())) 
-  // {
-  //   errs.add_error(901, "Input file not found.");
-  //   return;
-  // }
+  std::cout << "Reading file: " << ifile << std::endl;
+  pugi::xml_document doc;
+  if (!doc.load_file(ifile.c_str())) 
+  {
+    errs.add_error(901, "Input file not found.");
+    return;
+  }
+  //-- parse namespace
+  pugi::xml_node ncm = doc.first_child();
+  std::string vcitygml;
+  get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
 
+  if (vcitygml.empty() == true) {
+    errs.add_error(901, "Input file does not have the CityGML namespace.");
+    return;
+  }
 
+  //-- parsing all Buildings
+  std::string s = "//" + NS["building"] + "Building";
+  pugi::xpath_query myquery(s.c_str());
+  pugi::xpath_node_set nbuildings = myquery.evaluate_node_set(doc);
+  std::cout << "Parsing the file..." << std::endl;
+  std::cout << "# of Buildings found: ";
+  std::cout << nbuildings.size() << std::endl;
 
-//  //-- Primitives parsing and counting
-//  std::string s = "//";
-//  std::string sprim;
-//  if (prim == SOLID)
-//  {
-//    s += localise("Solid");
-//    sprim = "<gml:Solid>";
-//  }
-//  else if (prim == COMPOSITESOLID)
-//  {
-//    s += localise("CompositeSolid");
-//    sprim = "<gml:CompositeSolid>";
-//  }
-//  else if (prim == MULTISOLID)
-//  {
-//    s += localise("MultiSolid");
-//    sprim = "<gml:MultiSolid>";
-//  }
-//  else if (prim == MULTISURFACE)
-//  {
-//    s += localise("MultiSurface");
-//    sprim = "<gml:MultiSurface>";
-//  }
-//  else if (prim == COMPOSITESURFACE)
-//  {
-//    s += localise("CompositeSurface");
-//    sprim = "<gml:CompositeSurface>";
-//  }
-//
-//  pugi::xpath_query myquery(s.c_str());
-//  pugi::xpath_node_set nprims = myquery.evaluate_node_set(doc);
-//  std::cout << "Parsing the file..." << std::endl;
-//  std::cout << "# of " << sprim << " found: ";
-//  std::cout << nprims.size() << std::endl;
-//
-//  //-- build dico of xlinks for <gml:Polygon>
-//  std::map<std::string, pugi::xpath_node> dallpoly;
-//  build_dico_xlinks(doc, dallpoly, errs);
-//
-//  for(auto& nprim: nprims)
-//  {
-//    if (prim == SOLID)
-//    {
-//      Solid* sol = process_gml_solid(nprim.node(), dallpoly, tol_snap, errs);
-//      lsPrimitives.push_back(sol);
-//    }
-//    // else if (prim == COMPOSITESOLID)
-//    // {
-//    // }
-//    // else if (prim == MULTISOLID)
-//    // {
-//    // }
-//    else if (prim == MULTISURFACE)
-//    {
-//      MultiSurface* ms = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
-//      lsPrimitives.push_back(ms);
-//    }
-//    // else if (prim == COMPOSITESURFACE)
-//    // {
-//    // }
-//  }
-//  std::cout << "Input file correctly parsed without errors." << std::endl;
+  //-- build dico of xlinks for <gml:Polygon>
+  std::map<std::string, pugi::xpath_node> dallpoly;
+  build_dico_xlinks(doc, dallpoly, errs);
+
+  for(auto& nbuilding: nbuildings)
+  {
+    Building* b = process_citygml_building(nbuilding.node(), dallpoly, tol_snap, errs);
+    lsBuildings.push_back(b);
+  } 
 }
+
 
 void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs)
 {

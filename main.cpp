@@ -253,7 +253,21 @@ int main(int argc, char* const argv[])
     //-- now the validation starts
     if (usebuildings == true) 
     {
-      std::cout << "BUILDINGS AVLIDATION" << std::endl;
+      std::cout << "Validating " << lsBuildings.size() << " Buildings." << std::endl;
+      int i = 1;
+      for (auto& b : lsBuildings)
+      {
+        if ( (i % 10 == 0) && (verbose.getValue() == false) )
+          printProgressBar(100 * (i / double(lsBuildings.size())));
+        i++;
+        std::clog << std::endl << "===== Validating Building " << b->get_id() << " =====" << std::endl;
+        if (b->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
+          std::clog << "===== INVALID =====" << std::endl;
+        else
+          std::clog << "===== VALID =====" << std::endl;
+      }
+      if (verbose.getValue() == false)
+        printProgressBar(100);
     }
     else 
     {
@@ -445,110 +459,49 @@ std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Prim
 
 std::string print_summary_validation(std::vector<Building*>& lsBuildings)
 {
-  // std::stringstream ss;
-  // ss << std::endl;
-  // std::string primitives;
-  // if (prim3d == SOLID)
-  //   primitives = "Solid";
-  // else if (prim3d == COMPOSITESOLID)
-  //   primitives = "CompositeSolid";
-  // else if (prim3d == MULTISOLID)
-  //   primitives = "MultiSolid";
-  // else if (prim3d == MULTISURFACE)
-  //   primitives = "MultiSurface";
-  // else if (prim3d == COMPOSITESURFACE)
-  //   primitives = "CompositeSurface";
-
-  // ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  // ss << "Primitives validated: " << primitives << std::endl;
-  // ss << "Total # of primitives: " << setw(8) << lsPrimitives.size() << std::endl;
-  // int bValid = 0;
-  // for (auto& s : lsPrimitives)
-  //   if (s->is_valid() == true)
-  //     bValid++;
-  // float percentage;
-  // if (lsPrimitives.size() == 0)
-  //   percentage = 0;
-  // else
-  //   percentage = 100 * ((lsPrimitives.size() - bValid) / float(lsPrimitives.size()));
-  // ss << "# valid: " << setw(22) << bValid;
-  // if (lsPrimitives.size() == 0)
-  //   ss << " (" << 0 << "%)" << std::endl;
-  // else
-  //   ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  // ss << "# invalid: " << setw(20) << (lsPrimitives.size() - bValid);
-  // ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
-  // //-- Building overview
-  // if (buildings == true)
-  // {
-  //   std::map<std::string, vector<Solid*> > dBuildings;
-  //   for (auto& s : lsPrimitives)
-  //     dBuildings[s->get_id_building()].push_back(s);
-  //   ss << "+++++" << std::endl;
-  //   ss << "Total # of Buildings: " << setw(9) << dBuildings.size() << std::endl;
-  //   if (dBuildings.size() == 0)
-  //   {
-  //     ss << "# valid: "   << setw(22) << 0 << " (0.0%)" << std::endl;
-  //     ss << "# invalid: " << setw(20) << 0 << " (0.0%)" << std::endl;
-  //   }  
-  //   else
-  //   {
-  //     int bInvalid = 0;
-  //     for (auto b : dBuildings)
-  //     {
-  //       for (auto& sol : b.second)
-  //       {
-  //         if (sol->is_valid() == false)
-  //         {
-  //           bInvalid++;
-  //           break;
-  //         }
-  //       }
-  //     }
-  //     percentage = 100 * ((dBuildings.size() - bInvalid) / float(dBuildings.size()));
-  //     ss << "# valid: "   << setw(22) << (dBuildings.size() - bInvalid);
-  //     ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
-  //     ss << "# invalid: " << setw(20) << bInvalid;
-  //     ss << std::fixed << setprecision(1) << " (" << (100 - percentage) << "%)" << std::endl;
-  //   }
-  //   if (dBuildings.size() != nobuildings)
-  //   {
-  //     ss << "(file contains " << nobuildings << " Buildings in total)" << std::endl;
-  //     ss << "(but " << dBuildings.size() << " are stored with ";
-  //     if (prim3d == SOLID)
-  //       ss << "gml:Solid";
-  //     else if (prim3d == COMPOSITESURFACE)
-  //       ss << "gml:CompositeSurface";
-  //     else 
-  //       ss << "gml:MultiSurface";
-  //     ss << ")" << std::endl;
-  //   }
-  // }
-  // //-- overview of errors
-  // std::map<int,int> errors;
-  // for (auto& s : lsPrimitives)
-  // {
-  //   for (auto& code : s->get_unique_error_codes())
-  //     errors[code] = 0;
-  // }
-  // for (auto& s : lsPrimitives)
-  // {
-  //   for (auto& code : s->get_unique_error_codes())
-  //     errors[code] += 1;
-  // }
-  // if (errors.size() > 0)
-  // {
-  //   ss << "+++++" << std::endl;
-  //   ss << "Errors present:" << std::endl;
-  //   for (auto e : errors)
-  //   {
-  //     ss << "  " << e.first << " --- " << errorcode2description(e.first) << std::endl;
-  //     ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
-  //   }
-  // }
-  // ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-  // return ss.str();
-  return "yo";
+  std::stringstream ss;
+  ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  ss << "Total # of Buildings: " << setw(8) << lsBuildings.size() << std::endl;
+  int bValid = 0;
+  for (auto& s : lsBuildings)
+    if (s->is_valid() == true)
+      bValid++;
+  float percentage;
+  if (lsBuildings.size() == 0)
+    percentage = 0;
+  else
+    percentage = 100 * ((lsBuildings.size() - bValid) / float(lsBuildings.size()));
+  ss << "# valid: " << setw(22) << bValid;
+  if (lsBuildings.size() == 0)
+    ss << " (" << 0 << "%)" << std::endl;
+  else
+    ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
+  ss << "# invalid: " << setw(20) << (lsBuildings.size() - bValid);
+  ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  //-- overview of errors
+  std::map<int,int> errors;
+  for (auto& b : lsBuildings)
+  {
+    for (auto& code : b->get_unique_error_codes())
+      errors[code] = 0;
+  }
+  for (auto& b : lsBuildings)
+  {
+    for (auto& code : b->get_unique_error_codes())
+      errors[code] += 1;
+  }
+  if (errors.size() > 0)
+  {
+    ss << "+++++" << std::endl;
+    ss << "Errors present:" << std::endl;
+    for (auto e : errors)
+    {
+      ss << "  " << e.first << " --- " << errorcode2description(e.first) << std::endl;
+      ss << setw(11) << "(" << e.second << " Buildings)" << std::endl;
+    }
+  }
+  ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+  return ss.str();
 }
 
 
