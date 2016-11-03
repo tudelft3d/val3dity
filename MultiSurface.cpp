@@ -65,7 +65,7 @@ std::string MultiSurface::get_report_xml() {
     ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
   else
     ss << "\t\t<id>none</id>" << std::endl;
-  ss << "\t\t<numberfaces>" << this->number_faces() << "</numberfaces>" << std::endl;
+  ss << "\t\t<numbersurfaces>" << this->number_faces() << "</numbersurfaces>" << std::endl;
   // ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
   for (auto& err : _errors)
   {

@@ -166,7 +166,7 @@ std::string localise(std::string s)
 }
 
 
-vector<int> process_gml_ring(pugi::xml_node n, Surface* sh, IOErrors& errs) {
+vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs) {
   std::string s = "./" + localise("LinearRing") + "/" + localise("pos");
   pugi::xpath_node_set npos = n.select_nodes(s.c_str());
   std::vector<int> r;
@@ -293,7 +293,12 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
     if (fliporientation == true) 
       std::reverse(r.begin(), r.end());
     if (r.front() != r.back())
-      sh->add_error(103, p.node().attribute("gml:id").value());
+    {
+      if (p.node().attribute("gml:id") == 0)
+        sh->add_error(103, std::to_string(i));
+      else
+        sh->add_error(103, p.node().attribute("gml:id").value());
+    }
     else
       r.pop_back(); 
     oneface.push_back(r);
@@ -305,7 +310,12 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
       if (fliporientation == true) 
         std::reverse(r.begin(), r.end());
       if (r.front() != r.back())
-        sh->add_error(103, p.node().attribute("gml:id").value());
+      {
+        if (p.node().attribute("gml:id") == 0)
+          sh->add_error(103, std::to_string(i));
+        else
+          sh->add_error(103, p.node().attribute("gml:id").value());
+      }
       else
         r.pop_back(); 
       oneface.push_back(r);
