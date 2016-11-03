@@ -36,9 +36,9 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings);
 std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Primitive3D prim3d);
 
 // std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d, bool usebuildings);
-// void write_report_xml (std::ofstream& ss, std::string ifile, Primitive3D prim3d, 
-//                       double snap_tolerance, double planarity_d2p, double planarity_n, 
-//                       vector<Solid*>& lsSolids, IOErrors ioerrs, bool onlyinvalid = false);
+void write_report_xml (std::ofstream& ss, std::string ifile, vector<Primitive*>& lsPrimitives, Primitive3D prim3d, 
+                      double snap_tolerance, double planarity_d2p, double planarity_n, 
+                      IOErrors ioerrs, bool onlyinvalid = false);
 
 
 
@@ -287,22 +287,25 @@ int main(int argc, char* const argv[])
     else
       std::cout << "\n" << print_summary_validation(lsPrimitives, prim3d) << std::endl;        
    
-    // if (report.getValue() != "")
-    // {
-    //   std::ofstream thereport;
-    //   thereport.open(report.getValue());
-    //   write_report_xml(thereport, 
-    //                    inputfile.getValue(),
-    //                    prim3d, 
-    //                    snap_tolerance.getValue(),
-    //                    planarity_d2p.getValue(),
-    //                    planarity_n.getValue(),
-    //                    lsSolids,
-    //                    ioerrs,
-    //                    onlyinvalid.getValue());
-    //   thereport.close();
-    //   std::cout << "Full validation report saved to " << report.getValue() << std::endl;
-    // }
+    if (report.getValue() != "")
+    {
+      std::ofstream thereport;
+      thereport.open(report.getValue());
+      if (usebuildings == false)
+      {
+        write_report_xml(thereport, 
+                         inputfile.getValue(),
+                         lsPrimitives,
+                         prim3d, 
+                         snap_tolerance.getValue(),
+                         planarity_d2p.getValue(),
+                         planarity_n.getValue(),
+                         ioerrs,
+                         onlyinvalid.getValue());
+      }
+      thereport.close();
+      std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+    }
     
     if (report.getValue() == "")
       std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
@@ -544,54 +547,58 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings)
 }
 
 
-// void write_report_xml(std::ofstream& ss,
-//                       std::string ifile, 
-//                       Primitive3D prim3d, 
-//                       double snap_tolerance,
-//                       double planarity_d2p,
-//                       double planarity_n,
-//                       vector<Solid*>& lsSolids,
-//                       IOErrors ioerrs,
-//                       bool onlyinvalid)
-// {
-//   ss << "<val3dity>" << std::endl;
-//   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
-//   ss << "\t<primitives>";
-//   if (prim3d == SOLID)
-//     ss << "gml:Solid";
-//   else if (prim3d == COMPOSITESURFACE)
-//     ss << "gml:CompositeSurface";
-//   else
-//     ss << "gml:MultiSurface";
-//   ss << "</primitives>" << std::endl;
-//   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
-//   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
-//   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
-//   ss << "\t<totalprimitives>" << lsSolids.size() << "</totalprimitives>" << std::endl;
-//   int bValid = 0;
-//   for (auto& s : lsSolids)
-//     if (s->is_valid() == true)
-//       bValid++;
-//   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
-//   ss << "\t<invalidprimitives>" << (lsSolids.size() - bValid) << "</invalidprimitives>" << std::endl;
-//   std::time_t rawtime;
-//   struct tm * timeinfo;
-//   std::time (&rawtime);
-//   timeinfo = std::localtime ( &rawtime );
-//   char buffer[80];
-//   std::strftime(buffer, 80, "%c %Z", timeinfo);
-//   ss << "\t<time>" << buffer << "</time>" << std::endl;
-//   if (ioerrs.has_errors() == true)
-//   {
-//     ss << ioerrs.get_report_xml();
-//   }
-//   else
-//   {
-//     for (auto& s : lsSolids) 
-//     {
-//       if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
-//         ss << s->get_report_xml();
-//     }
-//   }
-//   ss << "</val3dity>" << std::endl;
-// }
+void write_report_xml(std::ofstream& ss,
+                      std::string ifile, 
+                      vector<Primitive*>& lsPrimitives,
+                      Primitive3D prim3d, 
+                      double snap_tolerance,
+                      double planarity_d2p,
+                      double planarity_n,
+                      IOErrors ioerrs,
+                      bool onlyinvalid)
+{
+  ss << "<val3dity>" << std::endl;
+  ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
+  ss << "\t<primitives>";
+  if (prim3d == SOLID)
+    ss << "gml:Solid";
+  else if (prim3d == COMPOSITESOLID)
+    ss << "gml:CompositeSolid";
+  else if (prim3d == MULTISOLID)
+    ss << "gml:MultiSolid";
+  else if (prim3d == MULTISURFACE)
+    ss << "gml:MultiSurface";
+  else if (prim3d == COMPOSITESURFACE)
+    ss << "gml:CompositeSurface";
+  ss << "</primitives>" << std::endl;
+  ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
+  ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
+  ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
+  ss << "\t<totalprimitives>" << lsPrimitives.size() << "</totalprimitives>" << std::endl;
+  int bValid = 0;
+  for (auto& s : lsPrimitives)
+    if (s->is_valid() == true)
+      bValid++;
+  ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
+  ss << "\t<invalidprimitives>" << (lsPrimitives.size() - bValid) << "</invalidprimitives>" << std::endl;
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  ss << "\t<time>" << buffer << "</time>" << std::endl;
+  if (ioerrs.has_errors() == true)
+  {
+    ss << ioerrs.get_report_xml();
+  }
+  else
+  {
+    for (auto& s : lsPrimitives) 
+    {
+      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
+        ss << s->get_report_xml();
+    }
+  }
+  ss << "</val3dity>" << std::endl;
+}
