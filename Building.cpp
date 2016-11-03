@@ -40,6 +40,35 @@ int Building::get_number_primitives()
   return _lsPrimitives.size();
 }
 
+int Building::get_number_solids()
+{
+  int t = 0;
+  for (auto& p : _lsPrimitives)
+    if (p->get_type() == "Solid")
+      t++;
+  return t;
+}
+
+int Building::get_number_compositesolids()
+{
+  int t = 0;
+  for (auto& p : _lsPrimitives)
+    if (p->get_type() == "MultiSolid")
+      t++;
+  return t;
+}
+
+int Building::get_number_multisurfaces()
+{
+  int t = 0;
+  for (auto& p : _lsPrimitives)
+    if (p->get_type() == "MultiSurface")
+      t++;
+  return t;
+}
+
+
+
 
 std::set<int> Building::get_unique_error_codes()
 {

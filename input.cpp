@@ -340,6 +340,7 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
   pugi::xpath_node_set nset;
   s = ".//" + NS["gml"] + "CompositeSolid";
   nset = nbuilding.select_nodes(s.c_str());
+  // TODO : parsing compositesolid
   std::clog << "Validate CompositeSolid" << std::endl;
   if (nset.size() > 0)
     return b;

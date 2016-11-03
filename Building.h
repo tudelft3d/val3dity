@@ -51,6 +51,9 @@ public:
   void          add_primitive(Primitive* p);
   std::set<int> get_unique_error_codes();
   int           get_number_primitives();
+  int           get_number_solids();
+  int           get_number_compositesolids();
+  int           get_number_multisurfaces();
   
   void          add_buildingpart(BuildingPart* bp);
   bool          has_parts();
@@ -61,6 +64,5 @@ protected:
   std::vector<Primitive*>    _lsPrimitives;
   std::vector<BuildingPart*> _lsBP;
 };
-
 
 #endif /* Building_h */

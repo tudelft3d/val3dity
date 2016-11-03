@@ -464,11 +464,17 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings)
   ss << "Total # of Buildings: " << setw(8) << lsBuildings.size() << std::endl;
   int bValid = 0;
   int countPrim = 0;
+  int countSolids = 0;
+  int countCSolids = 0;
+  int countMSurfaces = 0;
   for (auto& s : lsBuildings)
   {
     if (s->is_valid() == true)
       bValid++;
     countPrim += s->get_number_primitives();
+    countSolids += s->get_number_solids();
+    countCSolids += s->get_number_compositesolids();
+    countMSurfaces += s->get_number_multisurfaces();
   }
   float percentage;
   if (lsBuildings.size() == 0)
@@ -484,6 +490,9 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings)
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   ss << "+++++" << std::endl;
   ss << "Total # Primitives: " << setw(10) << countPrim << std::endl;
+  ss << "\tCompositeSolids: " << setw(5) << countCSolids << std::endl;
+  ss << "\tSolids: " << setw(14) << countSolids << std::endl;
+  ss << "\tMultiSurfaces: " << setw(7) << countMSurfaces << std::endl;
   //-- overview of errors
   std::map<int,int> errors;
   for (auto& b : lsBuildings)
