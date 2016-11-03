@@ -36,10 +36,13 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings);
 std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Primitive3D prim3d);
 
 // std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d, bool usebuildings);
+
 void write_report_xml (std::ofstream& ss, std::string ifile, vector<Primitive*>& lsPrimitives, Primitive3D prim3d, 
                       double snap_tolerance, double planarity_d2p, double planarity_n, 
                       IOErrors ioerrs, bool onlyinvalid = false);
-
+void write_report_xml (std::ofstream& ss, std::string ifile, vector<Building*>& lsBuildings,
+                      double snap_tolerance, double planarity_d2p, double planarity_n,
+                      IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -322,6 +325,17 @@ int main(int argc, char* const argv[])
                          ioerrs,
                          onlyinvalid.getValue());
       }
+      else
+      {
+        write_report_xml(thereport, 
+                         inputfile.getValue(),
+                         lsBuildings,
+                         snap_tolerance.getValue(),
+                         planarity_d2p.getValue(),
+                         planarity_n.getValue(),
+                         ioerrs,
+                         onlyinvalid.getValue());
+      }
       thereport.close();
       std::cout << "Full validation report saved to " << report.getValue() << std::endl;
     }
@@ -568,6 +582,50 @@ void write_report_xml(std::ofstream& ss,
   else
   {
     for (auto& s : lsPrimitives) 
+    {
+      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
+        ss << s->get_report_xml();
+    }
+  }
+  ss << "</val3dity>" << std::endl;
+}
+
+
+void write_report_xml(std::ofstream& ss,
+                      std::string ifile, 
+                      vector<Building*>& lsBuildings,
+                      double snap_tolerance,
+                      double planarity_d2p,
+                      double planarity_n,
+                      IOErrors ioerrs,
+                      bool onlyinvalid)
+{
+  ss << "<val3dity>" << std::endl;
+  ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
+  ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
+  ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
+  ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
+  ss << "\t<numberbuildings>" << lsBuildings.size() << "</numberbuildings>" << std::endl;
+  int bValid = 0;
+  for (auto& s : lsBuildings)
+    if (s->is_valid() == true)
+      bValid++;
+  ss << "\t<validbuildings>" << bValid << "</validbuildings>" << std::endl;
+  ss << "\t<invalidbuildings>" << (lsBuildings.size() - bValid) << "</invalidbuildings>" << std::endl;
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  ss << "\t<time>" << buffer << "</time>" << std::endl;
+  if (ioerrs.has_errors() == true)
+  {
+    ss << ioerrs.get_report_xml();
+  }
+  else
+  {
+    for (auto& s : lsBuildings) 
     {
       if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
         ss << s->get_report_xml();

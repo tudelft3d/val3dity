@@ -8,6 +8,7 @@
 
 #include "Building.h"
 #include <iostream>
+#include <sstream>
 
 Building::Building()
 {}
@@ -107,7 +108,19 @@ bool Building::is_empty()
 
 std::string Building::get_report_xml()
 {
-  return "<EMPTY>";
+  std::stringstream ss;
+  ss << "\t<Building>" << std::endl;
+  if (this->get_id() != "")
+    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  else
+    ss << "\t\t<id>none</id>" << std::endl;
+  ss << "\t\t<numberprimitives>" << this->get_number_primitives() << "</numberprimitives>" << std::endl;
+  for (auto& p : _lsPrimitives)
+  {
+    ss << p->get_report_xml();
+  }
+  ss << "\t</Building>" << std::endl;
+  return ss.str();
 }
 
 
