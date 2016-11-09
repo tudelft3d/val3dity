@@ -26,6 +26,11 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
     if (p->validate(tol_planarity_d2p, tol_planarity_normals) == false)
       isvalid = false;
   }
+  for (auto& bp : _lsBP)
+  {
+    if (bp->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+      isvalid = false;
+  }
   _is_valid = isvalid;
   return isvalid;
 }
