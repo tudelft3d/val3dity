@@ -56,6 +56,7 @@ public:
   int           get_number_multisurfaces();
   
   void          add_buildingpart(BuildingPart* bp);
+  int           get_number_buildingparts();
   bool          has_parts();
   
 protected:

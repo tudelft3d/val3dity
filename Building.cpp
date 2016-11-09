@@ -93,6 +93,10 @@ bool Building::has_parts()
   return !(_lsBP.empty());
 }
 
+int Building::get_number_buildingparts()
+{
+  return _lsBP.size();
+}
 
 bool Building::is_valid()
 {
