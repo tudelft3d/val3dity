@@ -7,11 +7,16 @@
 //
 
 #include "Building.h"
+#include "Solid.h"
+#include "definitions.h"
 #include <iostream>
 #include <sstream>
 
-Building::Building()
-{}
+Building::Building(std::string id)
+{
+  _id = id;
+  _is_valid = -1;
+}
 
 
 Building::~Building()
@@ -19,16 +24,48 @@ Building::~Building()
   
 bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "VALIDATING BUILDING" << std::endl;
   bool isvalid = true;
+  int numberprimitives = 0;
+  //-- 1. validate each primitive of the Building and the BuildingParts
   for (auto& p : _lsPrimitives)
   {
+    numberprimitives++;
     if (p->validate(tol_planarity_d2p, tol_planarity_normals) == false)
       isvalid = false;
   }
   for (auto& bp : _lsBP)
   {
+    numberprimitives++;
     if (bp->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+      isvalid = false;
+  }
+  //-- 2. make sure the union of all _Solids forms one Solid
+  if ( (isvalid == true) && (numberprimitives > 1) )
+  {
+    std::clog << "----- **********BuildingParts validation -----" << std::endl;
+
+    Nef_polyhedron* mynef = new Nef_polyhedron;
+    for (auto& p : _lsPrimitives)
+    {
+      if (p->get_type() == "Solid")
+      {
+        Solid* tmp = dynamic_cast<Solid*>(p);
+        *mynef += *tmp->get_nef_polyhedron();
+      }
+    }
+    for (auto& bp : _lsBP)
+    {
+      for (auto& p2 : bp->get_primitives())
+      {
+        if (p2->get_type() == "Solid")
+        {
+          Solid* tmp = dynamic_cast<Solid*>(p2);
+          *mynef += *tmp->get_nef_polyhedron();
+        }
+      }
+    }
+    std::clog << "# of volumes: " << mynef->number_of_volumes() << std::endl;
+    if (mynef->number_of_volumes() != 2)
       isvalid = false;
   }
   _is_valid = isvalid;
@@ -59,7 +96,7 @@ int Building::get_number_compositesolids()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "MultiSolid")
+    if (p->get_type() == "CompositeSolid")
       t++;
   return t;
 }
@@ -147,8 +184,11 @@ void Building::set_id(std::string id)
 //----------------------------------------------------------------
 //----------------------------------------------------------------
 
-BuildingPart::BuildingPart()
-{}
+BuildingPart::BuildingPart(std::string id)
+{
+  _id = id;
+  _is_valid = -1;
+}
 
 
 BuildingPart::~BuildingPart()
@@ -156,8 +196,16 @@ BuildingPart::~BuildingPart()
   
 bool BuildingPart::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "VALIDATING BUILDINGPART" << std::endl;
-  return true;
+  bool isvalid = true;
+  for (auto& p : _lsPrimitives)
+  {
+    if (p->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+      isvalid = false;
+  }
+  _is_valid = isvalid;
+  return isvalid;
+  
+  
 }
 
 void BuildingPart::add_primitive(Primitive* p)
@@ -168,7 +216,7 @@ void BuildingPart::add_primitive(Primitive* p)
 
 bool BuildingPart::is_valid()
 {
-  return true;
+  return _is_valid;
 }
 
 
@@ -183,6 +231,11 @@ std::string BuildingPart::get_report_xml()
   return "<EMPTY>";
 }
 
+
+std::vector<Primitive*>& BuildingPart::get_primitives()
+{
+  return _lsPrimitives;
+}
 
 std::string BuildingPart::get_id()
 {

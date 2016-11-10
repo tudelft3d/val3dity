@@ -36,6 +36,10 @@
 #include <CGAL/Constrained_triangulation_plus_2.h>
 #include <CGAL/Polygon_2.h>
 
+#include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/IO/Polyhedron_iostream.h>
+#include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+#include <CGAL/Polyhedron_copy_3.h>
 
 using namespace std;
 
@@ -57,6 +61,14 @@ typedef CGAL::Exact_intersections_tag                             Itag;
 typedef CGAL::Constrained_triangulation_2<K, TDS, Itag>           CTa;
 typedef CGAL::Constrained_triangulation_plus_2<CTa>               CT;
 typedef CGAL::Polygon_2<K> Polygon;
+
+//-- Nef requires EPEC (exact-predicates & exact-construction) and thus diff kernels
+typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
+typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
+typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
+
+typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
+
 
 typedef long long int64;
 

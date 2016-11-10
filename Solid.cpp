@@ -5,20 +5,6 @@
 #include "input.h"
 #include "validate_shell.h"
 
-#include <CGAL/Nef_polyhedron_3.h>
-#include <CGAL/IO/Polyhedron_iostream.h>
-#include <CGAL/IO/Nef_polyhedron_iostream_3.h>
-#include <CGAL/Polyhedron_copy_3.h>
-
-//-- Nef requires EPEC (exact-predicates & exact-construction) and thus diff kernels
- //-- Polyhedron are converted when they are valid
-typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
-typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
-typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
-
-typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
-
-
 
 Solid::Solid(std::string id)
 {
@@ -183,6 +169,27 @@ std::string Solid::get_report_xml()
   }
   ss << "\t</Solid>" << std::endl;
   return ss.str();
+}
+
+Nef_polyhedron* Solid::get_nef_polyhedron()
+{
+  std::vector<Nef_polyhedron> nefs;
+  for (auto& sh : this->get_shells())
+  {
+    //-- convert to an EPEC Polyhedron so that convertion to Nef is possible
+    CgalPolyhedronE pe;
+    Polyhedron_convert polyhedron_converter(*(sh->get_cgal_polyhedron()));
+    pe.delegate(polyhedron_converter);
+    Nef_polyhedron onef(pe);
+    nefs.push_back(onef);
+  }
+  Nef_polyhedron* re = new Nef_polyhedron;
+  *re += nefs[0];
+  for (int i = 1; i < nefs.size(); i++) 
+  {
+    *re -= nefs[i];
+  }
+  return re;
 }
 
 

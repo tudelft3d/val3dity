@@ -16,7 +16,7 @@
 class BuildingPart
 {
 public:
-  BuildingPart  ();
+  BuildingPart  (std::string id = "");
   ~BuildingPart ();
 
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
@@ -29,15 +29,18 @@ public:
 
   void          add_primitive(Primitive* p);
 
+  std::vector<Primitive*>&   get_primitives();
+
 protected:
   std::string                _id;
+  int                        _is_valid;
   std::vector<Primitive*>    _lsPrimitives;
 };
 
 class Building
 {
 public:
-  Building  ();
+  Building  (std::string id = "");
   ~Building ();
   
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals);

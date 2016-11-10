@@ -27,6 +27,7 @@
 #define __val3dity__Solid__
 
 #include "Primitive.h"
+#include "definitions.h"
 #include "Surface.h"
 
 #include <vector>
@@ -43,6 +44,8 @@ public:
   void                     set_oshell(Surface* sh);
   Surface*                 get_ishell(int i);
   void                     add_ishell(Surface* sh);
+  
+  Nef_polyhedron*          get_nef_polyhedron();
   
   const std::vector<Surface*>&  get_shells();
 
