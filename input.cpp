@@ -379,7 +379,7 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
     b->add_buildingpart(bp);
     if (nbp.node().attribute("gml:id") != 0) 
     {
-      b->set_id(std::string(nbp.node().attribute("gml:id").value()));
+      bp->set_id(std::string(nbp.node().attribute("gml:id").value()));
       // std::cout << "BuildingPart: " << std::string(nbp.node().attribute("gml:id").value()) << std::endl;
     }
     // s = ".//" + NS["gml"] + "CompositeSolid";
