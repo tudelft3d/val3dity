@@ -38,4 +38,9 @@ bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, double& va
 bool    is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance);
 bool    polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &ids, Vector &n);
 
+Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r);
+Nef_polyhedron* erode_nef_polyhedron (Nef_polyhedron* nef, float r);
+Nef_polyhedron* get_structuring_element(float r);
+
+
 #endif /* defined(__val3dity__geomtools__) */

@@ -9,6 +9,7 @@
 #include "Building.h"
 #include "Solid.h"
 #include "definitions.h"
+#include "geomtools.h"
 #include <iostream>
 #include <sstream>
 
@@ -47,6 +48,7 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
 
     Nef_polyhedron  emptynef(Nef_polyhedron::EMPTY);
     Nef_polyhedron* mynef = new Nef_polyhedron;
+
     for (auto& p : _lsPrimitives)
     {
       // TODO : CompositeSolid to add here 
@@ -58,6 +60,11 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
         {
           std::cout << "----- " << this->get_id() << " -----" << std::endl;
           std::cout << "INTERSECTION INTERIOR BuildingParts" << std::endl;
+          Nef_polyhedron a(mynef->interior() * tmpnef->interior());
+          std::cout << a.number_of_volumes() << std::endl;
+
+          Nef_polyhedron* dilated = dilate_nef_polyhedron(tmpnef, 0.1);
+
           isvalid = false;
         }
         *mynef += *tmpnef;
@@ -75,6 +82,11 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
           {
             std::cout << "----- " << this->get_id() << " -----" << std::endl;
             std::cout << "INTERSECTION INTERIOR BuildingParts" << std::endl;
+            Nef_polyhedron a(mynef->interior() * tmpnef->interior());
+            std::cout << a.number_of_volumes() << std::endl;
+
+             Nef_polyhedron* dilated = dilate_nef_polyhedron(tmpnef, 0.1);
+
             isvalid = false;
           }
           *mynef += *tmpnef;

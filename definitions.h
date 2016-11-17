@@ -41,6 +41,8 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <CGAL/Polyhedron_copy_3.h>
 
+#include <CGAL/aff_transformation_3.h>
+
 using namespace std;
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -51,7 +53,9 @@ typedef K::Point_3                  Point3;
 typedef K::Vector_3                 Vector;
 typedef K::Triangle_3               Triangle;
 typedef K::Tetrahedron_3            Tetrahedron;
+typedef K::Plane_3                  Plane;
 typedef CGAL::Polyhedron_3<K>       CgalPolyhedron;
+
 
 // CGAL typedefs
 typedef CGAL::Triangulation_vertex_base_with_info_2 <unsigned,K>  Vb;
@@ -66,6 +70,7 @@ typedef CGAL::Polygon_2<K> Polygon;
 typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
 typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
 typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
+typedef CGAL::Aff_transformation_3<KE>                       Transformation;
 
 typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
 

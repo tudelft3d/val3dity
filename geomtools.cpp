@@ -26,6 +26,53 @@
 #include "geomtools.h"
 #include "CGAL/squared_distance_3.h"
 #include <CGAL/linear_least_squares_fitting_3.h>
+#include <CGAL/minkowski_sum_3.h>
+#include <CGAL/OFF_to_nef_3.h>
+
+
+Nef_polyhedron* get_structuring_element(float r)
+{
+  std::stringstream ss;
+  ss << "OFF"        << std::endl
+     << "8 6 0"      << std::endl
+     << "1 1 1"      << std::endl
+     << "-1 1 1"     << std::endl
+     << "1 -1 1"     << std::endl
+     << "-1 -1 1"    << std::endl
+     << "1 1 -1 "    << std::endl
+     << "-1 1 -1"    << std::endl
+     << "1 -1 -1"    << std::endl
+     << "-1 -1 -1"   << std::endl
+     << "4 1 3 2 0"  << std::endl
+     << "4 2 6 4 0"  << std::endl
+     << "4 4 5 1 0"  << std::endl
+     << "4 5 4 6 7"  << std::endl
+     << "4 6 2 3 7"  << std::endl
+     << "4 3 1 5 7"  << std::endl;
+  Nef_polyhedron* mycube = new Nef_polyhedron;
+  CGAL::OFF_to_nef_3(ss, *mycube);
+  Transformation scale(CGAL::SCALING, r);
+  mycube->transform(scale);
+  return mycube;
+}
+
+
+Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
+{
+  Nef_polyhedron* output = new Nef_polyhedron;
+  Nef_polyhedron* cube = get_structuring_element(r);
+  *output = CGAL::minkowski_sum_3(*nef, *cube);
+  return output;
+}
+
+
+Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
+{
+  Nef_polyhedron* output = new Nef_polyhedron;
+  Nef_polyhedron* cube = get_structuring_element(r);
+  *output = CGAL::minkowski_sum_3(*nef, *cube);
+  return output;
+}
 
 
 bool is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance)
