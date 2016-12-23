@@ -69,15 +69,15 @@ Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
 
 Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
 {
-  get_aabb(nef);
-  std::cout << "-----" << std::endl;
   Nef_polyhedron* output = new Nef_polyhedron;
   Nef_polyhedron* cube = get_structuring_element(r);
-  Nef_polyhedron A(*nef);
-  Nef_polyhedron complement = !A;
+  Nef_polyhedron* bbox = get_aabb(nef);
+  Nef_polyhedron complement = *bbox - *nef;
   *output = CGAL::minkowski_sum_3(complement, *cube);
   *output = !(*output);
-  get_aabb(output);
+  Nef_polyhedron::Vertex_const_iterator v;
+  // for (v = output->vertices_begin(); v != output->vertices_end(); v++)
+  //   std::cout << v->point() << std::endl;
   return output;
 }
 
@@ -106,61 +106,35 @@ Nef_polyhedron* get_aabb(Nef_polyhedron* mynef)
     if ( CGAL::to_double(v->point().z()) > zmax )
       zmax = CGAL::to_double(v->point().z());
   }
+  //-- expand the bbox by 10units
   xmin -= 10;
   ymin -= 10;
   zmin -= 10;
   xmax += 10;
   ymax += 10;
   zmax += 10;
-  
-
-  // std::cout << xmin << std::endl;
-  // std::cout << ymin << std::endl;
-  // std::cout << zmin << std::endl;
-  // std::cout << xmax << std::endl;
-  // std::cout << ymax << std::endl;
-  // std::cout << zmax << std::endl;
-
-  PlaneE a( Point3E(xmin, ymin, zmin), Point3E(xmax, ymin, zmin), Point3E(xmax, ymax, zmin) );
-
-
-
-  return NULL;
+  //-- write an OFF file and convert Nef, simplest (and fastest?) solution
+  std::stringstream ss;
+  ss << "OFF" << std::endl
+     << "8 6 0" << std::endl
+     << xmin << " " << ymin << " " << zmin << std::endl
+     << xmax << " " << ymin << " " << zmin << std::endl
+     << xmax << " " << ymax << " " << zmin << std::endl
+     << xmin << " " << ymax << " " << zmin << std::endl
+     << xmin << " " << ymin << " " << zmax << std::endl
+     << xmax << " " << ymin << " " << zmax << std::endl
+     << xmax << " " << ymax << " " << zmax << std::endl
+     << xmin << " " << ymax << " " << zmax << std::endl
+     << "4 0 3 2 1" << std::endl
+     << "4 0 1 5 4"    << std::endl
+     << "4 1 2 6 5"    << std::endl
+     << "4 2 3 7 6"    << std::endl
+     << "4 0 4 7 3"    << std::endl
+     << "4 4 5 6 7"    << std::endl;
+  Nef_polyhedron* nefbbox = new Nef_polyhedron;
+  CGAL::OFF_to_nef_3(ss, *nefbbox);
+  return nefbbox;
 }
-
-
-
-
-  // Polyhedron polyhe, boundingBox;
-  // nef2polyhe(mynef,polyhe);
-  // Polyhedron::Vertex_const_iterator vit;
-  // // Point_3 initPoint = polyhe.vertices_begin()->point();
-  // double xmin = CGAL::to_double(initPoint.x()), xmax = CGAL::to_double(initPoint.x()),
-  //   ymin = CGAL::to_double(initPoint.y()), ymax = CGAL::to_double(initPoint.y()),
-  //   zmin = CGAL::to_double(initPoint.z()), zmax = CGAL::to_double(initPoint.z());
-
-  // for (vit=polyhe.vertices_begin();vit!=polyhe.vertices_end();++vit){
-  //   Point_3 vertex = vit->point();
-  //   double x = CGAL::to_double(vertex.x()),
-  //     y = CGAL::to_double(vertex.y()),
-  //     z = CGAL::to_double(vertex.z());
-  //   if (x > xmax) xmax = x;
-  //   if (x < xmin) xmin = x;
-  //   if (y > ymax) ymax = y;
-  //   if (y < ymin) ymin = y;
-  //   if (z > zmax) zmax = z;
-  //   if (z < zmin) zmin = z;
-  // }
-  // xmin-=5; xmax+=5; ymin-=5; ymax+=5; zmin-=5; zmax+=5;
-  // Point_3 p(xmin,ymin,zmin), q(xmax,ymax,zmax);
-  // Bounding_box bbox(p,q);
-  // pointVector convexPoints;
-  // for (int i = 0; i<8; ++ i) {
-  //   convexPoints.push_back(bbox.vertex(i));
-  // }
-  // CGAL::convex_hull_3(convexPoints.begin(),convexPoints.end(),boundingBox);
-  // return Nef_polyhedron (boundingBox);
-// }
 
 
 bool is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance)

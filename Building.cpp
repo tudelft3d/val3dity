@@ -82,14 +82,13 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
           {
             std::cout << "----- " << this->get_id() << " -----" << std::endl;
             std::cout << "INTERSECTION INTERIOR BuildingParts" << std::endl;
-            Nef_polyhedron a(mynef->interior() * p2nef->interior());
-            std::cout << a.number_of_volumes() << std::endl;
-
-            Nef_polyhedron* dilated = erode_nef_polyhedron(p2nef, 0.1);
-            // Nef_polyhedron* dilated = dilate_nef_polyhedron(p2nef, 10);
-            std::cout << dilated->number_of_volumes() << std::endl;
-            if (mynef->interior() * dilated->interior() == emptynef)
-              std::cout << "no intersection" << std::endl;
+//            Nef_polyhedron a(mynef->interior() * p2nef->interior());
+//            std::cout << a.number_of_volumes() << std::endl;
+//            //-- erode the solids  
+            Nef_polyhedron* eroded = erode_nef_polyhedron(p2nef, 0.1);
+//            std::cout << eroded->number_of_volumes() << std::endl;
+            if (mynef->interior() * eroded->interior() == emptynef)
+              std::cout << "Success: no intersection" << std::endl;
             isvalid = false;
           }
           *mynef += *p2nef;
