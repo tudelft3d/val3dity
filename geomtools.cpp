@@ -28,6 +28,7 @@
 #include <CGAL/linear_least_squares_fitting_3.h>
 #include <CGAL/minkowski_sum_3.h>
 #include <CGAL/OFF_to_nef_3.h>
+#include <CGAL/Bbox_3.h>
 
 
 Nef_polyhedron* get_structuring_element(float r)
@@ -68,11 +69,98 @@ Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
 
 Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
 {
+  get_aabb(nef);
+  std::cout << "-----" << std::endl;
   Nef_polyhedron* output = new Nef_polyhedron;
   Nef_polyhedron* cube = get_structuring_element(r);
-  *output = CGAL::minkowski_sum_3(*nef, *cube);
+  Nef_polyhedron A(*nef);
+  Nef_polyhedron complement = !A;
+  *output = CGAL::minkowski_sum_3(complement, *cube);
+  *output = !(*output);
+  get_aabb(output);
   return output;
 }
+
+
+Nef_polyhedron* get_aabb(Nef_polyhedron* mynef) 
+{
+  double xmin =  1e12; 
+  double ymin =  1e12; 
+  double zmin =  1e12; 
+  double xmax = -1e12;
+  double ymax = -1e12;
+  double zmax = -1e12;;
+  Nef_polyhedron::Vertex_const_iterator v;
+  for (v = mynef->vertices_begin(); v != mynef->vertices_end(); v++) 
+  {
+    if ( CGAL::to_double(v->point().x()) < xmin )
+      xmin = CGAL::to_double(v->point().x());
+    if ( CGAL::to_double(v->point().y()) < ymin )
+      ymin = CGAL::to_double(v->point().y());
+    if ( CGAL::to_double(v->point().z()) < zmin )
+      zmin = CGAL::to_double(v->point().z());
+    if ( CGAL::to_double(v->point().x()) > xmax )
+      xmax = CGAL::to_double(v->point().x());
+    if ( CGAL::to_double(v->point().y()) > ymax )
+      ymax = CGAL::to_double(v->point().y());
+    if ( CGAL::to_double(v->point().z()) > zmax )
+      zmax = CGAL::to_double(v->point().z());
+  }
+  xmin -= 10;
+  ymin -= 10;
+  zmin -= 10;
+  xmax += 10;
+  ymax += 10;
+  zmax += 10;
+  
+
+  // std::cout << xmin << std::endl;
+  // std::cout << ymin << std::endl;
+  // std::cout << zmin << std::endl;
+  // std::cout << xmax << std::endl;
+  // std::cout << ymax << std::endl;
+  // std::cout << zmax << std::endl;
+
+  PlaneE a( Point3E(xmin, ymin, zmin), Point3E(xmax, ymin, zmin), Point3E(xmax, ymax, zmin) );
+
+
+
+  return NULL;
+}
+
+
+
+
+  // Polyhedron polyhe, boundingBox;
+  // nef2polyhe(mynef,polyhe);
+  // Polyhedron::Vertex_const_iterator vit;
+  // // Point_3 initPoint = polyhe.vertices_begin()->point();
+  // double xmin = CGAL::to_double(initPoint.x()), xmax = CGAL::to_double(initPoint.x()),
+  //   ymin = CGAL::to_double(initPoint.y()), ymax = CGAL::to_double(initPoint.y()),
+  //   zmin = CGAL::to_double(initPoint.z()), zmax = CGAL::to_double(initPoint.z());
+
+  // for (vit=polyhe.vertices_begin();vit!=polyhe.vertices_end();++vit){
+  //   Point_3 vertex = vit->point();
+  //   double x = CGAL::to_double(vertex.x()),
+  //     y = CGAL::to_double(vertex.y()),
+  //     z = CGAL::to_double(vertex.z());
+  //   if (x > xmax) xmax = x;
+  //   if (x < xmin) xmin = x;
+  //   if (y > ymax) ymax = y;
+  //   if (y < ymin) ymin = y;
+  //   if (z > zmax) zmax = z;
+  //   if (z < zmin) zmin = z;
+  // }
+  // xmin-=5; xmax+=5; ymin-=5; ymax+=5; zmin-=5; zmax+=5;
+  // Point_3 p(xmin,ymin,zmin), q(xmax,ymax,zmax);
+  // Bounding_box bbox(p,q);
+  // pointVector convexPoints;
+  // for (int i = 0; i<8; ++ i) {
+  //   convexPoints.push_back(bbox.vertex(i));
+  // }
+  // CGAL::convex_hull_3(convexPoints.begin(),convexPoints.end(),boundingBox);
+  // return Nef_polyhedron (boundingBox);
+// }
 
 
 bool is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance)

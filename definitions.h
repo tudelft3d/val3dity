@@ -68,9 +68,11 @@ typedef CGAL::Polygon_2<K> Polygon;
 
 //-- Nef requires EPEC (exact-predicates & exact-construction) and thus diff kernels
 typedef CGAL::Exact_predicates_exact_constructions_kernel   KE;
+typedef KE::Point_3                                         Point3E;
+typedef KE::Plane_3                                         PlaneE;
 typedef CGAL::Polyhedron_3<KE>                              CgalPolyhedronE;
 typedef CGAL::Nef_polyhedron_3<KE>                          Nef_polyhedron;
-typedef CGAL::Aff_transformation_3<KE>                       Transformation;
+typedef CGAL::Aff_transformation_3<KE>                      Transformation;
 
 typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
 
