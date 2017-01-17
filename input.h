@@ -26,10 +26,12 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
+
 #include "Primitive.h"
 #include "Surface.h"
-#include "Solid.h"
 #include "MultiSurface.h"
+#include "Solid.h"
+#include "CompositeSolid.h"
 #include "MultiSolid.h"
 #include "Building.h"
 #include <fstream>
@@ -61,12 +63,12 @@ Surface*      readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
 
 Building*     process_citygml_building(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
-Solid*        process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-MultiSolid*   process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-Surface*      process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-vector<int>   process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
-// void          process_gml_building(std::vector<Primitive*>& lsPrimitives, pugi::xpath_node nbuilding, Primitive3D prim, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Solid*          process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+MultiSolid*     process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+MultiSurface*   process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Surface*        process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+vector<int>     process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 
 void          build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 

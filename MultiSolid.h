@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef CompositeSolid_h
-#define CompositeSolid_h
+#ifndef MultiSolid_h
+#define MultiSolid_h
 
 #include "Primitive.h"
 #include "Solid.h"

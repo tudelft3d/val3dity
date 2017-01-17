@@ -442,10 +442,24 @@ MultiSolid* process_gml_multisolid(const pugi::xml_node& nms, std::map<std::stri
   {
     Solid* s = process_gml_solid(it->node(), dallpoly, tol_snap, errs);
     ms->add_solid(s);
-    // sol->add_ishell(process_gml_surface(it->node(), id, dallpoly, tol_snap, errs));
-    // id++;
   }
   return ms;
+}
+
+
+CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+{
+  CompositeSolid* cs = new CompositeSolid;
+  if (nms.attribute("gml:id") != 0)
+    cs->set_id(std::string(nms.attribute("gml:id").value()));
+  std::string s = ".//" + NS["gml"] + "Solid";
+  pugi::xpath_node_set nn = nms.select_nodes(s.c_str());
+  for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
+  {
+    Solid* s = process_gml_solid(it->node(), dallpoly, tol_snap, errs);
+    cs->add_solid(s);
+  }
+  return cs;
 }
 
 
@@ -550,13 +564,11 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
   pugi::xml_node ncm = doc.first_child();
   std::string vcitygml;
   get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
-
   if (NS.count("gml") == 0)
   {
     errs.add_error(901, "Input file does not have the GML namespace.");
     return;
   }
-
   //-- Primitives parsing and counting
   std::string s = "//" + NS["gml"];
   std::string sprim;
@@ -585,17 +597,14 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
     s += "CompositeSurface";
     sprim = "<gml:CompositeSurface>";
   }
-
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nprims = myquery.evaluate_node_set(doc);
   std::cout << "Parsing the file..." << std::endl;
   std::cout << "# of " << sprim << " found: ";
   std::cout << nprims.size() << std::endl;
-
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
-
   for(auto& nprim: nprims)
   {
     if (prim == SOLID)
@@ -603,9 +612,11 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
       Solid* sol = process_gml_solid(nprim.node(), dallpoly, tol_snap, errs);
       lsPrimitives.push_back(sol);
     }
-    // else if (prim == COMPOSITESOLID)
-    // {
-    // }
+    else if (prim == COMPOSITESOLID)
+    {
+      CompositeSolid* csol = process_gml_compositesolid(nprim.node(), dallpoly, tol_snap, errs);
+      lsPrimitives.push_back(csol);
+    }
     else if (prim == MULTISOLID)
     {
       MultiSolid* msol = process_gml_multisolid(nprim.node(), dallpoly, tol_snap, errs);
