@@ -39,6 +39,19 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
   {
     // TODO: implement interactions between solids for CompositeSolid
     std::clog << "INTERACTIONS BETWEEN SOLIDS FOR COMPOSITESOLID" << std::endl;
+    Nef_polyhedron  emptynef(Nef_polyhedron::EMPTY);
+    // Nef_polyhedron* mynef = new Nef_polyhedron;
+
+    for (int i = 0; i < (_lsSolids.size() - 1); i++)
+    {
+      Nef_polyhedron* a = _lsSolids[i]->get_nef_polyhedron();
+      for (int j = i + 1; j < _lsSolids.size(); j++) 
+      {
+        Nef_polyhedron* b = _lsSolids[j]->get_nef_polyhedron();
+        if (a->interior() * b->interior() != emptynef)
+          std::cout << "!!!OVERLAP!!!" << std::endl;
+      }
+    }
   }
   _is_valid = isValid;
   return isValid;
