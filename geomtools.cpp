@@ -31,7 +31,76 @@
 #include <CGAL/Bbox_3.h>
 
 
-Nef_polyhedron* get_structuring_element(float r)
+
+Nef_polyhedron* get_structuring_element_dodecahedron(float r)
+{
+  std::stringstream ss;
+  ss << "OFF" << std::endl
+    << "20 36 0"      << std::endl
+    << "-0.57735 -0.57735 0.57735" << std::endl
+    << "0.934172 0.356822 0" << std::endl
+    << "0.934172 -0.356822 0" << std::endl
+    << "-0.934172 0.356822 0" << std::endl
+    << "-0.934172 -0.356822 0" << std::endl
+    << "0 0.934172 0.356822" << std::endl
+    << "0 0.934172 -0.356822" << std::endl
+    << "0.356822 0 -0.934172" << std::endl
+    << "-0.356822 0 -0.934172" << std::endl
+    << "0 -0.934172 -0.356822" << std::endl
+    << "0 -0.934172 0.356822" << std::endl
+    << "0.356822 0 0.934172" << std::endl
+    << "-0.356822 0 0.934172" << std::endl
+    << "0.57735 0.57735 -0.57735" << std::endl
+    << "0.57735 0.57735 0.57735" << std::endl
+    << "-0.57735 0.57735 -0.57735" << std::endl
+    << "-0.57735 0.57735 0.57735" << std::endl
+    << "0.57735 -0.57735 -0.57735" << std::endl
+    << "0.57735 -0.57735 0.57735" << std::endl
+    << "-0.57735 -0.57735 -0.57735" << std::endl
+    << "3 18 2 1" << std::endl
+    << "3 11 18 1" << std::endl
+    << "3 14 11 1" << std::endl
+    << "3 7 13 1" << std::endl
+    << "3 17 7 1" << std::endl
+    << "3 2 17 1" << std::endl
+    << "3 19 4 3" << std::endl
+    << "3 8 19 3" << std::endl
+    << "3 15 8 3" << std::endl
+    << "3 12 16 3" << std::endl
+    << "3 0 12 3" << std::endl
+    << "3 4 0 3" << std::endl
+    << "3 6 15 3" << std::endl
+    << "3 5 6 3" << std::endl
+    << "3 16 5 3" << std::endl
+    << "3 5 14 1" << std::endl
+    << "3 6 5 1" << std::endl
+    << "3 13 6 1" << std::endl
+    << "3 9 17 2" << std::endl
+    << "3 10 9 2" << std::endl
+    << "3 18 10 2" << std::endl
+    << "3 10 0 4" << std::endl
+    << "3 9 10 4" << std::endl
+    << "3 19 9 4" << std::endl
+    << "3 19 8 7" << std::endl
+    << "3 9 19 7" << std::endl
+    << "3 17 9 7" << std::endl
+    << "3 8 15 6" << std::endl
+    << "3 7 8 6" << std::endl
+    << "3 13 7 6" << std::endl
+    << "3 11 14 5" << std::endl
+    << "3 12 11 5" << std::endl
+    << "3 16 12 5" << std::endl
+    << "3 12 0 10" << std::endl
+    << "3 11 12 10" << std::endl
+    << "3 18 11 10" << std::endl;
+  Nef_polyhedron* myse = new Nef_polyhedron;
+  CGAL::OFF_to_nef_3(ss, *myse);
+  Transformation scale(CGAL::SCALING, r);
+  myse->transform(scale);
+  return myse;
+}
+
+Nef_polyhedron* get_structuring_element_cube(float r)
 {
   std::stringstream ss;
   ss << "OFF"        << std::endl
@@ -61,7 +130,7 @@ Nef_polyhedron* get_structuring_element(float r)
 Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
 {
   Nef_polyhedron* output = new Nef_polyhedron;
-  Nef_polyhedron* cube = get_structuring_element(r);
+  Nef_polyhedron* cube = get_structuring_element_cube(r);
   *output = CGAL::minkowski_sum_3(*nef, *cube);
   return output;
 }
@@ -70,10 +139,11 @@ Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
 Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
 {
   Nef_polyhedron* output = new Nef_polyhedron;
-  Nef_polyhedron* cube = get_structuring_element(r);
+//  Nef_polyhedron* se = get_structuring_element_cube(r);
+  Nef_polyhedron* se = get_structuring_element_dodecahedron(r);
   Nef_polyhedron* bbox = get_aabb(nef);
   Nef_polyhedron complement = *bbox - *nef;
-  *output = CGAL::minkowski_sum_3(complement, *cube);
+  *output = CGAL::minkowski_sum_3(complement, *se);
   *output = !(*output);
   Nef_polyhedron::Vertex_const_iterator v;
   // for (v = output->vertices_begin(); v != output->vertices_end(); v++)

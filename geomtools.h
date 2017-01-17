@@ -40,7 +40,8 @@ bool    polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int
 
 Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r);
 Nef_polyhedron* erode_nef_polyhedron (Nef_polyhedron* nef, float r);
-Nef_polyhedron* get_structuring_element(float r);
+Nef_polyhedron* get_structuring_element_cube(float r);
+Nef_polyhedron* get_structuring_element_dodecahedron(float r);
 Nef_polyhedron* get_aabb(Nef_polyhedron* mynef) ;
 
 #endif /* defined(__val3dity__geomtools__) */
