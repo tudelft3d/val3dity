@@ -132,7 +132,7 @@ int main(int argc, char* const argv[])
     cmd.parse( argc, argv );
   
     Primitive3D prim3d = SOLID;
-    if (primitives.getValue() == "CompositeSolid")
+    if (primitives.getValue()      == "CompositeSolid")
       prim3d = COMPOSITESOLID;
     else if (primitives.getValue() == "MultiSolid")
       prim3d = MULTISOLID;
@@ -279,9 +279,11 @@ int main(int argc, char* const argv[])
         std::cout << "Validating " << lsPrimitives.size();
         if (prim3d == SOLID)
           std::cout << " Solid";
+        else if (prim3d == MULTISOLID)
+          std::cout << " MultiSolid";
         else if (prim3d == COMPOSITESURFACE)
           std::cout << " CompositeSurface";
-        else 
+        else if (prim3d == MULTISURFACE)
           std::cout << " MultiSurface";
         std::cout << std::endl;
         int i = 1;
