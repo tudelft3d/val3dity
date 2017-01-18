@@ -445,6 +445,8 @@ MultiSolid* process_gml_multisolid(const pugi::xml_node& nms, std::map<std::stri
   for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
   {
     Solid* s = process_gml_solid(it->node(), dallpoly, tol_snap, errs);
+    if (s->get_id() == "")
+      s->set_id(std::to_string(ms->number_of_solids()));
     ms->add_solid(s);
   }
   return ms;
