@@ -40,31 +40,29 @@ public:
   Solid(std::string id = "");
   ~Solid();
   
-  Surface*                 get_oshell();
-  void                     set_oshell(Surface* sh);
-  Surface*                 get_ishell(int i);
-  void                     add_ishell(Surface* sh);
-  
-  Nef_polyhedron*          get_nef_polyhedron();
+  Surface*        get_oshell();
+  void            set_oshell(Surface* sh);
+  Surface*        get_ishell(int i);
+  void            add_ishell(Surface* sh);
+
+  int             num_ishells();
+  int             num_faces();
+  int             num_vertices();
+ 
+  bool            validate(double tol_planarity_d2p, double tol_planarity_normals);
+  Nef_polyhedron* get_nef_polyhedron();
+  void            translate_vertices();
+  std::string     get_report_xml();
+  std::string     get_poly_representation();
+  int             is_valid();
+  bool            is_empty();
+  std::string     get_type();
+  std::set<int>   get_unique_error_codes();
   
   const std::vector<Surface*>&  get_shells();
 
-  int                      num_ishells();
-  int                      num_faces();
-  int                      num_vertices();
- 
-  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
-  void          translate_vertices();
-  std::string   get_report_xml();
-  std::string   get_poly_representation();
-  int           is_valid();
-  bool          is_empty();
-  std::string   get_type();
-  std::set<int> get_unique_error_codes();
-  
 protected:
   std::vector<Surface*>  _shells;
-
   bool validate_solid_with_nef();
 };
 

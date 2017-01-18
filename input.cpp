@@ -461,8 +461,11 @@ CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<s
   for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
   {
     Solid* s = process_gml_solid(it->node(), dallpoly, tol_snap, errs);
+    if (s->get_id() == "")
+      s->set_id(std::to_string(cs->number_of_solids()));
     cs->add_solid(s);
   }
+
   return cs;
 }
 
