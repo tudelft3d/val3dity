@@ -25,6 +25,7 @@ std::string CompositeSolid::get_type()
   return "CompositeSolid";
 }
 
+
 bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_normals) 
 {
   bool isValid = true;
@@ -35,39 +36,62 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
   }
   if (isValid == true) 
   {
-    // TODO: implement interactions between solids for CompositeSolid
-    std::clog << "INTERACTIONS BETWEEN SOLIDS FOR COMPOSITESOLID" << std::endl;
-    //-- 1. store all Solids in Nef
+    std::clog << "----- CompositeSolid validation (interaction between Solids) -----" << std::endl;
     std::vector<Nef_polyhedron*> lsNefs;
     for (int i = 0; i < _lsSolids.size(); i++)
       lsNefs.push_back(_lsSolids[i]->get_nef_polyhedron());
-    //-- 2. check if their interior intersects
-    Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+//-- 1. check if any 2 are the same? ERROR:502
+    std::clog << "--Are two solids duplicated" << std::endl;
     for (int i = 0; i < (lsNefs.size() - 1); i++)
     {
-      Nef_polyhedron* a = lsNefs[i];
       for (int j = i + 1; j < lsNefs.size(); j++) 
       {
-        Nef_polyhedron* b = lsNefs[j];
-        if (a->interior() * b->interior() != emptynef)
+        if (*lsNefs[i] == *lsNefs[j])
         {
-          std::cout << "!!!OVERLAP!!!" << std::endl;
           std::stringstream msg;
-          msg << "Solid " << _lsSolids[i]->get_id() << "& Solid " << _lsSolids[j]->get_id();
-          this->add_error(501, msg.str(), "");
+          msg << _lsSolids[i]->get_id() << "& " << _lsSolids[j]->get_id();
+          this->add_error(502, msg.str(), "");
           isValid = false;
         }
       }
     }
     if (isValid == true)
     {
-      //-- 3. check if their union yields one solid
-      std::cout << "TEST UNION OF ALL THE SOLIDS IN THE COMPOSITESOLID" << std::endl;
+//-- 2. check if their interior intersects ERROR:501
+      std::clog << "--Intersections of solids" << std::endl;
+      Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+      for (int i = 0; i < (lsNefs.size() - 1); i++)
+      {
+        Nef_polyhedron* a = lsNefs[i];
+        for (int j = i + 1; j < lsNefs.size(); j++) 
+        {
+          Nef_polyhedron* b = lsNefs[j];
+          if (a->interior() * b->interior() != emptynef)
+          {
+            std::stringstream msg;
+            msg << "Solid " << _lsSolids[i]->get_id() << "& Solid " << _lsSolids[j]->get_id();
+            this->add_error(501, msg.str(), "");
+            isValid = false;
+          }
+        }
+      }
+    }
+    if (isValid == true)
+    {
+//-- 3. check if their union yields one solid ERROR:503
+      std::clog << "--Forming one solid (union)" << std::endl;
       Nef_polyhedron unioned(Nef_polyhedron::EMPTY);
       for (auto each : lsNefs)
         unioned = unioned + *each;
-      std::cout << "# of solids in union: " << unioned.number_of_volumes() << std::endl;
+      if (unioned.number_of_volumes() != 2)
+      {
+        std::stringstream msg;
+        msg << "CompositeSolid is formed of " << unioned.number_of_volumes() << " parts";
+        this->add_error(503, "", msg.str());
+        isValid = false;
+      }
     } 
+    //-- clear the temp Nefs
     for (auto each: lsNefs)
       delete each;
   }
