@@ -27,6 +27,7 @@ public:
   bool          is_empty();
   std::string   get_report_xml();
   std::string   get_type();
+  std::set<int> get_unique_error_codes();
 
   bool          add_solid(Solid* s);
   int           number_of_solids();

@@ -121,6 +121,16 @@ std::string CompositeSolid::get_report_xml() {
   return "<EMPTY>";
 }
 
+std::set<int> CompositeSolid::get_unique_error_codes() {
+  std::set<int> errs = Primitive::get_unique_error_codes();
+  for (auto& s : _lsSolids) {
+    std::set<int> tmp = s->get_unique_error_codes();
+    errs.insert(tmp.begin(), tmp.end());
+  }
+  return errs;
+}
+
+
 bool CompositeSolid::add_solid(Solid* s) {
   _lsSolids.push_back(s);
   return true;
