@@ -139,13 +139,15 @@ Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
 Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
 {
   Nef_polyhedron* output = new Nef_polyhedron;
-//  Nef_polyhedron* se = get_structuring_element_cube(r);
-  Nef_polyhedron* se = get_structuring_element_dodecahedron(r);
+ Nef_polyhedron* se = get_structuring_element_cube(r);
+  // Nef_polyhedron* se = get_structuring_element_dodecahedron(r);
   Nef_polyhedron* bbox = get_aabb(nef);
   Nef_polyhedron complement = *bbox - *nef;
-  *output = CGAL::minkowski_sum_3(complement, *se);
-  *output = !(*output);
-  Nef_polyhedron::Vertex_const_iterator v;
+  Nef_polyhedron tmp = CGAL::minkowski_sum_3(complement, *se);
+  *output = *nef - tmp;
+  output->regularization();
+  std::cout << "#volume " << output->number_of_volumes() << std::endl;
+  // Nef_polyhedron::Vertex_const_iterator v;
   // for (v = output->vertices_begin(); v != output->vertices_end(); v++)
   //   std::cout << v->point() << std::endl;
   return output;
