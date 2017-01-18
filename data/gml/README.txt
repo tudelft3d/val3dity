@@ -27,3 +27,16 @@ invalid: 104
 CompositeSolid with 2 cubes
 cube 0 has a missing face
 invalid: 302
+
+# msol1.gml
+MultiSolid with 2 cubes
+valid 
+
+# msol2.gml
+MultiSolid with 3 cubes adjacent
+valid 
+
+# msol3.gml
+MultiSolid with 2 cubes
+cube 0 has a missing face
+invalid: 302
