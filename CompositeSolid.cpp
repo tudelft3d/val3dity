@@ -8,6 +8,7 @@
 
 #include "CompositeSolid.h"
 #include "input.h"
+#include "geomtools.h"
 
 
 CompositeSolid::CompositeSolid(std::string id)
@@ -56,18 +57,20 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         }
       }
     }
-    //-- erode them all?
     if (isValid == true)
     {
 //-- 2. check if their interior intersects ERROR:501
       std::clog << "--Intersections of solids" << std::endl;
+      std::vector<Nef_polyhedron*> lsNefsEroded;
+      for (auto each : lsNefs)
+        lsNefsEroded.push_back(erode_nef_polyhedron(each, 0.1));
       Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
-      for (int i = 0; i < (lsNefs.size() - 1); i++)
+      for (int i = 0; i < (lsNefsEroded.size() - 1); i++)
       {
-        Nef_polyhedron* a = lsNefs[i];
-        for (int j = i + 1; j < lsNefs.size(); j++) 
+        Nef_polyhedron* a = lsNefsEroded[i];
+        for (int j = i + 1; j < lsNefsEroded.size(); j++) 
         {
-          Nef_polyhedron* b = lsNefs[j];
+          Nef_polyhedron* b = lsNefsEroded[j];
           if (a->interior() * b->interior() != emptynef)
           {
             std::stringstream msg;
@@ -77,13 +80,18 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           }
         }
       }
+      for (auto each : lsNefsEroded)
+        delete each;
     }
     if (isValid == true)
     {
 //-- 3. check if their union yields one solid ERROR:503
       std::clog << "--Forming one solid (union)" << std::endl;
-      Nef_polyhedron unioned(Nef_polyhedron::EMPTY);
+      std::vector<Nef_polyhedron*> lsNefsDilated;
       for (auto each : lsNefs)
+        lsNefsDilated.push_back(dilate_nef_polyhedron(each, 0.1));
+      Nef_polyhedron unioned(Nef_polyhedron::EMPTY);
+      for (auto each : lsNefsDilated)
         unioned = unioned + *each;
       if (unioned.number_of_volumes() != 2)
       {
@@ -92,6 +100,8 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         this->add_error(503, "", msg.str());
         isValid = false;
       }
+      for (auto each : lsNefsDilated)
+        delete each;
     } 
     //-- clear the temp Nefs
     for (auto each: lsNefs)
