@@ -7,6 +7,8 @@
 //
 
 #include "MultiSolid.h"
+#include "input.h"
+
 
 
 MultiSolid::MultiSolid(std::string id) {
@@ -44,15 +46,39 @@ int MultiSolid::is_valid()
 }
 
 
-bool MultiSolid::is_empty() {
+bool MultiSolid::is_empty() 
+{
   return _lsSolids.empty();
 }
 
 
-std::string MultiSolid::get_report_xml() {
-  // TODO: xml report
-  return "<EMPTY>";
+std::string MultiSolid::get_report_xml() 
+{
+    std::stringstream ss;
+  ss << "\t<MultiSolid>" << std::endl;
+  if (this->get_id() != "")
+    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
+  else
+    ss << "\t\t<id>none</id>" << std::endl;
+  ss << "\t\t<numbersolids>" << this->number_of_solids() << "</numbersolids>" << std::endl;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      ss << "\t\t<Error>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
+      ss << "\t\t\t<id>" << std::get<0>(e) << "</id>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
+      ss << "\t\t</Error>" << std::endl;
+    }
+  }
+  for (auto& s : _lsSolids)
+    ss << s->get_report_xml();
+  ss << "\t</MultiSolid>" << std::endl;
+  return ss.str();
 }
+
 
 bool MultiSolid::add_solid(Solid* s) {
   _lsSolids.push_back(s);
@@ -68,6 +94,6 @@ std::set<int> MultiSolid::get_unique_error_codes() {
   return errs;
 }
 
-int MultiSolid::num_solids() {
+int MultiSolid::number_of_solids() {
   return _lsSolids.size();
 }

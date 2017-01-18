@@ -30,7 +30,7 @@ public:
   std::set<int> get_unique_error_codes();
 
   bool        add_solid(Solid* s);
-  int         num_solids();
+  int         number_of_solids();
 
 protected:
   std::vector<Solid*> _lsSolids;
