@@ -9,8 +9,6 @@
 #include "CompositeSolid.h"
 
 
-
-
 CompositeSolid::CompositeSolid(std::string id)
 {
   _id = id;
@@ -39,13 +37,18 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
   {
     // TODO: implement interactions between solids for CompositeSolid
     std::clog << "INTERACTIONS BETWEEN SOLIDS FOR COMPOSITESOLID" << std::endl;
-    Nef_polyhedron  emptynef(Nef_polyhedron::EMPTY);
-    for (int i = 0; i < (_lsSolids.size() - 1); i++)
+    //-- 1. store all Solids in Nef
+    std::vector<Nef_polyhedron*> lsNefs;
+    for (int i = 0; i < _lsSolids.size(); i++)
+      lsNefs.push_back(_lsSolids[i]->get_nef_polyhedron());
+    //-- 2. check if their interior intersects
+    Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+    for (int i = 0; i < (lsNefs.size() - 1); i++)
     {
-      Nef_polyhedron* a = _lsSolids[i]->get_nef_polyhedron();
-      for (int j = i + 1; j < _lsSolids.size(); j++) 
+      Nef_polyhedron* a = lsNefs[i];
+      for (int j = i + 1; j < lsNefs.size(); j++) 
       {
-        Nef_polyhedron* b = _lsSolids[j]->get_nef_polyhedron();
+        Nef_polyhedron* b = lsNefs[j];
         if (a->interior() * b->interior() != emptynef)
         {
           std::cout << "!!!OVERLAP!!!" << std::endl;
@@ -54,14 +57,19 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           this->add_error(501, msg.str(), "");
           isValid = false;
         }
-        delete b;
       }
-      delete a;
     }
     if (isValid == true)
     {
+      //-- 3. check if their union yields one solid
       std::cout << "TEST UNION OF ALL THE SOLIDS IN THE COMPOSITESOLID" << std::endl;
+      Nef_polyhedron unioned(Nef_polyhedron::EMPTY);
+      for (auto each : lsNefs)
+        unioned = unioned + *each;
+      std::cout << "# of solids in union: " << unioned.number_of_volumes() << std::endl;
     } 
+    for (auto each: lsNefs)
+      delete each;
   }
   _is_valid = isValid;
   return isValid;
