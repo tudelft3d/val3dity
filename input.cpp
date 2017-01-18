@@ -108,12 +108,16 @@ std::string errorcode2description(int code, bool qie) {
       case 306: return string("SHELL_SELF_INTERSECTION"); break;
       case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
       case 309: return string("VERTICES_NOT_USED"); break;
-      //-- SOLID
+      //-- SOLID & MULTISOLID
       case 401: return string("INTERSECTION_SHELLS"); break;
       case 402: return string("DUPLICATED_SHELLS"); break;
       case 403: return string("INNER_SHELL_OUTSIDE"); break;
       case 404: return string("INTERIOR_DISCONNECTED"); break;
       case 405: return string("WRONG_ORIENTATION_SHELL"); break;
+      //-- COMPOSITESOLID
+      case 501: return string("INTERSECTION_SOLIDS"); break;
+      case 502: return string("DUPLICATED_SOLIDS"); break;
+      case 503: return string("DISCONNECTED_SOLIDS"); break;
       //-- OTHERS
       case 901: return string("INVALID_INPUT_FILE"); break;
       case 902: return string("EMPTY_PRIMITIVE"); break;
