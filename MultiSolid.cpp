@@ -9,7 +9,6 @@
 #include "MultiSolid.h"
 
 
-
 MultiSolid::MultiSolid(std::string id) {
   _id = id;
   _is_valid = -1;
@@ -60,6 +59,14 @@ bool MultiSolid::add_solid(Solid* s) {
   return true;
 }
 
+std::set<int> MultiSolid::get_unique_error_codes() {
+  std::set<int> errs = Primitive::get_unique_error_codes();
+  for (auto& s : _lsSolids) {
+    std::set<int> tmp = s->get_unique_error_codes();
+    errs.insert(tmp.begin(), tmp.end());
+  }
+  return errs;
+}
 
 int MultiSolid::num_solids() {
   return _lsSolids.size();

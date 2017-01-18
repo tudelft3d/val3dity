@@ -22,11 +22,12 @@ public:
               MultiSolid(std::string id = ""); 
               ~MultiSolid(); 
 
-  bool        validate(double tol_planarity_d2p, double tol_planarity_normals);
-  int         is_valid();
-  bool        is_empty();
-  std::string get_report_xml();
-  std::string get_type();
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  int           is_valid();
+  bool          is_empty();
+  std::string   get_report_xml();
+  std::string   get_type();
+  std::set<int> get_unique_error_codes();
 
   bool        add_solid(Solid* s);
   int         num_solids();
