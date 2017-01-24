@@ -10,6 +10,7 @@ Solid::Solid(std::string id)
 {
   _id = id;
   _is_valid = -1;
+  _nef = NULL;
 }
 
 
@@ -172,8 +173,11 @@ std::string Solid::get_report_xml()
   return ss.str();
 }
 
+
 Nef_polyhedron* Solid::get_nef_polyhedron()
 {
+  if (_nef != NULL)
+    return _nef;
   std::vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {
@@ -190,6 +194,7 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
   {
     *re -= nefs[i];
   }
+  _nef = re;
   return re;
 }
 
