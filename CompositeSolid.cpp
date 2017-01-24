@@ -28,6 +28,22 @@ std::string CompositeSolid::get_type()
 }
 
 
+Nef_polyhedron* CompositeSolid::get_nef_polyhedron()
+{
+  if (_nef != NULL)
+    return _nef;
+  Nef_polyhedron* unioned = new Nef_polyhedron(Nef_polyhedron::EMPTY);
+  for (int i = 0; i < _lsSolids.size(); i++)
+  {
+    Nef_polyhedron* tmp = _lsSolids[i]->get_nef_polyhedron();
+    *unioned = *unioned + *tmp;
+    delete tmp;
+  }
+  _nef = unioned;
+  return unioned;
+}
+
+
 bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
   bool isValid = true;
