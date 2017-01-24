@@ -95,6 +95,7 @@ void Solid::translate_vertices()
 
 bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
 {
+  std::clog << "- Solid validation (#" << _id << ") -" << std::endl;
   if (this->is_valid() == 0)
   {
     return false;
@@ -228,9 +229,8 @@ int Solid::num_vertices()
 bool Solid::validate_solid_with_nef()
 {
   bool isValid = true;
-  std::clog << "----- Solid validation -----" << std::endl;
   //-- check orientation of the normals is outwards or inwards
-  std::clog << "--Global orientation of normals" << std::endl;
+  std::clog << "-----Global orientation of normals" << std::endl;
   int i = 0;
   for (auto& sh : this->get_shells())
   {
@@ -247,7 +247,7 @@ bool Solid::validate_solid_with_nef()
   if (this->num_ishells() == 0)
     return true;
     
-  std::clog << "--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
+  std::clog << "-----Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   std::vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {

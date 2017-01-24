@@ -139,7 +139,7 @@ Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r)
 Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
 {
   Nef_polyhedron* output = new Nef_polyhedron;
- Nef_polyhedron* se = get_structuring_element_cube(r);
+  Nef_polyhedron* se = get_structuring_element_cube(r);
   // Nef_polyhedron* se = get_structuring_element_dodecahedron(r);
   Nef_polyhedron* bbox = get_aabb(nef);
   Nef_polyhedron complement = *bbox - *nef;

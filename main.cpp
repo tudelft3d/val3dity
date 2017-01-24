@@ -292,14 +292,14 @@ int main(int argc, char* const argv[])
           if ( (i % 10 == 0) && (verbose.getValue() == false) )
             printProgressBar(100 * (i / double(lsPrimitives.size())));
           i++;
-          std::clog << std::endl << "===== Validating Primitive " << s->get_id() << " =====" << std::endl;
-          std::clog << s->get_type() << std::endl;
+          std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
+          std::clog << "type: " << s->get_type() << std::endl;
           if (s->get_id() != "")
-            std::clog << "ID: " << s->get_id() << std::endl;
+            std::clog << "id: " << s->get_id() << std::endl;
           if (s->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
-            std::clog << "===== INVALID =====" << std::endl;
+            std::clog << "======== INVALID ========" << std::endl;
           else
-            std::clog << "===== VALID =====" << std::endl;
+            std::clog << "========= VALID =========" << std::endl;
         }
         if (verbose.getValue() == false)
           printProgressBar(100);
