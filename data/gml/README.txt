@@ -28,6 +28,15 @@ CompositeSolid with 2 cubes
 cube 0 has a missing face
 invalid: 302
 
+# csol7.gml
+CompositeSolid with: (1) cube+py1; (2) py1 filling the void
+valid
+
+# csol8.gml
+CompositeSolid with: (1) cube+py1; (2) py1 filling the void
+but intersection of the two
+invalid: 501
+
 # msol1.gml
 MultiSolid with 2 cubes
 valid 
