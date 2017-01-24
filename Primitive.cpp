@@ -37,7 +37,6 @@ void Primitive::add_error(int code, std::string whichgeoms, std::string info)
   std::clog << std::endl;
   if (info.empty() == false)
     std::clog << "\t[" << info << "]" << std::endl;
-
 }
 
 std::set<int> Primitive::get_unique_error_codes()

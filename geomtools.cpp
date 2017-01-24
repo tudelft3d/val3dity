@@ -146,7 +146,7 @@ Nef_polyhedron* erode_nef_polyhedron(Nef_polyhedron* nef, float r)
   Nef_polyhedron tmp = CGAL::minkowski_sum_3(complement, *se);
   *output = *nef - tmp;
   output->regularization();
-  std::cout << "#volume " << output->number_of_volumes() << std::endl;
+  // std::cout << "#volume " << output->number_of_volumes() << std::endl;
   // Nef_polyhedron::Vertex_const_iterator v;
   // for (v = output->vertices_begin(); v != output->vertices_end(); v++)
   //   std::cout << v->point() << std::endl;
