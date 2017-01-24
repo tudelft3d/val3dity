@@ -265,11 +265,11 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsBuildings.size())));
         i++;
-        std::clog << std::endl << "===== Validating Building " << b->get_id() << " =====" << std::endl;
+        std::clog << std::endl << "======== Validating Building (#" << b->get_id() << ") ========" << std::endl;
         if (b->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
-          std::clog << "===== INVALID =====" << std::endl;
+          std::clog << "======== INVALID ========" << std::endl;
         else
-          std::clog << "===== VALID =====" << std::endl;
+          std::clog << "======== VALID ========" << std::endl;
       }
       if (verbose.getValue() == false)
         printProgressBar(100);

@@ -25,112 +25,84 @@ Building::~Building()
   
 bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
-  // std::cout << "----- " << this->get_id() << " -----" << std::endl;
   bool isvalid = true;
   int numberprimitives = 0;
-  //-- 1. validate each primitive of the Building and the BuildingParts
+//-- 1. validate each primitive of the Building 
   for (auto& p : _lsPrimitives)
   {
     numberprimitives++;
     if (p->validate(tol_planarity_d2p, tol_planarity_normals) == false)
       isvalid = false;
   }
-  for (auto& bp : _lsBP)
-  {
-    numberprimitives++;
-    if (bp->validate(tol_planarity_d2p, tol_planarity_normals) == false)
-      isvalid = false;
-  }
-//-- 2. make sure solids from the parts don't overlap (their interior)
-  if ( (isvalid == true) && (numberprimitives > 1) )
-  {
-    // std::cout << "----- **********BuildingParts validation (overlap) -----" << std::endl;
+//-- 2. validate each primitive of the BuildingParts
+//   for (auto& bp : _lsBP)
+//   {
+//     numberprimitives++;
+//     if (bp->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+//       isvalid = false;
+//   }
+// //-- 3. collect all primitives for the Building and BPs and "Nef" them
+// //-- erode if necessary  
+//   if ( (isvalid == true) && (_lsBP.size() > 0) )
+//   {
+//     std::clog << "- Interactions between the BuildingParts -" << std::endl;
+//     std::vector<Nef_polyhedron*> lsNefs;
+//     for (auto& p : _lsPrimitives)
+//     {
+//       if (p->get_type() == "Solid")
+//       {
+//         Solid* tmp = dynamic_cast<Solid*>(p);
+//         Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
+//         if (tol_overlap > 0)
+//         {
+//           lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+//           delete tmpnef;
+//         }
+//         else
+//         {
+//           lsNefs.push_back(tmpnef);
+//         }
+//       }
+//     }
+//     for (auto& bp : _lsBP)
+//     {
+//       for (auto& p2 : bp->get_primitives())
+//       {
+//         if (p->get_type() == "Solid")
+//         {
+//           Solid* tmp = dynamic_cast<Solid*>(p);
+//           Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
+//           if (tol_overlap > 0)
+//           {
+//             lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+//             delete tmpnef;
+//           }
+//           else
+//           {
+//             lsNefs.push_back(tmpnef);
+//           }
+//         }
+//       }
+//     }
+//   }  
+//-- 4. make sure BPs do not overlap (their interior that is)
+  // Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+  // for (int i = 0; i < (lsNefs.size() - 1); i++)
+  // {
+  //   Nef_polyhedron* a = lsNefs[i];
+  //   for (int j = i + 1; j < lsNefs.size(); j++) 
+  //   {
+  //     Nef_polyhedron* b = lsNefs[j];
+  //     if (a->interior() * b->interior() != emptynef)
+  //     {
+  //       std::stringstream msg;
+  //       msg << _lsSolids[i]->get_id() << " & " << _lsSolids[j]->get_id();
+  //       this->add_error(501, msg.str(), "");
+  //       isValid = false;
+  //     }
+  //   }
+  // }
 
-    Nef_polyhedron  emptynef(Nef_polyhedron::EMPTY);
-    Nef_polyhedron* mynef = new Nef_polyhedron;
-
-    for (auto& p : _lsPrimitives)
-    {
-      // TODO : CompositeSolid to add here 
-      if (p->get_type() == "Solid")
-      {
-        Solid* tmp = dynamic_cast<Solid*>(p);
-        Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
-        if (mynef->interior() * tmpnef->interior() != emptynef)
-        {
-          std::cout << "----- " << this->get_id() << " -----" << std::endl;
-          std::cout << "INTERSECTION INTERIOR BuildingParts" << std::endl;
-          Nef_polyhedron a(mynef->interior() * tmpnef->interior());
-          std::cout << a.number_of_volumes() << std::endl;
-
-          Nef_polyhedron* dilated = dilate_nef_polyhedron(tmpnef, 0.1);
-
-          isvalid = false;
-        }
-        *mynef += *tmpnef;
-      }
-    }
-    for (auto& bp : _lsBP)
-    {
-      for (auto& p2 : bp->get_primitives())
-      {
-        if (p2->get_type() == "Solid")
-        {
-          Solid* tmp = dynamic_cast<Solid*>(p2);
-          Nef_polyhedron* p2nef = tmp->get_nef_polyhedron();
-          if (mynef->interior() * p2nef->interior() != emptynef)
-          {
-            std::cout << "----- " << this->get_id() << " -----" << std::endl;
-            std::cout << "INTERSECTION INTERIOR BuildingParts" << std::endl;
-//            Nef_polyhedron a(mynef->interior() * p2nef->interior());
-//            std::cout << a.number_of_volumes() << std::endl;
-//            //-- erode the solids  
-            Nef_polyhedron* eroded = erode_nef_polyhedron(p2nef, 0.1);
-//            std::cout << eroded->number_of_volumes() << std::endl;
-            if (mynef->interior() * eroded->interior() == emptynef)
-              std::cout << "Success: no intersection" << std::endl;
-            isvalid = false;
-          }
-          *mynef += *p2nef;
-        }
-      }
-    }
-  }  
-  //-- 3. make sure the union of all _Solids forms one Solid
-  if ( (isvalid == true) && (numberprimitives > 1) )
-  {
-    // std::cout << "----- **********BuildingParts validation (union) -----" << std::endl;
-
-    Nef_polyhedron  emtpynef(Nef_polyhedron::EMPTY);
-    Nef_polyhedron* mynef = new Nef_polyhedron;
-    for (auto& p : _lsPrimitives)
-    {
-      // TODO : CompositeSolid to add here 
-      if (p->get_type() == "Solid")
-      {
-        Solid* tmp = dynamic_cast<Solid*>(p);
-        *mynef += *tmp->get_nef_polyhedron();
-      }
-    }
-    for (auto& bp : _lsBP)
-    {
-      for (auto& p2 : bp->get_primitives())
-      {
-        if (p2->get_type() == "Solid")
-        {
-          Solid* tmp = dynamic_cast<Solid*>(p2);
-          *mynef += *tmp->get_nef_polyhedron();
-        }
-      }
-    }
-    std::clog << "# of volumes: " << mynef->number_of_volumes() << std::endl;
-    if (mynef->number_of_volumes() != 2) 
-    {
-      std::cout << "----- " << this->get_id() << " -----" << std::endl;
-      std::cout << "DISCONNECTED BuildingParts" << std::endl;
-      isvalid = false;
-    }
-  }
   _is_valid = isvalid;
   return isvalid;
 }
@@ -260,6 +232,7 @@ BuildingPart::~BuildingPart()
   
 bool BuildingPart::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
+  std::clog << "- BuildingPart validation (#" << _id << ") -" << std::endl;
   bool isvalid = true;
   for (auto& p : _lsPrimitives)
   {
