@@ -61,8 +61,15 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
 //-- 2. check if their interior intersects ERROR:501
       std::clog << "-----Intersections of solids" << std::endl;
       std::vector<Nef_polyhedron*> lsNefsEroded;
-      for (auto each : lsNefs)
-        lsNefsEroded.push_back(erode_nef_polyhedron(each, 0.1));
+      if (tol_overlap > 0.0)
+      {
+        for (auto each : lsNefs)
+          lsNefsEroded.push_back(erode_nef_polyhedron(each, tol_overlap));
+      }
+      else
+      {
+        lsNefsEroded = lsNefs;
+      }
       Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
       for (int i = 0; i < (lsNefsEroded.size() - 1); i++)
       {
@@ -79,16 +86,26 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           }
         }
       }
-      for (auto each : lsNefsEroded)
-        delete each;
+      if (tol_overlap > 0.0)
+      {
+        for (auto each : lsNefsEroded)
+          delete each;
+      }
     }
     if (isValid == true)
     {
 //-- 3. check if their union yields one solid ERROR:503
       std::clog << "-----Forming one solid (union)" << std::endl;
       std::vector<Nef_polyhedron*> lsNefsDilated;
-      for (auto each : lsNefs)
-        lsNefsDilated.push_back(dilate_nef_polyhedron(each, 0.1));
+      if (tol_overlap > 0.0)
+      {
+        for (auto each : lsNefs)
+          lsNefsDilated.push_back(dilate_nef_polyhedron(each, tol_overlap));
+      }
+      else
+      {
+        lsNefsDilated = lsNefs;
+      }
       Nef_polyhedron unioned(Nef_polyhedron::EMPTY);
       for (auto each : lsNefsDilated)
         unioned = unioned + *each;
@@ -103,8 +120,11 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         delete each;
     } 
     //-- clear the temp Nefs
-    for (auto each: lsNefs)
-      delete each;
+    if (tol_overlap > 0.0)
+    {
+      for (auto each: lsNefs)
+        delete each;
+    }
   }
   _is_valid = isValid;
   return isValid;
