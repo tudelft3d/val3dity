@@ -10,6 +10,7 @@
 #include "Solid.h"
 #include "definitions.h"
 #include "geomtools.h"
+#include "input.h"
 #include <iostream>
 #include <sstream>
 
@@ -35,78 +36,95 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
       isvalid = false;
   }
 //-- 2. validate each primitive of the BuildingParts
-//   for (auto& bp : _lsBP)
-//   {
-//     numberprimitives++;
-//     if (bp->validate(tol_planarity_d2p, tol_planarity_normals) == false)
-//       isvalid = false;
-//   }
-// //-- 3. collect all primitives for the Building and BPs and "Nef" them
-// //-- erode if necessary  
-//   if ( (isvalid == true) && (_lsBP.size() > 0) )
-//   {
-//     std::clog << "- Interactions between the BuildingParts -" << std::endl;
-//     std::vector<Nef_polyhedron*> lsNefs;
-//     for (auto& p : _lsPrimitives)
-//     {
-//       if (p->get_type() == "Solid")
-//       {
-//         Solid* tmp = dynamic_cast<Solid*>(p);
-//         Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
-//         if (tol_overlap > 0)
-//         {
-//           lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-//           delete tmpnef;
-//         }
-//         else
-//         {
-//           lsNefs.push_back(tmpnef);
-//         }
-//       }
-//     }
-//     for (auto& bp : _lsBP)
-//     {
-//       for (auto& p2 : bp->get_primitives())
-//       {
-//         if (p->get_type() == "Solid")
-//         {
-//           Solid* tmp = dynamic_cast<Solid*>(p);
-//           Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
-//           if (tol_overlap > 0)
-//           {
-//             lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-//             delete tmpnef;
-//           }
-//           else
-//           {
-//             lsNefs.push_back(tmpnef);
-//           }
-//         }
-//       }
-//     }
-//   }  
+  for (auto& bp : _lsBP)
+  {
+    numberprimitives++;
+    if (bp->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+      isvalid = false;
+  }
+//-- 3. collect all primitives for the Building and BPs and "Nef" them
+//-- erode if necessary
+  std::vector<Nef_polyhedron*> lsNefs;
+  if ( (isvalid == true) && (_lsBP.size() > 0) )
+  {
+    std::clog << "- Interactions between the BuildingParts -" << std::endl;
+    for (auto& p : _lsPrimitives)
+    {
+      if (p->get_type() == "Solid")
+      {
+        Solid* tmp = dynamic_cast<Solid*>(p);
+        Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
+        if (tol_overlap > 0)
+        {
+          lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+          delete tmpnef;
+        }
+        else
+        {
+          lsNefs.push_back(tmpnef);
+        }
+      }
+    }
+    for (auto& bp : _lsBP)
+    {
+      for (auto& p : bp->get_primitives())
+      {
+        if (p->get_type() == "Solid")
+        {
+          Solid* tmp = dynamic_cast<Solid*>(p);
+          Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
+          if (tol_overlap > 0)
+          {
+            lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+            delete tmpnef;
+          }
+          else
+          {
+            lsNefs.push_back(tmpnef);
+          }
+        }
+      }
+    }  
 //-- 4. make sure BPs do not overlap (their interior that is)
-  // Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
-  // for (int i = 0; i < (lsNefs.size() - 1); i++)
-  // {
-  //   Nef_polyhedron* a = lsNefs[i];
-  //   for (int j = i + 1; j < lsNefs.size(); j++) 
-  //   {
-  //     Nef_polyhedron* b = lsNefs[j];
-  //     if (a->interior() * b->interior() != emptynef)
-  //     {
-  //       std::stringstream msg;
-  //       msg << _lsSolids[i]->get_id() << " & " << _lsSolids[j]->get_id();
-  //       this->add_error(501, msg.str(), "");
-  //       isValid = false;
-  //     }
-  //   }
-  // }
-
+    Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+    for (int i = 0; i < (lsNefs.size() - 1); i++)
+    {
+      Nef_polyhedron* a = lsNefs[i];
+      for (int j = i + 1; j < lsNefs.size(); j++) 
+      {
+        Nef_polyhedron* b = lsNefs[j];
+        if (a->interior() * b->interior() != emptynef)
+        {
+          std::stringstream msg;
+//          msg << _lsPrimitives[i]->get_id() << " & " << _lsPrimitives[j]->get_id();
+          msg << i << " : " << j;
+          // TODO: fix error reporting for Building
+          this->add_error(601, msg.str(), "");
+          // std::cout << "INTERSECTION BUILDINGS-PARTS" << std::endl;
+          // std::cout << this->get_id() << std::endl;
+          // std::cout << i << " : " << j << std::endl;
+          isvalid = false;
+        }
+      }
+    }
+  }
   _is_valid = isvalid;
   return isvalid;
 }
 
+
+void Building::add_error(int code, std::string whichgeoms, std::string info)
+{
+  _is_valid = 0;
+  std::tuple<std::string, std::string> a(whichgeoms, info);
+  _errors[code].push_back(a);
+  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  if (whichgeoms.empty() == false)
+    std::clog << " (id: " << whichgeoms << ")";
+  std::clog << std::endl;
+  if (info.empty() == false)
+    std::clog << "\t[" << info << "]" << std::endl;
+}
 
 void Building::add_primitive(Primitive* p)
 {
@@ -145,8 +163,6 @@ int Building::get_number_multisurfaces()
       t++;
   return t;
 }
-
-
 
 
 std::set<int> Building::get_unique_error_codes()
@@ -197,9 +213,25 @@ std::string Building::get_report_xml()
   else
     ss << "\t\t<id>none</id>" << std::endl;
   ss << "\t\t<numberprimitives>" << this->get_number_primitives() << "</numberprimitives>" << std::endl;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      ss << "\t\t<Error>" << std::endl;
+      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
+      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
+      ss << "\t\t\t<id>" << std::get<0>(e) << "</id>" << std::endl;
+      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
+      ss << "\t\t</Error>" << std::endl;
+    }
+  }
   for (auto& p : _lsPrimitives)
   {
     ss << p->get_report_xml();
+  }
+  for (auto& bp : _lsBP)
+  {
+    ss << bp->get_report_xml();  
   }
   ss << "\t</Building>" << std::endl;
   return ss.str();
@@ -265,7 +297,18 @@ bool BuildingPart::is_empty()
 
 std::string BuildingPart::get_report_xml()
 {
-  return "<EMPTY>";
+  std::stringstream ss;
+  ss << "\t\t<BuildingPart>" << std::endl;
+  if (this->get_id() != "")
+    ss << "\t\t\t<id>" << this->_id << "</id>" << std::endl;
+  else
+    ss << "\t\t\t<id>none</id>" << std::endl;
+  for (auto& p : _lsPrimitives)
+  {
+    ss << p->get_report_xml();
+  }
+  ss << "\t\t</BuildingPart>" << std::endl;
+  return ss.str();
 }
 
 

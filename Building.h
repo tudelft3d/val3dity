@@ -37,6 +37,7 @@ protected:
   std::vector<Primitive*>    _lsPrimitives;
 };
 
+
 class Building
 {
 public:
@@ -46,6 +47,7 @@ public:
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   bool          is_valid();
   bool          is_empty();
+  void          add_error(int code, std::string whichgeoms, std::string info);
   std::string   get_report_xml();
   
   std::string   get_id();
@@ -67,6 +69,8 @@ protected:
   int                        _is_valid;
   std::vector<Primitive*>    _lsPrimitives;
   std::vector<BuildingPart*> _lsBP;
+
+  std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
 };
 
 #endif /* Building_h */
