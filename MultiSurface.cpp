@@ -19,7 +19,7 @@ MultiSurface::MultiSurface(std::string id) {
 MultiSurface::~MultiSurface() {
 }
 
-bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals)
+bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
   if (this->is_valid() == 0)
     return false;

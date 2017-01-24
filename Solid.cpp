@@ -93,7 +93,7 @@ void Solid::translate_vertices()
 }
 
 
-bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals)
+bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
   std::clog << "- Solid validation (#" << _id << ") -" << std::endl;
   if (this->is_valid() == 0)

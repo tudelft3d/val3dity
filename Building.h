@@ -19,7 +19,7 @@ public:
   BuildingPart  (std::string id = "");
   ~BuildingPart ();
 
-  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   bool          is_valid();
   bool          is_empty();
   std::string   get_report_xml();
@@ -43,7 +43,7 @@ public:
   Building  (std::string id = "");
   ~Building ();
   
-  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   bool          is_valid();
   bool          is_empty();
   std::string   get_report_xml();

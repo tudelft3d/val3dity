@@ -23,7 +23,7 @@ Building::Building(std::string id)
 Building::~Building()
 {}
   
-bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals)
+bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
   // std::cout << "----- " << this->get_id() << " -----" << std::endl;
   bool isvalid = true;
@@ -258,7 +258,7 @@ BuildingPart::BuildingPart(std::string id)
 BuildingPart::~BuildingPart()
 {}
   
-bool BuildingPart::validate(double tol_planarity_d2p, double tol_planarity_normals)
+bool BuildingPart::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
   bool isvalid = true;
   for (auto& p : _lsPrimitives)

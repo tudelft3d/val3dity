@@ -49,7 +49,7 @@ public:
   int             num_faces();
   int             num_vertices();
  
-  bool            validate(double tol_planarity_d2p, double tol_planarity_normals);
+  bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   Nef_polyhedron* get_nef_polyhedron();
   void            translate_vertices();
   std::string     get_report_xml();

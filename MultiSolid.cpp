@@ -24,7 +24,7 @@ std::string MultiSolid::get_type()
   return "MultiSolid";
 }
 
-bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals) 
+bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
   bool isValid = true;
   for (auto& s : _lsSolids)

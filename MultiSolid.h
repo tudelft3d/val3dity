@@ -22,7 +22,7 @@ public:
               MultiSolid(std::string id = ""); 
               ~MultiSolid(); 
 
-  bool          validate(double tol_planarity_d2p, double tol_planarity_normals);
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   int           is_valid();
   bool          is_empty();
   std::string   get_report_xml();

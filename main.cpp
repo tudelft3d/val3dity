@@ -114,6 +114,7 @@ int main(int argc, char* const argv[])
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE error codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
+    TCLAP::ValueArg<double>                overlap_tolerance("", "overlap_tolerance", "tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)", false, -1, "double");
     TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
 
@@ -121,6 +122,7 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
+    cmd.add(overlap_tolerance);
     cmd.add(primitives);
     cmd.add(buildings);
     cmd.add(verbose);
@@ -264,7 +266,7 @@ int main(int argc, char* const argv[])
           printProgressBar(100 * (i / double(lsBuildings.size())));
         i++;
         std::clog << std::endl << "===== Validating Building " << b->get_id() << " =====" << std::endl;
-        if (b->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
+        if (b->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
           std::clog << "===== INVALID =====" << std::endl;
         else
           std::clog << "===== VALID =====" << std::endl;
@@ -296,7 +298,7 @@ int main(int argc, char* const argv[])
           std::clog << "type: " << s->get_type() << std::endl;
           if (s->get_id() != "")
             std::clog << "id: " << s->get_id() << std::endl;
-          if (s->validate(planarity_d2p.getValue(), planarity_n.getValue()) == false)
+          if (s->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
             std::clog << "======== INVALID ========" << std::endl;
           else
             std::clog << "========= VALID =========" << std::endl;
