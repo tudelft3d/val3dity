@@ -5,7 +5,7 @@ valid
 
 # csol2.gml
 CompositeSolid with 3 cubes adjacent
-cube 1-2 overlap 
+cube 1-2 overlap by 1cm
 invalid: 501
 
 # csol3.gml
