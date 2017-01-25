@@ -102,13 +102,8 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
         if (nefB->interior() * nefsBP[i]->interior() != emptynef)
         {
           std::stringstream msg;
-  //          msg << _lsPrimitives[i]->get_id() << " & " << _lsPrimitives[j]->get_id();
-          msg << "Building" << " : " << i;
-          // TODO: fix error reporting for Building
+          msg << "Building main part" << " & BuildingPart #" << _lsBP[i]->get_id();
           this->add_error(601, msg.str(), "");
-          std::cout << "INTERSECTION BUILDING-BP" << std::endl;
-          // std::cout << this->get_id() << std::endl;
-          // std::cout << i << " : " << j << std::endl;
           isvalid = false;
         }
       }
@@ -122,13 +117,8 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
         if (a->interior() * b->interior() != emptynef)
         {
           std::stringstream msg;
-//          msg << _lsPrimitives[i]->get_id() << " & " << _lsPrimitives[j]->get_id();
-          msg << i << " : " << j;
-          // TODO: fix error reporting for Building
+          msg << "BuildingParts #" << _lsBP[i]->get_id() << " & #" << _lsBP[j]->get_id();
           this->add_error(601, msg.str(), "");
-          std::cout << "INTERSECTION BP-BP" << std::endl;
-          // std::cout << this->get_id() << std::endl;
-          // std::cout << i << " : " << j << std::endl;
           isvalid = false;
         }
       }
@@ -194,10 +184,22 @@ int Building::get_number_multisurfaces()
 std::set<int> Building::get_unique_error_codes()
 {
   std::set<int> errs;
+  for (auto& err : _errors)
+  {
+    errs.insert(std::get<0>(err));
+  }
   for (auto& p : _lsPrimitives)
   {
     std::set<int> tmp = p->get_unique_error_codes();
     errs.insert(tmp.begin(), tmp.end());
+  }
+  for (auto& bp : _lsBP)
+  {
+    for (auto& p : bp->get_primitives())
+    {
+      std::set<int> tmp = p->get_unique_error_codes();
+      errs.insert(tmp.begin(), tmp.end());
+    }
   }
   return errs;
 }
