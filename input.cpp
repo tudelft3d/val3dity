@@ -367,7 +367,7 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
     if (nset.size() > 0)
       bCS = true;
   }
-  s = "./*/" + NS["gml"] + "MultiSurface";
+  s = ".//" + NS["gml"] + "MultiSurface";
   nset = nbuilding.select_nodes(s.c_str());
   for(auto& n: nset)
   {
