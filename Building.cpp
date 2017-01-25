@@ -150,7 +150,11 @@ void Building::add_primitive(Primitive* p)
 
 int Building::get_number_primitives()
 {
-  return _lsPrimitives.size();
+  int total = 0;
+  total += _lsPrimitives.size();
+  for (auto& bp : _lsBP)
+    total += bp->get_number_primitives();
+  return total;
 }
 
 int Building::get_number_solids()
@@ -159,6 +163,8 @@ int Building::get_number_solids()
   for (auto& p : _lsPrimitives)
     if (p->get_type() == "Solid")
       t++;
+  for (auto& bp : _lsBP)
+    t += bp->get_number_solids();
   return t;
 }
 
@@ -168,6 +174,8 @@ int Building::get_number_compositesolids()
   for (auto& p : _lsPrimitives)
     if (p->get_type() == "CompositeSolid")
       t++;
+  for (auto& bp : _lsBP)
+    t += bp->get_number_compositesolids();  
   return t;
 }
 
@@ -177,6 +185,8 @@ int Building::get_number_multisurfaces()
   for (auto& p : _lsPrimitives)
     if (p->get_type() == "MultiSurface")
       t++;
+  for (auto& bp : _lsBP)
+    t += bp->get_number_multisurfaces();
   return t;
 }
 
@@ -353,4 +363,36 @@ std::string BuildingPart::get_id()
 void BuildingPart::set_id(std::string id)
 {
   _id = id;
+}
+
+int BuildingPart::get_number_primitives()
+{
+  return _lsPrimitives.size();
+}
+
+int BuildingPart::get_number_solids()
+{
+  int t = 0;
+  for (auto& p : _lsPrimitives)
+    if (p->get_type() == "Solid")
+      t++;
+  return t;
+}
+
+int BuildingPart::get_number_compositesolids()
+{
+  int t = 0;
+  for (auto& p : _lsPrimitives)
+    if (p->get_type() == "CompositeSolid")
+      t++;
+  return t;
+}
+
+int BuildingPart::get_number_multisurfaces()
+{
+  int t = 0;
+  for (auto& p : _lsPrimitives)
+    if (p->get_type() == "MultiSurface")
+      t++;
+  return t;
 }

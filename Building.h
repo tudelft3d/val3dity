@@ -26,6 +26,10 @@ public:
 
   std::string   get_id();
   void          set_id(std::string id);
+  int           get_number_primitives();
+  int           get_number_solids();
+  int           get_number_compositesolids();
+  int           get_number_multisurfaces();
 
   void          add_primitive(Primitive* p);
 
