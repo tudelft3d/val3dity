@@ -29,11 +29,14 @@ public:
   std::string   get_type();
   std::set<int> get_unique_error_codes();
 
+  Nef_polyhedron* get_nef_polyhedron();
+
   bool          add_solid(Solid* s);
   int           number_of_solids();
 
 protected:
   std::vector<Solid*> _lsSolids;
+  Nef_polyhedron*     _nef;
 };
 
 

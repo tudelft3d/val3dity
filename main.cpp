@@ -485,14 +485,14 @@ std::string print_summary_validation(std::vector<Building*>& lsBuildings)
   int countSolids = 0;
   int countCSolids = 0;
   int countMSurfaces = 0;
-  for (auto& s : lsBuildings)
+  for (auto& b : lsBuildings)
   {
-    if (s->is_valid() == true)
+    if (b->is_valid() == true)
       bValid++;
-    countPrim += s->get_number_primitives();
-    countSolids += s->get_number_solids();
-    countCSolids += s->get_number_compositesolids();
-    countMSurfaces += s->get_number_multisurfaces();
+    countPrim += b->get_number_primitives();
+    countSolids += b->get_number_solids();
+    countCSolids += b->get_number_compositesolids();
+    countMSurfaces += b->get_number_multisurfaces();
   }
   float percentage;
   if (lsBuildings.size() == 0)

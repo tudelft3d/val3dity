@@ -61,8 +61,11 @@ public:
   
   const std::vector<Surface*>&  get_shells();
 
+
 protected:
   std::vector<Surface*>  _shells;
+  Nef_polyhedron*        _nef;
+
   bool validate_solid_with_nef();
 };
 

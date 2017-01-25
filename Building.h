@@ -26,6 +26,10 @@ public:
 
   std::string   get_id();
   void          set_id(std::string id);
+  int           get_number_primitives();
+  int           get_number_solids();
+  int           get_number_compositesolids();
+  int           get_number_multisurfaces();
 
   void          add_primitive(Primitive* p);
 
@@ -37,6 +41,7 @@ protected:
   std::vector<Primitive*>    _lsPrimitives;
 };
 
+
 class Building
 {
 public:
@@ -46,6 +51,7 @@ public:
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   bool          is_valid();
   bool          is_empty();
+  void          add_error(int code, std::string whichgeoms, std::string info);
   std::string   get_report_xml();
   
   std::string   get_id();
@@ -67,6 +73,8 @@ protected:
   int                        _is_valid;
   std::vector<Primitive*>    _lsPrimitives;
   std::vector<BuildingPart*> _lsBP;
+
+  std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
 };
 
 #endif /* Building_h */

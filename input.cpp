@@ -118,6 +118,8 @@ std::string errorcode2description(int code, bool qie) {
       case 501: return string("INTERSECTION_SOLIDS"); break;
       case 502: return string("DUPLICATED_SOLIDS"); break;
       case 503: return string("DISCONNECTED_SOLIDS"); break;
+      //-- BUILDING
+      case 601: return string("BUILDINGPARTS_INTERSECT"); break;
       //-- OTHERS
       case 901: return string("INVALID_INPUT_FILE"); break;
       case 902: return string("EMPTY_PRIMITIVE"); break;
