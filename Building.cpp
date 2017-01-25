@@ -44,24 +44,29 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
   }
 //-- 3. collect all primitives for the Building and BPs and "Nef" them
 //-- erode if necessary
-  std::vector<Nef_polyhedron*> lsNefs;
   if ( (isvalid == true) && (_lsBP.size() > 0) )
   {
+    Nef_polyhedron* nefB = NULL;
+    std::vector<Nef_polyhedron*> nefsBP;
     std::clog << "- Interactions between the BuildingParts -" << std::endl;
-    for (auto& p : _lsPrimitives)
-    {
+    if (_lsPrimitives.empty() == false)
+    { 
+      Primitive* p = _lsPrimitives[0];
+      Nef_polyhedron* tmpnef;
       if (p->get_type() == "Solid")
+        tmpnef = dynamic_cast<Solid*>(p)->get_nef_polyhedron();
+      else if (p->get_type() == "CompositeSolid")
+        tmpnef = dynamic_cast<CompositeSolid*>(p)->get_nef_polyhedron();
+      if (nefB != NULL)
       {
-        Solid* tmp = dynamic_cast<Solid*>(p);
-        Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
         if (tol_overlap > 0)
         {
-          lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+          nefB = erode_nef_polyhedron(tmpnef, tol_overlap);
           delete tmpnef;
         }
         else
         {
-          lsNefs.push_back(tmpnef);
+          nefB = tmpnef;
         }
       }
     }
@@ -69,30 +74,51 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
     {
       for (auto& p : bp->get_primitives())
       {
+        Nef_polyhedron* tmpnef;
         if (p->get_type() == "Solid")
+          tmpnef = dynamic_cast<Solid*>(p)->get_nef_polyhedron();
+        else if (p->get_type() == "CompositeSolid")
+          tmpnef = dynamic_cast<CompositeSolid*>(p)->get_nef_polyhedron();
+        else
+          continue;
+        if (tol_overlap > 0)
         {
-          Solid* tmp = dynamic_cast<Solid*>(p);
-          Nef_polyhedron* tmpnef = tmp->get_nef_polyhedron();
-          if (tol_overlap > 0)
-          {
-            lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-            delete tmpnef;
-          }
-          else
-          {
-            lsNefs.push_back(tmpnef);
-          }
+          nefsBP.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+          delete tmpnef;
+        }
+        else
+        {
+          nefsBP.push_back(tmpnef);
         }
       }
     }  
-//-- 4. make sure BPs do not overlap (their interior that is)
+//-- 4. make sure B & BPs do not overlap with each other (their interior that is)
     Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
-    for (int i = 0; i < (lsNefs.size() - 1); i++)
+    //-- verify intersection B-primitive (if any!) with each BP
+    if (nefB != NULL)
     {
-      Nef_polyhedron* a = lsNefs[i];
-      for (int j = i + 1; j < lsNefs.size(); j++) 
+      for (int i = 0; i < nefsBP.size(); i++)
       {
-        Nef_polyhedron* b = lsNefs[j];
+        if (nefB->interior() * nefsBP[i]->interior() != emptynef)
+        {
+          std::stringstream msg;
+  //          msg << _lsPrimitives[i]->get_id() << " & " << _lsPrimitives[j]->get_id();
+          msg << "Building" << " : " << i;
+          // TODO: fix error reporting for Building
+          this->add_error(601, msg.str(), "");
+          std::cout << "INTERSECTION BUILDING-BP" << std::endl;
+          // std::cout << this->get_id() << std::endl;
+          // std::cout << i << " : " << j << std::endl;
+          isvalid = false;
+        }
+      }
+    }
+    for (int i = 0; i < (nefsBP.size() - 1); i++)
+    {
+      Nef_polyhedron* a = nefsBP[i];
+      for (int j = i + 1; j < nefsBP.size(); j++) 
+      {
+        Nef_polyhedron* b = nefsBP[j];
         if (a->interior() * b->interior() != emptynef)
         {
           std::stringstream msg;
@@ -100,7 +126,7 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
           msg << i << " : " << j;
           // TODO: fix error reporting for Building
           this->add_error(601, msg.str(), "");
-          // std::cout << "INTERSECTION BUILDINGS-PARTS" << std::endl;
+          std::cout << "INTERSECTION BP-BP" << std::endl;
           // std::cout << this->get_id() << std::endl;
           // std::cout << i << " : " << j << std::endl;
           isvalid = false;
