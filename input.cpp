@@ -573,6 +573,30 @@ void print_information(std::string &ifile)
 
 }
 
+void report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns) {
+  std::cout << "+++++++++++++++++++ PRIMITIVES +++++++++++++++++++" << std::endl;
+  
+  std::string s = "//" + ns["gml"] + "Solid";
+  print_info_aligned("gml:Solid", doc.select_nodes(s.c_str()).size());
+
+  s = "//" + ns["gml"] + "MultiSolid";
+  print_info_aligned("gml:MultiSolid", doc.select_nodes(s.c_str()).size());
+
+  s = "//" + ns["gml"] + "CompositeSolid";
+  print_info_aligned("gml:CompositeSolid", doc.select_nodes(s.c_str()).size());
+  
+  s = "//" + ns["gml"] + "MultiSurface";
+  print_info_aligned("gml:MultiSurface", doc.select_nodes(s.c_str()).size());
+  
+  s = "//" + ns["gml"] + "CompositeSurface";
+  print_info_aligned("gml:CompositeSurface", doc.select_nodes(s.c_str()).size());
+
+  s = "//" + ns["gml"] + "Polygon";
+  print_info_aligned("gml:Polygon", doc.select_nodes(s.c_str()).size());
+
+  std::cout << std::endl;
+}
+
 void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
