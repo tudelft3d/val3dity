@@ -38,10 +38,10 @@ std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Prim
 // std::string print_unit_tests(vector<Solid*>& lsSolids, Primitive3D prim3d, bool usebuildings);
 
 void write_report_xml (std::ofstream& ss, std::string ifile, vector<Primitive*>& lsPrimitives, Primitive3D prim3d, 
-                      double snap_tolerance, double planarity_d2p, double planarity_n, 
+                      double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, 
                       IOErrors ioerrs, bool onlyinvalid = false);
 void write_report_xml (std::ofstream& ss, std::string ifile, vector<Building*>& lsBuildings,
-                      double snap_tolerance, double planarity_d2p, double planarity_n,
+                      double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n,
                       IOErrors ioerrs, bool onlyinvalid);
 
 
@@ -324,6 +324,7 @@ int main(int argc, char* const argv[])
                          lsPrimitives,
                          prim3d, 
                          snap_tolerance.getValue(),
+                         overlap_tolerance.getValue(),
                          planarity_d2p.getValue(),
                          planarity_n.getValue(),
                          ioerrs,
@@ -335,6 +336,7 @@ int main(int argc, char* const argv[])
                          inputfile.getValue(),
                          lsBuildings,
                          snap_tolerance.getValue(),
+                         overlap_tolerance.getValue(),
                          planarity_d2p.getValue(),
                          planarity_n.getValue(),
                          ioerrs,
@@ -543,6 +545,7 @@ void write_report_xml(std::ofstream& ss,
                       vector<Primitive*>& lsPrimitives,
                       Primitive3D prim3d, 
                       double snap_tolerance,
+                      double overlap_tolerance,
                       double planarity_d2p,
                       double planarity_n,
                       IOErrors ioerrs,
@@ -563,6 +566,7 @@ void write_report_xml(std::ofstream& ss,
     ss << "gml:CompositeSurface";
   ss << "</primitives>" << std::endl;
   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
+  ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
   ss << "\t<totalprimitives>" << lsPrimitives.size() << "</totalprimitives>" << std::endl;
@@ -599,6 +603,7 @@ void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
                       vector<Building*>& lsBuildings,
                       double snap_tolerance,
+                      double overlap_tolerance,
                       double planarity_d2p,
                       double planarity_n,
                       IOErrors ioerrs,
@@ -607,6 +612,7 @@ void write_report_xml(std::ofstream& ss,
   ss << "<val3dity>" << std::endl;
   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
+  ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
   ss << "\t<numberbuildings>" << lsBuildings.size() << "</numberbuildings>" << std::endl;
