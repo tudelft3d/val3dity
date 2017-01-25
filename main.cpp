@@ -64,18 +64,20 @@ public:
     std::cout << "==SOME EXAMPLES==" << std::endl;
     std::cout << "\tval3dity input.gml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -B" << std::endl;
-    std::cout << "\t\tsame as previous, but reporting considers Buildings for reporting" << std::endl;
-    std::cout << "\tval3dity input.obj" << std::endl;
-    std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -B -p MS" << std::endl;
-    std::cout << "\t\tValidates each building represented with gml:MultiSurface and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
-    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
-    std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl;
+    std::cout << "\tval3dity input.gml -p CompositeSolid --overlap_tolerance 0.05" << std::endl;
+    std::cout << "\t\tValidates each gml:CompositeSolid in input.gml and outputs a summary. A tolerance of 0.05 unit is used." << std::endl;
+    std::cout << "\tval3dity input.gml -B" << std::endl;
+    std::cout << "\t\tValidates each CityGML Buildings in input.gml and outputs a summary" << std::endl;
+    std::cout << "\tval3dity input.obj" << std::endl;
+    std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
+    // std::cout << "\tval3dity input.gml -B -p MS" << std::endl;
+    // std::cout << "\t\tValidates each building represented with gml:MultiSurface and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation of the solids is printed out" << std::endl;
+    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
+    std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl;
     std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
     std::cout << "\t\tThe vertices in gml:Solid closer than 0.1unit are snapped together" << std::endl;
     std::cout << "\tval3dity input.gml --planarity_d2p 0.1" << std::endl;
@@ -109,6 +111,7 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<std::string>           report("r", "report", "output report in XML format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
     TCLAP::SwitchArg                       buildings("B", "Buildings", "validate only CityGML Buildings", false);
+    TCLAP::SwitchArg                       info("i", "info", "prints information about the file", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
@@ -126,12 +129,19 @@ int main(int argc, char* const argv[])
     cmd.add(primitives);
     cmd.add(buildings);
     cmd.add(verbose);
+    cmd.add(info);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
     cmd.parse( argc, argv );
+
+    if (info.getValue() == true)
+    {
+      print_information(inputfile.getValue());
+      return (1);
+    }
   
     Primitive3D prim3d = SOLID;
     if (primitives.getValue()      == "CompositeSolid")

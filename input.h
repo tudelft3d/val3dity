@@ -56,6 +56,7 @@ void          readGMLfile_buildings(std::string &ifile, std::vector<Building*>& 
 void          readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 void          get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
+void          print_information(std::string &ifile);
 
 std::string   errorcode2description(int code, bool qie = false);
 void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);

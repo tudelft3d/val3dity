@@ -561,6 +561,17 @@ MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::
 //   }
 // }
 
+void print_information(std::string &ifile)
+{
+  std::cout << "Reading file: " << ifile << std::endl;
+  pugi::xml_document doc;
+  if (!doc.load_file(ifile.c_str())) 
+  {
+    std::cout << "Input file not found." << std::endl;
+    return;
+  }
+
+}
 
 void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
 {
