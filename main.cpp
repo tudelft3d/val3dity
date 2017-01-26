@@ -139,7 +139,7 @@ int main(int argc, char* const argv[])
 
     if (info.getValue() == true)
     {
-      std::cout << "Only reporting information about the file, the rest of the options are ignored." << std::endl;
+      std::cout << "(only reporting information about the file, the rest of the options are ignored)" << std::endl;
       print_information(inputfile.getValue());
       return (1);
     }
