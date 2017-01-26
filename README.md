@@ -1,14 +1,31 @@
 # val3dity
 
-Validation of 3D primitives according to the international standard ISO 19107.
+Validation of 3D primitives according to the international standard ISO19107.
+Think of it as the [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS is only for 2D ones).
 
-The 3D primitives of GML (`<gml:Solid>`, `<gml:CompositeSurface>`, or `<gml:MultiSurface>`) are what it was built for, but it can be used to validate any 3D primitive, also in other formats. 
-It accepts as input any [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) (or one of the formats built upon it, such as [CityGML](http://www.citygml.org)), [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file), and [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
-It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107 (all the rest is ignored). 
-In a OBJ file, each primitive will be validated according to the ISO 19107 rules. 
+Allows us to validate a 3D primitive, ie to verify whether the 3D primitive respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
+The 3D primitives of GML are all supported:
 
-For `Solids`, the validation is performed hierarchically, ie first every polygon (embedded in 3D) is validated (by projecting it to a 2D plane and using [GEOS](http://trac.osgeo.org/geos/)), then every shell is validated (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc), and finally the interactions between the shells are analysed. 
-This means that if one polygon of your solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
+  - `<gml:Solid>`
+  - `<gml:MultiSolid>`
+  - `<gml:CompositeSolid>`
+  - `<gml:CompositeSurface>` 
+  - `<gml:MultiSurface>`
+
+However, as is the case for CityGML, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives.
+
+val3dity accepts as input any [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) (or one of the formats built upon it, such as [CityGML](http://www.citygml.org)), [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file), and [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
+It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
+In a OBJ file, each primitive will be validated according to the ISO19107 rules, as if they were a Solid.
+
+All primitives are validated hierarchically, for instance:
+
+  1. the lower-dimensionality primitives (the polygons) are validated by first embedding every polygon in 3D and then by projecting it to a 2D plane and using [GEOS](http://trac.osgeo.org/geos/);
+  1. then these are assembled into shells/surfaces and their validity analysed (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc);
+  1. then the Solids are validated
+  1. finally, for CompositeSolids the interactions between the Solids are analysed.
+
+This means that if one polygon of a Solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
 
 For `CompositeSurfaces`, the surface formed by the polygons must be a 2-manifold, and the same hierarchical validation applies.
 
