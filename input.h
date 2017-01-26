@@ -56,6 +56,12 @@ void          readGMLfile_buildings(std::string &ifile, std::vector<Building*>& 
 void          readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 void          get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
+void          print_information(std::string &ifile);
+void          report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
+void          report_building(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
+void          report_building_each_lod(pugi::xml_document& doc, std::map<std::string, std::string>& ns, int lod, int& total_solid, int& total_ms, int& total_sem);
+void          get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml);
+void          print_info_aligned(std::string o, size_t number, bool tab = false);
 
 std::string   errorcode2description(int code, bool qie = false);
 void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
