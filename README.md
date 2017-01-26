@@ -37,6 +37,13 @@ Most of the details are available in this scientific article, (if you use val3di
 international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. [ [PDF] ](https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf) [ [DOI] ](http://dx.doi.org/10.1111/mice.12043)
 
 
+## Validation of CityGML Buildings
+
+By using the `--Buildings` option, the validator will--instead of search for specific 3D primitives--validate each CityGML `Building`, and produce a report per building.
+Every 3D primitive of a building will be validated (be it a `Solid`, `CompositeSolid`, or MultiSurface`) and included in the report.
+Furthermore, if a building is composed of `BuildingPart`, then the topological relationships between all the parts are analysed to ensure that they do not overlap (technically that the interior of each part does not intersect with the interior of any other part).
+
+
 ## Web application
 
 If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
@@ -72,7 +79,7 @@ To execute val3dity and see its options:
 
     $ ./val3dity --help
     
-To validate all the solids in a GML or CityGML file and see a summary output:
+To validate all the `<gml:Solid>` in a GML or CityGML file and see a summary output:
 
     $ ./val3dity input.gml
 
@@ -82,9 +89,16 @@ For a full report in XML format:
 
     $ ./val3dity input.gml -r myreport.xml
 
-To validate all the MultiSurfaces in a GML or CityGML file:
+To validate other 3D primitives use the `-p` option:
 
-    $ ./val3dity input.gml -p MS
+  - `-p MultiSurface`
+  - `-p CompositeSurface`
+  - `-p MultiSolid`
+  - `-p CompositeSolid`
+
+eg:
+
+    $ ./val3dity ./data/gml/csol2.gml -p CompositeSolid
 
 
 Other formats can also be used as input, the 3D primitives will then be validated according to the ISO19107 definitions:
@@ -92,9 +106,9 @@ Other formats can also be used as input, the 3D primitives will then be validate
   1. OBJ: a file can contain more than 1 object (lines starting with "o", eg `o myobject`), each will be validated individually
   1. [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly), there are several examples of test datasets in the folder `data/poly/`, see the `README.txt`
 
-In an OBJ file, each primitive will be validated according to the ISO 19107 rules. 
+In an OBJ file, each primitive will be validated according to the ISO19107 rules. 
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
-Validating one primitive in an OBJ as a MultiSurface (`-p MS` option) will validate individually each surface according to the ISO 19107 rules, without ensuring that they form a 2-manifold.
+Validating one primitive in an OBJ as a MultiSurface (`-p MultSurface` option) will validate individually each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
 If your OBJ contains only be triangles (often the case), then using the option `-p MS` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (error `309: VERTICES_NOT_USED`), cases where triangles are collapsed to a line/point.
 Validating it as a solid verify whether the primitive is a 2-manifold, ie whether it is closed/watertight and whether all normals are pointing outwards.
 
@@ -110,15 +124,16 @@ It is possible to define 2 tolerances for the planarity of surfaces with the fla
 
 Similarly, the input points in a GML files are snapped together using a tolerance, which can be changed with `--snap_tolerance` (default is 1mm).
 
-It is also possible to consider `Buildings` in a CityGML file when reporting, ie each primitive is validated individually and also a summary of the `Buildings` (which can contain several Solids and/or MultiSurfaces) is given.
-In this case, each primitive in the report have the ID of the Building they represent.
-It should be noticed that primitives not used for representing a `Building` is ignored when the flag `-B` is used.
+For the validation of the topological relationships between Solids forming a CompositeSolid, or the different `BuildingParts` of a building, one can define a tolerance.
+This is used to prevent the validator reporting that 2 parts of a building overlap, while they are simply overlapping by 0.1mm for instance.
+The tolerance `--overlap_tolerance 0.05` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating.
+Its default is 0.0unit.
+Observe that using an overlap tolerance significantly reduces the speed of the validator, as rather complex geometric operations are performed.
 
-    $ ./val3dity input.gml -B 
+To validate only the buildings in a CityGML file (and ignore all the rest), and to obtain a report where each building has its ID and its error:
 
-One could also do the same but for `Buildings` represented as `MultiSurface`:
+    $ ./val3dity input.gml -B --overlap-tolerance 0.01 -r myreport.xml
 
-    $ ./val3dity input.gml -B -p MS
 
 ## Error reported 
 
