@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -110,7 +110,7 @@ int main(int argc, char* const argv[])
     TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only; more than one possible)", false, "string");
     TCLAP::ValueArg<std::string>           report("r", "report", "output report in XML format", false, "", "string");
     TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
-    TCLAP::SwitchArg                       buildings("B", "Buildings", "validate only CityGML Buildings", false);
+    TCLAP::SwitchArg                       buildings("B", "Buildings", "validate all 3D primitives of CityGML Buildings (including BuidingParts), skips the rest, and report per building", false);
     TCLAP::SwitchArg                       info("i", "info", "prints information about the file", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
