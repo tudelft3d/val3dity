@@ -568,7 +568,7 @@ void print_information(std::string &ifile)
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) 
   {
-    std::cout << "Input file not found." << std::endl;
+    std::cout << "Input file not found and/or incorrect GML file." << std::endl;
     return;
   }
   //-- parse namespace
