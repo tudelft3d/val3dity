@@ -605,34 +605,7 @@ void report_building(pugi::xml_document& doc, std::map<std::string, std::string>
   print_info_aligned("BuildingPart", nobuildingparts);
   s = "//" + ns["building"] + "BuildingPart" + "[@" + ns["gml"] + "id]";
   print_info_aligned("with gml:id", doc.select_nodes(s.c_str()).size(), true);
-  
-  std::cout << "LOD0" << std::endl;
-  int total_footprint = 0;
-  int total_roofedge = 0;
-  s = "//" + ns["building"] + "Building";
-  pugi::xpath_node_set nb = doc.select_nodes(s.c_str());
-  for (auto& b : nb) {
-    std::string s1 = ".//" + ns["building"] + "lod0FootPrint";
-    pugi::xpath_node_set tmp = b.node().select_nodes(s1.c_str());
-    if (tmp.empty() == false) {
-      for (auto& nbp : tmp) {
-        total_footprint++;
-        break;
-      }
-    }
-    s1 = ".//" + ns["building"] + "lod0RoofEdge";
-    tmp = b.node().select_nodes(s1.c_str());
-    if (tmp.empty() == false) {
-      for (auto& nbp : tmp) {
-        total_roofedge++;
-        break;
-      }
-    }
-  }
-  print_info_aligned("Building with FootPrint", total_footprint, true);
-  print_info_aligned("Building with RoofEdge", total_roofedge, true);
-  
-  for (int lod = 1; lod <= 4; lod++) {
+  for (int lod = 1; lod <= 3; lod++) {
     std::cout << "LOD" << lod << std::endl;
     int totals = 0;
     int totalms = 0;
@@ -642,13 +615,10 @@ void report_building(pugi::xml_document& doc, std::map<std::string, std::string>
     print_info_aligned("Building stored in gml:MultiSurface", totalms, true);
     print_info_aligned("Building with semantics for surfaces", totalsem, true);
   }
+  std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 }
 
 void print_info_aligned(std::string o, size_t number, bool tab) {
-  // boost::locale::generator gen;
-  // std::locale loc = gen("en_US.UTF-8");
-  // std::locale::global(loc);
-  // std::cout.imbue(loc);
   if (tab == false)
     std::cout << std::setw(40) << std::left  << o;
   else
