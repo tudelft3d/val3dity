@@ -25,6 +25,7 @@
 */
 
 #include "validate_shell.h"
+#include <CGAL/Polygon_mesh_processing/orientation.h>
 
 
 //-- CGAL stuff
@@ -34,6 +35,7 @@ typedef K::Segment_3                            Segment;
 typedef CgalPolyhedron::Halfedge_const_handle   Halfedge_const_handle;
 typedef CgalPolyhedron::Facet_const_iterator    Facet_const_iterator;
 typedef CgalPolyhedron::Facet_const_handle      Facet_const_handle;
+
 
 
 CgalPolyhedron* construct_CgalPolyhedron_incremental(vector< vector<int*> > *lsTr, vector<Point3> *lsPts, Shell* sh)
@@ -324,87 +326,9 @@ void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HD
   return ;
 } 
 
-
-//problematic
 bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter)
 {
-	//-- get a 'convex corner', sorting order is x-y-z
-	CgalPolyhedron::Vertex_iterator vIt;
-	vIt = p->vertices_begin();
-	CgalPolyhedron::Vertex_handle cc = vIt;
-	vIt++;
-
-	for ( ; vIt != p->vertices_end(); vIt++)
-	{
-		if (vIt->point().x() > cc->point().x())
-			cc = vIt;
-		else if (vIt->point().x() == cc->point().x())
-		{
-			if (vIt->point().y() > cc->point().y())
-				cc = vIt;
-			else if (vIt->point().y() == cc->point().y())
-			{
-				if (vIt->point().z() > cc->point().z())
-					cc = vIt;
-			}
-		}
-	}
-	//  cout << "CONVEX CORNER IS: " << cc->point() << endl;
-	CgalPolyhedron::Halfedge_handle curhe = cc->halfedge();
-	CgalPolyhedron::Halfedge_handle otherhe;
-	otherhe = curhe->opposite()->next();
-	CGAL::Orientation orient = orientation( curhe->vertex()->point(),
-	                                        curhe->next()->vertex()->point(),
-	                                        curhe->next()->next()->vertex()->point(),
-	                                        otherhe->vertex()->point() );
-	while (orient == CGAL::COPLANAR)
-	{
-	   otherhe = otherhe->next()->opposite()->next();
-	   if (otherhe->next() == curhe->next()->opposite())
-	   {
-		    //finished the traverse
-		   break;
-	   }
-	   orient = orientation( curhe->vertex()->point(),
-	                         curhe->next()->vertex()->point(),
-	                         curhe->next()->next()->vertex()->point(),
-	                         otherhe->vertex()->point() );
-  }
-	if ( ((bOuter == true) && (orient != CGAL::CLOCKWISE)) || ((bOuter == false) && (orient != CGAL::COUNTERCLOCKWISE)) ) 
-		  return false;
-	else
-		  return true;
-
-	//revised by John to check whether the normals of the star of the vertex point to the "peak" direction
-	/*bool bOrient = true;
-	CgalPolyhedron::Halfedge_around_vertex_circulator hcir = curhe->vertex()->vertex_begin();
-	int iNum = CGAL::circulator_size(hcir);
-	Vector x_direction(1.0, 1.0, 1.0);
-
-	for(int i = 0 ; i < iNum; ++i)
-	{
-	CgalPolyhedron::Plane_3 plane = CgalPolyhedron::Plane_3(hcir->vertex()->point(),
-	hcir->next()->vertex()->point(),
-	hcir->next()->next()->vertex()->point());
-
-	cout<<x_direction * plane.orthogonal_vector()<<endl;
-	cout<<hcir->vertex()->point()<<", "<<
-	hcir->next()->vertex()->point()<<", "<<
-	hcir->next()->next()->vertex()->point()<<endl;
-
-	if (CGAL::compare(x_direction * plane.orthogonal_vector(), 0.0) == CGAL::SMALLER)
-	{
-	bOrient  = false;
-	break;
-	}
-
-	++hcir;
-	}
-
-	if ( ((bOuter == true) && (bOrient)) || ((bOuter == false) && (!bOrient)) ) 
-	return true;
-	else
-	return false;*/
+  return CGAL::Polygon_mesh_processing::is_outward_oriented(*p);
 }
 
 
