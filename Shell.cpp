@@ -29,6 +29,7 @@
 #include "input.h"
 #include "validate_shell.h"
 #include "validate_shell_intersection.h"
+#include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <geos_c.h>
 #include <sstream>
 
@@ -665,8 +666,28 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
   std::clog << "--Geometrical consistency" << std::endl;
-  if (is_polyhedron_geometrically_consistent(this) == false)
+  if (CGAL::Polygon_mesh_processing::does_self_intersect(*_polyhedron) == true)
+  {
+    std::vector<std::pair<CgalPolyhedron::Facet_const_handle, CgalPolyhedron::Facet_const_handle> > intersected_tris;
+    CGAL::Polygon_mesh_processing::self_intersections(*_polyhedron, std::back_inserter(intersected_tris));
+    std::set<CgalPolyhedron::Facet_const_handle> uniquetr;
+    for (auto& each : intersected_tris)
+    {
+      uniquetr.insert(each.first);
+      uniquetr.insert(each.second);
+    }
+    std::cout << uniquetr.size() << std::endl;
+    for (auto& each : intersected_tris)
+    {
+      std::stringstream st;
+      st << "Location: (" 
+      << (each.first)->halfedge()->vertex()->point().x() << ", " 
+      << (each.first)->halfedge()->vertex()->point().y() << ", " 
+      << (each.first)->halfedge()->vertex()->point().z() << ")"; 
+      this->add_error(306, "", st.str());
+    }
     return false;
+  }
   return true;
 }
 
