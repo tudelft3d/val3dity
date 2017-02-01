@@ -83,6 +83,7 @@ private:
   bool has_face_rings_toofewpoints(const vector< vector<int> >& theface);
   bool has_face_2_consecutive_repeated_pts(const vector< vector<int> >& theface);
 
+  bool does_self_intersect();
 };
 
 
