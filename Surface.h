@@ -35,6 +35,7 @@ public:
   void   get_min_bbox(double& x, double& y);
   int    get_id();
 
+  bool   does_self_intersect();
   bool   is_empty();
   int    add_point(Point3 p);
   void   add_face(std::vector< std::vector<int> > f, std::string id = "");

@@ -567,7 +567,7 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
 }
 
 
-bool Shell::does_self_intersect()
+bool Surface::does_self_intersect()
 {
   if (CGAL::Polygon_mesh_processing::does_self_intersect(*_polyhedron) == true)
   {
@@ -668,7 +668,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
     return false;
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
-  std::clog << "--Geometrical consistency" << std::endl;
+  std::clog << "-----Geometrical consistency" << std::endl;
   if (does_self_intersect() == false)
     return false;
   return true;
