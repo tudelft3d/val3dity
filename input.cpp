@@ -1065,7 +1065,6 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
       {
-//        Solid* sol = new Solid(OBJ);
         Solid* sol = new Solid();
         sol->set_oshell(sh);
         lsSolids.push_back(sol);
@@ -1090,14 +1089,12 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
           Point3* tp = allvertices[std::stoi(tmp.substr(0, k)) - 1];
           r.push_back(sh->add_point(*tp));
         }
-        
       }
       std::vector< std::vector<int> > pgnids;
       pgnids.push_back(r);
       sh->add_face(pgnids);
     }
   }
-//  Solid* s = new Solid(OBJ);
   Solid* s = new Solid();
   s->set_oshell(sh);
   lsSolids.push_back(s);
