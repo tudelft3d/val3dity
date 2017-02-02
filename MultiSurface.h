@@ -28,6 +28,9 @@ public:
   std::string get_report_xml();
   std::string get_type();
 
+  void          get_min_bbox(double& x, double& y);
+  void          translate_vertices(double minx, double miny);
+
   int           number_faces();
   bool          set_surface(Surface* s);
   Surface*      get_surface();

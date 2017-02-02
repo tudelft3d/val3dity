@@ -28,7 +28,8 @@ public:
   virtual std::string   get_report_xml() = 0;
   virtual std::string   get_type() = 0;
 
-  // virtual void          translate_vertices() = 0;
+  virtual void          get_min_bbox(double& x, double& y) = 0;
+  virtual void          translate_vertices(double minx, double miny) = 0;
 
   std::string           get_id();
   void                  set_id(std::string id);

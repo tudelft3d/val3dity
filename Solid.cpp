@@ -76,19 +76,26 @@ bool Solid::is_empty()
 }
 
 
-void Solid::translate_vertices()
+void Solid::get_min_bbox(double& x, double& y)
 {
+  double tmpx, tmpy;
   double minx = 9e10;
   double miny = 9e10;
   for (auto& sh : _shells)
   {
-    double tx, ty;
-    sh->get_min_bbox(tx, ty);
-    if (tx < minx)
-      minx = tx;
-    if (ty < miny)
-      miny = ty;
+    sh->get_min_bbox(tmpx, tmpy);
+    if (tmpx < minx)
+      minx = tmpx;
+    if (tmpy < miny)
+      miny = tmpy;
   }
+  x = minx;
+  y = miny;
+}
+
+
+void Solid::translate_vertices(double minx, double miny)
+{
   for (auto& sh : _shells)
     sh->translate_vertices(minx, miny);
 }

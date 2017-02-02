@@ -51,7 +51,8 @@ public:
  
   bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   Nef_polyhedron* get_nef_polyhedron();
-  void            translate_vertices();
+  void            get_min_bbox(double& x, double& y);
+  void            translate_vertices(double minx, double miny);
   std::string     get_report_xml();
   std::string     get_poly_representation();
   int             is_valid();
