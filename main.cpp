@@ -119,13 +119,11 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
 
-    cmd.add(qie);
+    cmd.xorAdd(primitives, buildings);
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
     cmd.add(overlap_tolerance);
-    cmd.add(primitives);
-    cmd.add(buildings);
     cmd.add(verbose);
     cmd.add(info);
     cmd.add(unittests);
@@ -133,6 +131,7 @@ int main(int argc, char* const argv[])
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
+    cmd.add(qie);
     cmd.parse( argc, argv );
 
     if (info.getValue() == true)
