@@ -677,7 +677,6 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
 
 bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid)
 {
-  // TODO: need to init GEOS and "close" it each time? I guess not...
   initGEOS(NULL, NULL);
   //-- check the orientation of the rings: oring != irings
   //-- we don't care about CCW or CW at this point, just opposite is important
