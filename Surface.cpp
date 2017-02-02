@@ -11,7 +11,7 @@
 #include "geomtools.h"
 #include "input.h"
 #include "validate_shell.h"
-#include "validate_shell_intersection.h"
+#include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <geos_c.h>
 #include <sstream>
 
@@ -561,9 +561,37 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
   }
 //-- 2. Geometrical consistency (aka intersection tests between faces)
   std::clog << "--Geometrical consistency" << std::endl;
-  if (is_polyhedron_geometrically_consistent(this) == false)
+  if (does_self_intersect() == false)
     return false;
-  // std::cout << _polyhedron << std::endl;
+  return true;
+}
+
+
+bool Surface::does_self_intersect()
+{
+  if (CGAL::Polygon_mesh_processing::does_self_intersect(*_polyhedron) == true)
+  {
+    std::vector<std::pair<CgalPolyhedron::Facet_const_handle, CgalPolyhedron::Facet_const_handle> > intersected_tris;
+    CGAL::Polygon_mesh_processing::self_intersections(*_polyhedron, std::back_inserter(intersected_tris));
+    std::set<CgalPolyhedron::Facet_const_handle> uniquetr;
+    for (auto& each : intersected_tris)
+    {
+      uniquetr.insert(each.first);
+      uniquetr.insert(each.second);
+    }
+    for (auto& each : uniquetr)
+    {
+      //-- report the triangle centroid, as an approximation of the intersection
+      //-- faster and less error-prone than reporting exact location
+      Point3 c = CGAL::centroid(each->halfedge()->vertex()->point(),
+                                each->halfedge()->next()->vertex()->point(),
+                                each->halfedge()->next()->next()->vertex()->point()); 
+      std::stringstream st;
+      st << "Location close to: (" << c << ")"; 
+      this->add_error(306, "", st.str());
+    }
+    return false;
+  }
   return true;
 }
 
@@ -641,7 +669,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
   std::clog << "-----Geometrical consistency" << std::endl;
-  if (is_polyhedron_geometrically_consistent(this) == false)
+  if (does_self_intersect() == false)
     return false;
   return true;
 }

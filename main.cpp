@@ -72,8 +72,6 @@ public:
     std::cout << "\t\tValidates each CityGML Buildings in input.gml and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.obj" << std::endl;
     std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
-    // std::cout << "\tval3dity input.gml -B -p MS" << std::endl;
-    // std::cout << "\t\tValidates each building represented with gml:MultiSurface and outputs a summary" << std::endl;
     std::cout << "\tval3dity input.gml --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation of the solids is printed out" << std::endl;
     std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
