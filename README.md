@@ -81,13 +81,13 @@ To execute val3dity and see its options:
     
 To validate all the `<gml:Solid>` in a GML or CityGML file and see a summary output:
 
-    $ ./val3dity input.gml
+    $ ./val3dity input.gml -p Solid
 
 Each `<gml:Solid>` in the file will be individually validated and a summary report will be output. 
 
 For a full report in XML format:
 
-    $ ./val3dity input.gml -r myreport.xml
+    $ ./val3dity input.gml -p Solid -r myreport.xml
 
 To validate other 3D primitives use the `-p` option:
 

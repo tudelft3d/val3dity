@@ -63,25 +63,22 @@ public:
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
-    std::cout << "\tval3dity input.gml" << std::endl;
+    std::cout << "\tval3dity input.gml -p Solid" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
+    std::cout << "\tval3dity input.gml -p Solid -r report.xml" << std::endl;
     std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity input.gml -p CompositeSolid --overlap_tolerance 0.05" << std::endl;
     std::cout << "\t\tValidates each gml:CompositeSolid in input.gml and outputs a summary. A tolerance of 0.05 unit is used." << std::endl;
     std::cout << "\tval3dity input.gml -B" << std::endl;
     std::cout << "\t\tValidates each CityGML Buildings in input.gml and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.obj" << std::endl;
-    std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml --verbose" << std::endl;
+    std::cout << "\tval3dity input.gml -p MultiSolid --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation of the solids is printed out" << std::endl;
-    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
+    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly -p Solid" << std::endl;
     std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl;
-    std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
+    std::cout << "\tval3dity input.gml -p Solid --snap_tolerance 0.1" << std::endl;
     std::cout << "\t\tThe vertices in gml:Solid closer than 0.1unit are snapped together" << std::endl;
-    std::cout << "\tval3dity input.gml --planarity_d2p 0.1" << std::endl;
-    std::cout << "\t\tValidates each gml:Solid in input.gml" << std::endl;
-    std::cout << "\t\tand uses a tolerance of 0.1unit (distance point-to-fitted-plane)" << std::endl;
+    std::cout << "\tval3dity input.gml --info" << std::endl;
+    std::cout << "\t\tOutputs information about the GML file (no validation performed)." << std::endl;
   }
 };
 
@@ -101,7 +98,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("CompositeSurface");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "1.2");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "2.0 beta 1");
   MyOutput my;
   cmd.setOutput(&my);
   try {
