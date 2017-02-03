@@ -65,7 +65,7 @@ Solid::Solid(Shell* sh)
 
 Solid::~Solid()
 {
-  // std::clog << "DESTRUCTOR SOLIDS" << std::endl;
+  // STDLOG("DESTRUCTOR SOLIDS" << std::endl);
   // for (auto& sh : _shells)
   // {
     // delete sh;
@@ -286,22 +286,22 @@ void Solid::add_error(int code, int shell1, int shell2, std::string info)
 {
   std::tuple<int, int, std::string> a(shell1, shell2, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  STDLOG("\tERROR " << code << ": " << errorcode2description(code));
   if (shell2 == -1)
-    std::clog << " (shell: #" << shell1 << ")" << std::endl;
+    STDLOG(" (shell: #" << shell1 << ")" << std::endl);
   else
-    std::clog << " (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl;
+    STDLOG(" (shells: #" << shell1 << " & #" << shell2 << ")" << std::endl);
   if (info.empty() == false)
-    std::clog << "\t[" << info << "]" << std::endl;
+    STDLOG("\t[" << info << "]" << std::endl);
 }
 
 
 bool Solid::validate_solid_with_nef()
 {
   bool isValid = true;
-  std::clog << "----- Solid validation -----" << std::endl;
+  STDLOG("----- Solid validation -----" << std::endl);
   //-- check orientation of the normals is outwards or inwards
-  std::clog << "--Global orientation of normals" << std::endl;
+  STDLOG("--Global orientation of normals" << std::endl);
   int i = 0;
   for (auto& sh : this->get_shells())
   {
@@ -318,7 +318,7 @@ bool Solid::validate_solid_with_nef()
   if (this->num_ishells() == 0)
     return true;
     
-  std::clog << "--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
+  STDLOG("--Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl);
   vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {

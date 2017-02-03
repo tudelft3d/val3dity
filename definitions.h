@@ -78,4 +78,12 @@ typedef enum
   OTHER = 3,
 } InputTypes;
 
+#ifndef VAL3DITY_DISABLE_LOGGING
+#define STDOUT(x) do{ std::cout << x; } while(0)
+#define STDLOG(x) do{ std::clog << x; } while(0)
+#else
+#define STDOUT(x) do{} while(0)
+#define STDLOG(x) do{} while(0)
+#endif
+
 #endif

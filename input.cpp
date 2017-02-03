@@ -37,7 +37,7 @@ bool IOErrors::has_errors()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  std::clog << "--> errors #" << code << " : " << info << std::endl;
+  STDLOG("--> errors #" << code << " : " << info << std::endl);
 }
 
 
@@ -395,7 +395,7 @@ void process_gml_building(vector<Solid*>& lsSolids, pugi::xpath_node nbuilding, 
 
 void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim, bool buildings, IOErrors& errs, double tol_snap, int& nobuildings)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
+  STDOUT("Reading file: " << ifile << std::endl);
   pugi::xml_document doc;
   if (!doc.load_file(ifile.c_str())) 
   {
@@ -413,14 +413,14 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
     s += localise("MultiSurface");
   pugi::xpath_query myquery(s.c_str());
   pugi::xpath_node_set nsolids = myquery.evaluate_node_set(doc);
-  std::cout << "Parsing the file..." << std::endl;
+  STDOUT("Parsing the file..." << std::endl);
   if (prim == SOLID)
-    std::cout << "# of <gml:Solid> found: ";
+    STDOUT("# of <gml:Solid> found: ");
   else if (prim == COMPOSITESURFACE)
-    std::cout << "# of <gml:CompositeSurface> found: ";
+    STDOUT("# of <gml:CompositeSurface> found: ");
   else 
-    std::cout << "# of <gml:MultiSurface> found: ";
-  std::cout << nsolids.size() << std::endl;
+    STDOUT("# of <gml:MultiSurface> found: ");
+  STDOUT(nsolids.size() << std::endl);
 
   //-- CityGML Buildings
   pugi::xpath_node_set nbuildings;
@@ -429,7 +429,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
     s = "//" + localise("Building");
     nbuildings = doc.select_nodes(s.c_str());
     nobuildings = nbuildings.size();
-    std::cout << "# of CityGML Buildings found: " << nbuildings.size() << std::endl;
+    STDOUT("# of CityGML Buildings found: " << nbuildings.size() << std::endl);
   }
 
   //-- build dico of xlinks
@@ -437,7 +437,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
   s = "//" + localise("Polygon") + "[@" + localise("id") + "]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
-   std::cout << "XLinks found, resolving them..." << std::flush;
+   STDOUT("XLinks found, resolving them..." << std::flush);
   map<std::string, pugi::xpath_node> dallpoly;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
   {
@@ -470,7 +470,7 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
     }
   }
   if (nallpoly.size() > 0)
-    std::cout << "done." << std::endl;
+    STDOUT("done." << std::endl);
   if (buildings == true) 
   {
     for (auto& nbuilding: nbuildings)
@@ -486,13 +486,13 @@ void readGMLfile(std::vector<Solid*>& lsSolids, string &ifile, Primitive3D prim,
       lsSolids.push_back(sol);
     }
   }
-  std::cout << "Input file correctly parsed without errors." << std::endl;
+  STDOUT("Input file correctly parsed without errors." << std::endl);
 }
 
 
 Shell* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
 {
-  std::clog << "Reading file: " << ifile << std::endl;
+  STDLOG("Reading file: " << ifile << std::endl);
   std::stringstream st;
   ifstream infile(ifile.c_str(), ifstream::in);
   if (!infile)
@@ -591,22 +591,22 @@ void printProgressBar(int percent) {
       bar.replace(i, 1, " ");
     }
   }
-  std::cout << "\r" "[" << bar << "] ";
+  STDOUT("\r" "[" << bar << "] ");
   std::cout.width(3);
-  std::cout << percent << "%     " << std::flush;
+  STDOUT(percent << "%     " << std::flush);
 }
 
 
 void readOBJfile(std::vector<Solid*>& lsSolids, std::string &ifile, IOErrors& errs, double tol_snap)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
+  STDOUT("Reading file: " << ifile << std::endl);
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
   if (!infile)
   {
     errs.add_error(901, "Input file not found.");
     return;
   }
-  std::cout << "Parsing the file..." << std::endl; 
+  STDOUT("Parsing the file..." << std::endl); 
   Shell* sh = new Shell(0, tol_snap);
   std::string l;
   std::vector<Point3*> allvertices;
