@@ -26,7 +26,7 @@ public:
   int           is_valid();
   bool          is_empty();
   std::string   get_report_xml();
-  std::string   get_type();
+  Primitive3D   get_type();
   std::set<int> get_unique_error_codes();
 
   void          get_min_bbox(double& x, double& y);

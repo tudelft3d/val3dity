@@ -26,7 +26,7 @@ public:
   int         is_valid();
   bool        is_empty();
   std::string get_report_xml();
-  std::string get_type();
+  Primitive3D get_type();
 
   void          get_min_bbox(double& x, double& y);
   void          translate_vertices(double minx, double miny);

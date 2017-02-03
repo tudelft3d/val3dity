@@ -22,9 +22,9 @@ Surface* Solid::get_oshell()
   return _shells[0];
 }
 
-std::string Solid::get_type() 
+Primitive3D Solid::get_type() 
 {
-  return "Solid";
+  return SOLID;
 }
 
 void Solid::set_oshell(Surface* sh)

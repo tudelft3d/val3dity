@@ -334,7 +334,18 @@ int main(int argc, char* const argv[])
             printProgressBar(100 * (i / double(lsPrimitives.size())));
           i++;
           std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
-          std::clog << "type: " << s->get_type() << std::endl;
+          std::clog << "type: ";
+          Primitive3D prim3d = s->get_type();
+          if (prim3d == SOLID)
+            std::clog << "Solid" << std::endl;
+          else if (prim3d == COMPOSITESOLID)
+            std::clog << "CompositeSolid" << std::endl;
+          else if (prim3d == MULTISOLID)
+            std::clog << "MultiSolid" << std::endl;
+          else if (prim3d == MULTISURFACE)
+            std::clog << "MultiSurface" << std::endl;
+          else if (prim3d == COMPOSITESURFACE)
+            std::clog << "CompositeSurface" << std::endl;
           if (s->get_id() != "")
             std::clog << "id: " << s->get_id() << std::endl;
           if (s->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)

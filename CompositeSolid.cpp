@@ -22,9 +22,9 @@ CompositeSolid::~CompositeSolid()
 {}
 
 
-std::string CompositeSolid::get_type() 
+Primitive3D CompositeSolid::get_type() 
 {
-  return "CompositeSolid";
+  return COMPOSITESOLID;
 }
 
 

@@ -53,9 +53,9 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
     { 
       Primitive* p = _lsPrimitives[0];
       Nef_polyhedron* tmpnef;
-      if (p->get_type() == "Solid")
+      if (p->get_type() == SOLID)
         tmpnef = dynamic_cast<Solid*>(p)->get_nef_polyhedron();
-      else if (p->get_type() == "CompositeSolid")
+      else if (p->get_type() == COMPOSITESOLID)
         tmpnef = dynamic_cast<CompositeSolid*>(p)->get_nef_polyhedron();
       if (nefB != NULL)
       {
@@ -75,9 +75,9 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
       for (auto& p : bp->get_primitives())
       {
         Nef_polyhedron* tmpnef;
-        if (p->get_type() == "Solid")
+        if (p->get_type() == SOLID)
           tmpnef = dynamic_cast<Solid*>(p)->get_nef_polyhedron();
-        else if (p->get_type() == "CompositeSolid")
+        else if (p->get_type() == COMPOSITESOLID)
           tmpnef = dynamic_cast<CompositeSolid*>(p)->get_nef_polyhedron();
         else
           continue;
@@ -202,7 +202,7 @@ int Building::get_number_solids()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "Solid")
+    if (p->get_type() == SOLID)
       t++;
   for (auto& bp : _lsBP)
     t += bp->get_number_solids();
@@ -213,7 +213,7 @@ int Building::get_number_compositesolids()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "CompositeSolid")
+    if (p->get_type() == COMPOSITESOLID)
       t++;
   for (auto& bp : _lsBP)
     t += bp->get_number_compositesolids();  
@@ -224,7 +224,7 @@ int Building::get_number_multisurfaces()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "MultiSurface")
+    if (p->get_type() == MULTISURFACE)
       t++;
   for (auto& bp : _lsBP)
     t += bp->get_number_multisurfaces();
@@ -415,7 +415,7 @@ int BuildingPart::get_number_solids()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "Solid")
+    if (p->get_type() == SOLID)
       t++;
   return t;
 }
@@ -424,7 +424,7 @@ int BuildingPart::get_number_compositesolids()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "CompositeSolid")
+    if (p->get_type() == COMPOSITESOLID)
       t++;
   return t;
 }
@@ -433,7 +433,7 @@ int BuildingPart::get_number_multisurfaces()
 {
   int t = 0;
   for (auto& p : _lsPrimitives)
-    if (p->get_type() == "MultiSurface")
+    if (p->get_type() == MULTISURFACE)
       t++;
   return t;
 }

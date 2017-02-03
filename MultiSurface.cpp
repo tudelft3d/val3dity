@@ -36,9 +36,9 @@ bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_norma
 }
 
 
-std::string MultiSurface::get_type() 
+Primitive3D MultiSurface::get_type() 
 {
-  return "MultiSurface";
+  return MULTISURFACE;
 }
 
 int MultiSurface::is_valid() {

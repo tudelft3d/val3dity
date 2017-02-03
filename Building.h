@@ -9,6 +9,7 @@
 #ifndef Building_h
 #define Building_h
 
+#include "definitions.h"
 #include "Primitive.h"
 #include <string>
 #include <vector>

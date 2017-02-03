@@ -9,7 +9,7 @@
 #ifndef Primitive_h
 #define Primitive_h
 
-
+#include "definitions.h"
 #include <map>
 #include <vector>
 #include <set>
@@ -26,7 +26,7 @@ public:
   virtual int           is_valid() = 0;
   virtual bool          is_empty() = 0;
   virtual std::string   get_report_xml() = 0;
-  virtual std::string   get_type() = 0;
+  virtual Primitive3D   get_type() = 0;
 
   virtual void          get_min_bbox(double& x, double& y) = 0;
   virtual void          translate_vertices(double minx, double miny) = 0;

@@ -19,9 +19,9 @@ MultiSolid::MultiSolid(std::string id) {
 MultiSolid::~MultiSolid() {
 }
 
-std::string MultiSolid::get_type() 
+Primitive3D MultiSolid::get_type() 
 {
-  return "MultiSolid";
+  return MULTISOLID;
 }
 
 bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
