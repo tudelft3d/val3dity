@@ -112,7 +112,7 @@ int main(int argc, char* const argv[])
     TCLAP::SwitchArg                       info("i", "info", "prints information about the file", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
-    TCLAP::SwitchArg                       translate("", "translate", "translate to (minx, miny)", false);
+    TCLAP::SwitchArg                       notranslate("", "notranslate", "do not translate to (minx, miny)", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE error codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
@@ -128,7 +128,7 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
-    cmd.add(translate);
+    cmd.add(notranslate);
     cmd.add(overlap_tolerance);
     cmd.add(verbose);
     cmd.add(unittests);
@@ -261,23 +261,39 @@ int main(int argc, char* const argv[])
       }
     }
 
-    if (translate.getValue() == true)
+    if (notranslate.getValue() == false)
     {
       //-- translate all vertices to avoid potential problems
       double tmpx, tmpy;
       double minx = 9e10;
       double miny = 9e10;
-      for (auto& p : lsPrimitives)
+      if (buildings.getValue() == true)
       {
-        p->get_min_bbox(tmpx, tmpy);
-        if (tmpx < minx)
-          minx = tmpx;
-        if (tmpy < miny)
-          miny = tmpy;
+        for (auto& b : lsBuildings)
+        {
+          b->get_min_bbox(tmpx, tmpy);
+          if (tmpx < minx)
+            minx = tmpx;
+          if (tmpy < miny)
+            miny = tmpy;
+        }
+        for (auto& b : lsBuildings)
+          b->translate_vertices(minx, miny);
       }
-      std::cout << "min: " << minx << " | " << miny << std::endl;
-      for (auto& p : lsPrimitives)
-        p->translate_vertices(minx, miny);
+      else 
+      {
+        for (auto& p : lsPrimitives)
+        {
+          p->get_min_bbox(tmpx, tmpy);
+          if (tmpx < minx)
+            minx = tmpx;
+          if (tmpy < miny)
+            miny = tmpy;
+        }
+        for (auto& p : lsPrimitives)
+          p->translate_vertices(minx, miny);
+      }
+      std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
     }
     
     //-- now the validation starts
