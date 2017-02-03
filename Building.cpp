@@ -129,6 +129,47 @@ bool Building::validate(double tol_planarity_d2p, double tol_planarity_normals, 
 }
 
 
+void Building::translate_vertices(double minx, double miny)
+{
+  for (auto& p : _lsPrimitives)
+    p->translate_vertices(minx, miny);
+  for (auto& bp : _lsBP)
+  {
+    for (auto& p : bp->get_primitives())
+      p->translate_vertices(minx, miny);
+  }
+}
+
+
+void Building::get_min_bbox(double& x, double& y)
+{
+  double tmpx, tmpy;
+  double minx = 9e10;
+  double miny = 9e10;
+  for (auto& p : _lsPrimitives)
+  {
+    p->get_min_bbox(tmpx, tmpy);
+    if (tmpx < minx)
+      minx = tmpx;
+    if (tmpy < miny)
+      miny = tmpy;
+  }
+  for (auto& bp : _lsBP)
+  {
+    for (auto& p : bp->get_primitives())
+    {
+      p->get_min_bbox(tmpx, tmpy);
+      if (tmpx < minx)
+        minx = tmpx;
+      if (tmpy < miny)
+        miny = tmpy;
+    }
+  }
+  x = minx;
+  y = miny;
+}
+
+
 void Building::add_error(int code, std::string whichgeoms, std::string info)
 {
   _is_valid = 0;

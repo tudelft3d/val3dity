@@ -31,6 +31,7 @@ public:
   int           get_number_compositesolids();
   int           get_number_multisurfaces();
 
+
   void          add_primitive(Primitive* p);
 
   std::vector<Primitive*>&   get_primitives();
@@ -63,6 +64,8 @@ public:
   int           get_number_solids();
   int           get_number_compositesolids();
   int           get_number_multisurfaces();
+  void          get_min_bbox(double& x, double& y);
+  void          translate_vertices(double minx, double miny);
   
   void          add_buildingpart(BuildingPart* bp);
   int           get_number_buildingparts();

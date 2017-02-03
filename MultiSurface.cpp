@@ -53,6 +53,18 @@ int MultiSurface::is_valid() {
     return _is_valid;
 }
 
+
+void MultiSurface::get_min_bbox(double& x, double& y)
+{
+  _surface->get_min_bbox(x, y);
+}
+
+
+void MultiSurface::translate_vertices(double minx, double miny)
+{
+    _surface->translate_vertices(minx, miny);
+}
+
 bool MultiSurface::is_empty() {
   return _surface->is_empty();
 }

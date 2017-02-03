@@ -46,6 +46,30 @@ int MultiSolid::is_valid()
 }
 
 
+void MultiSolid::get_min_bbox(double& x, double& y)
+{
+  double tmpx, tmpy;
+  double minx = 9e10;
+  double miny = 9e10;
+  for (auto& s : _lsSolids)
+  {
+    s->get_min_bbox(tmpx, tmpy);
+    if (tmpx < minx)
+      minx = tmpx;
+    if (tmpy < miny)
+      miny = tmpy;
+  }
+  x = minx;
+  y = miny;
+}
+
+
+void MultiSolid::translate_vertices(double minx, double miny)
+{
+  for (auto& s : _lsSolids)
+    s->translate_vertices(minx, miny);
+}
+
 bool MultiSolid::is_empty() 
 {
   return _lsSolids.empty();

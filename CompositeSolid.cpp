@@ -44,6 +44,31 @@ Nef_polyhedron* CompositeSolid::get_nef_polyhedron()
 }
 
 
+void CompositeSolid::get_min_bbox(double& x, double& y)
+{
+  double tmpx, tmpy;
+  double minx = 9e10;
+  double miny = 9e10;
+  for (auto& s : _lsSolids)
+  {
+    s->get_min_bbox(tmpx, tmpy);
+    if (tmpx < minx)
+      minx = tmpx;
+    if (tmpy < miny)
+      miny = tmpy;
+  }
+  x = minx;
+  y = miny;
+}
+
+
+void CompositeSolid::translate_vertices(double minx, double miny)
+{
+  for (auto& s : _lsSolids)
+    s->translate_vertices(minx, miny);
+}
+
+
 bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
   bool isValid = true;

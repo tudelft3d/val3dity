@@ -112,6 +112,7 @@ int main(int argc, char* const argv[])
     TCLAP::SwitchArg                       info("i", "info", "prints information about the file", false);
     TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
     TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
+    TCLAP::SwitchArg                       notranslate("", "notranslate", "do not translate to (minx, miny)", false);
     TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
     TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE error codes", false);
     TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
@@ -119,13 +120,17 @@ int main(int argc, char* const argv[])
     TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
     TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
 
-    cmd.xorAdd(primitives, buildings);
+    vector<TCLAP::Arg*> xorlist;
+    xorlist.push_back(&primitives);
+    xorlist.push_back(&buildings);
+    xorlist.push_back(&info);
+    cmd.xorAdd( xorlist );
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
+    cmd.add(notranslate);
     cmd.add(overlap_tolerance);
     cmd.add(verbose);
-    cmd.add(info);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
@@ -136,7 +141,6 @@ int main(int argc, char* const argv[])
 
     if (info.getValue() == true)
     {
-      std::cout << "(only reporting information about the file, the rest of the options are ignored)" << std::endl;
       print_information(inputfile.getValue());
       return (1);
     }
@@ -215,8 +219,8 @@ int main(int argc, char* const argv[])
           ioerrs.add_error(901, "Invalid GML structure, or that particular (twisted and obscure) construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues");
       }
     }
-   else if (inputtype == POLY)
-   {
+    else if (inputtype == POLY)
+    {
      Solid* s = new Solid;
      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
      if (ioerrs.has_errors() == true)
@@ -239,29 +243,58 @@ int main(int argc, char* const argv[])
        if (ioerrs.has_errors() == false)
          lsPrimitives.push_back(s);
      }
-   }
-   else if (inputtype == OBJ)
-   {
-     readOBJfile(lsPrimitives,
-                 inputfile.getValue(), 
-                 ioerrs, 
-                 snap_tolerance.getValue()
-                );
+    }
+    else if (inputtype == OBJ)
+    {
+      readOBJfile(lsPrimitives,
+                  inputfile.getValue(), 
+                  ioerrs, 
+                  snap_tolerance.getValue());
      if (ioerrs.has_errors() == true) {
        std::cout << "Errors while reading the input file, aborting." << std::endl;
        std::cout << ioerrs.get_report_text() << std::endl;
      }
      if (ishellfiles.getValue().size() > 0)
      {
-       std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-       ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
-     }
-   }
+        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+      }
+    }
 
-    // TODO : translate? tricky with CompositeSolid
-    //-- translate all vertices to avoid potential problems
-    // for (auto& s : lsSolids)
-      // s->translate_vertices();
+    if (notranslate.getValue() == false)
+    {
+      //-- translate all vertices to avoid potential problems
+      double tmpx, tmpy;
+      double minx = 9e10;
+      double miny = 9e10;
+      if (buildings.getValue() == true)
+      {
+        for (auto& b : lsBuildings)
+        {
+          b->get_min_bbox(tmpx, tmpy);
+          if (tmpx < minx)
+            minx = tmpx;
+          if (tmpy < miny)
+            miny = tmpy;
+        }
+        for (auto& b : lsBuildings)
+          b->translate_vertices(minx, miny);
+      }
+      else 
+      {
+        for (auto& p : lsPrimitives)
+        {
+          p->get_min_bbox(tmpx, tmpy);
+          if (tmpx < minx)
+            minx = tmpx;
+          if (tmpy < miny)
+            miny = tmpy;
+        }
+        for (auto& p : lsPrimitives)
+          p->translate_vertices(minx, miny);
+      }
+      std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
+    }
     
     //-- now the validation starts
     if (usebuildings == true) 
