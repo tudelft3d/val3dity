@@ -801,6 +801,7 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
       MultiSurface* msur = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
       lsPrimitives.push_back(msur);
     }
+    // TODO: CompositeSurface
     // else if (prim == COMPOSITESURFACE)
     // {
     // }
@@ -913,7 +914,7 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
   for (pugi::xpath_node_set::const_iterator it = nallosurf.begin(); it != nallosurf.end(); ++it)
     dallpoly[it->node().attribute("gml:id").value()] = *it;
   //-- checking xlinks validity now, not to be bitten later
-  s = "//" + NS["gml"] + "surfaceMember" + "[@" + NS["gml"] + "href" + "]";
+  s = "//" + NS["gml"] + "surfaceMember" + "[@" + NS["xlink"] + "href" + "]";
   pugi::xpath_node_set nsmxlink = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nsmxlink.begin(); it != nsmxlink.end(); ++it) 
   {
