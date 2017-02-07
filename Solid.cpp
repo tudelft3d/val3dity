@@ -65,11 +65,11 @@ Solid::Solid(Shell* sh)
 
 Solid::~Solid()
 {
-  // std::clog << "DESTRUCTOR SOLIDS" << std::endl;
-  // for (auto& sh : _shells)
-  // {
-    // delete sh;
-  // }
+  std::clog << "DESTRUCTOR SOLIDS" << std::endl;
+  for (auto& sh : _shells)
+  {
+    delete sh;
+  }
 }
 
 Shell* Solid::get_oshell()
