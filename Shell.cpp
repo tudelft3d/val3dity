@@ -43,8 +43,15 @@ Shell::Shell(int id, double tol_snap)
 
 Shell::~Shell()
 {
-  // TODO: clear memory properly
-  _lsPts.clear();
+  delete _polyhedron;
+
+  for (auto& triangles : _lsTr)
+  {
+    for (int* triangle : triangles)
+    {
+      delete[] triangle;
+    }
+  }
 }
 
 int Shell::get_id()
