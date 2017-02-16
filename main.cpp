@@ -45,36 +45,36 @@ public:
   
   virtual void usage(TCLAP::CmdLineInterface& c)
   {
-    std::cout << "===== val3dity =====" << std::endl;
-    std::cout << "OPTIONS" << std::endl;
+    STDOUT("===== val3dity =====" << std::endl);
+    STDOUT("OPTIONS" << std::endl);
     std::list<TCLAP::Arg*> args = c.getArgList();
     for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
       if ((*it)->getFlag() == "")
-        std::cout << "\t--" << (*it)->getName() << std::endl;
+        STDOUT("\t--" << (*it)->getName() << std::endl);
       else
-        std::cout << "\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl;
-      std::cout << "\t\t" << (*it)->getDescription() << std::endl;
+        STDOUT("\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl);
+      STDOUT("\t\t" << (*it)->getDescription() << std::endl);
     }
-    std::cout << "==SOME EXAMPLES==" << std::endl;
-    std::cout << "\tval3dity input.gml" << std::endl;
-    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -B" << std::endl;
-    std::cout << "\t\tsame as previous, but reporting considers Buildings for reporting" << std::endl;
-    std::cout << "\tval3dity input.obj" << std::endl;
-    std::cout << "\t\tValidates each object in the OBJ file and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -B -p MS" << std::endl;
-    std::cout << "\t\tValidates each building represented with gml:MultiSurface and outputs a summary" << std::endl;
-    std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
-    std::cout << "\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl;
-    std::cout << "\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl;
-    std::cout << "\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl;
-    std::cout << "\tval3dity input.gml --verbose" << std::endl;
-    std::cout << "\t\tAll details of the validation of the solids is printed out" << std::endl;
-    std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
-    std::cout << "\t\tThe vertices in gml:Solid closer than 0.1unit are snapped together" << std::endl;
-    std::cout << "\tval3dity input.gml --planarity_d2p 0.1" << std::endl;
-    std::cout << "\t\tValidates each gml:Solid in input.gml" << std::endl;
-    std::cout << "\t\tand uses a tolerance of 0.1unit (distance point-to-fitted-plane)" << std::endl;
+    STDOUT("==SOME EXAMPLES==" << std::endl);
+    STDOUT("\tval3dity input.gml" << std::endl);
+    STDOUT("\t\tValidates each gml:Solid in input.gml and outputs a summary" << std::endl);
+    STDOUT("\tval3dity input.gml -B" << std::endl);
+    STDOUT("\t\tsame as previous, but reporting considers Buildings for reporting" << std::endl);
+    STDOUT("\tval3dity input.obj" << std::endl);
+    STDOUT("\t\tValidates each object in the OBJ file and outputs a summary" << std::endl);
+    STDOUT("\tval3dity input.gml -B -p MS" << std::endl);
+    STDOUT("\t\tValidates each building represented with gml:MultiSurface and outputs a summary" << std::endl);
+    STDOUT("\tval3dity input.gml -r report.xml" << std::endl);
+    STDOUT("\t\tValidates each gml:Solid in input.gml and outputs a detailed report in XML" << std::endl);
+    STDOUT("\tval3dity data/poly/cube.poly --ishell data/poly/a.poly" << std::endl);
+    STDOUT("\t\tValidates the solid formed by the outer shell cube.poly with the inner shell a.poly" << std::endl);
+    STDOUT("\tval3dity input.gml --verbose" << std::endl);
+    STDOUT("\t\tAll details of the validation of the solids is printed out" << std::endl);
+    STDOUT("\tval3dity input.gml --snap_tolerance 0.1" << std::endl);
+    STDOUT("\t\tThe vertices in gml:Solid closer than 0.1unit are snapped together" << std::endl);
+    STDOUT("\tval3dity input.gml --planarity_d2p 0.1" << std::endl);
+    STDOUT("\t\tValidates each gml:Solid in input.gml" << std::endl);
+    STDOUT("\t\tand uses a tolerance of 0.1unit (distance point-to-fitted-plane)" << std::endl);
   }
 };
 
@@ -139,14 +139,14 @@ int main(int argc, char* const argv[])
       inputtype = OBJ;
     if (inputtype == OTHER)
     {
-      std::cout << "File type not supported. Abort." << std::endl;
+      STDOUT("File type not supported. Abort." << std::endl);
       ioerrs.add_error(901, "File type not supported");
     }
 
     bool usebuildings = buildings.getValue();    
     if ( (inputtype != GML) && (buildings.getValue() == true) )
     {
-      std::cout << "Ignoring flag '-B/--Buildings' for OBJ and POLY files" << std::endl;
+      STDOUT("Ignoring flag '-B/--Buildings' for OBJ and POLY files" << std::endl);
       usebuildings = false;
     }
 
@@ -174,12 +174,12 @@ int main(int argc, char* const argv[])
                     nobuildings
                    );
         if (ioerrs.has_errors() == true) {
-          std::cout << "Errors while reading the input file, aborting." << std::endl;
-          std::cout << ioerrs.get_report_text() << std::endl;
+          STDOUT("Errors while reading the input file, aborting." << std::endl);
+          STDOUT(ioerrs.get_report_text() << std::endl);
         }
         if (ishellfiles.getValue().size() > 0)
         {
-          std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+          STDOUT("No inner shells allowed when GML file used as input." << std::endl);
           ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
         }
       }
@@ -194,7 +194,7 @@ int main(int argc, char* const argv[])
       Solid* s = new Solid;
       Shell* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
       if (ioerrs.has_errors() == true)
-        std::cout << "Input file not found." << std::endl;
+        STDOUT("Input file not found." << std::endl);
       else
       {
         s->set_oshell(sh);
@@ -203,7 +203,7 @@ int main(int argc, char* const argv[])
         {
           Shell* sh = readPolyfile(ifile, sid, ioerrs);
           if (ioerrs.has_errors() == true)
-            std::cout << "Input file inner shell not found." << std::endl;
+            STDOUT("Input file inner shell not found." << std::endl);
           else
           {
             s->add_ishell(sh);
@@ -222,12 +222,12 @@ int main(int argc, char* const argv[])
                   snap_tolerance.getValue()
                  );
       if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
+        STDOUT("Errors while reading the input file, aborting." << std::endl);
+        STDOUT(ioerrs.get_report_text() << std::endl);
       }
       if (ishellfiles.getValue().size() > 0)
       {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+        STDOUT("No inner shells allowed when GML file used as input." << std::endl);
         ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
       }
     }
@@ -239,49 +239,49 @@ int main(int argc, char* const argv[])
     //-- now the validation starts
     if ( (lsSolids.empty() == false) && (ioerrs.has_errors() == false) )
     {
-      std::cout << "Validating " << lsSolids.size();
+      STDOUT("Validating " << lsSolids.size());
       if (prim3d == SOLID)
-        std::cout << " Solid";
+        STDOUT(" Solid");
       else if (prim3d == COMPOSITESURFACE)
-        std::cout << " CompositeSurface";
+        STDOUT(" CompositeSurface");
       else 
-        std::cout << " MultiSurface";
-      std::cout << std::endl;
+        STDOUT(" MultiSurface");
+      STDOUT(std::endl);
       int i = 1;
       for (auto& s : lsSolids)
       {
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsSolids.size())));
         i++;
-        std::clog << std::endl << "===== Validating Primitive #" << s->get_id() << " =====" << std::endl;
-        std::clog << "Number shells: " << (s->num_ishells() + 1) << std::endl;
-        std::clog << "Number faces: " << s->num_faces() << std::endl;
-        std::clog << "Number vertices: " << s->num_vertices() << std::endl;
+        STDLOG(std::endl << "===== Validating Primitive #" << s->get_id() << " =====" << std::endl);
+        STDLOG("Number shells: " << (s->num_ishells() + 1) << std::endl);
+        STDLOG("Number faces: " << s->num_faces() << std::endl);
+        STDLOG("Number vertices: " << s->num_vertices() << std::endl);
         if (inputtype == OBJ) 
         {
           Shell* sh = s->get_oshell();
           if (sh->were_vertices_merged_during_parsing() == true)
           {
-            std::clog << "-->" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << " duplicate vertices were merged" << std::endl;
-            std::clog << "-->" << "tolerance applied was " << snap_tolerance.getValue() << std::endl;
+            STDLOG("-->" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << " duplicate vertices were merged" << std::endl);
+            STDLOG("-->" << "tolerance applied was " << snap_tolerance.getValue() << std::endl);
           }
         }
         if (s->get_id_building().empty() == false)
-          std::clog << "Building: " << s->get_id_building() << std::endl;
+          STDLOG("Building: " << s->get_id_building() << std::endl);
         if (s->get_id_buildingpart().empty() == false)
-          std::clog << "BuildingPart: " << s->get_id_buildingpart() << std::endl;
+          STDLOG("BuildingPart: " << s->get_id_buildingpart() << std::endl);
 
         if (s->validate(prim3d, planarity_d2p.getValue(), planarity_n.getValue()) == false)
-          std::clog << "===== INVALID =====" << std::endl;
+          STDLOG("===== INVALID =====" << std::endl);
         else
-          std::clog << "===== VALID =====" << std::endl;
+          STDLOG("===== VALID =====" << std::endl);
       }
       if (verbose.getValue() == false)
         printProgressBar(100);
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(lsSolids, prim3d, usebuildings, nobuildings) << std::endl;        
+    STDOUT("\n" << print_summary_validation(lsSolids, prim3d, usebuildings, nobuildings) << std::endl);
    
     if (report.getValue() != "")
     {
@@ -297,10 +297,10 @@ int main(int argc, char* const argv[])
                        ioerrs,
                        onlyinvalid.getValue());
       thereport.close();
-      std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+      STDOUT("Full validation report saved to " << report.getValue() << std::endl);
     }
     if (report.getValue() == "")
-      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+      STDOUT("-->The validation report wasn't saved, use option '--report'." << std::endl);
 
     if (verbose.getValue() == false)
     {
@@ -309,12 +309,12 @@ int main(int argc, char* const argv[])
     }
     if (unittests.getValue() == true)
     {
-      std::cout << "\n" << print_unit_tests(lsSolids, prim3d, usebuildings) << std::endl;
+      STDOUT("\n" << print_unit_tests(lsSolids, prim3d, usebuildings) << std::endl);
     }
     return(1);
   }
   catch (TCLAP::ArgException &e) {
-    std::cout << "ERROR: " << e.error() << " for arg " << e.argId() << std::endl;
+    STDOUT("ERROR: " << e.error() << " for arg " << e.argId() << std::endl);
     return(0);
   }
 }
