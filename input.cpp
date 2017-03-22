@@ -298,9 +298,9 @@ Shell* process_gml_compositesurface(pugi::xml_node n, int id, map<std::string, p
     oneface.push_back(r);
     //-- interior rings
     s = ".//" + localise("interior");
-    pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
-    for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
-      vector<int> r = process_gml_ring(it->node(), sh, errs);
+    pugi::xpath_node_set nint = p.node().select_nodes(s.c_str());
+    for (pugi::xpath_node_set::const_iterator it2 = nint.begin(); it2 != nint.end(); ++it2) {
+      vector<int> r = process_gml_ring(it2->node(), sh, errs);
       if (fliporientation == true) 
         std::reverse(r.begin(), r.end());
       if (r.front() != r.back())
