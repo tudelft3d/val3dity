@@ -92,7 +92,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MS");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "1.3");
+  TCLAP::CmdLine cmd("Allowed options", ' ', "1.3.1");
   MyOutput my;
   cmd.setOutput(&my);
   try {
