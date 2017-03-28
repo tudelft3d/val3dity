@@ -1,9 +1,9 @@
 # val3dity
 
 Validation of 3D primitives according to the international standard ISO19107.
-Think of it as the [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS is only for 2D ones).
+Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS is only for 2D ones).
 
-Allows us to validate a 3D primitive, ie to verify whether the 3D primitive respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
+It allows us to validate a 3D primitive, ie to verify whether it respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
 The 3D primitives of GML are all supported:
 
   - `<gml:Solid>`
@@ -12,22 +12,24 @@ The 3D primitives of GML are all supported:
   - `<gml:CompositeSurface>` 
   - `<gml:MultiSurface>`
 
-However, as is the case for CityGML, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives.
+However, as is the case for CityGML, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported (and there is no plan to do so!).
 
 val3dity accepts as input any [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) (or one of the formats built upon it, such as [CityGML](http://www.citygml.org)), [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file), and [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
 It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
-In a OBJ file, each primitive will be validated according to the ISO19107 rules, as if they were a Solid.
+In a OBJ or POLY file, each primitive will be validated according to the ISO19107 rules, as if they were a Solid.
 
 All primitives are validated hierarchically, for instance:
 
   1. the lower-dimensionality primitives (the polygons) are validated by first embedding every polygon in 3D and then by projecting it to a 2D plane and using [GEOS](http://trac.osgeo.org/geos/);
-  1. then these are assembled into shells/surfaces and their validity analysed (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc);
+  1. then these are assembled into shells/surfaces and their validity is analysed (must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc);
   1. then the Solids are validated
   1. finally, for CompositeSolids the interactions between the Solids are analysed.
 
 This means that if one polygon of a Solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
 
-For `CompositeSurfaces`, the surface formed by the polygons must be a 2-manifold, and the same hierarchical validation applies.
+For a `MultiSolid`, each of the `Solid` is validated individually, but the topological relationships between the `Solids` are not verified, since a Multi* is a simple collection of primitives that does not enforce any.
+
+For a `CompositeSurface`, the surface formed by the individual surfaces must be a 2-manifold, and the same hierarchical validation applies.
 
 For `MultiSurfaces`, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar (we use a tolerance that can be defined)?
 
@@ -41,7 +43,7 @@ international standards for geographic information. *Computer-Aided Civil and In
 
 By using the `--buildings` option, the validator will--instead of search for specific 3D primitives--validate each CityGML `Building`, and produce a report per building.
 Every 3D primitive of a building will be validated (be it a `Solid`, `CompositeSolid`, or `MultiSurface`) and included in the report.
-Furthermore, if a building is composed of `BuildingPart`, then the topological relationships between all the parts are analysed to ensure that they do not overlap (technically that the interior of each part does not intersect with the interior of any other part).
+Furthermore, if a building is composed of `BuildingPart`, then these are also validated and the topological relationships between all the parts are analysed to ensure that they do not overlap (technically that the interior of each part does not intersect with the interior of any other part).
 
 
 <!-- ## Web application
@@ -117,12 +119,18 @@ See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dit
 
 ## Options for validating
 
+### Snapping tolerance
+
+The input points in a GML files are snapped together using a tolerance, which can be changed with `--snap_tolerance` (default is 1mm).
+
+### Planarity tolerances
+
 It is possible to define 2 tolerances for the planarity of surfaces with the flags: 
 
   1. `--planarity_d2s` the distance between every point forming a surface and a plane is less than a given tolerance (eg 1cm, which is the default).
   1. `--planarity_n` the surface is triangulated and the normal of each triangle must not deviate more than than a certain usef-defined tolerance (eg 1 degree, which is the default).
 
-Similarly, the input points in a GML files are snapped together using a tolerance, which can be changed with `--snap_tolerance` (default is 1mm).
+### Tolerance for 3D distance between Solids and/or BuildingParts
 
 For the validation of the topological relationships between Solids forming a CompositeSolid, or the different `BuildingParts` of a building, one can define a tolerance.
 This is used to prevent the validator reporting that 2 parts of a building overlap, while they are simply overlapping by 0.1mm for instance.
@@ -130,7 +138,7 @@ The tolerance `--overlap_tolerance 0.05` means that each of the solids is given 
 Its default is 0.0unit.
 Observe that using an overlap tolerance significantly reduces the speed of the validator, as rather complex geometric operations are performed.
 
-To validate only the buildings in a CityGML file (and ignore all the rest), and to obtain a report where each building has its ID and its error:
+To validate only the buildings in a CityGML file (and ignore all the rest) with a tolerance for the overlap of 1cm (0.01unit), and to obtain a report for each building:
 
     $ ./val3dity input.gml -b --overlap-tolerance 0.01 -r myreport.xml
 
