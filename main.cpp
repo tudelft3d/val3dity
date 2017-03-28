@@ -102,21 +102,85 @@ int main(int argc, char* const argv[])
   MyOutput my;
   cmd.setOutput(&my);
   try {
-    TCLAP::UnlabeledValueArg<std::string>  inputfile("inputfile", "input file in either GML (containing several solids/objects), OBJ or POLY (one exterior shell only)", true, "", "string");
-    TCLAP::MultiArg<std::string>           ishellfiles("", "ishell", "one interior shell (in POLY format only; more than one possible)", false, "string");
-    TCLAP::ValueArg<std::string>           report("r", "report", "output report in XML format", false, "", "string");
-    TCLAP::ValueArg<std::string>           primitives("p", "primitive", "what primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S),", false, "S", &primVals);
-    TCLAP::SwitchArg                       buildings("B", "Buildings", "validate all 3D primitives of CityGML Buildings (including BuidingParts), skips the rest, and report per building", false);
-    TCLAP::SwitchArg                       info("i", "info", "prints information about the file", false);
-    TCLAP::SwitchArg                       verbose("", "verbose", "verbose output", false);
-    TCLAP::SwitchArg                       unittests("", "unittests", "unit tests output", false);
-    TCLAP::SwitchArg                       notranslate("", "notranslate", "do not translate to (minx, miny)", false);
-    TCLAP::SwitchArg                       onlyinvalid("", "onlyinvalid", "only invalid primitives are reported", false);
-    TCLAP::SwitchArg                       qie("", "qie", "use the OGC QIE error codes", false);
-    TCLAP::ValueArg<double>                snap_tolerance("", "snap_tolerance", "tolerance for snapping vertices in GML (default=0.001)", false, 0.001, "double");
-    TCLAP::ValueArg<double>                overlap_tolerance("", "overlap_tolerance", "tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)", false, -1, "double");
-    TCLAP::ValueArg<double>                planarity_d2p("", "planarity_d2p", "tolerance for planarity distance_to_plane (default=0.01)", false, 0.01, "double");
-    TCLAP::ValueArg<double>                planarity_n("", "planarity_n", "tolerance for planarity based on normals deviation (default=1.0degree)", false, 1.0, "double");
+    TCLAP::UnlabeledValueArg<std::string>   inputfile(
+                                              "inputfile", 
+                                              "input file in either GML (containing several solids/objects), OBJ or POLY (one exterior shell only)", 
+                                              true, 
+                                              "", 
+                                              "string");
+    TCLAP::MultiArg<std::string>            ishellfiles(
+                                              "", 
+                                              "ishell", 
+                                              "one interior shell (in POLY format only; more than one possible)", 
+                                              false, 
+                                              "string");
+    TCLAP::ValueArg<std::string>            report("r",
+                                              "report",
+                                              "output report in XML format",
+                                              false,
+                                              "",
+                                              "string");
+    TCLAP::ValueArg<std::string>            primitives("p",
+                                              "primitive",
+                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S)",
+                                              false,
+                                              "S",
+                                              &primVals);
+    TCLAP::SwitchArg                        buildings("B",
+                                              "buildings",
+                                              "validate all 3D primitives of CityGML Buildings (including BuidingParts),
+                                              skips the rest,
+                                              and report per building",
+                                              false);
+    TCLAP::SwitchArg                        info("i",
+                                              "info",
+                                              "prints information about the file",
+                                              false);
+    TCLAP::SwitchArg                        verbose("",
+                                              "verbose",
+                                              "verbose output",
+                                              false);
+    TCLAP::SwitchArg                        unittests("",
+                                              "unittests",
+                                              "unit tests output",
+                                              false);
+    TCLAP::SwitchArg                        notranslate("",
+                                              "notranslate",
+                                              "do not translate to (minx,
+                                              miny)",
+                                              false);
+    TCLAP::SwitchArg                        onlyinvalid("",
+                                              "onlyinvalid",
+                                              "only invalid primitives are reported",
+                                              false);
+    TCLAP::SwitchArg                        qie("",
+                                              "qie",
+                                              "use the OGC QIE error codes",
+                                              false);
+    TCLAP::ValueArg<double>                 snap_tolerance("",
+                                              "snap_tolerance",
+                                              "tolerance for snapping vertices in GML (default=0.001)",
+                                              false,
+                                              0.001,
+                                              "double");
+    TCLAP::ValueArg<double>                 overlap_tolerance("",
+                                              "overlap_tolerance",
+                                              "tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)",
+                                              false,
+                                              -1,
+                                              "double");
+    TCLAP::ValueArg<double>                 planarity_d2p("",
+                                              "planarity_d2p",
+                                              "tolerance for planarity distance_to_plane (default=0.01)",
+                                              false,
+                                              0.01,
+                                              "double");
+    TCLAP::ValueArg<double>                 planarity_n("",
+                                              "planarity_n",
+                                              "tolerance for planarity based on normals deviation (default=1.0degree)",
+                                              false,
+                                              1.0,
+                                              "double");
 
     vector<TCLAP::Arg*> xorlist;
     xorlist.push_back(&primitives);
