@@ -39,18 +39,18 @@ international standards for geographic information. *Computer-Aided Civil and In
 
 ## Validation of CityGML Buildings
 
-By using the `--Buildings` option, the validator will--instead of search for specific 3D primitives--validate each CityGML `Building`, and produce a report per building.
-Every 3D primitive of a building will be validated (be it a `Solid`, `CompositeSolid`, or MultiSurface`) and included in the report.
+By using the `--buildings` option, the validator will--instead of search for specific 3D primitives--validate each CityGML `Building`, and produce a report per building.
+Every 3D primitive of a building will be validated (be it a `Solid`, `CompositeSolid`, or `MultiSurface`) and included in the report.
 Furthermore, if a building is composed of `BuildingPart`, then the topological relationships between all the parts are analysed to ensure that they do not overlap (technically that the interior of each part does not intersect with the interior of any other part).
 
 
-## Web application
+<!-- ## Web application
 
 If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
 You upload your file to our server and get a validation report back.
 We delete the file as soon as it has been validated.
 However, a file is limited to 50MB.
-
+ -->
 
 ## How do I compile and use val3dity?
 
@@ -108,8 +108,8 @@ Other formats can also be used as input, the 3D primitives will then be validate
 
 In an OBJ file, each primitive will be validated according to the ISO19107 rules. 
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
-Validating one primitive in an OBJ as a MultiSurface (`-p MultSurface` option) will validate individually each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
-If your OBJ contains only be triangles (often the case), then using the option `-p MS` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (error `309: VERTICES_NOT_USED`), cases where triangles are collapsed to a line/point.
+Validating one primitive in an OBJ as a MultiSurface (`-p MultiSurface` option) will validate individually each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
+If your OBJ contains only triangles (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (error `309: VERTICES_NOT_USED`), cases where triangles are collapsed to a line/point.
 Validating it as a solid verify whether the primitive is a 2-manifold, ie whether it is closed/watertight and whether all normals are pointing outwards.
 
 See the [FAQ for the web application](http://geovalidation.bk.tudelft.nl/val3dity/faq) for more details.
@@ -132,12 +132,12 @@ Observe that using an overlap tolerance significantly reduces the speed of the v
 
 To validate only the buildings in a CityGML file (and ignore all the rest), and to obtain a report where each building has its ID and its error:
 
-    $ ./val3dity input.gml -B --overlap-tolerance 0.01 -r myreport.xml
+    $ ./val3dity input.gml -b --overlap-tolerance 0.01 -r myreport.xml
 
 
 ## Error reported 
 
-![](https://dl.dropboxusercontent.com/u/8129172/errorcodes.png)
+![](/ressources/help/errorcodes.png)
 
 (a description of each error is available [here](https://github.com/tudelft3d/val3dity/blob/master/errors_description/errors_description.md))
 
