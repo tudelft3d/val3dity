@@ -139,5 +139,5 @@ To validate only the buildings in a CityGML file (and ignore all the rest), and 
 
 ![](/ressources/help/errorcodes.png)
 
-(a description of each error is available [here](https://github.com/tudelft3d/val3dity/blob/master/errors_description/errors_description.md))
+<!-- (a description of each error is available [here](https://github.com/tudelft3d/val3dity/blob/master/errors_description/errors_description.md)) -->
 
