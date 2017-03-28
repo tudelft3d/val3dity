@@ -126,7 +126,7 @@ int main(int argc, char* const argv[])
                                               false,
                                               "S",
                                               &primVals);
-    TCLAP::SwitchArg                        buildings("B",
+    TCLAP::SwitchArg                        buildings("b",
                                               "buildings",
                                               "validate all 3D primitives of CityGML Buildings (including BuidingParts),
                                               skips the rest,
@@ -234,7 +234,7 @@ int main(int argc, char* const argv[])
     bool usebuildings = buildings.getValue();    
     if ( (inputtype != GML) && (buildings.getValue() == true) )
     {
-      std::cout << "Ignoring flag '-B/--Buildings' for non-CityGML files" << std::endl;
+      std::cout << "Ignoring flag '-b/--buildings' for non-CityGML files" << std::endl;
       usebuildings = false;
     }
 
