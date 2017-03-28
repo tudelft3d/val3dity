@@ -214,7 +214,7 @@ int main(int argc, char* const argv[])
       catch (int e)
       {
         if (e == 901)
-          ioerrs.add_error(901, "Invalid GML structure, or that particular (twisted and obscure) construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues");
+          ioerrs.add_error(901, "Invalid GML structure, or that particular construction of GML is not supported yet. Please report at https://github.com/tudelft3d/val3dity/issues and provide the file.");
       }
     }
     else if (inputtype == POLY)
