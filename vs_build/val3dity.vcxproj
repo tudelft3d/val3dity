@@ -126,7 +126,6 @@
     <ClCompile Include="..\Shell.cpp" />
     <ClCompile Include="..\Solid.cpp" />
     <ClCompile Include="..\validate_shell.cpp" />
-    <ClCompile Include="..\validate_shell_intersection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\definitions.h" />

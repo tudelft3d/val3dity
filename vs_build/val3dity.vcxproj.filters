@@ -36,9 +36,6 @@
     <ClCompile Include="..\validate_shell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\validate_shell_intersection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\definitions.h">
