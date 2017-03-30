@@ -132,6 +132,8 @@ It is possible to define 2 tolerances for the planarity of surfaces with the fla
 
 ### Tolerance for 3D distance between Solids and/or BuildingParts
 
+![](/ressources/help/vcol_2.png)
+
 For the validation of the topological relationships between Solids forming a CompositeSolid, or the different `BuildingParts` of a building, one can define a tolerance.
 This is used to prevent the validator reporting that 2 parts of a building overlap, while they are simply overlapping by 0.1mm for instance.
 The tolerance `--overlap_tolerance 0.05` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating.
