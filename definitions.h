@@ -43,7 +43,8 @@
 
 #include <CGAL/aff_transformation_3.h>
 
-using namespace std;
+namespace val3dity
+{
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 
@@ -95,5 +96,7 @@ typedef enum
   POLY  = 2,
   OTHER = 3,
 } InputTypes;
+
+} // namespace val3dity
 
 #endif

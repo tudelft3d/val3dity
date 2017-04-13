@@ -31,6 +31,8 @@
 #include <tclap/CmdLine.h>
 #include <time.h>  
 
+using namespace std;
+using namespace val3dity;
 
 std::string print_summary_validation(std::vector<Building*>& lsBuildings);
 std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Primitive3D prim3d);
@@ -128,9 +130,9 @@ int main(int argc, char* const argv[])
                                               &primVals);
     TCLAP::SwitchArg                        buildings("b",
                                               "buildings",
-                                              "validate all 3D primitives of CityGML Buildings (including BuidingParts),
-                                              skips the rest,
-                                              and report per building",
+                                              "validate all 3D primitives of CityGML Buildings (including BuidingParts),"
+                                              "skips the rest,"
+                                              "and report per building",
                                               false);
     TCLAP::SwitchArg                        info("i",
                                               "info",
@@ -146,8 +148,8 @@ int main(int argc, char* const argv[])
                                               false);
     TCLAP::SwitchArg                        notranslate("",
                                               "notranslate",
-                                              "do not translate to (minx,
-                                              miny)",
+                                              "do not translate to (minx,"
+                                              "miny)",
                                               false);
     TCLAP::SwitchArg                        onlyinvalid("",
                                               "onlyinvalid",

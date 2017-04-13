@@ -15,6 +15,8 @@
 #include <set>
 #include <string>
 
+namespace val3dity
+{
 
 class Primitive
 {
@@ -44,5 +46,6 @@ protected:
 
 };
 
+} // namespace val3dity
 
 #endif /* Primitive_h */

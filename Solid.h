@@ -33,6 +33,8 @@
 #include <vector>
 #include <string>
 
+namespace val3dity
+{
 
 class Solid : public Primitive
 {
@@ -70,5 +72,6 @@ protected:
   bool validate_solid_with_nef();
 };
 
+} // namespace val3dity
 
 #endif /* defined(__val3dity__Solid__) */

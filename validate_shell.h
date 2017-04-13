@@ -33,11 +33,13 @@
 #include <set>
 #include <list>
 
+namespace val3dity
+{
 
 template <class HDS>
 class ConstructShell : public CGAL::Modifier_base<HDS> {
-  vector< vector<int*> > *faces;
-  vector<Point3> *lsPts;
+  std::vector< std::vector<int*> > *faces;
+  std::vector<Point3> *lsPts;
   int _width;
   Surface* sh;
 public:
@@ -50,7 +52,7 @@ public:
   void construct_faces_order_given(CGAL::Polyhedron_incremental_builder_3<HDS>& B);
   int m2a(int m, int n);
   void construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B);
-  bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, list<int*>& trFaces, bool* halfedges, bool bMustBeConnected);
+  bool try_to_add_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, std::list<int*>& trFaces, bool* halfedges, bool bMustBeConnected);
   bool is_connected(int* tr, bool* halfedges);
   void add_one_face(CGAL::Polyhedron_incremental_builder_3<HDS>& B, int i0, int i1, int i2, std::string faceID) ;
 };
@@ -59,3 +61,5 @@ public:
 CgalPolyhedron*   construct_CgalPolyhedron_incremental(std::vector< std::vector<int*> > *lsTr, std::vector<Point3> *lsPts, Surface* sh);
 CgalPolyhedron*   construct_CgalPolyhedron_batch(const std::vector< std::vector<int*> >&lsTr, const std::vector<Point3>& lsPts);
 bool              check_global_orientation_normals(CgalPolyhedron* p, bool bOuter);
+
+} // namespace val3dity

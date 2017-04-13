@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+namespace val3dity
+{
 
 class MultiSolid : public Primitive 
 {
@@ -39,5 +41,6 @@ protected:
   std::vector<Solid*> _lsSolids;
 };
 
+} // namespace val3dity
 
 #endif /* CompositeSolid_h */

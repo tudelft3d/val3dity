@@ -14,6 +14,9 @@
 #include <string>
 #include <vector>
 
+namespace val3dity
+{
+
 class BuildingPart
 {
 public:
@@ -80,5 +83,7 @@ protected:
 
   std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
 };
+
+} // namespace val3dity
 
 #endif /* Building_h */

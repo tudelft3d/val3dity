@@ -28,6 +28,9 @@
 
 #include "definitions.h"
 
+namespace val3dity
+{
+
 //-- misc
 #define PI 3.14159265
 
@@ -43,5 +46,7 @@ Nef_polyhedron* erode_nef_polyhedron (Nef_polyhedron* nef, float r);
 Nef_polyhedron* get_structuring_element_cube(float r);
 Nef_polyhedron* get_structuring_element_dodecahedron(float r);
 Nef_polyhedron* get_aabb(Nef_polyhedron* mynef) ;
+
+} // namespace val3dity
 
 #endif /* defined(__val3dity__geomtools__) */

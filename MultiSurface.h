@@ -15,6 +15,8 @@
 
 #include <string>
 
+namespace val3dity
+{
 
 class MultiSurface : public Primitive 
 {
@@ -40,5 +42,6 @@ protected:
   Surface* _surface;
 };
 
+} // namespace val3dity
 
 #endif /* MultiSurface_h */

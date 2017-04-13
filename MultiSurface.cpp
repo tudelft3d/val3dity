@@ -10,6 +10,8 @@
 #include "Primitive.h"
 #include "input.h"
 
+namespace val3dity
+{
 
 MultiSurface::MultiSurface(std::string id) {
   _id = id;
@@ -121,3 +123,4 @@ Surface* MultiSurface::get_surface()
   return _surface;
 }
 
+} // namespace val3dity

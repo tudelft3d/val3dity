@@ -5,6 +5,8 @@
 #include "input.h"
 #include "validate_shell.h"
 
+namespace val3dity
+{
 
 Solid::Solid(std::string id)
 {
@@ -365,3 +367,5 @@ bool Solid::validate_solid_with_nef()
   }
   return isValid;
 }
+
+} // namespace val3dity

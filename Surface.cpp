@@ -15,6 +15,10 @@
 #include <geos_c.h>
 #include <sstream>
 
+using namespace std;
+
+namespace val3dity
+{
 
 Surface::Surface(int id, double tol_snap)
 {
@@ -788,3 +792,5 @@ bool Surface::has_face_rings_toofewpoints(const std::vector< std::vector<int> >&
   }
   return bErrors;
 }
+
+} // namespace val3dity

@@ -30,7 +30,8 @@
 #include <CGAL/OFF_to_nef_3.h>
 #include <CGAL/Bbox_3.h>
 
-
+namespace val3dity
+{
 
 Nef_polyhedron* get_structuring_element_dodecahedron(float r)
 {
@@ -324,3 +325,5 @@ bool is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Poin
   }
   return isPlanar;
 }
+
+} // namespace val3dity

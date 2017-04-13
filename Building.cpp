@@ -14,6 +14,9 @@
 #include <iostream>
 #include <sstream>
 
+namespace val3dity
+{
+
 Building::Building(std::string id)
 {
   _id = id;
@@ -437,3 +440,5 @@ int BuildingPart::get_number_multisurfaces()
       t++;
   return t;
 }
+
+} // namespace val3dity
