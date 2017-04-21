@@ -25,7 +25,10 @@
 
 #include "input.h"
 
+using namespace std;
 
+namespace val3dity
+{
 
 //-- XML namespaces map
 std::map<std::string, std::string> NS; 
@@ -1104,4 +1107,4 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
   allvertices.clear();
 } 
 
-  
+} // namespace val3dity

@@ -9,7 +9,8 @@
 #include "MultiSolid.h"
 #include "input.h"
 
-
+namespace val3dity
+{
 
 MultiSolid::MultiSolid(std::string id) {
   _id = id;
@@ -121,3 +122,5 @@ std::set<int> MultiSolid::get_unique_error_codes() {
 int MultiSolid::number_of_solids() {
   return _lsSolids.size();
 }
+
+} // namespace val3dity

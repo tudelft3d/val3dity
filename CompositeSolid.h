@@ -15,6 +15,8 @@
 #include <vector>
 #include <string>
 
+namespace val3dity
+{
 
 class CompositeSolid : public Primitive 
 {
@@ -42,5 +44,6 @@ protected:
   Nef_polyhedron*     _nef;
 };
 
+} // namespace val3dity
 
 #endif /* CompositeSolid_h */

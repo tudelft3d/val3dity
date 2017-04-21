@@ -10,6 +10,8 @@
 #include "input.h"
 #include "geomtools.h"
 
+namespace val3dity
+{
 
 CompositeSolid::CompositeSolid(std::string id)
 {
@@ -233,3 +235,5 @@ bool CompositeSolid::add_solid(Solid* s) {
 int CompositeSolid::number_of_solids() {
   return _lsSolids.size();
 }
+
+} // namespace val3dity

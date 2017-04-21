@@ -10,6 +10,9 @@
 #include "input.h"
 #include <iostream>
 
+namespace val3dity
+{
+
 Primitive::Primitive() {
 }
 
@@ -49,5 +52,4 @@ std::set<int> Primitive::get_unique_error_codes()
   return errs;
 }
 
-
-
+} // namespace val3dity
