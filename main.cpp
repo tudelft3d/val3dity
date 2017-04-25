@@ -360,6 +360,19 @@ int main(int argc, char* const argv[])
       std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
     }
     
+    //-- report on parameters used
+    std::cout << "Parameters used for validation:" << std::endl;
+    if (snap_tolerance.getValue() < 1e-8)
+      std::cout << "   snap_tolerance"    << setw(12)  << "none" << std::endl;
+    else
+      std::cout << "   snap_tolerance"    << setw(12)  << snap_tolerance.getValue() << std::endl;
+    std::cout << "   planarity_d2p"     << setw(13)  << planarity_d2p.getValue() << std::endl;
+    std::cout << "   planarity_n"       << setw(15) << planarity_n.getValue() << std::endl;
+    if (overlap_tolerance.getValue() < 1e-8)
+      std::cout << "   overlap_tolerance" << setw(9)  << "none" << std::endl;
+    else
+      std::cout << "   overlap_tolerance" << setw(9)  << overlap_tolerance.getValue() << std::endl;
+
     //-- now the validation starts
     if (usebuildings == true) 
     {
