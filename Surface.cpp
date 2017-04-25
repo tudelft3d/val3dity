@@ -23,9 +23,12 @@ namespace val3dity
 Surface::Surface(int id, double tol_snap)
 {
   _id = id;
-  _tol_snap = tol_snap;
   _is_valid_2d = -1;
   _vertices_added = 0;
+  if (tol_snap < 1e-8)
+    _tol_snap = -1;
+  else
+    _tol_snap = tol_snap;
 }
 
 Surface::~Surface()
@@ -149,8 +152,16 @@ std::string Surface::get_poly_representation()
 
 std::string Surface::get_coords_key(Point3* p)
 {
-  int tol = int(1 / _tol_snap);
-  std::string s = std::to_string(int64(p->x() * tol)) + std::to_string(int64(p->y() * tol)) + std::to_string(int64(p->z() * tol));
+  std::string s;
+  if (_tol_snap < 0.0)
+  {
+    s = std::to_string(p->x()) + std::to_string(p->y()) + std::to_string(p->z());
+  }
+  else
+  {
+    int tol = int(1 / _tol_snap);
+    s = std::to_string(int64(p->x() * tol)) + std::to_string(int64(p->y() * tol)) + std::to_string(int64(p->z() * tol));
+  }
   return s;
 }
 

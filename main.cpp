@@ -161,7 +161,7 @@ int main(int argc, char* const argv[])
                                               false);
     TCLAP::ValueArg<double>                 snap_tolerance("",
                                               "snap_tolerance",
-                                              "tolerance for snapping vertices in GML (default=0.001)",
+                                              "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
                                               false,
                                               0.001,
                                               "double");
