@@ -940,7 +940,7 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
 
 Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
 {
-  std::clog << "Reading file: " << ifile << std::endl;
+  std::cout << "Reading file: " << ifile << std::endl;
   std::stringstream st;
   ifstream infile(ifile.c_str(), ifstream::in);
   if (!infile)
