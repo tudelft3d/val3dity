@@ -488,6 +488,16 @@ MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::
   return ms;
 }
 
+CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+{
+  CompositeSurface* cs = new CompositeSurface;
+  if (nms.attribute("gml:id") != 0)
+    cs->set_id(std::string(nms.attribute("gml:id").value()));
+  Surface* s = process_gml_surface(nms, 0, dallpoly, tol_snap, errs);
+  cs->set_surface(s);
+  return cs;
+}
+
 
 // Solid* process_gml_solid(pugi::xpath_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 // {
