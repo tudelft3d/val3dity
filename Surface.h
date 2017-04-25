@@ -26,6 +26,7 @@ public:
   
   bool validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals);
   bool validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals);
+  bool validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
   
   bool is_shell(double tol_planarity_d2p, double tol_planarity_normals);
 
@@ -67,7 +68,6 @@ private:
   std::map<int, std::vector<std::tuple<std::string, std::string> > > _errors;
   
   bool validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
-  bool validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals);
   std::string get_coords_key(Point3* p);
   bool triangulate_shell();
   bool construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum);

@@ -804,10 +804,11 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
       MultiSurface* msur = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
       lsPrimitives.push_back(msur);
     }
-    // TODO: CompositeSurface
-    // else if (prim == COMPOSITESURFACE)
-    // {
-    // }
+    else if (prim == COMPOSITESURFACE)
+    {
+      MultiSurface* msur = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
+      lsPrimitives.push_back(msur);
+    }
   }
   std::cout << "Input file correctly parsed without errors." << std::endl;
 }
