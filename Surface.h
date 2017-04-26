@@ -74,6 +74,7 @@ private:
   bool validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid);
   bool has_face_rings_toofewpoints(const std::vector< std::vector<int> >& theface);
   bool has_face_2_consecutive_repeated_pts(const std::vector< std::vector<int> >& theface);
+  bool contains_nonmanifold_vertices();
 
 };
 

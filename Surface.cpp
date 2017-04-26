@@ -569,37 +569,9 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
       this->add_error(300, "", "Something went wrong during construction of the shell, reason is unknown.");
       return false;
     }
-    //-- check for non-manifold vertices (which oddly CGAL doesn't expose as a function)
-    //-- the trick is to check if a given vertex has >2 incident edges (not half-edges, but edges)
-    //-- that are border edges
-    // count border edges 
-    std::map<CgalPolyhedron::Vertex_handle, int> noincident;
-    for (CgalPolyhedron::Halfedge_handle heh = _polyhedron->halfedges_begin(); heh != _polyhedron->halfedges_end(); heh++)
-    {
-      if (heh->is_border() == true)
-      {
-        auto it = noincident.find(heh->vertex());
-        if (it == noincident.end())
-          noincident[heh->vertex()] = 1;
-        else
-          noincident[heh->vertex()] += 1;
-        it = noincident.find(heh->opposite()->vertex());
-        if (it == noincident.end())
-          noincident[heh->opposite()->vertex()] = 1;
-        else
-          noincident[heh->opposite()->vertex()] += 1;
-      }
-    }
-    for (auto& v : noincident)
-    {
-      if (v.second > 2)
-      {
-        std::stringstream st;
-        st << "Vertex location: " << v.first->point();
-        this->add_error(303, "", st.str());
-        
-      }
-    }
+    //-- check for non-manifold vertices
+    //-- errors will be added to the Surface
+    this->contains_nonmanifold_vertices();
   }
   else
   {
@@ -615,6 +587,41 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
   return true;
 }
 
+
+bool Surface::contains_nonmanifold_vertices()
+{
+  //-- check for non-manifold vertices (which oddly CGAL doesn't expose as a function)
+  //-- the trick is to check if a given vertex has >2 incident edges (not half-edges, but edges)
+  //-- that are border edges
+  // count border edges 
+  std::map<CgalPolyhedron::Vertex_handle, int> noincident;
+  for (CgalPolyhedron::Halfedge_handle heh = _polyhedron->halfedges_begin(); heh != _polyhedron->halfedges_end(); heh++)
+  {
+    if (heh->is_border() == true)
+    {
+      auto it = noincident.find(heh->vertex());
+      if (it == noincident.end())
+        noincident[heh->vertex()] = 1;
+      else
+        noincident[heh->vertex()] += 1;
+      it = noincident.find(heh->opposite()->vertex());
+      if (it == noincident.end())
+        noincident[heh->opposite()->vertex()] = 1;
+      else
+        noincident[heh->opposite()->vertex()] += 1;
+    }
+  }
+  for (auto& v : noincident)
+  {
+    if (v.second > 2)
+    {
+      std::stringstream st;
+      st << "Vertex location: " << v.first->point();
+      this->add_error(303, "", st.str());
+    }
+  }
+  return (this->has_errors());
+}
 
 bool Surface::does_self_intersect()
 {
