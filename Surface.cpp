@@ -573,32 +573,33 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
     //-- the trick is to check if a given vertex has >2 incident edges (not half-edges, but edges)
     //-- that are border edges
     // count border edges 
-    std::cout << "here we are" << std::endl;
     std::map<CgalPolyhedron::Vertex_handle, int> noincident;
     for (CgalPolyhedron::Halfedge_handle heh = _polyhedron->halfedges_begin(); heh != _polyhedron->halfedges_end(); heh++)
     {
       if (heh->is_border() == true)
       {
-        std::cout << "border he" << std::endl;
-        if (noincident.find(heh->vertex())
+        auto it = noincident.find(heh->vertex());
+        if (it == noincident.end())
+          noincident[heh->vertex()] = 1;
+        else
+          noincident[heh->vertex()] += 1;
+        it = noincident.find(heh->opposite()->vertex());
+        if (it == noincident.end())
+          noincident[heh->opposite()->vertex()] = 1;
+        else
+          noincident[heh->opposite()->vertex()] += 1;
       }
-
     }
-    // for (CgalPolyhedron::Vertex_const_iterator v = _polyhedron->vertices_begin() ; v != _polyhedron->vertices_end() ; v++ ) 
-    // { 
-    //   CgalPolyhedron::Halfedge_around_vertex_const_circulator hc = v->vertex_begin(); 
-    //   CgalPolyhedron::Halfedge_around_vertex_const_circulator hc_end = hc; 
-    //   int nBorderEdges = 0; 
-    //   CGAL_For_all(hc, hc_end) { 
-    //     if (hc->is_border()) { 
-    //       nBorderEdges++; 
-    //       if (nBorderEdges > 2) 
-    //       {
-    //         this->add_error(303, "", "");
-    //       } 
-    //     } 
-    //   } 
-    // } 
+    for (auto& v : noincident)
+    {
+      if (v.second > 2)
+      {
+        std::stringstream st;
+        st << "Vertex location: " << v.first->point();
+        this->add_error(303, "", st.str());
+        
+      }
+    }
   }
   else
   {
