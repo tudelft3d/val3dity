@@ -45,7 +45,7 @@ bool IOErrors::has_errors()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  std::clog << "--> errors #" << code << " : " << info << std::endl;
+  std::clog << "ERROR " << code << " : " << info << std::endl;
 }
 
 

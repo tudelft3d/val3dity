@@ -228,11 +228,13 @@ int main(int argc, char* const argv[])
     else if ( (extension == "obj") || (extension == "OBJ") ) 
       inputtype = OBJ;
     if (inputtype == OTHER)
-    {
-      std::cout << "File type not supported. Abort." << std::endl;
       ioerrs.add_error(901, "File type not supported");
-    }
 
+    if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
+    {
+      ioerrs.add_error(999, "POLY files having inner shells can be validated as CompositeSurface (only Solids)");
+    }
+    
     bool usebuildings = buildings.getValue();    
     if ( (inputtype != GML) && (buildings.getValue() == true) )
     {
@@ -285,28 +287,32 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == POLY)
     {
-     Solid* s = new Solid;
-     Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
-     if (ioerrs.has_errors() == true)
-       std::cout << "Input file not found." << std::endl;
-     else
-     {
-       s->set_oshell(sh);
-       int sid = 1;
-       for (auto ifile : ishellfiles.getValue())
-       {
-         Surface* sh = readPolyfile(ifile, sid, ioerrs);
-         if (ioerrs.has_errors() == true)
-           std::cout << "Input file inner shell not found." << std::endl;
-         else
-         {
-           s->add_ishell(sh);
-           sid++;
-         }
-       }
-       if (ioerrs.has_errors() == false)
-         lsPrimitives.push_back(s);
-     }
+      if (prim3d == SOLID)
+        Solid* p = new Solid;
+      else if (prim3d == COMPOSITESURFACE)
+        CompositeSurface* p = new CompositeSurface;
+      
+      // Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+      // if (ioerrs.has_errors() == true)
+      //   std::cout << "Input file not found." << std::endl;
+      // else
+      // {
+      //   s->set_oshell(sh);
+      //   int sid = 1;
+      //   for (auto ifile : ishellfiles.getValue())
+      //   {
+      //     Surface* sh = readPolyfile(ifile, sid, ioerrs);
+      //     if (ioerrs.has_errors() == true)
+      //       std::cout << "Input file inner shell not found." << std::endl;
+      //     else
+      //     {
+      //       s->add_ishell(sh);
+      //       sid++;
+      //     }
+      //   }
+      // if (ioerrs.has_errors() == false)
+      //   lsPrimitives.push_back(s);
+      // }
     }
     else if (inputtype == OBJ)
     {
