@@ -228,6 +228,8 @@ int main(int argc, char* const argv[])
       inputtype = POLY;
     else if ( (extension == "obj") || (extension == "OBJ") ) 
       inputtype = OBJ;
+    else if ( (extension == "off") || (extension == "OFF") ) 
+      inputtype = OFF;
     if (inputtype == OTHER)
       ioerrs.add_error(901, "File type not supported");
 
@@ -302,7 +304,7 @@ int main(int argc, char* const argv[])
           }
         }
         if (ioerrs.has_errors() == false)
-            lsPrimitives.push_back(s);
+          lsPrimitives.push_back(s);
       }
       if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
@@ -312,6 +314,24 @@ int main(int argc, char* const argv[])
           lsPrimitives.push_back(cs);
       }
     }
+    else if (inputtype == OFF)
+    {
+      Surface* sh = readOFFfile(inputfile.getValue(), 0, ioerrs);
+      if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
+      {
+        Solid* s = new Solid;
+        s->set_oshell(sh);
+        if (ioerrs.has_errors() == false)
+          lsPrimitives.push_back(s);
+      }
+      if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+      {
+        CompositeSurface* cs = new CompositeSurface;
+        cs->set_surface(sh);
+        if (ioerrs.has_errors() == false)
+          lsPrimitives.push_back(cs);
+      }
+    }    
     else if (inputtype == OBJ)
     {
       readOBJfile(lsPrimitives,

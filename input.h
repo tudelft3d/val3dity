@@ -68,6 +68,7 @@ void          print_info_aligned(std::string o, size_t number, bool tab = false)
 std::string   errorcode2description(int code, bool qie = false);
 void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
 Surface*      readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
+Surface*      readOFFfile(std::string &ifile, int shellid, IOErrors& errs);
 
 Building*     process_citygml_building(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 

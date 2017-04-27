@@ -1055,6 +1055,45 @@ void printProgressBar(int percent) {
   std::cout << percent << "%     " << std::flush;
 }
 
+Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
+{
+  std::cout << "Reading file: " << ifile << std::endl;
+  std::stringstream st;
+  ifstream infile(ifile.c_str(), ifstream::in);
+  if (!infile)
+  {
+    errs.add_error(901, "Input file not found.");
+    return NULL;
+  }
+  Surface* sh = new Surface(shellid);  
+  //-- read the points
+  int numpt, numf, tmpint;
+  float tmpfloat;
+  std::string s;
+  infile >> s;
+  infile >> numpt >> numf >> tmpint;
+  std::vector< Point3 >::iterator iPoint3;
+  //-- read first line to decide if 0- or 1-based indexing
+  for (int i = 0; i < numpt; i++)
+  {
+    Point3 p;
+    infile >> p;
+    sh->add_point(p);
+  }
+  //-- read the facets
+  for (int i = 0; i < numf; i++)
+  {
+    infile >> tmpint;
+    std::vector<int> ids(tmpint);
+    for (int k = 0; k < tmpint; k++)
+      infile >> ids[k];
+    std::vector< std::vector<int> > pgnids;
+    pgnids.push_back(ids);
+    sh->add_face(pgnids);
+  }
+  return sh;
+}
+
 
 void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors& errs, double tol_snap)
 {
