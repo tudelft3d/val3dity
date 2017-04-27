@@ -34,6 +34,7 @@
 using namespace std;
 using namespace val3dity;
 
+
 std::string print_summary_validation(std::vector<Building*>& lsBuildings);
 std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Primitive3D prim3d);
 
@@ -231,9 +232,7 @@ int main(int argc, char* const argv[])
       ioerrs.add_error(901, "File type not supported");
 
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
-    {
       ioerrs.add_error(999, "POLY files having inner shells can be validated as CompositeSurface (only Solids)");
-    }
     
     bool usebuildings = buildings.getValue();    
     if ( (inputtype != GML) && (buildings.getValue() == true) )
@@ -287,32 +286,31 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == POLY)
     {
-      if (prim3d == SOLID)
-        Solid* p = new Solid;
-      else if (prim3d == COMPOSITESURFACE)
-        CompositeSurface* p = new CompositeSurface;
-      
-      // Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
-      // if (ioerrs.has_errors() == true)
-      //   std::cout << "Input file not found." << std::endl;
-      // else
-      // {
-      //   s->set_oshell(sh);
-      //   int sid = 1;
-      //   for (auto ifile : ishellfiles.getValue())
-      //   {
-      //     Surface* sh = readPolyfile(ifile, sid, ioerrs);
-      //     if (ioerrs.has_errors() == true)
-      //       std::cout << "Input file inner shell not found." << std::endl;
-      //     else
-      //     {
-      //       s->add_ishell(sh);
-      //       sid++;
-      //     }
-      //   }
-      // if (ioerrs.has_errors() == false)
-      //   lsPrimitives.push_back(s);
-      // }
+      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+      if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
+      {
+        Solid* s = new Solid;
+        s->set_oshell(sh);
+        int sid = 1;
+        for (auto ifile : ishellfiles.getValue())
+        {
+          Surface* sh = readPolyfile(ifile, sid, ioerrs);
+          if (ioerrs.has_errors() == false)
+          {
+            s->add_ishell(sh);
+            sid++;
+          }
+        }
+        if (ioerrs.has_errors() == false)
+            lsPrimitives.push_back(s);
+      }
+      if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+      {
+        CompositeSurface* cs = new CompositeSurface;
+        cs->set_surface(sh);
+        if (ioerrs.has_errors() == false)
+          lsPrimitives.push_back(cs);
+      }
     }
     else if (inputtype == OBJ)
     {
@@ -331,7 +329,7 @@ int main(int argc, char* const argv[])
       }
     }
 
-    if (notranslate.getValue() == false)
+    if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
     {
       //-- translate all vertices to avoid potential problems
       double tmpx, tmpy;
@@ -367,20 +365,23 @@ int main(int argc, char* const argv[])
     }
     
     //-- report on parameters used
-    std::cout << "Parameters used for validation:" << std::endl;
-    if (snap_tolerance.getValue() < 1e-8)
-      std::cout << "   snap_tolerance"    << setw(12)  << "none" << std::endl;
-    else
-      std::cout << "   snap_tolerance"    << setw(12)  << snap_tolerance.getValue() << std::endl;
-    std::cout << "   planarity_d2p"     << setw(13)  << planarity_d2p.getValue() << std::endl;
-    std::cout << "   planarity_n"       << setw(15) << planarity_n.getValue() << std::endl;
-    if (overlap_tolerance.getValue() < 1e-8)
-      std::cout << "   overlap_tolerance" << setw(9)  << "none" << std::endl;
-    else
-      std::cout << "   overlap_tolerance" << setw(9)  << overlap_tolerance.getValue() << std::endl;
+    if (ioerrs.has_errors() == false)
+    {
+      std::cout << "Parameters used for validation:" << std::endl;
+      if (snap_tolerance.getValue() < 1e-8)
+        std::cout << "   snap_tolerance"    << setw(12)  << "none" << std::endl;
+      else
+        std::cout << "   snap_tolerance"    << setw(12)  << snap_tolerance.getValue() << std::endl;
+      std::cout << "   planarity_d2p"     << setw(13)  << planarity_d2p.getValue() << std::endl;
+      std::cout << "   planarity_n"       << setw(15) << planarity_n.getValue() << std::endl;
+      if (overlap_tolerance.getValue() < 1e-8)
+        std::cout << "   overlap_tolerance" << setw(9)  << "none" << std::endl;
+      else
+        std::cout << "   overlap_tolerance" << setw(9)  << overlap_tolerance.getValue() << std::endl;
+    }
 
     //-- now the validation starts
-    if (usebuildings == true) 
+    if ( (ioerrs.has_errors() == false) && (usebuildings == true) )
     {
       std::cout << "Validating " << lsBuildings.size() << " Buildings." << std::endl;
       int i = 1;
@@ -479,8 +480,7 @@ int main(int argc, char* const argv[])
       thereport.close();
       std::cout << "Full validation report saved to " << report.getValue() << std::endl;
     }
-    
-    if (report.getValue() == "")
+    else
       std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
 
     if (verbose.getValue() == false)
@@ -783,3 +783,4 @@ void write_report_xml(std::ofstream& ss,
   }
   ss << "</val3dity>" << std::endl;
 }
+
