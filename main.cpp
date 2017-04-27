@@ -107,7 +107,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either GML (containing several solids/objects), OBJ or POLY (one exterior shell only)", 
+                                              "input file in either GML (containing several solids/objects), OBJ, OFF, or POLY (one exterior shell only)", 
                                               true, 
                                               "", 
                                               "string");
