@@ -240,16 +240,16 @@ int projection_plane(const std::vector< Point3 > &lsPts, const std::vector<int> 
 {
   Vector n;
   polygon_normal(lsPts, ids, n);
-  double maxcomp = abs(n.x());
+  double maxcomp = std::abs(n.x());
   int proj = 0;
-  if (abs(n.y()) > maxcomp)
+  if (std::abs(n.y()) > maxcomp)
   {
-    maxcomp = abs(n.y());
+    maxcomp = std::abs(n.y());
     proj = 1;
   }
-  if (abs(n.z()) > maxcomp)
+  if (std::abs(n.z()) > maxcomp)
   {
-    maxcomp = abs(n.z());
+    maxcomp = std::abs(n.z());
     proj = 2;
   }
   return proj;

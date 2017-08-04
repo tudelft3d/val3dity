@@ -94,7 +94,8 @@ typedef enum
   GML   = 0,
   OBJ   = 1,
   POLY  = 2,
-  OTHER = 3,
+  OFF   = 3,
+  OTHER = 4,
 } InputTypes;
 
 } // namespace val3dity

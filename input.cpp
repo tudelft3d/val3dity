@@ -45,7 +45,7 @@ bool IOErrors::has_errors()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  std::clog << "--> errors #" << code << " : " << info << std::endl;
+  std::cout << "ERROR " << code << " : " << info << std::endl;
 }
 
 
@@ -488,6 +488,16 @@ MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::
   return ms;
 }
 
+CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+{
+  CompositeSurface* cs = new CompositeSurface;
+  if (nms.attribute("gml:id") != 0)
+    cs->set_id(std::string(nms.attribute("gml:id").value()));
+  Surface* s = process_gml_surface(nms, 0, dallpoly, tol_snap, errs);
+  cs->set_surface(s);
+  return cs;
+}
+
 
 // Solid* process_gml_solid(pugi::xpath_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 // {
@@ -804,10 +814,11 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
       MultiSurface* msur = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
       lsPrimitives.push_back(msur);
     }
-    // TODO: CompositeSurface
-    // else if (prim == COMPOSITESURFACE)
-    // {
-    // }
+    else if (prim == COMPOSITESURFACE)
+    {
+      CompositeSurface* csur = process_gml_compositesurface(nprim.node(), dallpoly, tol_snap, errs);
+      lsPrimitives.push_back(csur);
+    }
   }
   std::cout << "Input file correctly parsed without errors." << std::endl;
 }
@@ -1042,6 +1053,45 @@ void printProgressBar(int percent) {
   std::cout << "\r" "[" << bar << "] ";
   std::cout.width(3);
   std::cout << percent << "%     " << std::flush;
+}
+
+Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
+{
+  std::cout << "Reading file: " << ifile << std::endl;
+  std::stringstream st;
+  ifstream infile(ifile.c_str(), ifstream::in);
+  if (!infile)
+  {
+    errs.add_error(901, "Input file not found.");
+    return NULL;
+  }
+  Surface* sh = new Surface(shellid);  
+  //-- read the points
+  int numpt, numf, tmpint;
+  float tmpfloat;
+  std::string s;
+  infile >> s;
+  infile >> numpt >> numf >> tmpint;
+  std::vector< Point3 >::iterator iPoint3;
+  //-- read first line to decide if 0- or 1-based indexing
+  for (int i = 0; i < numpt; i++)
+  {
+    Point3 p;
+    infile >> p;
+    sh->add_point(p);
+  }
+  //-- read the facets
+  for (int i = 0; i < numf; i++)
+  {
+    infile >> tmpint;
+    std::vector<int> ids(tmpint);
+    for (int k = 0; k < tmpint; k++)
+      infile >> ids[k];
+    std::vector< std::vector<int> > pgnids;
+    pgnids.push_back(ids);
+    sh->add_face(pgnids);
+  }
+  return sh;
 }
 
 
