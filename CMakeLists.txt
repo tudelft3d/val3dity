@@ -37,19 +37,16 @@ if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
 
-include_directories( ${GEOS_INCLUDE_DIR}, ${CMAKE_SOURCE_DIR}/thirdparty/pugixml )
+include_directories( ${GEOS_INCLUDE_DIR}, ${CMAKE_SOURCE_DIR}/thirdparty/tclap, ${CMAKE_SOURCE_DIR}/thirdparty/pugixml )
 
 FILE(GLOB_RECURSE THIRDPARTY thirdparty/*.cpp)
 add_library(thirdparty STATIC ${THIRDPARTY})
-
 
 file(GLOB SRC_FILES src/*.cpp)
 add_executable(val3dity ${SRC_FILES})
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 
-# Link the executable to CGAL and third-party libraries
 target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} thirdparty)
 
-# Have the option to properly install val3dity to the system 
 install(TARGETS val3dity DESTINATION bin)
