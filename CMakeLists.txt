@@ -37,7 +37,7 @@ if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
 
-include_directories( ${GEOS_INCLUDE_DIR}, include,  ${CMAKE_SOURCE_DIR}/thirdparty/tclap, ${CMAKE_SOURCE_DIR}/thirdparty/pugixml )
+include_directories( ${GEOS_INCLUDE_DIR}, include,  ${CMAKE_SOURCE_DIR}/thirdparty )
 
 FILE(GLOB_RECURSE THIRDPARTY thirdparty/*.cpp)
 add_library(thirdparty STATIC ${THIRDPARTY})

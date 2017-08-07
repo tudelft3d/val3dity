@@ -37,7 +37,7 @@
 #include "Building.h"
 #include <fstream>
 #include <string>
-#include "pugixml.hpp"
+#include "pugixml/pugixml.hpp"
 
 namespace val3dity
 {
