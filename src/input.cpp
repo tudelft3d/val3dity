@@ -82,93 +82,52 @@ std::string IOErrors::get_report_xml()
 }
 
 
-std::string errorcode2description(int code, bool qie) {
-  if (qie == false) {
-    switch(code)
-    {
-      case 0:   return string("STATUS_OK"); break;
-      //-- RING
-      case 101: return string("TOO_FEW_POINTS"); break;
-      case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
-      case 103: return string("RING_NOT_CLOSED"); break;
-      case 104: return string("RING_SELF_INTERSECTION"); break;
-      case 105: return string("RING_COLLAPSED"); break;
-      //-- POLYGON
-      case 201: return string("INTERSECTION_RINGS"); break;
-      case 202: return string("DUPLICATED_RINGS"); break;
-      case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
-      case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
-      case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
-      case 206: return string("INNER_RING_OUTSIDE"); break;
-      case 207: return string("INNER_RINGS_NESTED"); break;
-      case 208: return string("ORIENTATION_RINGS_SAME"); break;
-      //-- SHELL
-      case 300: return string("NOT_VALID_2_MANIFOLD"); break;
-      case 301: return string("TOO_FEW_POLYGONS"); break;
-      case 302: return string("SHELL_NOT_CLOSED"); break;
-      case 303: return string("NON_MANIFOLD_VERTEX"); break;
-      case 304: return string("NON_MANIFOLD_EDGE"); break;
-      case 305: return string("SEPARATE_PARTS"); break;
-      case 306: return string("SHELL_SELF_INTERSECTION"); break;
-      case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
-      case 309: return string("VERTICES_NOT_USED"); break;
-      //-- SOLID & MULTISOLID
-      case 401: return string("INTERSECTION_SHELLS"); break;
-      case 402: return string("DUPLICATED_SHELLS"); break;
-      case 403: return string("INNER_SHELL_OUTSIDE"); break;
-      case 404: return string("INTERIOR_DISCONNECTED"); break;
-      case 405: return string("WRONG_ORIENTATION_SHELL"); break;
-      //-- COMPOSITESOLID
-      case 501: return string("INTERSECTION_SOLIDS"); break;
-      case 502: return string("DUPLICATED_SOLIDS"); break;
-      case 503: return string("DISCONNECTED_SOLIDS"); break;
-      //-- BUILDING
-      case 601: return string("BUILDINGPARTS_OVERLAP"); break;
-      //-- OTHERS
-      case 901: return string("INVALID_INPUT_FILE"); break;
-      case 902: return string("EMPTY_PRIMITIVE"); break;
-      case 999: return string("UNKNOWN_ERROR"); break;
-      default:  return string("UNKNOWN_ERROR"); break;
-    }
-  }
-  else { //-- return QIE error codes
-    switch(code)
-    {
-      case 0:   return string("STATUS_OK"); break;
-      //-- RING
-      case 101: return string("GE_R_TOO_FEW_POINTS"); break;
-      case 102: return string("GE_R_CONSECUTIVE_POINTS_SAME"); break;
-      case 103: return string("GE_R_NOT_CLOSED"); break;
-      case 104: return string("GE_R_SELF_INTERSECTION"); break;
-      case 105: return string("GE_R_COLLAPSED"); break;
-      //-- POLYGON
-      case 201: return string("GE_P_INTERSECTION_RINGS"); break;
-      case 202: return string("GE_P_DUPLICATED_RINGS"); break;
-      case 203: return string("GE_P_NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
-      case 204: return string("GE_P_NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
-      case 205: return string("GE_P_INTERIOR_DISCONNECTED"); break;
-      case 206: return string("GE_P_HOLE_OUTSIDE"); break;
-      case 207: return string("GE_P_INNER_RINGS_NESTED"); break;
-      case 208: return string("GE_P_ORIENTATION_RINGS_SAME"); break;
-      //-- SHELL
-      case 301: return string("GE_S_TOO_FEW_POLYGONS"); break;
-      case 302: return string("GE_S_NOT_CLOSED"); break;
-      case 303: return string("GE_S_NON_MANIFOLD_VERTEX"); break;
-      case 304: return string("GE_S_NON_MANIFOLD_EDGE"); break;
-      case 305: return string("GE_S_SEPARATE_PARTS"); break;
-      case 306: return string("GE_S_SELF_INTERSECTION"); break;
-      case 307: return string("GE_S_POLYGON_WRONG_ORIENTATION"); break;
-      //--SOLID
-      case 401: return string("GE_SO_INTERSECTION_SHELLS"); break;
-      case 402: return string("GE_SO_DUPLICATED_SHELLS"); break;
-      case 403: return string("GE_SO_INNER_SHELL_OUTSIDE"); break;
-      case 404: return string("GE_SO_INTERIOR_DISCONNECTED"); break;
-      case 405: return string("GE_SO_WRONG_ORIENTATION_SHELL"); break;
-      //-- OTHERS
-      case 901: return string("INVALID_INPUT_FILE"); break;
-      case 999: return string("UNKNOWN_ERROR"); break;
-      default:  return string("UNKNOWN_ERROR"); break;
-    }
+std::string errorcode2description(int code) {
+  switch(code)
+  {
+    case 0:   return string("STATUS_OK"); break;
+    //-- RING
+    case 101: return string("TOO_FEW_POINTS"); break;
+    case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
+    case 103: return string("RING_NOT_CLOSED"); break;
+    case 104: return string("RING_SELF_INTERSECTION"); break;
+    case 105: return string("RING_COLLAPSED"); break;
+    //-- POLYGON
+    case 201: return string("INTERSECTION_RINGS"); break;
+    case 202: return string("DUPLICATED_RINGS"); break;
+    case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
+    case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
+    case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
+    case 206: return string("INNER_RING_OUTSIDE"); break;
+    case 207: return string("INNER_RINGS_NESTED"); break;
+    case 208: return string("ORIENTATION_RINGS_SAME"); break;
+    //-- SHELL
+    case 300: return string("NOT_VALID_2_MANIFOLD"); break;
+    case 301: return string("TOO_FEW_POLYGONS"); break;
+    case 302: return string("SHELL_NOT_CLOSED"); break;
+    case 303: return string("NON_MANIFOLD_VERTEX"); break;
+    case 304: return string("NON_MANIFOLD_EDGE"); break;
+    case 305: return string("SEPARATE_PARTS"); break;
+    case 306: return string("SHELL_SELF_INTERSECTION"); break;
+    case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
+    case 309: return string("VERTICES_NOT_USED"); break;
+    //-- SOLID & MULTISOLID
+    case 401: return string("INTERSECTION_SHELLS"); break;
+    case 402: return string("DUPLICATED_SHELLS"); break;
+    case 403: return string("INNER_SHELL_OUTSIDE"); break;
+    case 404: return string("INTERIOR_DISCONNECTED"); break;
+    case 405: return string("WRONG_ORIENTATION_SHELL"); break;
+    //-- COMPOSITESOLID
+    case 501: return string("INTERSECTION_SOLIDS"); break;
+    case 502: return string("DUPLICATED_SOLIDS"); break;
+    case 503: return string("DISCONNECTED_SOLIDS"); break;
+    //-- BUILDING
+    case 601: return string("BUILDINGPARTS_OVERLAP"); break;
+    //-- OTHERS
+    case 901: return string("INVALID_INPUT_FILE"); break;
+    case 902: return string("EMPTY_PRIMITIVE"); break;
+    case 999: return string("UNKNOWN_ERROR"); break;
+    default:  return string("UNKNOWN_ERROR"); break;
   }
 }
 

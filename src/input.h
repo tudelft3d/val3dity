@@ -65,7 +65,7 @@ void          report_building_each_lod(pugi::xml_document& doc, std::map<std::st
 void          get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml);
 void          print_info_aligned(std::string o, size_t number, bool tab = false);
 
-std::string   errorcode2description(int code, bool qie = false);
+std::string   errorcode2description(int code);
 void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
 Surface*      readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
 Surface*      readOFFfile(std::string &ifile, int shellid, IOErrors& errs);
