@@ -1,5 +1,10 @@
+======
+Errors
+======
 
-## Ring level
+
+Ring level
+----------
 
   * 101: TOO_FEW_POINTS
   * 102: CONSECUTIVE_POINTS_SAME
@@ -8,7 +13,8 @@
   * 105: COLLAPSED_TO_LINE
 
 
-## POLYGON level
+POLYGON level
+-------------
 
   * 201: INTERSECTION_RINGS
   * 202: DUPLICATED_RINGS
@@ -20,7 +26,8 @@
   * 208: ORIENTATION_RINGS_SAME
 
 
-## SHELL level
+SHELL level
+-----------
 
   * 301: TOO_FEW_POLYGONS
   * 302: NOT_CLOSED
@@ -32,7 +39,8 @@
   * 309: VERTICES_NOT_USED 
 
 
-## SOLID level
+SOLID level
+-----------
 
   * 401: INTERSECTION_SHELLS
   * 402: DUPLICATED_SHELLS
@@ -40,17 +48,21 @@
   * 404: INTERIOR_DISCONNECTED
   * 405: WRONG_ORIENTATION_SHELL
 
-## COMPOSITESOLID level
+
+COMPOSITESOLID level
+--------------------
 
   * 501: INTERSECTION_SOLIDS
   * 502: DUPLICATED_SOLIDS
   * 503: DISCONNECTED_SOLIDS
 
-## BUILDING 
+BUILDING 
+--------
   
   * 601: BUILDINGPARTS_OVERLAP
 
-## OTHERS
+OTHERS
+------
 
   * 901: INVALID_INPUT_FILE
   * 902: EMPTY_PRIMITIVE
