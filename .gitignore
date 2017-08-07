@@ -33,3 +33,4 @@ vs_build/.vs
 *.lib
 x64/
 x86/
+/build/libthirdparty.a
