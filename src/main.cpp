@@ -156,10 +156,6 @@ int main(int argc, char* const argv[])
                                               "onlyinvalid",
                                               "only invalid primitives are reported",
                                               false);
-    TCLAP::SwitchArg                        qie("",
-                                              "qie",
-                                              "use the OGC QIE error codes",
-                                              false);
     TCLAP::ValueArg<double>                 snap_tolerance("",
                                               "snap_tolerance",
                                               "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
@@ -201,7 +197,6 @@ int main(int argc, char* const argv[])
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
-    cmd.add(qie);
     cmd.parse( argc, argv );
 
     if (info.getValue() == true)
@@ -219,6 +214,7 @@ int main(int argc, char* const argv[])
       prim3d = MULTISURFACE;
     else if (primitives.getValue() == "CompositeSurface")
       prim3d = COMPOSITESURFACE;
+    
 
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);

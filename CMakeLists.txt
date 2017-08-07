@@ -1,14 +1,7 @@
 
-project( val3dity )
+cmake_minimum_required (VERSION 3.2)
 
-cmake_minimum_required(VERSION 2.6.2)
-if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
-  if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
-    cmake_policy(VERSION 2.8.4)
-  else()
-    cmake_policy(VERSION 2.6)
-  endif()
-endif()
+project( val3dity )
 
 add_definitions(-std=c++11)
 
@@ -37,26 +30,23 @@ if ( NOT Boost_FOUND )
   return()  
 endif()
 
-# GDAL
-set( GEOS_DIR .)
+# GEOS
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package( GEOS )
-
 if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
 
-include_directories( ${GEOS_INCLUDE_DIR}, include )
+include_directories( ${GEOS_INCLUDE_DIR}, include,  ${CMAKE_SOURCE_DIR}/thirdparty/tclap, ${CMAKE_SOURCE_DIR}/thirdparty/pugixml )
 
+FILE(GLOB_RECURSE THIRDPARTY thirdparty/*.cpp)
+add_library(thirdparty STATIC ${THIRDPARTY})
 
-# Creating entries for target: val3dity
-# ############################
-
-add_executable( val3dity input.cpp pugixml.cpp geomtools.cpp Primitive.cpp Surface.cpp Solid.cpp CompositeSolid.cpp MultiSolid.cpp Surface.cpp MultiSurface.cpp CompositeSurface.cpp validate_shell.cpp Building.cpp main.cpp )
+file(GLOB SRC_FILES src/*.cpp)
+add_executable(val3dity ${SRC_FILES})
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 
-# Link the executable to CGAL and third-party libraries
-target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY})
+target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} thirdparty)
 
-# Have the option to properly install val3dity to the system 
 install(TARGETS val3dity DESTINATION bin)
