@@ -214,6 +214,7 @@ int main(int argc, char* const argv[])
       prim3d = MULTISURFACE;
     else if (primitives.getValue() == "CompositeSurface")
       prim3d = COMPOSITESURFACE;
+    
 
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
