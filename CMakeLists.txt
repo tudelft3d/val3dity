@@ -1,7 +1,7 @@
 
-cmake_minimum_required (VERSION 3.2)
-
 project( val3dity )
+
+cmake_minimum_required (VERSION 3.2)
 
 add_definitions(-std=c++11)
 
@@ -16,7 +16,6 @@ find_package( CGAL QUIET COMPONENTS core )
 if ( CGAL_FOUND )
   include( ${CGAL_USE_FILE} )
   message(STATUS "CGAL found")
-  message(STATUS ${CGAL_INCLUDE_DIR})
   message(STATUS ${CGAL_LIBRARIES})
   message(STATUS ${CGAL_3RD_PARTY_LIBRARIES})
 else()

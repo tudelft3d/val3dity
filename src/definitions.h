@@ -41,7 +41,7 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <CGAL/Polyhedron_copy_3.h>
 
-#include <CGAL/aff_transformation_3.h>
+#include <CGAL/Aff_transformation_3.h>
 
 namespace val3dity
 {
