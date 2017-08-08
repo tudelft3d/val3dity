@@ -96,7 +96,7 @@ But this surface would not be detected the error 203 test and a tolerance of 1cm
 Thus, another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinaisons of 3 non-colinear points is less than a given tolerance. 
 In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain usef-defined tolerance; this tolerance is in val3dity set to 1 degree, but can be defined (not in the web-version), but in the executable. |
 
-A surface is first check for error 203, if valid then error 204 is checked. 
+A surface is first checked for error 203, if valid then error 204 is checked. 
 By definition, if an error 204 is reported then all the vertices are within 1cm (tolerance you used), thus you wouldn’t be able to visualise them. 
 That usually means that you have vertices that are very close (say 0.1mm) and thus it’s easy to get a large deviation (say 80degree; the report contains the deviation).
 

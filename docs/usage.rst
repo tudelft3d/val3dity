@@ -80,9 +80,25 @@ Validating it as a solid verify whether the primitive is a 2-manifold, ie whethe
 Options for the validation
 --------------------------
 
+Validation of CityGML Buildings
+*******************************
+
+By using the ``--buildings`` option, the validator will--instead of searching for specific 3D primitives--validate each CityGML ``Building``, and produce a report per building.
+Every 3D primitive of a building will be validated (be it a ``gml:Solid``, ``gml:CompositeSolid``, or ``gml:MultiSurface``) and included in the report.
+Furthermore, if a building is composed of ``BuildingPart``, then these are also validated and the topological relationships between all the parts are analysed to ensure that they do not overlap (technically that the interior of each part does not intersect with the interior of any other part).
+
+
 Snapping tolerance
 ******************
-The input points in a GML files are snapped together using a tolerance, which can be changed with ``--snap_tolerance`` (default is 1mm).
+Geometries modelled in GML store amazingly very little topological relationships. 
+A cube is for instance represented with 6 surfaces, all stored independently. 
+This means that the coordinates xyz of a single vertex (where 3 surfaces "meet") is stored 3 times. 
+It is possible that these 3 vertices are not exactly at the same location (eg (0.01, 0.5, 1.0), (0.011, 0.49999, 1.00004) and (0.01002, 0.5002, 1.0007)), and that would create problems when validating since there would for example be holes in the cube. 
+The snap tolerance basically gives a threshold that says: "if 2 points are closer then *X*, then we assume that they are the same". 
+It's setup by default to be 1mm. 
+
+It can be changed with ``--snap_tolerance 0.08`` (which would mean to use 0.08unit; default is 1mm).
+If no snapping is wanted, use ``--snap_tolerance 0``
 
 Planarity tolerances
 ********************
