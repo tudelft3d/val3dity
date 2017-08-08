@@ -33,11 +33,12 @@ However, as is the case for CityGML, only planar and linear primitives are allow
 .. rubric:: Content
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   usage
-   faq
-   errors
-   changelog
-   contact
+  install
+  usage
+  faq
+  errors
+  changelog
+  contact
 
