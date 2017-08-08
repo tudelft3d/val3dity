@@ -38,6 +38,7 @@
 #include <fstream>
 #include <string>
 #include "pugixml/pugixml.hpp"
+#include "nlohmann-json/json.hpp"
 
 namespace val3dity
 {
@@ -57,6 +58,8 @@ public:
 void          readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
 void          readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 void          get_namespaces(pugi::xml_node& root, std::string& vcitygml);
+
+void          readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 
 void          print_information(std::string &ifile);
 void          report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);

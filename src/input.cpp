@@ -26,6 +26,7 @@
 #include "input.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 namespace val3dity
 {
@@ -696,6 +697,24 @@ void report_primitives(pugi::xml_document& doc, std::map<std::string, std::strin
 
   std::cout << std::endl;
 }
+
+
+void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
+{
+  std::ifstream input(ifile);
+  json j;
+  try {
+    input >> j;
+  }
+  catch (nlohmann::detail::parse_error e) {
+    errs.add_error(901, "Input file not a valid JSON file.");
+    return;
+  }
+
+  std::cout << j["vertices"].size() << std::endl;
+
+}
+
 
 void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
 {

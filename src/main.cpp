@@ -107,7 +107,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either GML (containing several solids/objects), OBJ, OFF, or POLY (one exterior shell only)", 
+                                              "input file in either GML (containing several solids/objects), CityJSON, OBJ, OFF, or POLY (one exterior shell only)", 
                                               true, 
                                               "", 
                                               "string");
@@ -221,7 +221,9 @@ int main(int argc, char* const argv[])
     if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
       inputtype = GML;
     else if ( (extension == "poly") || (extension == "POLY") ) 
-      inputtype = POLY;
+      inputtype = POLY;    
+    else if ( (extension == "json") || (extension == "JSON") ) 
+      inputtype = JSON;
     else if ( (extension == "obj") || (extension == "OBJ") ) 
       inputtype = OBJ;
     else if ( (extension == "off") || (extension == "OFF") ) 
@@ -281,6 +283,15 @@ int main(int argc, char* const argv[])
         if (e == 901)
           ioerrs.add_error(901, "Invalid GML structure, or that particular construction of GML is not supported yet. Please report at https://github.com/tudelft3d/val3dity/issues and provide the file.");
       }
+    }
+    else if (inputtype == JSON)
+    {
+      readCityJSONfile_primitives(inputfile.getValue(), 
+                                  lsPrimitives,
+                                  prim3d, 
+                                  ioerrs, 
+                                  snap_tolerance.getValue());
+
     }
     else if (inputtype == POLY)
     {

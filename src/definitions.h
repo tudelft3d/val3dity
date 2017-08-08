@@ -92,10 +92,11 @@ typedef enum
 typedef enum
 {
   GML   = 0,
-  OBJ   = 1,
-  POLY  = 2,
-  OFF   = 3,
-  OTHER = 4,
+  JSON  = 1,
+  OBJ   = 2,
+  POLY  = 3,
+  OFF   = 4,
+  OTHER = 5,
 } InputTypes;
 
 } // namespace val3dity
