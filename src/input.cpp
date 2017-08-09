@@ -713,12 +713,13 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
     return;
   }
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
-    std::cout << "o " << it.key() << std::endl;
+    // std::cout << "o " << it.key() << std::endl;
+    int idgeom = 0;
     for (auto& g : it.value()["geometry"]) {
-      // std::cout << g["type"] << std::endl;
       if ( (prim == SOLID) && (g["type"] == "Solid") )
       {
-        Solid* s = new Solid();
+        std::string theid = it.key() + "(" + std::to_string(idgeom) + ")";
+        Solid* s = new Solid(theid);
         bool oshell = true;
         for (auto& shell : g["boundaries"]) 
         {
@@ -767,11 +768,13 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
           }
           sh->add_face(pgnids);
         }
-        MultiSurface* ms = new MultiSurface;
+        std::string theid = it.key() + "(" + std::to_string(idgeom) + ")";
+        MultiSurface* ms = new MultiSurface(theid);
         ms->set_surface(sh);
         lsPrimitives.push_back(ms);
       }
     }
+    idgeom++;
   }
 }
 
