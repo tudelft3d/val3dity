@@ -703,16 +703,76 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
 {
   std::ifstream input(ifile);
   json j;
-  try {
+  try 
+  {
     input >> j;
   }
-  catch (nlohmann::detail::parse_error e) {
+  catch (nlohmann::detail::parse_error e) 
+  {
     errs.add_error(901, "Input file not a valid JSON file.");
     return;
   }
-
-  std::cout << j["vertices"].size() << std::endl;
-
+  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+    std::cout << "o " << it.key() << std::endl;
+    for (auto& g : it.value()["geometry"]) {
+      // std::cout << g["type"] << std::endl;
+      if ( (prim == SOLID) && (g["type"] == "Solid") )
+      {
+        Solid* s = new Solid();
+        bool oshell = true;
+        for (auto& shell : g["boundaries"]) 
+        {
+          Surface* sh = new Surface(-1, tol_snap);
+          for (auto& p : shell) { 
+            std::vector< std::vector<int> > pa = p;
+            std::vector< std::vector<int> > pgnids;
+            for (auto& r : pa)
+            {
+              std::vector<int> newr;
+              for (auto& i : r)
+              {
+                Point3 p3(j["vertices"][i][0], j["vertices"][i][1], j["vertices"][i][2]);
+                newr.push_back(sh->add_point(p3));
+              }
+              pgnids.push_back(newr);
+            }
+            sh->add_face(pgnids);
+          }
+          if (oshell == true)
+          {
+            oshell = false;
+            s->set_oshell(sh);
+          }
+          else
+            s->add_ishell(sh);
+        }
+        lsPrimitives.push_back(s);
+      }
+      else if ( (prim == MULTISURFACE) && (g["type"] == "MultiSurface") )
+      {
+        Surface* sh = new Surface(-1, tol_snap);
+        for (auto& p : g["boundaries"]) 
+        { 
+          std::vector< std::vector<int> > pa = p;
+          std::vector< std::vector<int> > pgnids;
+          for (auto& r : pa)
+          {
+            std::vector<int> newr;
+            for (auto& i : r)
+            {
+              Point3 p3(j["vertices"][i][0], j["vertices"][i][1], j["vertices"][i][2]);
+              newr.push_back(sh->add_point(p3));
+            }
+            pgnids.push_back(newr);
+          }
+          sh->add_face(pgnids);
+        }
+        MultiSurface* ms = new MultiSurface;
+        ms->set_surface(sh);
+        lsPrimitives.push_back(ms);
+      }
+    }
+  }
 }
 
 
