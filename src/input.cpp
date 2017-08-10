@@ -785,7 +785,7 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
         {
           Solid* s = new Solid();
           bool oshell = true;
-          for (auto& shell : g["boundaries"]) 
+          for (auto& shell : solid) 
           {
             Surface* sh = new Surface(-1, tol_snap);
             for (auto& polygon : shell) { 
@@ -811,7 +811,7 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
         {
           Solid* s = new Solid();
           bool oshell = true;
-          for (auto& shell : g["boundaries"]) 
+          for (auto& shell : solid) 
           {
             Surface* sh = new Surface(-1, tol_snap);
             for (auto& polygon : shell) { 
