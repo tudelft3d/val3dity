@@ -744,7 +744,6 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
     errs.add_error(901, "Input file not a valid JSON file.");
     return;
   }
-  //-- TODO: transform to support!!
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
     // std::cout << "o " << it.key() << std::endl;
     int idgeom = 0;
