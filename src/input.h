@@ -55,38 +55,40 @@ public:
 
 //--
 
-void          readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
-void          readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
-void          get_namespaces(pugi::xml_node& root, std::string& vcitygml);
+void              readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
+void              readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
+void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
-void          readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
+void              readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 
-void          print_information(std::string &ifile);
-void          report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
-void          report_building(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
-void          report_building_each_lod(pugi::xml_document& doc, std::map<std::string, std::string>& ns, int lod, int& total_solid, int& total_ms, int& total_sem);
-void          get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml);
-void          print_info_aligned(std::string o, size_t number, bool tab = false);
+void              print_information(std::string &ifile);
+void              report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
+void              report_building(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
+void              report_building_each_lod(pugi::xml_document& doc, std::map<std::string, std::string>& ns, int lod, int& total_solid, int& total_ms, int& total_sem);
+void              get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml);
+void              print_info_aligned(std::string o, size_t number, bool tab = false);
 
-std::string   errorcode2description(int code);
-void          readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
-Surface*      readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
-Surface*      readOFFfile(std::string &ifile, int shellid, IOErrors& errs);
+std::string       errorcode2description(int code);
+void              readOBJfile(std::vector<Primitive*>& lsPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
+Surface*          readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
+Surface*          readOFFfile(std::string &ifile, int shellid, IOErrors& errs);
 
-Building*     process_citygml_building(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Building*         process_citygml_building(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
+std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
+Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+MultiSurface*     process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 Solid*            process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-MultiSurface*     process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 
-void          build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
+void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
 
-void          printProgressBar(int percent);
-std::string   localise(std::string s);
+void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
+
+void              printProgressBar(int percent);
+std::string       localise(std::string s);
 
 } // namespace val3dity
 
