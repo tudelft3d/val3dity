@@ -331,7 +331,7 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
     if (nset.size() > 0)
       bCS = true;
   }
-  s = ".//" + NS["gml"] + "MultiSurface";
+  s = "./*/" + NS["gml"] + "MultiSurface";
   nset = nbuilding.select_nodes(s.c_str());
   for(auto& n: nset)
   {
@@ -359,7 +359,7 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
     pugi::xpath_node_set nset2;
     if (bCS == false)
     {
-      s = ".//" + NS["gml"] + "Solid";
+      s = "./*/" + NS["gml"] + "Solid";
       nset2 = nbp.node().select_nodes(s.c_str());
       for(auto& n: nset2)
       {
@@ -367,7 +367,7 @@ Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std
         bp->add_primitive(sol);
       }
     }
-    s = ".//" + NS["gml"] + "MultiSurface";
+    s = "./*/" + NS["gml"] + "MultiSurface";
     nset2 = nbp.node().select_nodes(s.c_str());
     for(auto& n: nset2)
     {
