@@ -707,7 +707,22 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
     std::vector<int> newr;
     for (auto& i : r)
     {
-      Point3 p3(j["vertices"][i][0], j["vertices"][i][1], j["vertices"][i][2]);
+      double x;
+      double y;
+      double z;
+      if (j.count("transform") == 0)
+      {
+        x = double(j["vertices"][i][0]);
+        y = double(j["vertices"][i][1]);
+        z = double(j["vertices"][i][2]);
+      }
+      else
+      {
+        x = (double(j["vertices"][i][0]) * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
+        y = (double(j["vertices"][i][1]) * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
+        z = (double(j["vertices"][i][2]) * double(j["transform"]["scale"][2])) + double(j["transform"]["translate"][2]);
+      }
+      Point3 p3(x, y, z);
       newr.push_back(sh->add_point(p3));
     }
     pgnids.push_back(newr);
