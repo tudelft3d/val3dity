@@ -148,7 +148,6 @@ CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::m
 Solid*            process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-void              process_gml_all_3d_primitives(const pugi::xml_node& nms, std::vector<Primitive*>& lsPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
 void              readCityJSONfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
@@ -156,6 +155,8 @@ void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::strin
 
 void              printProgressBar(int percent);
 std::string       localise(std::string s);
+void              remove_xml_namespace(const char* input, const char* output);
+std::string       remove_xml_namespace(const char* input);
 
 } // namespace val3dity
 
