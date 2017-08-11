@@ -52,9 +52,75 @@ public:
   std::string get_report_xml();
 };
 
+  
+struct citygml_objects_walker: pugi::xml_tree_walker {
+  std::vector<pugi::xml_node> lsNodes;
+  virtual bool for_each(pugi::xml_node &node) 
+  {
+    const char *nodeType = node.name();
+    const char *namespaceSeparator = strchr(nodeType, ':');
+    if (namespaceSeparator != NULL) {
+      nodeType = namespaceSeparator+1;
+    }
+    if (strcmp(nodeType, "AuxiliaryTrafficArea") == 0 ||
+        strcmp(nodeType, "Bridge") == 0 ||
+        strcmp(nodeType, "Building") == 0 ||
+        // strcmp(nodeType, "BuildingPart") == 0 ||
+        strcmp(nodeType, "CityFurniture") == 0 ||
+        strcmp(nodeType, "GenericCityObject") == 0 ||
+        strcmp(nodeType, "LandUse") == 0 ||
+        strcmp(nodeType, "PlantCover") == 0 ||
+        strcmp(nodeType, "Railway") == 0 ||
+        strcmp(nodeType, "ReliefFeature") == 0 ||
+        strcmp(nodeType, "Road") == 0 ||
+        strcmp(nodeType, "SolitaryVegetationObject") == 0 ||
+        strcmp(nodeType, "TrafficArea") == 0 ||
+        strcmp(nodeType, "Tunnel") == 0 ||
+        strcmp(nodeType, "WaterBody") == 0) {
+      lsNodes.push_back(node);
+    } return true;
+  }
+};
+
+
+struct primitives_walker: pugi::xml_tree_walker
+{
+  std::vector<pugi::xml_node> lsNodes;
+  int depthprim = 999;
+  virtual bool for_each(pugi::xml_node& node)
+  { 
+    const char *nodeType = node.name();
+    const char *namespaceSeparator = strchr(nodeType, ':');
+    if (namespaceSeparator != NULL) {
+      nodeType = namespaceSeparator+1;
+    }
+    if (depth() == depthprim)
+    {
+      // std::cout << "back to reading mode" << node.name() << std::endl;
+      depthprim = 999;
+    }
+    if ((strcmp(nodeType, "boundedBy") == 0))
+      depthprim = depth();
+    if ( (depth() < depthprim) && 
+         ( (strcmp(nodeType, "Solid") == 0) ||
+           (strcmp(nodeType, "MultiSolid") == 0) ||
+           (strcmp(nodeType, "CompositeSolid") == 0) ||
+           (strcmp(nodeType, "MultiSurface") == 0) ||
+           (strcmp(nodeType, "boundedBy") == 0) ||
+           (strcmp(nodeType, "CompositeSurface") == 0) ) )
+    {
+      // std::cout << "----" << node.name() << std::endl;
+      // std::cout << "depth " << depth() << std::endl;
+      depthprim = depth();
+      lsNodes.push_back(node);
+    }
+    return true; 
+  }
+};
 
 //--
 
+void              readGMLfile(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap);
 void              readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
 void              readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap);
 void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
@@ -82,6 +148,7 @@ CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::m
 Solid*            process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+void              process_gml_all_3d_primitives(const pugi::xml_node& nms, std::vector<Primitive*>& lsPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
 void              readCityJSONfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);

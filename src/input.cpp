@@ -28,6 +28,8 @@
 using namespace std;
 using json = nlohmann::json;
 
+
+
 namespace val3dity
 {
 
@@ -437,6 +439,11 @@ CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<s
   return cs;
 }
 
+
+void process_gml_all_3d_primitives(const pugi::xml_node& nms, std::vector<Primitive*>& lsPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
+{
+  
+}
 
 MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
@@ -849,6 +856,52 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
   }
 }
 
+
+void readGMLfile(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
+{
+  std::cout << "Reading file: " << ifile << std::endl;
+  pugi::xml_document doc;
+  if (!doc.load_file(ifile.c_str())) 
+  {
+    errs.add_error(901, "Input file not found.");
+    return;
+  }
+  //-- parse namespace
+  pugi::xml_node ncm = doc.first_child();
+  std::string vcitygml;
+  get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
+  if (NS.count("gml") == 0)
+  {
+    errs.add_error(901, "Input file does not have the GML namespace.");
+    return;
+  }
+  if (NS.count("citygml") != 0)
+    std::cout << "CityGML file!" << std::endl;
+  // TODO: implement CityGML/GML variant for the parsing
+
+  //-- build dico of xlinks for <gml:Polygon>
+  std::map<std::string, pugi::xpath_node> dallpoly;
+  build_dico_xlinks(doc, dallpoly, errs);
+  
+  //-- read each CityObject in the file
+  citygml_objects_walker walker;
+  doc.traverse(walker);
+  std::cout << "# city objects found: " << walker.lsNodes.size() << std::endl;
+  //-- for each City Object parse it's primitives
+  for (auto& each : walker.lsNodes)
+  {
+    // Building* b = process_citygml_building(nbuilding.node(), dallpoly, tol_snap, errs);
+    // lsBuildings.push_back(b);
+    std::cout << each.name() << std::endl;  
+  }
+  
+
+
+  // primitives_walker walker2;
+  // doc.traverse(walker2);
+  // for (auto& each : walker2.lsNodes)
+  //   std::cout << each.name() << std::endl;
+}
 
 void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
 {

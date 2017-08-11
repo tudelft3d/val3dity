@@ -251,22 +251,28 @@ int main(int argc, char* const argv[])
 
     std::vector<Primitive*> lsPrimitives;
     std::vector<Building*> lsBuildings;
+    std::map<std::string, std::vector<Primitive*> > dPrimitives;
 
     if (inputtype == GML)
     {
       try
       {
-        if (usebuildings == false)
-          readGMLfile_primitives(inputfile.getValue(), 
-                                 lsPrimitives,
-                                 prim3d, 
-                                 ioerrs, 
-                                 snap_tolerance.getValue());
-        else
-          readGMLfile_buildings(inputfile.getValue(), 
-                                lsBuildings,
-                                ioerrs, 
-                                snap_tolerance.getValue());
+        readGMLfile(inputfile.getValue(), 
+                    dPrimitives,
+                    ioerrs, 
+                    snap_tolerance.getValue());
+
+        // if (usebuildings == false)
+        //   readGMLfile_primitives(inputfile.getValue(), 
+        //                          lsPrimitives,
+        //                          prim3d, 
+        //                          ioerrs, 
+        //                          snap_tolerance.getValue());
+        // else
+        //   readGMLfile_buildings(inputfile.getValue(), 
+        //                         lsBuildings,
+        //                         ioerrs, 
+        //                         snap_tolerance.getValue());
 
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
