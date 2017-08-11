@@ -286,12 +286,26 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == JSON)
     {
-      readCityJSONfile_primitives(inputfile.getValue(), 
-                                  lsPrimitives,
-                                  prim3d, 
-                                  ioerrs, 
-                                  snap_tolerance.getValue());
-
+      if (usebuildings == true)
+        readCityJSONfile_primitives(inputfile.getValue(), 
+                                    lsPrimitives,
+                                    prim3d, 
+                                    ioerrs, 
+                                    snap_tolerance.getValue());
+      else
+        readCityJSONfile_buildings(inputfile.getValue(), 
+                                   lsBuildings,
+                                   ioerrs, 
+                                   snap_tolerance.getValue());
+      if (ioerrs.has_errors() == true) {
+        std::cout << "Errors while reading the input file, aborting." << std::endl;
+        std::cout << ioerrs.get_report_text() << std::endl;
+      }
+      if (ishellfiles.getValue().size() > 0)
+      {
+        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+      }
     }
     else if (inputtype == POLY)
     {

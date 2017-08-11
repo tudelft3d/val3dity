@@ -990,6 +990,29 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
 }
 
 
+void readCityJSONfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap)
+{
+  std::ifstream input(ifile);
+  json j;
+  try 
+  {
+    input >> j;
+  }
+  catch (nlohmann::detail::parse_error e) 
+  {
+    errs.add_error(901, "Input file not a valid JSON file.");
+    return;
+  }
+  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
+  {
+    if (it.value()["type"] == "Building")
+    {
+      std::cout << "one building" << std::endl;
+    }
+  }
+}  
+
+
 void readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;

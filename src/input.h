@@ -84,7 +84,7 @@ MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
-
+void              readCityJSONfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 
 void              printProgressBar(int percent);
