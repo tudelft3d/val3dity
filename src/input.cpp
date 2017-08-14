@@ -147,14 +147,6 @@ std::string remove_xml_namespace(const char* input)
   return s.substr(s.find_first_of(":") + 1);
 }
 
-void remove_xml_namespace(const char* input, const char* output)
-{
-  output = input;
-  const char *namespaceSeparator = strchr(output, ':');
-  if (namespaceSeparator != NULL) {
-    output = namespaceSeparator+1;
-  }
-}
 
 vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs) {
   std::string s = "./" + NS["gml"] + "LinearRing" + "/" + NS["gml"] + "pos";
@@ -868,6 +860,60 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
 }
 
 
+// void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
+// {
+// }
+
+void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
+{
+  //-- read each CityObject in the file
+  citygml_objects_walker walker;
+  doc.traverse(walker);
+  std::cout << "# city objects found: " << walker.lsNodes.size() << std::endl;
+  //-- for each City Object parse its primitives
+  for (auto& co : walker.lsNodes)
+  {
+    std::string coid = remove_xml_namespace(co.name());
+    coid += "|";
+    if (co.attribute("gml:id") != 0)
+      coid += co.attribute("gml:id").value();
+    std::cout << "coid: " << coid << std::endl;
+    primitives_walker walker2;
+    co.traverse(walker2);
+    for (auto& prim : walker2.lsNodes)
+    {
+      std::cout << "\t" << prim.name() << std::endl;
+      std::string typeprim = remove_xml_namespace(prim.name());
+      if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
+      {
+        Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      }
+      else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
+      {
+        MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      }      
+      else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
+      {
+        CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      }
+      else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
+      {
+        MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      } 
+      else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
+      {
+        CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      } 
+    }
+  }
+
+}
+
 void readGMLfile(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
@@ -886,43 +932,17 @@ void readGMLfile(std::string &ifile, std::map<std::string, std::vector<Primitive
     errs.add_error(901, "Input file does not have the GML namespace.");
     return;
   }
-  if (NS.count("citygml") != 0)
-    std::cout << "CityGML file!" << std::endl;
-  // TODO: implement CityGML/GML variant for the parsing
 
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
-  
-  //-- read each CityObject in the file
-  citygml_objects_walker walker;
-  doc.traverse(walker);
-  std::cout << "# city objects found: " << walker.lsNodes.size() << std::endl;
-  //-- for each City Object parse it's primitives
-  for (auto& co : walker.lsNodes)
-  {
-    std::string coid = remove_xml_namespace(co.name());
-    coid += "|";
-    if (co.attribute("gml:id") != 0)
-      coid += co.attribute("gml:id").value();
-    std::cout << "coid: " << coid << std::endl;
-    primitives_walker walker2;
-    co.traverse(walker2);
-    // for (auto& prim : walker2.lsNodes)
-    // {
-      // std::cout << "\t" << prim.name() << std::endl;
-      // const char *namespaceSeparator = strchr(nodeType, ':');
-      // if (namespaceSeparator != NULL) {
-      //   nodeType = namespaceSeparator+1;
-      // }
-      // remove_xml_namespace(prim.name(), nodeType);
-      // if (strcmp(nodeType, "Solid") == 0)
-      // {
-      //   Solid* s = process_gml_solid(prim, dallpoly, tol_snap, errs);
 
-      // }
-    // }
+  if (NS.count("citygml") != 0)
+  {
+    std::cout << "CityGML file: processing each City Object" << std::endl;
+    process_gml_file_city_objects(doc, dPrimitives, dallpoly, errs, tol_snap);
   }
+  
 }
 
 void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)

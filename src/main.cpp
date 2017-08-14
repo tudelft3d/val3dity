@@ -262,18 +262,8 @@ int main(int argc, char* const argv[])
                     ioerrs, 
                     snap_tolerance.getValue());
 
-        // if (usebuildings == false)
-        //   readGMLfile_primitives(inputfile.getValue(), 
-        //                          lsPrimitives,
-        //                          prim3d, 
-        //                          ioerrs, 
-        //                          snap_tolerance.getValue());
-        // else
-        //   readGMLfile_buildings(inputfile.getValue(), 
-        //                         lsBuildings,
-        //                         ioerrs, 
-        //                         snap_tolerance.getValue());
-
+        for (auto& each: dPrimitives)
+          std::cout << each.first << " : " << (each.second).size() << std::endl;
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
