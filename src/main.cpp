@@ -257,13 +257,12 @@ int main(int argc, char* const argv[])
     {
       try
       {
-        readGMLfile(inputfile.getValue(), 
-                    dPrimitives,
-                    ioerrs, 
-                    snap_tolerance.getValue());
-
+        read_gml_file(inputfile.getValue(), 
+                      dPrimitives,
+                      ioerrs, 
+                      snap_tolerance.getValue());
         for (auto& each: dPrimitives)
-          std::cout << each.first << " : " << (each.second).size() << std::endl;
+          std::cout << "\t" << each.first << " : " << (each.second).size() << std::endl;
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
@@ -282,17 +281,10 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == JSON)
     {
-      if (usebuildings == true)
-        readCityJSONfile_primitives(inputfile.getValue(), 
-                                    lsPrimitives,
-                                    prim3d, 
-                                    ioerrs, 
-                                    snap_tolerance.getValue());
-      else
-        readCityJSONfile_buildings(inputfile.getValue(), 
-                                   lsBuildings,
-                                   ioerrs, 
-                                   snap_tolerance.getValue());
+      read_cityjson_file(inputfile.getValue(), 
+                         dPrimitives,
+                         ioerrs, 
+                         snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
