@@ -1237,7 +1237,7 @@ Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
 }
 
 
-void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors& errs, double tol_snap)
+void readOBJfile(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
@@ -1246,6 +1246,7 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
     errs.add_error(901, "Input file not found.");
     return;
   }
+  int primid = 0;
   std::cout << "Parsing the file..." << std::endl; 
   Surface* sh = new Surface(0, tol_snap);
   std::string l;
@@ -1261,9 +1262,12 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
       {
-        Solid* sol = new Solid();
+        std::string s = "Primitive|";
+        s += std::to_string(primid);
+        Solid* sol = new Solid(s);
+        primid++;
         sol->set_oshell(sh);
-        lsSolids.push_back(sol);
+        dPrimitives[s].push_back(sol);
         sh = new Surface(0, tol_snap);
       }
     }
@@ -1291,9 +1295,11 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
       sh->add_face(pgnids);
     }
   }
-  Solid* s = new Solid();
-  s->set_oshell(sh);
-  lsSolids.push_back(s);
+  std::string s = "Primitive|";
+  s += std::to_string(primid);
+  Solid* sol = new Solid(s);
+  sol->set_oshell(sh);
+  dPrimitives[s].push_back(sol);
   for (auto& each : allvertices)
     delete each;
   allvertices.clear();
