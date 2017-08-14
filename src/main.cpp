@@ -205,17 +205,6 @@ int main(int argc, char* const argv[])
       return (1);
     }
   
-    Primitive3D prim3d = SOLID;
-    if (primitives.getValue()      == "CompositeSolid")
-      prim3d = COMPOSITESOLID;
-    else if (primitives.getValue() == "MultiSolid")
-      prim3d = MULTISOLID;
-    else if (primitives.getValue() == "MultiSurface")
-      prim3d = MULTISURFACE;
-    else if (primitives.getValue() == "CompositeSurface")
-      prim3d = COMPOSITESURFACE;
-    
-
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
@@ -230,6 +219,16 @@ int main(int argc, char* const argv[])
       inputtype = OFF;
     if (inputtype == OTHER)
       ioerrs.add_error(901, "File type not supported");
+
+    Primitive3D prim3d = ALL;
+    if (primitives.getValue() == "Solid")
+      prim3d = SOLID;
+    else if (primitives.getValue() == "MultiSurface")
+      prim3d = MULTISURFACE;
+    else if (primitives.getValue() == "CompositeSurface")
+      prim3d = COMPOSITESURFACE;
+    if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
+      ioerrs.add_error(999, "CityJSON, CityGML and GML files have all their 3D primitives validated.");
 
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
       ioerrs.add_error(999, "POLY files having inner shells can be validated as CompositeSurface (only Solids)");
@@ -261,8 +260,6 @@ int main(int argc, char* const argv[])
                       dPrimitives,
                       ioerrs, 
                       snap_tolerance.getValue());
-        for (auto& each: dPrimitives)
-          std::cout << "\t" << each.first << " : " << (each.second).size() << std::endl;
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
