@@ -866,35 +866,51 @@ void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, 
   primitives_walker walker;
   doc.traverse(walker);
   std::cout << "# 3D primitives found: " << walker.lsNodes.size() << std::endl;
+  int primid = 0;
   for (auto& prim : walker.lsNodes)
   {
-    std::string coid = remove_xml_namespace(prim.name());
-    std::string typeprim = remove_xml_namespace(prim.name());
+    std::string coid = "Primitive|";
     if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
     {
       Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        coid += std::to_string(primid);
+      p->set_id(coid);
       dPrimitives[coid].push_back(p);
     }
     else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
     {
       MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        coid += std::to_string(primid);
+      p->set_id(coid);
       dPrimitives[coid].push_back(p);
     }      
     else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
     {
       CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        coid += std::to_string(primid);
+      p->set_id(coid);
       dPrimitives[coid].push_back(p);
     }
     else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
     {
       MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        coid += std::to_string(primid);
+      p->set_id(coid);
       dPrimitives[coid].push_back(p);
     } 
     else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
     {
       CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        coid += std::to_string(primid);
+      p->set_id(coid);
       dPrimitives[coid].push_back(p);
     } 
+    primid++;
   }  
 }
 
