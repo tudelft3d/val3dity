@@ -512,7 +512,26 @@ std::string print_summary_validation(std::map<std::string, std::vector<Primitive
       noprim++;
     
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  // ss << "Primitives validated: " << primitives << std::endl;
+  //-- if a CityGML/CityJSON report also CityObjects
+  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
+  {
+    int coInvalid = 0;
+    for (auto& co : dPrimitives)
+    {
+      for (auto& p : co.second)
+      {
+        if (p->is_valid() == false)
+        {
+          coInvalid++;
+          break;
+        }
+      }
+    }
+    ss << "Total # of CityObjects: " << setw(7) << dPrimitives.size() << std::endl;
+    ss << "# valid: " << setw(22) << dPrimitives.size() - coInvalid << std::endl;
+    ss << "# invalid: " << setw(20) << coInvalid << std::endl;
+    ss << "+++++" << std::endl;
+  }
   ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
   int bValid = 0;
   for (auto& co : dPrimitives)
@@ -586,7 +605,6 @@ void write_report_xml(std::ofstream& ss,
         bValid++;
   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
   ss << "\t<invalidprimitives>" << noprim - bValid << "</invalidprimitives>" << std::endl;
-
   //-- if a CityGML/CityJSON report also CityObjects
   if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
   {
@@ -606,7 +624,6 @@ void write_report_xml(std::ofstream& ss,
     ss << "\t<validcityobjects>" << dPrimitives.size() - coInvalid << "</validcityobjects>" << std::endl;
     ss << "\t<invalidcityobjects>" << coInvalid << "</invalidcityobjects>" << std::endl;
   }
-
   std::time_t rawtime;
   struct tm * timeinfo;
   std::time (&rawtime);
