@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -27,8 +27,6 @@
 
 using namespace std;
 using json = nlohmann::json;
-
-
 
 namespace val3dity
 {
@@ -307,85 +305,6 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
   }
   return sh;
 }
-
-
-Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
-{
-  Building* b = new Building;
-  if (nbuilding.attribute("gml:id") != 0) {
-    b->set_id(std::string(nbuilding.attribute("gml:id").value()));
-    // std::cout << "Building: " << std::string(nbuilding.attribute("gml:id").value()) << std::endl;
-  }
-  
-  std::string s;
-  pugi::xpath_node_set nset;
-  bool bCS = false;
-  
-  //-- 1. process the geometries for the Building (and not BuildingParts)
-  s = "./*/" + NS["gml"] + "CompositeSolid";
-  nset = nbuilding.select_nodes(s.c_str());
-  // TODO : parsing compositesolid
-  // std::clog << "Validate CompositeSolid" << std::endl;
-  if (nset.size() > 0)
-    bCS = true;
-  if (bCS == false) //-- to avoid processing Solids part of CompositeSolids
-  {
-    s = "./*/" + NS["gml"] + "Solid";
-    nset = nbuilding.select_nodes(s.c_str());
-    for(auto& n: nset)
-    {
-      Solid* sol = process_gml_solid(n.node(), dallpoly, tol_snap, errs);
-      b->add_primitive(sol);
-    }
-    if (nset.size() > 0)
-      bCS = true;
-  }
-  s = "./*/" + NS["gml"] + "MultiSurface";
-  nset = nbuilding.select_nodes(s.c_str());
-  for(auto& n: nset)
-  {
-    MultiSurface* ms = process_gml_multisurface(n.node(), dallpoly, tol_snap, errs);
-    b->add_primitive(ms);
-  }
-
-  //-- 2. process the geometries children of BuildingParts
-  s = ".//" + NS["building"] + "BuildingPart";
-  nset = nbuilding.select_nodes(s.c_str());
-  for(auto& nbp: nset)
-  {
-    bCS = false;
-    BuildingPart* bp = new BuildingPart;
-    b->add_buildingpart(bp);
-    if (nbp.node().attribute("gml:id") != 0) 
-    {
-      bp->set_id(std::string(nbp.node().attribute("gml:id").value()));
-      // std::cout << "BuildingPart: " << std::string(nbp.node().attribute("gml:id").value()) << std::endl;
-    }
-    // s = ".//" + NS["gml"] + "CompositeSolid";
-    // nset = nbp.node().select_nodes(s.c_str());
-    // // TODO : parsing compositesolid
-    // std::clog << "Validate CompositeSolid" << std::endl;
-    pugi::xpath_node_set nset2;
-    if (bCS == false)
-    {
-      s = "./*/" + NS["gml"] + "Solid";
-      nset2 = nbp.node().select_nodes(s.c_str());
-      for(auto& n: nset2)
-      {
-        Solid* sol = process_gml_solid(n.node(), dallpoly, tol_snap, errs);
-        bp->add_primitive(sol);
-      }
-    }
-    s = "./*/" + NS["gml"] + "MultiSurface";
-    nset2 = nbp.node().select_nodes(s.c_str());
-    for(auto& n: nset2)
-    {
-      MultiSurface* ms = process_gml_multisurface(n.node(), dallpoly, tol_snap, errs);
-      bp->add_primitive(ms);
-    }
-  }
-  return b;
-} 
 
 
 Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)

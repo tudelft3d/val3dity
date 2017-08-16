@@ -34,7 +34,6 @@
 #include "Solid.h"
 #include "CompositeSolid.h"
 #include "MultiSolid.h"
-#include "Building.h"
 #include <fstream>
 #include <string>
 #include "pugixml/pugixml.hpp"
@@ -137,8 +136,6 @@ void              readOBJfile(std::map<std::string, std::vector<Primitive*> >& d
 Surface*          readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
 Surface*          readOFFfile(std::string &ifile, int shellid, IOErrors& errs);
 
-Building*         process_citygml_building(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
-
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSurface*     process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
@@ -148,7 +145,6 @@ MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
-void              readCityJSONfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 void              process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
 void              process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
