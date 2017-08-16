@@ -660,7 +660,7 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
-void read_cityjson_file(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
+void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
 {
   std::ifstream input(ifile);
   json j;
@@ -674,6 +674,8 @@ void read_cityjson_file(std::string &ifile, std::map<std::string, std::vector<Pr
     errs.add_error(901, "Input file not a valid JSON file.");
     return;
   }
+  std::cout << "CityJSON input file" << std::endl;
+  std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
     // std::cout << "o " << it.key() << std::endl;
@@ -882,7 +884,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
 
 }
 
-void read_gml_file(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
+void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
@@ -905,17 +907,15 @@ void read_gml_file(std::string &ifile, std::map<std::string, std::vector<Primiti
   build_dico_xlinks(doc, dallpoly, errs);
   if (NS.count("citygml") != 0)
   {
-    std::cout << "CityGML file: processing the 3D primitives of each City Object." << std::endl;
+    std::cout << "CityGML input file" << std::endl;
     process_gml_file_city_objects(doc, dPrimitives, dallpoly, errs, tol_snap);
   }
   else
   {
-    std::cout << "Not a CityGML file: processing each 3D primitives." << std::endl;
+    std::cout << "GML input file (ie not CityGML)" << std::endl;
     process_gml_file_primitives(doc, dPrimitives, dallpoly, errs, tol_snap);
   }
 }
-
-
 
 
 void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
@@ -1010,7 +1010,7 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
 }
 
 
-Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
+Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -1116,7 +1116,7 @@ void printProgressBar(int percent) {
   std::cout << percent << "%     " << std::flush;
 }
 
-Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
+Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -1156,7 +1156,7 @@ Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
 }
 
 
-void readOBJfile(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap)
+void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);

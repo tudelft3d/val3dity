@@ -2,7 +2,7 @@
 #define VAL3DITY_INPUT_DEFINITIONS_H
 
 /*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -119,10 +119,10 @@ struct primitives_walker: pugi::xml_tree_walker
 
 //--
 
-void              read_gml_file(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap);
+void              read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap);
 void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
-void              read_cityjson_file(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap);
+void              read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap);
 
 void              print_information(std::string &ifile);
 void              report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
@@ -132,9 +132,9 @@ void              get_namespaces(pugi::xml_node& root, std::map<std::string, std
 void              print_info_aligned(std::string o, size_t number, bool tab = false);
 
 std::string       errorcode2description(int code);
-void              readOBJfile(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
-Surface*          readPolyfile(std::string &ifile, int shellid, IOErrors& errs);
-Surface*          readOFFfile(std::string &ifile, int shellid, IOErrors& errs);
+void              read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
+Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
+Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs);
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
