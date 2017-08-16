@@ -451,6 +451,7 @@ int main(int argc, char* const argv[])
   }
 }
 
+// TODO: fix the unit_test function
 std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
 {
 //   int bValid = 0;
@@ -585,6 +586,27 @@ void write_report_xml(std::ofstream& ss,
         bValid++;
   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
   ss << "\t<invalidprimitives>" << noprim - bValid << "</invalidprimitives>" << std::endl;
+
+  //-- if a CityGML/CityJSON report also CityObjects
+  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
+  {
+    int coInvalid = 0;
+    for (auto& co : dPrimitives)
+    {
+      for (auto& p : co.second)
+      {
+        if (p->is_valid() == false)
+        {
+          coInvalid++;
+          break;
+        }
+      }
+    }
+    ss << "\t<totalcityobjects>" << dPrimitives.size() << "</totalcityobjects>" << std::endl;
+    ss << "\t<validcityobjects>" << dPrimitives.size() - coInvalid << "</validcityobjects>" << std::endl;
+    ss << "\t<invalidcityobjects>" << coInvalid << "</invalidcityobjects>" << std::endl;
+  }
+
   std::time_t rawtime;
   struct tm * timeinfo;
   std::time (&rawtime);
@@ -598,12 +620,32 @@ void write_report_xml(std::ofstream& ss,
   }
   else
   {
-    for (auto& co : dPrimitives)
-      for (auto& p : co.second)
+    //-- only primitives, no CityObjects
+    if ( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) )
+    {
+      for (auto& p : dPrimitives["Primitives"])
       {
         if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
           ss << p->get_report_xml();
       }
+    }
+    else
+    {
+      for (auto& co : dPrimitives)
+      {
+        std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
+        std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+        ss << "<" << cotype << ">" << std::endl;
+        ss << "<id>" << coid << "</id>" << std::endl;
+        for (auto& p : co.second)
+        {
+          if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+            ss << p->get_report_xml();
+        }
+        ss << "</" << cotype << ">" << std::endl;
+      }
+
+    }
   }
   ss << "</val3dity>" << std::endl;
 }
