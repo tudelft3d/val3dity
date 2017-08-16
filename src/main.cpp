@@ -39,12 +39,8 @@ std::string print_summary_validation(std::map<std::string, std::vector<Primitive
 std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
 std::string print_unit_tests(vector<Building*>& lsBuilding);
 
-// void write_report_xml (std::ofstream& ss, std::string ifile, vector<Primitive*>& lsPrimitives, Primitive3D prim3d, 
-                      // double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, 
-                      // IOErrors ioerrs, bool onlyinvalid = false);
-// void write_report_xml (std::ofstream& ss, std::string ifile, vector<Building*>& lsBuildings,
-                      // double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n,
-                      // IOErrors ioerrs, bool onlyinvalid);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
+
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -227,8 +223,6 @@ int main(int argc, char* const argv[])
       std::clog.rdbuf(mylog.rdbuf());
     }
 
-    std::vector<Primitive*> lsPrimitives;
-    std::vector<Building*> lsBuildings;
     std::map<std::string, std::vector<Primitive*> > dPrimitives;
 
     if (inputtype == GML)
@@ -400,7 +394,6 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    // std::cout << "\n" << print_summary_validation(lsPrimitives, prim3d) << std::endl;        
     std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;        
     // if (report.getValue() != "")
     // {
@@ -544,107 +537,55 @@ std::string print_summary_validation(std::map<std::string, std::vector<Primitive
 }
 
 
-// void write_report_xml(std::ofstream& ss,
-//                       std::string ifile, 
-//                       vector<Primitive*>& lsPrimitives,
-//                       Primitive3D prim3d, 
-//                       double snap_tolerance,
-//                       double overlap_tolerance,
-//                       double planarity_d2p,
-//                       double planarity_n,
-//                       IOErrors ioerrs,
-//                       bool onlyinvalid)
-// {
-//   ss << "<val3dity>" << std::endl;
-//   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
-//   ss << "\t<primitives>";
-//   if (prim3d == SOLID)
-//     ss << "gml:Solid";
-//   else if (prim3d == COMPOSITESOLID)
-//     ss << "gml:CompositeSolid";
-//   else if (prim3d == MULTISOLID)
-//     ss << "gml:MultiSolid";
-//   else if (prim3d == MULTISURFACE)
-//     ss << "gml:MultiSurface";
-//   else if (prim3d == COMPOSITESURFACE)
-//     ss << "gml:CompositeSurface";
-//   ss << "</primitives>" << std::endl;
-//   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
-//   ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
-//   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
-//   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
-//   ss << "\t<totalprimitives>" << lsPrimitives.size() << "</totalprimitives>" << std::endl;
-//   int bValid = 0;
-//   for (auto& s : lsPrimitives)
-//     if (s->is_valid() == true)
-//       bValid++;
-//   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
-//   ss << "\t<invalidprimitives>" << (lsPrimitives.size() - bValid) << "</invalidprimitives>" << std::endl;
-//   std::time_t rawtime;
-//   struct tm * timeinfo;
-//   std::time (&rawtime);
-//   timeinfo = std::localtime ( &rawtime );
-//   char buffer[80];
-//   std::strftime(buffer, 80, "%c %Z", timeinfo);
-//   ss << "\t<time>" << buffer << "</time>" << std::endl;
-//   if (ioerrs.has_errors() == true)
-//   {
-//     ss << ioerrs.get_report_xml();
-//   }
-//   else
-//   {
-//     for (auto& s : lsPrimitives) 
-//     {
-//       if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
-//         ss << s->get_report_xml();
-//     }
-//   }
-//   ss << "</val3dity>" << std::endl;
-// }
-
-
-// void write_report_xml(std::ofstream& ss,
-//                       std::string ifile, 
-//                       vector<Building*>& lsBuildings,
-//                       double snap_tolerance,
-//                       double overlap_tolerance,
-//                       double planarity_d2p,
-//                       double planarity_n,
-//                       IOErrors ioerrs,
-//                       bool onlyinvalid)
-// {
-//   ss << "<val3dity>" << std::endl;
-//   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
-//   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
-//   ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
-//   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
-//   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
-//   ss << "\t<numberbuildings>" << lsBuildings.size() << "</numberbuildings>" << std::endl;
-//   int bValid = 0;
-//   for (auto& s : lsBuildings)
-//     if (s->is_valid() == true)
-//       bValid++;
-//   ss << "\t<validbuildings>" << bValid << "</validbuildings>" << std::endl;
-//   ss << "\t<invalidbuildings>" << (lsBuildings.size() - bValid) << "</invalidbuildings>" << std::endl;
-//   std::time_t rawtime;
-//   struct tm * timeinfo;
-//   std::time (&rawtime);
-//   timeinfo = std::localtime ( &rawtime );
-//   char buffer[80];
-//   std::strftime(buffer, 80, "%c %Z", timeinfo);
-//   ss << "\t<time>" << buffer << "</time>" << std::endl;
-//   if (ioerrs.has_errors() == true)
-//   {
-//     ss << ioerrs.get_report_xml();
-//   }
-//   else
-//   {
-//     for (auto& s : lsBuildings) 
-//     {
-//       if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
-//         ss << s->get_report_xml();
-//     }
-//   }
-//   ss << "</val3dity>" << std::endl;
-// }
+void write_report_xml(std::ofstream& ss,
+                      std::string ifile, 
+                      std::map<std::string, std::vector<Primitive*> >& dPrimitives,
+                      double snap_tolerance,
+                      double overlap_tolerance,
+                      double planarity_d2p,
+                      double planarity_n,
+                      IOErrors ioerrs,
+                      bool onlyinvalid)
+{
+  ss << "<val3dity>" << std::endl;
+  ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
+  ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
+  ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
+  ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
+  ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
+  int noprim = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      noprim++;
+  ss << "\t<totalprimitives>" << noprim << "</totalprimitives>" << std::endl;
+    
+  int bValid = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      if (p->is_valid() == true)
+        bValid++;
+  ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
+  ss << "\t<invalidprimitives>" << noprim - bValid << "</invalidprimitives>" << std::endl;
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  ss << "\t<time>" << buffer << "</time>" << std::endl;
+  if (ioerrs.has_errors() == true)
+  {
+    ss << ioerrs.get_report_xml();
+  }
+  else
+  {
+    for (auto& co : dPrimitives)
+      for (auto& p : co.second)
+      {
+        if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+          ss << p->get_report_xml();
+      }
+  }
+  ss << "</val3dity>" << std::endl;
+}
 
