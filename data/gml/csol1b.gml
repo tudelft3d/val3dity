@@ -176,4 +176,88 @@
 			</gml:Solid>
 		</gml:solidMember>
 	</gml:CompositeSolid>
+	<gml:Solid gml:id="helivesindelft">
+		<gml:exterior>
+			<gml:CompositeSurface>
+				<gml:surfaceMember>
+					<gml:Polygon>
+						<gml:exterior>
+							<gml:LinearRing>
+								<gml:pos>0.00 0.00 0.00</gml:pos>
+								<gml:pos>0.00 100.00 0.00</gml:pos>
+								<gml:pos>100.00 100.00 0.00</gml:pos>
+								<gml:pos>100.00 0.00 0.00</gml:pos>
+								<gml:pos>0.00 0.00 0.00</gml:pos>
+							</gml:LinearRing>
+						</gml:exterior>
+					</gml:Polygon>
+				</gml:surfaceMember>
+				<gml:surfaceMember>
+					<gml:Polygon>
+						<gml:exterior>
+							<gml:LinearRing>
+								<gml:pos>0.00 0.00 100.00</gml:pos>
+								<gml:pos>100.00 0.00 100.00</gml:pos>
+								<gml:pos>100.00 100.00 100.00</gml:pos>
+								<gml:pos>0.00 100.00 100.00</gml:pos>
+								<gml:pos>0.00 0.00 100.00</gml:pos>
+							</gml:LinearRing>
+						</gml:exterior>
+					</gml:Polygon>
+				</gml:surfaceMember>
+				<gml:surfaceMember>
+					<gml:Polygon>
+						<gml:exterior>
+							<gml:LinearRing>
+								<gml:pos>0.00 0.00 0.00</gml:pos>
+								<gml:pos>100.00 0.00 0.00</gml:pos>
+								<gml:pos>100.00 0.00 100.00</gml:pos>
+								<gml:pos>0.00 0.00 100.00</gml:pos>
+								<gml:pos>0.00 0.00 0.00</gml:pos>
+							</gml:LinearRing>
+						</gml:exterior>
+					</gml:Polygon>
+				</gml:surfaceMember>
+				<gml:surfaceMember>
+					<gml:Polygon>
+						<gml:exterior>
+							<gml:LinearRing>
+								<gml:pos>100.00 0.00 0.00</gml:pos>
+								<gml:pos>100.00 100.00 0.00</gml:pos>
+								<gml:pos>100.00 100.00 100.00</gml:pos>
+								<gml:pos>100.00 0.00 100.00</gml:pos>
+								<gml:pos>100.00 0.00 0.00</gml:pos>
+							</gml:LinearRing>
+						</gml:exterior>
+					</gml:Polygon>
+				</gml:surfaceMember>
+				<gml:surfaceMember>
+					<gml:Polygon>
+						<gml:exterior>
+							<gml:LinearRing>
+								<gml:pos>100.00 100.00 0.00</gml:pos>
+								<gml:pos>0.00 100.00 0.00</gml:pos>
+								<gml:pos>0.00 100.00 100.00</gml:pos>
+								<gml:pos>100.00 100.00 100.00</gml:pos>
+								<gml:pos>100.00 100.00 0.00</gml:pos>
+							</gml:LinearRing>
+						</gml:exterior>
+					</gml:Polygon>
+				</gml:surfaceMember>
+				<gml:surfaceMember>
+					<gml:Polygon>
+						<gml:exterior>
+							<gml:LinearRing>
+								<gml:pos>0.00 100.00 0.00</gml:pos>
+								<gml:pos>0.00 0.00 0.00</gml:pos>
+								<gml:pos>0.00 0.00 100.00</gml:pos>
+								<gml:pos>0.00 100.00 100.00</gml:pos>
+								<gml:pos>0.00 100.00 0.00</gml:pos>
+							</gml:LinearRing>
+						</gml:exterior>
+					</gml:Polygon>
+				</gml:surfaceMember>
+			</gml:CompositeSurface>
+		</gml:exterior>
+	</gml:Solid>
 </GenericGML>
