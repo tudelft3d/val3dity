@@ -35,13 +35,9 @@ using namespace std;
 using namespace val3dity;
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives);
-
 std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
 std::string print_unit_tests(vector<Building*>& lsBuilding);
-
 void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
-
-
 
 class MyOutput : public TCLAP::StdOutput
 {
@@ -89,8 +85,8 @@ int main(int argc, char* const argv[])
   //-- tclap options
   std::vector<std::string> primitivestovalidate;
   primitivestovalidate.push_back("Solid");  
-  primitivestovalidate.push_back("MultiSurface");   
   primitivestovalidate.push_back("CompositeSurface");   
+  primitivestovalidate.push_back("MultiSurface");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
   TCLAP::CmdLine cmd("Allowed options", ' ', "2.0 beta 1");
@@ -174,6 +170,7 @@ int main(int argc, char* const argv[])
     cmd.add(notranslate);
     cmd.add(overlap_tolerance);
     cmd.add(verbose);
+    cmd.add(primitives);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
@@ -181,12 +178,8 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-    if (info.getValue() == true)
-    {
-      print_information(inputfile.getValue());
-      return (1);
-    }
-  
+    std::map<std::string, std::vector<Primitive*> > dPrimitives;
+
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
@@ -210,11 +203,24 @@ int main(int argc, char* const argv[])
     else if (primitives.getValue() == "CompositeSurface")
       prim3d = COMPOSITESURFACE;
     if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
-      ioerrs.add_error(999, "CityJSON, CityGML and GML files have all their 3D primitives validated.");
+      ioerrs.add_error(999, "option '-p' not possible with CityJSON, CityGML, and GML input since all 3D primitives are validated.");
+    if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == JSON) || (inputtype == POLY)) )
+      ioerrs.add_error(999, "option '-p' must be used to specify how to validate the primitives given as input.");
 
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
-      ioerrs.add_error(999, "POLY files having inner shells can be validated as CompositeSurface (only Solids)");
+      ioerrs.add_error(999, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
     
+    if (ioerrs.has_errors() == true)
+    {
+      std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;
+      return(1);
+    }
+     
+    if (info.getValue() == true)
+    {
+      print_information(inputfile.getValue());
+      return (1);
+    }
      //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
@@ -223,13 +229,11 @@ int main(int argc, char* const argv[])
       std::clog.rdbuf(mylog.rdbuf());
     }
 
-    std::map<std::string, std::vector<Primitive*> > dPrimitives;
-
     if (inputtype == GML)
     {
       try
       {
-        read_gml_file(inputfile.getValue(), 
+        read_file_gml(inputfile.getValue(), 
                       dPrimitives,
                       ioerrs, 
                       snap_tolerance.getValue());
@@ -251,7 +255,7 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == JSON)
     {
-      read_cityjson_file(inputfile.getValue(), 
+      read_file_cityjson(inputfile.getValue(), 
                          dPrimitives,
                          ioerrs, 
                          snap_tolerance.getValue());
@@ -267,7 +271,7 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == POLY)
     {
-      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+      Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
       if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
       {
         Solid* s = new Solid;
@@ -275,7 +279,7 @@ int main(int argc, char* const argv[])
         int sid = 1;
         for (auto ifile : ishellfiles.getValue())
         {
-          Surface* sh = readPolyfile(ifile, sid, ioerrs);
+          Surface* sh = read_file_poly(ifile, sid, ioerrs);
           if (ioerrs.has_errors() == false)
           {
             s->add_ishell(sh);
@@ -285,17 +289,24 @@ int main(int argc, char* const argv[])
         if (ioerrs.has_errors() == false)
           dPrimitives["Primitive|0"].push_back(s);
       }
-      if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+      else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
         CompositeSurface* cs = new CompositeSurface;
         cs->set_surface(sh);
         if (ioerrs.has_errors() == false)
           dPrimitives["Primitive|0"].push_back(cs);
       }
+      else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+      {
+        MultiSurface* ms = new MultiSurface;
+        ms->set_surface(sh);
+        if (ioerrs.has_errors() == false)
+          dPrimitives["Primitive|0"].push_back(ms);
+      }      
     }
     else if (inputtype == OFF)
     {
-      Surface* sh = readOFFfile(inputfile.getValue(), 0, ioerrs);
+      Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
       if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
       {
         Solid* s = new Solid;
@@ -303,20 +314,27 @@ int main(int argc, char* const argv[])
         if (ioerrs.has_errors() == false)
           dPrimitives["Primitive|0"].push_back(s);
       }
-      if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+      else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
         CompositeSurface* cs = new CompositeSurface;
         cs->set_surface(sh);
         if (ioerrs.has_errors() == false)
           dPrimitives["Primitive|0"].push_back(cs);
       }
+      else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+      {
+        MultiSurface* ms = new MultiSurface;
+        ms->set_surface(sh);
+        if (ioerrs.has_errors() == false)
+          dPrimitives["Primitive|0"].push_back(ms);
+      }
     }    
     else if (inputtype == OBJ)
     {
-      readOBJfile(dPrimitives,
-                  inputfile.getValue(), 
-                  ioerrs, 
-                  snap_tolerance.getValue());
+      read_file_obj(dPrimitives,
+                    inputfile.getValue(), 
+                    ioerrs, 
+                    snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
