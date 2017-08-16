@@ -528,8 +528,18 @@ std::string print_summary_validation(std::map<std::string, std::vector<Primitive
       }
     }
     ss << "Total # of CityObjects: " << setw(7) << dPrimitives.size() << std::endl;
-    ss << "# valid: " << setw(22) << dPrimitives.size() - coInvalid << std::endl;
-    ss << "# invalid: " << setw(20) << coInvalid << std::endl;
+    float percentage;
+    if (dPrimitives.size()  == 0)
+      percentage = 0;
+    else
+      percentage = 100 * (coInvalid / float(dPrimitives.size()));
+    ss << "# valid: " << setw(22) << dPrimitives.size() - coInvalid;
+    if (dPrimitives.size() == 0)
+      ss << " (" << 0 << "%)" << std::endl;
+    else
+      ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
+    ss << "# invalid: " << setw(20) << coInvalid;
+    ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
     ss << "+++++" << std::endl;
   }
   ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
