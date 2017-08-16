@@ -788,47 +788,42 @@ void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, 
   doc.traverse(walker);
   std::cout << "# 3D primitives found: " << walker.lsNodes.size() << std::endl;
   int primid = 0;
+  std::string coid = "Primitives";
   for (auto& prim : walker.lsNodes)
   {
-    std::string coid = "Primitive|";
     if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
     {
       Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
-        coid += std::to_string(primid);
-      p->set_id(coid);
+        p->set_id(std::to_string(primid));
       dPrimitives[coid].push_back(p);
     }
     else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
     {
       MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
-        coid += std::to_string(primid);
-      p->set_id(coid);
+        p->set_id(std::to_string(primid));
       dPrimitives[coid].push_back(p);
     }      
     else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
     {
       CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
-        coid += std::to_string(primid);
-      p->set_id(coid);
+        p->set_id(std::to_string(primid));
       dPrimitives[coid].push_back(p);
     }
     else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
     {
       MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
-        coid += std::to_string(primid);
-      p->set_id(coid);
+        p->set_id(std::to_string(primid));
       dPrimitives[coid].push_back(p);
     } 
     else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
     {
       CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
-        coid += std::to_string(primid);
-      p->set_id(coid);
+        p->set_id(std::to_string(primid));
       dPrimitives[coid].push_back(p);
     } 
     primid++;
@@ -1156,7 +1151,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
 }
 
 
-void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap)
+void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
@@ -1181,12 +1176,25 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
       {
-        std::string s = "Primitive|";
-        s += std::to_string(primid);
-        Solid* sol = new Solid(s);
+        if (prim3d == SOLID)
+        {
+          Solid* sol = new Solid(std::to_string(primid));
+          sol->set_oshell(sh);
+          dPrimitives["Primitives"].push_back(sol);
+        }
+        else if ( prim3d == COMPOSITESURFACE)
+        {
+          CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
+          cs->set_surface(sh);
+          dPrimitives["Primitives"].push_back(cs);
+        }
+        else if (prim3d == MULTISURFACE)
+        {
+          MultiSurface* ms = new MultiSurface(std::to_string(primid));
+          ms->set_surface(sh);
+          dPrimitives["Primitives"].push_back(ms);
+        }
         primid++;
-        sol->set_oshell(sh);
-        dPrimitives[s].push_back(sol);
         sh = new Surface(0, tol_snap);
       }
     }
@@ -1214,11 +1222,24 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
       sh->add_face(pgnids);
     }
   }
-  std::string s = "Primitive|";
-  s += std::to_string(primid);
-  Solid* sol = new Solid(s);
-  sol->set_oshell(sh);
-  dPrimitives[s].push_back(sol);
+  if (prim3d == SOLID)
+  {
+    Solid* sol = new Solid(std::to_string(primid));
+    sol->set_oshell(sh);
+    dPrimitives["Primitives"].push_back(sol);
+  }
+  else if ( prim3d == COMPOSITESURFACE)
+  {
+    CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
+    cs->set_surface(sh);
+    dPrimitives["Primitives"].push_back(cs);
+  }
+  else if (prim3d == MULTISURFACE)
+  {
+    MultiSurface* ms = new MultiSurface(std::to_string(primid));
+    ms->set_surface(sh);
+    dPrimitives["Primitives"].push_back(ms);
+  }
   for (auto& each : allvertices)
     delete each;
   allvertices.clear();

@@ -132,7 +132,7 @@ void              get_namespaces(pugi::xml_node& root, std::map<std::string, std
 void              print_info_aligned(std::string o, size_t number, bool tab = false);
 
 std::string       errorcode2description(int code);
-void              read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, IOErrors& errs, double tol_snap);
+void              read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
 Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs);
 

@@ -204,7 +204,7 @@ int main(int argc, char* const argv[])
       prim3d = COMPOSITESURFACE;
     if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
       ioerrs.add_error(999, "option '-p' not possible with CityJSON, CityGML, and GML input since all 3D primitives are validated.");
-    if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == JSON) || (inputtype == POLY)) )
+    if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == OFF) || (inputtype == POLY)) )
       ioerrs.add_error(999, "option '-p' must be used to specify how to validate the primitives given as input.");
 
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
@@ -287,21 +287,21 @@ int main(int argc, char* const argv[])
           }
         }
         if (ioerrs.has_errors() == false)
-          dPrimitives["Primitive|0"].push_back(s);
+          dPrimitives["Primitives"].push_back(s);
       }
       else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
         CompositeSurface* cs = new CompositeSurface;
         cs->set_surface(sh);
         if (ioerrs.has_errors() == false)
-          dPrimitives["Primitive|0"].push_back(cs);
+          dPrimitives["Primitives"].push_back(cs);
       }
       else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
       {
         MultiSurface* ms = new MultiSurface;
         ms->set_surface(sh);
         if (ioerrs.has_errors() == false)
-          dPrimitives["Primitive|0"].push_back(ms);
+          dPrimitives["Primitives"].push_back(ms);
       }      
     }
     else if (inputtype == OFF)
@@ -312,27 +312,28 @@ int main(int argc, char* const argv[])
         Solid* s = new Solid;
         s->set_oshell(sh);
         if (ioerrs.has_errors() == false)
-          dPrimitives["Primitive|0"].push_back(s);
+          dPrimitives["Primitives"].push_back(s);
       }
       else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
         CompositeSurface* cs = new CompositeSurface;
         cs->set_surface(sh);
         if (ioerrs.has_errors() == false)
-          dPrimitives["Primitive|0"].push_back(cs);
+          dPrimitives["Primitives"].push_back(cs);
       }
       else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
       {
         MultiSurface* ms = new MultiSurface;
         ms->set_surface(sh);
         if (ioerrs.has_errors() == false)
-          dPrimitives["Primitive|0"].push_back(ms);
+          dPrimitives["Primitives"].push_back(ms);
       }
     }    
     else if (inputtype == OBJ)
     {
       read_file_obj(dPrimitives,
                     inputfile.getValue(), 
+                    prim3d,
                     ioerrs, 
                     snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
@@ -413,24 +414,24 @@ int main(int argc, char* const argv[])
 
     //-- print summary of errors
     std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;        
-    // if (report.getValue() != "")
-    // {
-    //   std::ofstream thereport;
-    //   thereport.open(report.getValue());
-    //   write_report_xml(thereport, 
-    //                    inputfile.getValue(),
-    //                    dPrimitives,
-    //                    snap_tolerance.getValue(),
-    //                    overlap_tolerance.getValue(),
-    //                    planarity_d2p.getValue(),
-    //                    planarity_n.getValue(),
-    //                    ioerrs,
-    //                    onlyinvalid.getValue());
-    //   thereport.close();
-    //   std::cout << "Full validation report saved to " << report.getValue() << std::endl;
-    // }
-    // else
-    //   std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+    if (report.getValue() != "")
+    {
+      std::ofstream thereport;
+      thereport.open(report.getValue());
+      write_report_xml(thereport, 
+                       inputfile.getValue(),
+                       dPrimitives,
+                       snap_tolerance.getValue(),
+                       overlap_tolerance.getValue(),
+                       planarity_d2p.getValue(),
+                       planarity_n.getValue(),
+                       ioerrs,
+                       onlyinvalid.getValue());
+      thereport.close();
+      std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+    }
+    else
+      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
 
     if (verbose.getValue() == false)
     {
