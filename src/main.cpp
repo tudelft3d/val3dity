@@ -35,10 +35,10 @@
 using namespace std;
 using namespace val3dity;
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives);
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors);
 // std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
 // std::string print_unit_tests(vector<Building*>& lsBuilding);
-void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -181,6 +181,7 @@ int main(int argc, char* const argv[])
     cmd.parse( argc, argv );
 
     std::map<std::string, std::vector<Primitive*> > dPrimitives;
+    std::map<std::string, VError > dPrimitivesErrors;
 
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
@@ -214,7 +215,7 @@ int main(int argc, char* const argv[])
     
     if (ioerrs.has_errors() == true)
     {
-      std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;
+      std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors) << std::endl;
       return(1);
     }
      
@@ -223,7 +224,7 @@ int main(int argc, char* const argv[])
       print_information(inputfile.getValue());
       return (1);
     }
-     //-- if verbose == false then log to a file
+    //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
       savedBufferCLOG = clog.rdbuf();
@@ -389,7 +390,6 @@ int main(int argc, char* const argv[])
     }
 
     //-- now the validation starts
-    std::map<std::string, VError > dPrimitivesErrors;
     if ( (dPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
     {
       // std::cout << "Validating " << dPrimitives.size();
@@ -421,6 +421,7 @@ int main(int argc, char* const argv[])
           VError coerrs;
           if (do_primitives_overlap(co.second, coerrs, overlap_tolerance.getValue()) == true)
           {
+            std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
             dPrimitivesErrors[co.first] = coerrs;
           }
         }
@@ -430,7 +431,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;        
+    std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors) << std::endl;        
     if (report.getValue() != "")
     {
       std::ofstream thereport;
@@ -438,6 +439,7 @@ int main(int argc, char* const argv[])
       write_report_xml(thereport, 
                        inputfile.getValue(),
                        dPrimitives,
+                       dPrimitivesErrors,
                        snap_tolerance.getValue(),
                        overlap_tolerance.getValue(),
                        planarity_d2p.getValue(),
@@ -519,7 +521,7 @@ int main(int argc, char* const argv[])
 //   return ss.str();
 // }
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives)
+std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -535,6 +537,11 @@ std::string print_summary_validation(std::map<std::string, std::vector<Primitive
     int coInvalid = 0;
     for (auto& co : dPrimitives)
     {
+      if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      {
+        coInvalid++;
+        continue;
+      }
       for (auto& p : co.second)
       {
         if (p->is_valid() == false)
@@ -606,6 +613,7 @@ std::string print_summary_validation(std::map<std::string, std::vector<Primitive
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
                       std::map<std::string, std::vector<Primitive*> >& dPrimitives,
+                      std::map<std::string, VError >& dPrimitivesErrors,
                       double snap_tolerance,
                       double overlap_tolerance,
                       double planarity_d2p,
@@ -638,6 +646,11 @@ void write_report_xml(std::ofstream& ss,
     int coInvalid = 0;
     for (auto& co : dPrimitives)
     {
+      if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      {
+        coInvalid++;
+        continue;
+      }
       for (auto& p : co.second)
       {
         if (p->is_valid() == false)
@@ -681,6 +694,8 @@ void write_report_xml(std::ofstream& ss,
         std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
         ss << "<" << cotype << ">" << std::endl;
         ss << "<id>" << coid << "</id>" << std::endl;
+        if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+          ss << dPrimitivesErrors[co.first].get_report_xml();
         for (auto& p : co.second)
         {
           if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
