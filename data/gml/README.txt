@@ -3,6 +3,12 @@
 CompositeSolid with 2 cubes adjacent
 valid
 
+# csol1b.gml
+CompositeSolid with 2 cubes adjacent, file w/o CityGML namespace!
+a dummy GenericGML is put instead
+valid
+
+
 # csol2.gml
 CompositeSolid with 3 cubes adjacent
 cube 1-2 overlap by 1cm

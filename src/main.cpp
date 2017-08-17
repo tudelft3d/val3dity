@@ -25,28 +25,20 @@
 
 #include "input.h"
 #include "Primitive.h"
-#include "Building.h"
+#include "validate_prim_toporel.h"
 #include "Surface.h"
 #include "Solid.h"
+#include "VError.h"
 #include <tclap/CmdLine.h>
 #include <time.h>  
 
 using namespace std;
 using namespace val3dity;
 
-
-std::string print_summary_validation(std::vector<Building*>& lsBuildings);
-std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Primitive3D prim3d);
-
-std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
-std::string print_unit_tests(vector<Building*>& lsBuilding);
-
-void write_report_xml (std::ofstream& ss, std::string ifile, vector<Primitive*>& lsPrimitives, Primitive3D prim3d, 
-                      double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, 
-                      IOErrors ioerrs, bool onlyinvalid = false);
-void write_report_xml (std::ofstream& ss, std::string ifile, vector<Building*>& lsBuildings,
-                      double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n,
-                      IOErrors ioerrs, bool onlyinvalid);
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives);
+// std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
+// std::string print_unit_tests(vector<Building*>& lsBuilding);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -95,10 +87,8 @@ int main(int argc, char* const argv[])
   //-- tclap options
   std::vector<std::string> primitivestovalidate;
   primitivestovalidate.push_back("Solid");  
-  primitivestovalidate.push_back("MultiSolid");  
-  primitivestovalidate.push_back("CompositeSolid");  
-  primitivestovalidate.push_back("MultiSurface");   
   primitivestovalidate.push_back("CompositeSurface");   
+  primitivestovalidate.push_back("MultiSurface");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
   TCLAP::CmdLine cmd("Allowed options", ' ', "2.0 beta 1");
@@ -129,12 +119,6 @@ int main(int argc, char* const argv[])
                                               false,
                                               "S",
                                               &primVals);
-    TCLAP::SwitchArg                        buildings("b",
-                                              "buildings",
-                                              "validate all 3D primitives of CityGML Buildings (including BuidingParts),"
-                                              "skips the rest,"
-                                              "and report per building",
-                                              false);
     TCLAP::SwitchArg                        info("i",
                                               "info",
                                               "prints information about the file",
@@ -181,17 +165,14 @@ int main(int argc, char* const argv[])
                                               1.0,
                                               "double");
 
-    vector<TCLAP::Arg*> xorlist;
-    xorlist.push_back(&primitives);
-    xorlist.push_back(&buildings);
-    xorlist.push_back(&info);
-    cmd.xorAdd( xorlist );
+    cmd.add(info);
     cmd.add(planarity_d2p);
     cmd.add(planarity_n);
     cmd.add(snap_tolerance);
     cmd.add(notranslate);
     cmd.add(overlap_tolerance);
     cmd.add(verbose);
+    cmd.add(primitives);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
@@ -199,22 +180,7 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-    if (info.getValue() == true)
-    {
-      print_information(inputfile.getValue());
-      return (1);
-    }
-  
-    Primitive3D prim3d = SOLID;
-    if (primitives.getValue()      == "CompositeSolid")
-      prim3d = COMPOSITESOLID;
-    else if (primitives.getValue() == "MultiSolid")
-      prim3d = MULTISOLID;
-    else if (primitives.getValue() == "MultiSurface")
-      prim3d = MULTISURFACE;
-    else if (primitives.getValue() == "CompositeSurface")
-      prim3d = COMPOSITESURFACE;
-    
+    std::map<std::string, std::vector<Primitive*> > dPrimitives;
 
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
@@ -231,17 +197,33 @@ int main(int argc, char* const argv[])
     if (inputtype == OTHER)
       ioerrs.add_error(901, "File type not supported");
 
-    if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
-      ioerrs.add_error(999, "POLY files having inner shells can be validated as CompositeSurface (only Solids)");
-    
-    bool usebuildings = buildings.getValue();    
-    if ( (inputtype != GML) && (buildings.getValue() == true) )
-    {
-      std::cout << "Ignoring flag '-b/--buildings' for non-CityGML files" << std::endl;
-      usebuildings = false;
-    }
+    Primitive3D prim3d = ALL;
+    if (primitives.getValue() == "Solid")
+      prim3d = SOLID;
+    else if (primitives.getValue() == "MultiSurface")
+      prim3d = MULTISURFACE;
+    else if (primitives.getValue() == "CompositeSurface")
+      prim3d = COMPOSITESURFACE;
+    if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
+      ioerrs.add_error(999, "option '-p' not possible with CityJSON, CityGML, and GML input since all 3D primitives are validated.");
+    if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == OFF) || (inputtype == POLY)) )
+      ioerrs.add_error(999, "option '-p' must be used to specify how to validate the primitives given as input.");
 
-    //-- if verbose == false then log to a file
+    if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
+      ioerrs.add_error(999, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
+    
+    if (ioerrs.has_errors() == true)
+    {
+      std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;
+      return(1);
+    }
+     
+    if (info.getValue() == true)
+    {
+      print_information(inputfile.getValue());
+      return (1);
+    }
+     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
       savedBufferCLOG = clog.rdbuf();
@@ -249,25 +231,14 @@ int main(int argc, char* const argv[])
       std::clog.rdbuf(mylog.rdbuf());
     }
 
-    std::vector<Primitive*> lsPrimitives;
-    std::vector<Building*> lsBuildings;
-
     if (inputtype == GML)
     {
       try
       {
-        if (usebuildings == false)
-          readGMLfile_primitives(inputfile.getValue(), 
-                                 lsPrimitives,
-                                 prim3d, 
-                                 ioerrs, 
-                                 snap_tolerance.getValue());
-        else
-          readGMLfile_buildings(inputfile.getValue(), 
-                                lsBuildings,
-                                ioerrs, 
-                                snap_tolerance.getValue());
-
+        read_file_gml(inputfile.getValue(), 
+                      dPrimitives,
+                      ioerrs, 
+                      snap_tolerance.getValue());
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
@@ -286,17 +257,10 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == JSON)
     {
-      if (usebuildings == true)
-        readCityJSONfile_primitives(inputfile.getValue(), 
-                                    lsPrimitives,
-                                    prim3d, 
-                                    ioerrs, 
-                                    snap_tolerance.getValue());
-      else
-        readCityJSONfile_buildings(inputfile.getValue(), 
-                                   lsBuildings,
-                                   ioerrs, 
-                                   snap_tolerance.getValue());
+      read_file_cityjson(inputfile.getValue(), 
+                         dPrimitives,
+                         ioerrs, 
+                         snap_tolerance.getValue());
       if (ioerrs.has_errors() == true) {
         std::cout << "Errors while reading the input file, aborting." << std::endl;
         std::cout << ioerrs.get_report_text() << std::endl;
@@ -309,7 +273,7 @@ int main(int argc, char* const argv[])
     }
     else if (inputtype == POLY)
     {
-      Surface* sh = readPolyfile(inputfile.getValue(), 0, ioerrs);
+      Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
       if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
       {
         Solid* s = new Solid;
@@ -317,7 +281,7 @@ int main(int argc, char* const argv[])
         int sid = 1;
         for (auto ifile : ishellfiles.getValue())
         {
-          Surface* sh = readPolyfile(ifile, sid, ioerrs);
+          Surface* sh = read_file_poly(ifile, sid, ioerrs);
           if (ioerrs.has_errors() == false)
           {
             s->add_ishell(sh);
@@ -325,46 +289,61 @@ int main(int argc, char* const argv[])
           }
         }
         if (ioerrs.has_errors() == false)
-          lsPrimitives.push_back(s);
+          dPrimitives["Primitives"].push_back(s);
       }
-      if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+      else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
         CompositeSurface* cs = new CompositeSurface;
         cs->set_surface(sh);
         if (ioerrs.has_errors() == false)
-          lsPrimitives.push_back(cs);
+          dPrimitives["Primitives"].push_back(cs);
       }
+      else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+      {
+        MultiSurface* ms = new MultiSurface;
+        ms->set_surface(sh);
+        if (ioerrs.has_errors() == false)
+          dPrimitives["Primitives"].push_back(ms);
+      }      
     }
     else if (inputtype == OFF)
     {
-      Surface* sh = readOFFfile(inputfile.getValue(), 0, ioerrs);
+      Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
       if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
       {
         Solid* s = new Solid;
         s->set_oshell(sh);
         if (ioerrs.has_errors() == false)
-          lsPrimitives.push_back(s);
+          dPrimitives["Primitives"].push_back(s);
       }
-      if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+      else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
       {
         CompositeSurface* cs = new CompositeSurface;
         cs->set_surface(sh);
         if (ioerrs.has_errors() == false)
-          lsPrimitives.push_back(cs);
+          dPrimitives["Primitives"].push_back(cs);
+      }
+      else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+      {
+        MultiSurface* ms = new MultiSurface;
+        ms->set_surface(sh);
+        if (ioerrs.has_errors() == false)
+          dPrimitives["Primitives"].push_back(ms);
       }
     }    
     else if (inputtype == OBJ)
     {
-      readOBJfile(lsPrimitives,
-                  inputfile.getValue(), 
-                  ioerrs, 
-                  snap_tolerance.getValue());
-     if (ioerrs.has_errors() == true) {
-       std::cout << "Errors while reading the input file, aborting." << std::endl;
-       std::cout << ioerrs.get_report_text() << std::endl;
-     }
-     if (ishellfiles.getValue().size() > 0)
-     {
+      read_file_obj(dPrimitives,
+                    inputfile.getValue(), 
+                    prim3d,
+                    ioerrs, 
+                    snap_tolerance.getValue());
+      if (ioerrs.has_errors() == true) {
+        std::cout << "Errors while reading the input file, aborting." << std::endl;
+        std::cout << ioerrs.get_report_text() << std::endl;
+      }
+      if (ishellfiles.getValue().size() > 0)
+      {
         std::cout << "No inner shells allowed when GML file used as input." << std::endl;
         ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
       }
@@ -376,22 +355,9 @@ int main(int argc, char* const argv[])
       double tmpx, tmpy;
       double minx = 9e10;
       double miny = 9e10;
-      if (buildings.getValue() == true)
+      for (auto& co : dPrimitives)
       {
-        for (auto& b : lsBuildings)
-        {
-          b->get_min_bbox(tmpx, tmpy);
-          if (tmpx < minx)
-            minx = tmpx;
-          if (tmpy < miny)
-            miny = tmpy;
-        }
-        for (auto& b : lsBuildings)
-          b->translate_vertices(minx, miny);
-      }
-      else 
-      {
-        for (auto& p : lsPrimitives)
+        for (auto& p : co.second)
         {
           p->get_min_bbox(tmpx, tmpy);
           if (tmpx < minx)
@@ -399,9 +365,10 @@ int main(int argc, char* const argv[])
           if (tmpy < miny)
             miny = tmpy;
         }
-        for (auto& p : lsPrimitives)
-          p->translate_vertices(minx, miny);
       }
+      for (auto& co : dPrimitives)
+        for (auto& p : co.second)
+          p->translate_vertices(minx, miny);
       std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
     }
     
@@ -422,102 +389,61 @@ int main(int argc, char* const argv[])
     }
 
     //-- now the validation starts
-    if ( (ioerrs.has_errors() == false) && (usebuildings == true) )
+    std::map<std::string, VError > dPrimitivesErrors;
+    if ( (dPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
     {
-      std::cout << "Validating " << lsBuildings.size() << " Buildings." << std::endl;
+      // std::cout << "Validating " << dPrimitives.size();
       int i = 1;
-      for (auto& b : lsBuildings)
+      for (auto& co : dPrimitives)
       {
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
-          printProgressBar(100 * (i / double(lsBuildings.size())));
+          printProgressBar(100 * (i / double(dPrimitives.size())));
         i++;
-        std::clog << std::endl << "======== Validating Building (#" << b->get_id() << ") ========" << std::endl;
-        if (b->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
-          std::clog << "======== INVALID ========" << std::endl;
-        else
-          std::clog << "======== VALID ========" << std::endl;
+        bool bValid = true;
+        for (auto& p : co.second)
+        {
+          std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
+          std::clog << "type: ";
+          if (p->get_id() != "")
+            std::clog << "id: " << p->get_id() << std::endl;
+          if (p->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
+          {
+            std::clog << "======== INVALID ========" << std::endl;
+            bValid = false;
+          }
+          else
+            std::clog << "========= VALID =========" << std::endl;
+        }
+        //-- if Building then do extra checks  
+        if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
+        {
+          std::clog << "--extra building validation" << std::endl;
+          VError coerrs;
+          if (do_primitives_overlap(co.second, coerrs, overlap_tolerance.getValue()) == true)
+          {
+            dPrimitivesErrors[co.first] = coerrs;
+          }
+        }
       }
       if (verbose.getValue() == false)
         printProgressBar(100);
     }
-    else 
-    {
-      if ( (lsPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
-      {
-        std::cout << "Validating " << lsPrimitives.size();
-        if (prim3d == SOLID)
-          std::cout << " Solid";
-        else if (prim3d == MULTISOLID)
-          std::cout << " MultiSolid";
-        else if (prim3d == COMPOSITESURFACE)
-          std::cout << " CompositeSurface";
-        else if (prim3d == MULTISURFACE)
-          std::cout << " MultiSurface";
-        std::cout << std::endl;
-        int i = 1;
-        for (auto& s : lsPrimitives)
-        {
-          if ( (i % 10 == 0) && (verbose.getValue() == false) )
-            printProgressBar(100 * (i / double(lsPrimitives.size())));
-          i++;
-          std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
-          std::clog << "type: ";
-          Primitive3D prim3d = s->get_type();
-          if (prim3d == SOLID)
-            std::clog << "Solid" << std::endl;
-          else if (prim3d == COMPOSITESOLID)
-            std::clog << "CompositeSolid" << std::endl;
-          else if (prim3d == MULTISOLID)
-            std::clog << "MultiSolid" << std::endl;
-          else if (prim3d == MULTISURFACE)
-            std::clog << "MultiSurface" << std::endl;
-          else if (prim3d == COMPOSITESURFACE)
-            std::clog << "CompositeSurface" << std::endl;
-          if (s->get_id() != "")
-            std::clog << "id: " << s->get_id() << std::endl;
-          if (s->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
-            std::clog << "======== INVALID ========" << std::endl;
-          else
-            std::clog << "========= VALID =========" << std::endl;
-        }
-        if (verbose.getValue() == false)
-          printProgressBar(100);
-      }
-    }
+
     //-- print summary of errors
-    if (usebuildings == true)
-      std::cout << "\n" << print_summary_validation(lsBuildings) << std::endl;        
-    else
-      std::cout << "\n" << print_summary_validation(lsPrimitives, prim3d) << std::endl;        
+    std::cout << "\n" << print_summary_validation(dPrimitives) << std::endl;        
     if (report.getValue() != "")
     {
       std::ofstream thereport;
       thereport.open(report.getValue());
-      if (usebuildings == false)
-      {
-        write_report_xml(thereport, 
-                         inputfile.getValue(),
-                         lsPrimitives,
-                         prim3d, 
-                         snap_tolerance.getValue(),
-                         overlap_tolerance.getValue(),
-                         planarity_d2p.getValue(),
-                         planarity_n.getValue(),
-                         ioerrs,
-                         onlyinvalid.getValue());
-      }
-      else
-      {
-        write_report_xml(thereport, 
-                         inputfile.getValue(),
-                         lsBuildings,
-                         snap_tolerance.getValue(),
-                         overlap_tolerance.getValue(),
-                         planarity_d2p.getValue(),
-                         planarity_n.getValue(),
-                         ioerrs,
-                         onlyinvalid.getValue());
-      }
+      write_report_xml(thereport, 
+                       inputfile.getValue(),
+                       dPrimitives,
+                       snap_tolerance.getValue(),
+                       overlap_tolerance.getValue(),
+                       planarity_d2p.getValue(),
+                       planarity_n.getValue(),
+                       ioerrs,
+                       onlyinvalid.getValue());
       thereport.close();
       std::cout << "Full validation report saved to " << report.getValue() << std::endl;
     }
@@ -529,13 +455,10 @@ int main(int argc, char* const argv[])
       clog.rdbuf(savedBufferCLOG);
       mylog.close();
     }
-    if (unittests.getValue() == true)
-    {
-      if (buildings.getValue() == true)
-        std::cout << "\n" << print_unit_tests(lsBuildings) << std::endl;
-      else
-        std::cout << "\n" << print_unit_tests(lsPrimitives) << std::endl;
-    }
+    // if (unittests.getValue() == true)
+    // {
+    //   std::cout << "\n" << print_unit_tests(lsPrimitives) << std::endl;
+    // }
     return(1);
   }
   catch (TCLAP::ArgException &e) 
@@ -545,104 +468,126 @@ int main(int argc, char* const argv[])
   }
 }
 
-std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
+// TODO: fix the unit_test function
+// std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
+// {
+//   int bValid = 0;
+//   std::stringstream ss;
+//   std::map<int,int> errors;
+//   for (auto& s : lsPrimitives)
+//   {
+//     if (s->is_valid() == true)
+//       bValid++;
+//     for (auto& code : s->get_unique_error_codes())
+//       errors[code] = 0;
+//   }
+//   if (errors.size() > 0)
+//   {
+//     ss << "@INVALID " << lsPrimitives.size() << " " << (lsPrimitives.size() - bValid) << " ";
+//     for (auto e : errors)
+//       ss << e.first << " ";
+//   }
+//   else {
+//     ss << "@VALID " << lsPrimitives.size() << " " << (lsPrimitives.size() - bValid) << " ";
+//   }
+//   ss << std::endl;
+//   return ss.str();
+// }
+
+// std::string print_unit_tests(vector<Building*>& lsBuilding)
+// {
+//   int bValid = 0;
+//   std::stringstream ss;
+//   std::map<int,int> errors;
+//   for (auto& s : lsBuilding)
+//   {
+//     if (s->is_valid() == true)
+//       bValid++;
+//     for (auto& code : s->get_unique_error_codes())
+//       errors[code] = 0;
+//   }
+//   if (errors.size() > 0)
+//   {
+//     ss << "@INVALID " << lsBuilding.size() << " " << (lsBuilding.size() - bValid) << " ";
+//     for (auto e : errors)
+//       ss << e.first << " ";
+//   }
+//   else {
+//     ss << "@VALID " << lsBuilding.size() << " " << (lsBuilding.size() - bValid) << " ";
+//   }
+//   ss << std::endl;
+//   return ss.str();
+// }
+
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives)
 {
-  int bValid = 0;
-  std::stringstream ss;
-  std::map<int,int> errors;
-  for (auto& s : lsPrimitives)
-  {
-    if (s->is_valid() == true)
-      bValid++;
-    for (auto& code : s->get_unique_error_codes())
-      errors[code] = 0;
-  }
-  if (errors.size() > 0)
-  {
-    ss << "@INVALID " << lsPrimitives.size() << " " << (lsPrimitives.size() - bValid) << " ";
-    for (auto e : errors)
-      ss << e.first << " ";
-  }
-  else {
-    ss << "@VALID " << lsPrimitives.size() << " " << (lsPrimitives.size() - bValid) << " ";
-  }
-  ss << std::endl;
-  return ss.str();
-}
-
-std::string print_unit_tests(vector<Building*>& lsBuilding)
-{
-  int bValid = 0;
-  std::stringstream ss;
-  std::map<int,int> errors;
-  for (auto& s : lsBuilding)
-  {
-    if (s->is_valid() == true)
-      bValid++;
-    for (auto& code : s->get_unique_error_codes())
-      errors[code] = 0;
-  }
-  if (errors.size() > 0)
-  {
-    ss << "@INVALID " << lsBuilding.size() << " " << (lsBuilding.size() - bValid) << " ";
-    for (auto e : errors)
-      ss << e.first << " ";
-  }
-  else {
-    ss << "@VALID " << lsBuilding.size() << " " << (lsBuilding.size() - bValid) << " ";
-  }
-  ss << std::endl;
-  return ss.str();
-}
-
-
-std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Primitive3D prim3d)
-{
   std::stringstream ss;
   ss << std::endl;
-  std::string primitives;
-  if (prim3d == SOLID)
-    primitives = "Solid";
-  else if (prim3d == COMPOSITESOLID)
-    primitives = "CompositeSolid";
-  else if (prim3d == MULTISOLID)
-    primitives = "MultiSolid";
-  else if (prim3d == MULTISURFACE)
-    primitives = "MultiSurface";
-  else if (prim3d == COMPOSITESURFACE)
-    primitives = "CompositeSurface";
-
+  int noprim = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      noprim++;
+    
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  ss << "Primitives validated: " << primitives << std::endl;
-  ss << "Total # of primitives: " << setw(8) << lsPrimitives.size() << std::endl;
+  //-- if a CityGML/CityJSON report also CityObjects
+  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
+  {
+    int coInvalid = 0;
+    for (auto& co : dPrimitives)
+    {
+      for (auto& p : co.second)
+      {
+        if (p->is_valid() == false)
+        {
+          coInvalid++;
+          break;
+        }
+      }
+    }
+    ss << "Total # of CityObjects: " << setw(7) << dPrimitives.size() << std::endl;
+    float percentage;
+    if (dPrimitives.size()  == 0)
+      percentage = 0;
+    else
+      percentage = 100 * (coInvalid / float(dPrimitives.size()));
+    ss << "# valid: " << setw(22) << dPrimitives.size() - coInvalid;
+    if (dPrimitives.size() == 0)
+      ss << " (" << 0 << "%)" << std::endl;
+    else
+      ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
+    ss << "# invalid: " << setw(20) << coInvalid;
+    ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+    ss << "+++++" << std::endl;
+  }
+  ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
   int bValid = 0;
-  for (auto& s : lsPrimitives)
-    if (s->is_valid() == true)
-      bValid++;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      if (p->is_valid() == true)
+        bValid++;
   float percentage;
-  if (lsPrimitives.size() == 0)
+  if (noprim  == 0)
     percentage = 0;
   else
-    percentage = 100 * ((lsPrimitives.size() - bValid) / float(lsPrimitives.size()));
+    percentage = 100 * ((noprim - bValid) / float(noprim));
   ss << "# valid: " << setw(22) << bValid;
-  if (lsPrimitives.size() == 0)
+  if (noprim == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << (lsPrimitives.size() - bValid);
+  ss << "# invalid: " << setw(20) << (noprim - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   //-- overview of errors
   std::map<int,int> errors;
-  for (auto& s : lsPrimitives)
-  {
-    for (auto& code : s->get_unique_error_codes())
-      errors[code] = 0;
-  }
-  for (auto& s : lsPrimitives)
-  {
-    for (auto& code : s->get_unique_error_codes())
-      errors[code] += 1;
-  }
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      for (auto& code : p->get_unique_error_codes())
+        errors[code] = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      for (auto& code : p->get_unique_error_codes())
+        errors[code] += 1;
+
   if (errors.size() > 0)
   {
     ss << "+++++" << std::endl;
@@ -658,73 +603,9 @@ std::string print_summary_validation(std::vector<Primitive*>& lsPrimitives, Prim
 }
 
 
-std::string print_summary_validation(std::vector<Building*>& lsBuildings)
-{
-  std::stringstream ss;
-  ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  ss << "Total # of Buildings: " << setw(8) << lsBuildings.size() << std::endl;
-  int bValid = 0;
-  int countPrim = 0;
-  int countSolids = 0;
-  int countCSolids = 0;
-  int countMSurfaces = 0;
-  for (auto& b : lsBuildings)
-  {
-    if (b->is_valid() == true)
-      bValid++;
-    countPrim += b->get_number_primitives();
-    countSolids += b->get_number_solids();
-    countCSolids += b->get_number_compositesolids();
-    countMSurfaces += b->get_number_multisurfaces();
-  }
-  float percentage;
-  if (lsBuildings.size() == 0)
-    percentage = 0;
-  else
-    percentage = 100 * ((lsBuildings.size() - bValid) / float(lsBuildings.size()));
-  ss << "# valid: " << setw(21) << bValid;
-  if (lsBuildings.size() == 0)
-    ss << " (" << 0 << "%)" << std::endl;
-  else
-    ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(19) << (lsBuildings.size() - bValid);
-  ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
-  ss << "+++++" << std::endl;
-  ss << "Total # Primitives: " << setw(10) << countPrim << std::endl;
-  ss << "\tCompositeSolids: " << setw(5) << countCSolids << std::endl;
-  ss << "\tSolids: " << setw(14) << countSolids << std::endl;
-  ss << "\tMultiSurfaces: " << setw(7) << countMSurfaces << std::endl;
-  //-- overview of errors
-  std::map<int,int> errors;
-  for (auto& b : lsBuildings)
-  {
-    for (auto& code : b->get_unique_error_codes())
-      errors[code] = 0;
-  }
-  for (auto& b : lsBuildings)
-  {
-    for (auto& code : b->get_unique_error_codes())
-      errors[code] += 1;
-  }
-  if (errors.size() > 0)
-  {
-    ss << "+++++" << std::endl;
-    ss << "Errors present:" << std::endl;
-    for (auto e : errors)
-    {
-      ss << "  " << e.first << " --- " << errorcode2description(e.first) << std::endl;
-      ss << setw(11) << "(" << e.second << " Buildings)" << std::endl;
-    }
-  }
-  ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-  return ss.str();
-}
-
-
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
-                      vector<Primitive*>& lsPrimitives,
-                      Primitive3D prim3d, 
+                      std::map<std::string, std::vector<Primitive*> >& dPrimitives,
                       double snap_tolerance,
                       double overlap_tolerance,
                       double planarity_d2p,
@@ -734,75 +615,42 @@ void write_report_xml(std::ofstream& ss,
 {
   ss << "<val3dity>" << std::endl;
   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
-  ss << "\t<primitives>";
-  if (prim3d == SOLID)
-    ss << "gml:Solid";
-  else if (prim3d == COMPOSITESOLID)
-    ss << "gml:CompositeSolid";
-  else if (prim3d == MULTISOLID)
-    ss << "gml:MultiSolid";
-  else if (prim3d == MULTISURFACE)
-    ss << "gml:MultiSurface";
-  else if (prim3d == COMPOSITESURFACE)
-    ss << "gml:CompositeSurface";
-  ss << "</primitives>" << std::endl;
   ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
   ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
   ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
   ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
-  ss << "\t<totalprimitives>" << lsPrimitives.size() << "</totalprimitives>" << std::endl;
+  int noprim = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      noprim++;
+  ss << "\t<totalprimitives>" << noprim << "</totalprimitives>" << std::endl;
+    
   int bValid = 0;
-  for (auto& s : lsPrimitives)
-    if (s->is_valid() == true)
-      bValid++;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      if (p->is_valid() == true)
+        bValid++;
   ss << "\t<validprimitives>" << bValid << "</validprimitives>" << std::endl;
-  ss << "\t<invalidprimitives>" << (lsPrimitives.size() - bValid) << "</invalidprimitives>" << std::endl;
-  std::time_t rawtime;
-  struct tm * timeinfo;
-  std::time (&rawtime);
-  timeinfo = std::localtime ( &rawtime );
-  char buffer[80];
-  std::strftime(buffer, 80, "%c %Z", timeinfo);
-  ss << "\t<time>" << buffer << "</time>" << std::endl;
-  if (ioerrs.has_errors() == true)
+  ss << "\t<invalidprimitives>" << noprim - bValid << "</invalidprimitives>" << std::endl;
+  //-- if a CityGML/CityJSON report also CityObjects
+  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
   {
-    ss << ioerrs.get_report_xml();
-  }
-  else
-  {
-    for (auto& s : lsPrimitives) 
+    int coInvalid = 0;
+    for (auto& co : dPrimitives)
     {
-      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
-        ss << s->get_report_xml();
+      for (auto& p : co.second)
+      {
+        if (p->is_valid() == false)
+        {
+          coInvalid++;
+          break;
+        }
+      }
     }
+    ss << "\t<totalcityobjects>" << dPrimitives.size() << "</totalcityobjects>" << std::endl;
+    ss << "\t<validcityobjects>" << dPrimitives.size() - coInvalid << "</validcityobjects>" << std::endl;
+    ss << "\t<invalidcityobjects>" << coInvalid << "</invalidcityobjects>" << std::endl;
   }
-  ss << "</val3dity>" << std::endl;
-}
-
-
-void write_report_xml(std::ofstream& ss,
-                      std::string ifile, 
-                      vector<Building*>& lsBuildings,
-                      double snap_tolerance,
-                      double overlap_tolerance,
-                      double planarity_d2p,
-                      double planarity_n,
-                      IOErrors ioerrs,
-                      bool onlyinvalid)
-{
-  ss << "<val3dity>" << std::endl;
-  ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
-  ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
-  ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
-  ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
-  ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
-  ss << "\t<numberbuildings>" << lsBuildings.size() << "</numberbuildings>" << std::endl;
-  int bValid = 0;
-  for (auto& s : lsBuildings)
-    if (s->is_valid() == true)
-      bValid++;
-  ss << "\t<validbuildings>" << bValid << "</validbuildings>" << std::endl;
-  ss << "\t<invalidbuildings>" << (lsBuildings.size() - bValid) << "</invalidbuildings>" << std::endl;
   std::time_t rawtime;
   struct tm * timeinfo;
   std::time (&rawtime);
@@ -816,10 +664,31 @@ void write_report_xml(std::ofstream& ss,
   }
   else
   {
-    for (auto& s : lsBuildings) 
+    //-- only primitives, no CityObjects
+    if ( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) )
     {
-      if ( !((onlyinvalid == true) && (s->is_valid() == true)) )
-        ss << s->get_report_xml();
+      for (auto& p : dPrimitives["Primitives"])
+      {
+        if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+          ss << p->get_report_xml();
+      }
+    }
+    else
+    {
+      for (auto& co : dPrimitives)
+      {
+        std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
+        std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+        ss << "<" << cotype << ">" << std::endl;
+        ss << "<id>" << coid << "</id>" << std::endl;
+        for (auto& p : co.second)
+        {
+          if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+            ss << p->get_report_xml();
+        }
+        ss << "</" << cotype << ">" << std::endl;
+      }
+
     }
   }
   ss << "</val3dity>" << std::endl;

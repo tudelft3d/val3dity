@@ -152,16 +152,6 @@ std::string Solid::get_report_xml()
   ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
   ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
   ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
-  // if (this->_inputtype == OBJ)
-  // {
-  //   Surface* sh = this->get_oshell();
-  //   if (sh->were_vertices_merged_during_parsing() == true)
-  //     ss << "\t\t<numberverticesmerged>" << (sh->get_number_parsed_vertices() - sh->number_vertices()) << "</numberverticesmerged>" << std::endl;
-  // }
-  // if (_id_building.empty() == false)
-  //   ss << "\t\t<Building>" << this->get_id_building() << "</Building>" << std::endl;
-  // if (_id_buildingpart.empty() == false)
-  //   ss << "\t\t<BuildingPart>" << this->get_id_buildingpart() << "</BuildingPart>" << std::endl;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])

@@ -87,6 +87,7 @@ typedef enum
   MULTISOLID       = 2,
   COMPOSITESURFACE = 3,
   MULTISURFACE     = 4,
+  ALL              = 5,
 } Primitive3D;
 
 typedef enum

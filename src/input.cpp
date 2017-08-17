@@ -1,5 +1,5 @@
 /*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -136,6 +136,13 @@ std::string errorcode2description(int code) {
 std::string localise(std::string s)
 {
   return "*[local-name(.) = '" + s + "']";
+}
+
+  
+std::string remove_xml_namespace(const char* input)
+{
+  std::string s = input;
+  return s.substr(s.find_first_of(":") + 1);
 }
 
 
@@ -300,85 +307,6 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
 }
 
 
-Building* process_citygml_building(const pugi::xml_node& nbuilding, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
-{
-  Building* b = new Building;
-  if (nbuilding.attribute("gml:id") != 0) {
-    b->set_id(std::string(nbuilding.attribute("gml:id").value()));
-    // std::cout << "Building: " << std::string(nbuilding.attribute("gml:id").value()) << std::endl;
-  }
-  
-  std::string s;
-  pugi::xpath_node_set nset;
-  bool bCS = false;
-  
-  //-- 1. process the geometries for the Building (and not BuildingParts)
-  s = "./*/" + NS["gml"] + "CompositeSolid";
-  nset = nbuilding.select_nodes(s.c_str());
-  // TODO : parsing compositesolid
-  // std::clog << "Validate CompositeSolid" << std::endl;
-  if (nset.size() > 0)
-    bCS = true;
-  if (bCS == false) //-- to avoid processing Solids part of CompositeSolids
-  {
-    s = "./*/" + NS["gml"] + "Solid";
-    nset = nbuilding.select_nodes(s.c_str());
-    for(auto& n: nset)
-    {
-      Solid* sol = process_gml_solid(n.node(), dallpoly, tol_snap, errs);
-      b->add_primitive(sol);
-    }
-    if (nset.size() > 0)
-      bCS = true;
-  }
-  s = "./*/" + NS["gml"] + "MultiSurface";
-  nset = nbuilding.select_nodes(s.c_str());
-  for(auto& n: nset)
-  {
-    MultiSurface* ms = process_gml_multisurface(n.node(), dallpoly, tol_snap, errs);
-    b->add_primitive(ms);
-  }
-
-  //-- 2. process the geometries children of BuildingParts
-  s = ".//" + NS["building"] + "BuildingPart";
-  nset = nbuilding.select_nodes(s.c_str());
-  for(auto& nbp: nset)
-  {
-    bCS = false;
-    BuildingPart* bp = new BuildingPart;
-    b->add_buildingpart(bp);
-    if (nbp.node().attribute("gml:id") != 0) 
-    {
-      bp->set_id(std::string(nbp.node().attribute("gml:id").value()));
-      // std::cout << "BuildingPart: " << std::string(nbp.node().attribute("gml:id").value()) << std::endl;
-    }
-    // s = ".//" + NS["gml"] + "CompositeSolid";
-    // nset = nbp.node().select_nodes(s.c_str());
-    // // TODO : parsing compositesolid
-    // std::clog << "Validate CompositeSolid" << std::endl;
-    pugi::xpath_node_set nset2;
-    if (bCS == false)
-    {
-      s = "./*/" + NS["gml"] + "Solid";
-      nset2 = nbp.node().select_nodes(s.c_str());
-      for(auto& n: nset2)
-      {
-        Solid* sol = process_gml_solid(n.node(), dallpoly, tol_snap, errs);
-        bp->add_primitive(sol);
-      }
-    }
-    s = "./*/" + NS["gml"] + "MultiSurface";
-    nset2 = nbp.node().select_nodes(s.c_str());
-    for(auto& n: nset2)
-    {
-      MultiSurface* ms = process_gml_multisurface(n.node(), dallpoly, tol_snap, errs);
-      bp->add_primitive(ms);
-    }
-  }
-  return b;
-} 
-
-
 Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   //-- exterior shell
@@ -436,6 +364,7 @@ CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<s
 
   return cs;
 }
+
 
 
 MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
@@ -731,25 +660,32 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
-void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
+void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
 {
   std::ifstream input(ifile);
   json j;
   try 
   {
     input >> j;
+    // TODO: other validation for CityJSON and just not JSON stuff?
   }
   catch (nlohmann::detail::parse_error e) 
   {
     errs.add_error(901, "Input file not a valid JSON file.");
     return;
   }
-  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+  std::cout << "CityJSON input file" << std::endl;
+  std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
+  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
+  {
     // std::cout << "o " << it.key() << std::endl;
+    std::string coid = it.value()["type"];
+    coid += "|";
+    coid += it.key();
     int idgeom = 0;
     for (auto& g : it.value()["geometry"]) {
       std::string theid = it.key() + "(" + std::to_string(idgeom) + ")";
-      if ( (prim == SOLID) && (g["type"] == "Solid") )
+      if  (g["type"] == "Solid")
       {
         Solid* s = new Solid(theid);
         bool oshell = true;
@@ -768,10 +704,9 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
           else
             s->add_ishell(sh);
         }
-        lsPrimitives.push_back(s);
+        dPrimitives[coid].push_back(s);
       }
-      else if ( ( (prim == MULTISURFACE) && (g["type"] == "MultiSurface") ) ||
-                ( (prim == COMPOSITESURFACE) && (g["type"] == "CompositeSurface") ) )
+      else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
       {
         Surface* sh = new Surface(-1, tol_snap);
         for (auto& p : g["boundaries"]) 
@@ -779,20 +714,20 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
           std::vector< std::vector<int> > pa = p;
           process_json_surface(pa, j, sh);
         }
-        if (prim == MULTISURFACE)
+        if (g["type"] == "MultiSurface")
         {
           MultiSurface* ms = new MultiSurface(theid);
           ms->set_surface(sh);
-          lsPrimitives.push_back(ms);
+          dPrimitives[coid].push_back(ms);
         }
         else
         {
           CompositeSurface* cs = new CompositeSurface(theid);
           cs->set_surface(sh);
-          lsPrimitives.push_back(cs);
+          dPrimitives[coid].push_back(cs);
         }
       }
-      else if ( (prim == MULTISOLID) && (g["type"] == "MultiSolid") ) 
+      else if (g["type"] == "MultiSolid") 
       {
         MultiSolid* ms = new MultiSolid(theid);
         for (auto& solid : g["boundaries"]) 
@@ -816,9 +751,9 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
           }
           ms->add_solid(s);
         }
-        lsPrimitives.push_back(ms);
+        dPrimitives[coid].push_back(ms);
       }
-      else if ( (prim == COMPOSITESOLID) && (g["type"] == "CompositeSolid") ) 
+      else if (g["type"] == "CompositeSolid") 
       {
         CompositeSolid* cs = new CompositeSolid(theid);
         for (auto& solid : g["boundaries"]) 
@@ -842,7 +777,7 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
           }
           cs->add_solid(s);
         }
-        lsPrimitives.push_back(cs);
+        dPrimitives[coid].push_back(cs);
       }      
     }
     idgeom++;
@@ -850,7 +785,104 @@ void readCityJSONfile_primitives(std::string &ifile, std::vector<Primitive*>& ls
 }
 
 
-void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimitives, Primitive3D prim, IOErrors& errs, double tol_snap)
+void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
+{
+  primitives_walker walker;
+  doc.traverse(walker);
+  std::cout << "# 3D primitives found: " << walker.lsNodes.size() << std::endl;
+  int primid = 0;
+  std::string coid = "Primitives";
+  for (auto& prim : walker.lsNodes)
+  {
+    if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
+    {
+      Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        p->set_id(std::to_string(primid));
+      dPrimitives[coid].push_back(p);
+    }
+    else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
+    {
+      MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        p->set_id(std::to_string(primid));
+      dPrimitives[coid].push_back(p);
+    }      
+    else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
+    {
+      CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        p->set_id(std::to_string(primid));
+      dPrimitives[coid].push_back(p);
+    }
+    else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
+    {
+      MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        p->set_id(std::to_string(primid));
+      dPrimitives[coid].push_back(p);
+    } 
+    else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
+    {
+      CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+      if (p->get_id().compare("") == 0)
+        p->set_id(std::to_string(primid));
+      dPrimitives[coid].push_back(p);
+    } 
+    primid++;
+  }  
+}
+
+
+void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
+{
+  //-- read each CityObject in the file
+  citygml_objects_walker walker;
+  doc.traverse(walker);
+  std::cout << "# City Objects found: " << walker.lsNodes.size() << std::endl;
+  //-- for each City Object parse its primitives
+  for (auto& co : walker.lsNodes)
+  {
+    std::string coid = remove_xml_namespace(co.name());
+    coid += "|";
+    if (co.attribute("gml:id") != 0)
+      coid += co.attribute("gml:id").value();
+    primitives_walker walker2;
+    co.traverse(walker2);
+    for (auto& prim : walker2.lsNodes)
+    {
+      std::string typeprim = remove_xml_namespace(prim.name());
+      if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
+      {
+        Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      }
+      else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
+      {
+        MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      }      
+      else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
+      {
+        CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      }
+      else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
+      {
+        MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      } 
+      else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
+      {
+        CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+        dPrimitives[coid].push_back(p);
+      } 
+    }
+  }
+
+}
+
+void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
@@ -868,71 +900,19 @@ void readGMLfile_primitives(std::string &ifile, std::vector<Primitive*>& lsPrimi
     errs.add_error(901, "Input file does not have the GML namespace.");
     return;
   }
-  //-- Primitives parsing and counting
-  std::string s = "//" + NS["gml"];
-  std::string sprim;
-  if (prim == SOLID)
-  {
-    s += "Solid";
-    sprim = "<gml:Solid>";
-  }
-  else if (prim == COMPOSITESOLID)
-  {
-    s += "CompositeSolid";
-    sprim = "<gml:CompositeSolid>";
-  }
-  else if (prim == MULTISOLID)
-  {
-    s += "MultiSolid";
-    sprim = "<gml:MultiSolid>";
-  }
-  else if (prim == MULTISURFACE)
-  {
-    s += "MultiSurface";
-    sprim = "<gml:MultiSurface>";
-  }
-  else if (prim == COMPOSITESURFACE)
-  {
-    s += "CompositeSurface";
-    sprim = "<gml:CompositeSurface>";
-  }
-  pugi::xpath_query myquery(s.c_str());
-  pugi::xpath_node_set nprims = myquery.evaluate_node_set(doc);
-  std::cout << "Parsing the file..." << std::endl;
-  std::cout << "# of " << sprim << " found: ";
-  std::cout << nprims.size() << std::endl;
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
-  for(auto& nprim: nprims)
+  if (NS.count("citygml") != 0)
   {
-    if (prim == SOLID)
-    {
-      Solid* sol = process_gml_solid(nprim.node(), dallpoly, tol_snap, errs);
-      lsPrimitives.push_back(sol);
-    }
-    else if (prim == COMPOSITESOLID)
-    {
-      CompositeSolid* csol = process_gml_compositesolid(nprim.node(), dallpoly, tol_snap, errs);
-      lsPrimitives.push_back(csol);
-    }
-    else if (prim == MULTISOLID)
-    {
-      MultiSolid* msol = process_gml_multisolid(nprim.node(), dallpoly, tol_snap, errs);
-      lsPrimitives.push_back(msol);
-    }
-    else if (prim == MULTISURFACE)
-    {
-      MultiSurface* msur = process_gml_multisurface(nprim.node(), dallpoly, tol_snap, errs);
-      lsPrimitives.push_back(msur);
-    }
-    else if (prim == COMPOSITESURFACE)
-    {
-      CompositeSurface* csur = process_gml_compositesurface(nprim.node(), dallpoly, tol_snap, errs);
-      lsPrimitives.push_back(csur);
-    }
+    std::cout << "CityGML input file" << std::endl;
+    process_gml_file_city_objects(doc, dPrimitives, dallpoly, errs, tol_snap);
   }
-  std::cout << "Input file correctly parsed without errors." << std::endl;
+  else
+  {
+    std::cout << "GML input file (ie not CityGML)" << std::endl;
+    process_gml_file_primitives(doc, dPrimitives, dallpoly, errs, tol_snap);
+  }
 }
 
 
@@ -990,63 +970,7 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
 }
 
 
-void readCityJSONfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap)
-{
-  std::ifstream input(ifile);
-  json j;
-  try 
-  {
-    input >> j;
-  }
-  catch (nlohmann::detail::parse_error e) 
-  {
-    errs.add_error(901, "Input file not a valid JSON file.");
-    return;
-  }
-  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
-  {
-    if (it.value()["type"] == "Building")
-    {
-      std::cout << "one building" << std::endl;
-    }
-  }
-}  
 
-
-void readGMLfile_buildings(std::string &ifile, std::vector<Building*>& lsBuildings, IOErrors& errs, double tol_snap)
-{
-  std::cout << "Reading file: " << ifile << std::endl;
-  pugi::xml_document doc;
-  if (!doc.load_file(ifile.c_str())) 
-  {
-    errs.add_error(901, "Input file not found.");
-    return;
-  }
-  //-- parse namespace
-  pugi::xml_node ncm = doc.first_child();
-  std::string vcitygml;
-  get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
-
-  if (vcitygml.empty() == true) {
-    errs.add_error(901, "Input file does not have the CityGML namespace.");
-    return;
-  }
-  //-- parsing all Buildings
-  std::string s = "//" + NS["building"] + "Building";
-  pugi::xpath_query myquery(s.c_str());
-  pugi::xpath_node_set nbuildings = myquery.evaluate_node_set(doc);
-  std::cout << "Parsing the file..." << std::endl;
-  std::cout << "# of Buildings found: ";
-  std::cout << nbuildings.size() << std::endl;
-  //-- build dico of xlinks for <gml:Polygon>
-  std::map<std::string, pugi::xpath_node> dallpoly;
-  build_dico_xlinks(doc, dallpoly, errs);
-  for(auto& nbuilding: nbuildings)
-  {
-    Building* b = process_citygml_building(nbuilding.node(), dallpoly, tol_snap, errs);
-    lsBuildings.push_back(b);
-  } 
-}
 
 
 void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs)
@@ -1084,7 +1008,7 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
 }
 
 
-Surface* readPolyfile(std::string &ifile, int shellid, IOErrors& errs)
+Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -1190,7 +1114,7 @@ void printProgressBar(int percent) {
   std::cout << percent << "%     " << std::flush;
 }
 
-Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
+Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -1230,7 +1154,7 @@ Surface* readOFFfile(std::string &ifile, int shellid, IOErrors& errs)
 }
 
 
-void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors& errs, double tol_snap)
+void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
@@ -1239,6 +1163,7 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
     errs.add_error(901, "Input file not found.");
     return;
   }
+  int primid = 0;
   std::cout << "Parsing the file..." << std::endl; 
   Surface* sh = new Surface(0, tol_snap);
   std::string l;
@@ -1254,9 +1179,25 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
     else if (l.substr(0, 2) == "o ") {
       if (sh->is_empty() == false)
       {
-        Solid* sol = new Solid();
-        sol->set_oshell(sh);
-        lsSolids.push_back(sol);
+        if (prim3d == SOLID)
+        {
+          Solid* sol = new Solid(std::to_string(primid));
+          sol->set_oshell(sh);
+          dPrimitives["Primitives"].push_back(sol);
+        }
+        else if ( prim3d == COMPOSITESURFACE)
+        {
+          CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
+          cs->set_surface(sh);
+          dPrimitives["Primitives"].push_back(cs);
+        }
+        else if (prim3d == MULTISURFACE)
+        {
+          MultiSurface* ms = new MultiSurface(std::to_string(primid));
+          ms->set_surface(sh);
+          dPrimitives["Primitives"].push_back(ms);
+        }
+        primid++;
         sh = new Surface(0, tol_snap);
       }
     }
@@ -1284,9 +1225,24 @@ void readOBJfile(std::vector<Primitive*>& lsSolids, std::string &ifile, IOErrors
       sh->add_face(pgnids);
     }
   }
-  Solid* s = new Solid();
-  s->set_oshell(sh);
-  lsSolids.push_back(s);
+  if (prim3d == SOLID)
+  {
+    Solid* sol = new Solid(std::to_string(primid));
+    sol->set_oshell(sh);
+    dPrimitives["Primitives"].push_back(sol);
+  }
+  else if ( prim3d == COMPOSITESURFACE)
+  {
+    CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
+    cs->set_surface(sh);
+    dPrimitives["Primitives"].push_back(cs);
+  }
+  else if (prim3d == MULTISURFACE)
+  {
+    MultiSurface* ms = new MultiSurface(std::to_string(primid));
+    ms->set_surface(sh);
+    dPrimitives["Primitives"].push_back(ms);
+  }
   for (auto& each : allvertices)
     delete each;
   allvertices.clear();
