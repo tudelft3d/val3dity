@@ -3,8 +3,8 @@
 | :---- | :------ | :---- |
 | AppVeyor | Windows | [![AppVeyor build status][1]][2]
 
-[1]: https://ci.appveyor.com/api/projects/status/github/tudelft3d/val3dity?branch=master&svg=true
-[2]: https://ci.appveyor.com/project/tudelft3d/val3dity/branch/master
+[1]: https://ci.appveyor.com/api/projects/status/github/tcommandeur/val3dity?branch=master&svg=true
+[2]: https://ci.appveyor.com/project/tcommandeur/val3dity/branch/master
 
 # val3dity
 
