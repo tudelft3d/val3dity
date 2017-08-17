@@ -1,3 +1,11 @@
+## Continuous integration
+| Build server | Platform | Build status |
+| :---- | :------ | :---- |
+| AppVeyor | Windows | [![AppVeyor build status][1]][2]
+
+[1]: https://ci.appveyor.com/api/projects/status/github/tudelft3d/val3dity?branch=master&svg=true
+[2]: https://ci.appveyor.com/project/tudelft3d/val3dity/branch/master
+
 # val3dity
 
 Validation of 3D primitives according to the international standard ISO 19107.
