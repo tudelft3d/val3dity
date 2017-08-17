@@ -1,0 +1,60 @@
+version: 1.0.{build}
+branches:
+  only:
+  - master
+skip_tags: true
+image: Visual Studio 2015
+configuration:
+- Debug
+- Release
+platform: x64
+install:
+  ############################################################################
+  # All external dependencies are installed in C:\projects\deps
+  ############################################################################
+  - mkdir C:\deps
+  - cd C:\deps
+  
+  ############################################################################
+  # Set boost variables
+  ############################################################################
+  - set BOOST_ROOT=C:\Libraries\boost_1_60_0
+  - set BOOST_INCLUDEDIR=C:\Libraries\boost_1_60_0
+  - set BOOST_LIBRARYDIR=C:\Libraries\boost_1_60_0\lib64-msvc-14.0
+
+  ############################################################################
+  # Install OSGeo4W
+  ############################################################################
+  - set OSGEO4W_ROOT=C:\OSGeo4W
+  - appveyor DownloadFile http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -FileName osgeo4w-setup-x86_64.exe
+  - osgeo4w-setup-x86_64.exe -q -k -r -A -s http://download.osgeo.org/osgeo4w/ -a x86_64 -P liblas-devel,liblas,laszip,gdal -R %OSGEO4W_ROOT% > NUL
+  - set LIBLAS_ROOT=C:\OSGeo4W
+  - set LASZIP_ROOT=C:\OSGeo4W
+  - set PATH=C:\OSGeo4W\bin;%PATH%
+  
+  ############################################################################
+  # Install CGAL 4.8
+  ############################################################################
+  - appveyor DownloadFile https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.8/CGAL-4.8.zip -FileName CGAL-4.8.zip
+  - 7z x CGAL-4.8.zip -oC:\deps > nul
+  
+  - appveyor DownloadFile https://www.dropbox.com/s/okbl2nvdj36y31i/gmp.zip?dl=1 -FileName gmp.zip
+  - 7z x gmp.zip -aoa -oC:\deps\CGAL-4.8\auxiliary > nul
+  
+  - cd C:\deps\CGAL-4.8
+  - cmake -G "Visual Studio 14 2015 Win64" -H.\ -B.\build -DBUILD_SHARED_LIBS=OFF -DBoost_USE_STATIC_LIBS=ON
+  
+  - set PATH=C:\deps\CGAL-4.8;%PATH%
+  - set CGAL_DIR=C:\deps\CGAL-4.8\
+
+  - msbuild "%CGAL_DIR%\build\src\CGAL_Core\CGAL_Core.vcxproj" /property:Configuration=Release /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - copy /Y "%CGAL_DIR%\build\lib\Release\libCGAL_Core-vc140-mt-4.8.lib" "%CGAL_DIR%\build\lib"
+  - msbuild "%CGAL_DIR%\build\src\CGAL_Core\CGAL_Core.vcxproj" /property:Configuration=Debug /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - copy /Y "%CGAL_DIR%\build\lib\Debug\libCGAL_Core-vc140-mt-gd-4.8.lib" "%CGAL_DIR%\build\lib"
+  - msbuild "%CGAL_DIR%\build\src\CGAL\CGAL.vcxproj" /property:Configuration=Release /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - copy /Y "%CGAL_DIR%\build\lib\Release\libCGAL-vc140-mt-4.8.lib" "%CGAL_DIR%\build\lib"  
+  - msbuild "%CGAL_DIR%\build\src\CGAL\CGAL.vcxproj" /property:Configuration=Debug /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - copy /Y "%CGAL_DIR%\build\lib\Debug\libCGAL-vc140-mt-gd-4.8.lib" "%CGAL_DIR%\build\lib"
+build:
+  project: vs_build\val3dity.sln
+  verbosity: minimal
