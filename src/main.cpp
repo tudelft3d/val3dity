@@ -39,6 +39,7 @@ std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
 std::string print_unit_tests(vector<Building*>& lsBuilding);
 void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
 
+
 class MyOutput : public TCLAP::StdOutput
 {
 public:
@@ -389,13 +390,19 @@ int main(int argc, char* const argv[])
     //-- now the validation starts
     if ( (dPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
     {
-      std::cout << "Validating " << dPrimitives.size();
+      // std::cout << "Validating " << dPrimitives.size();
       int i = 1;
       for (auto& co : dPrimitives)
       {
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(dPrimitives.size())));
         i++;
+        // std::cout << "id: " << co.first << std::endl;
+        if (co.first.find("Building|") != std::string::npos)
+        {
+          std::cout << "A BUILDING" << std::endl;
+          
+        }
         for (auto& p : co.second)
         {
           std::clog << std::endl << "======== Validating Primitive ========" << std::endl;

@@ -679,6 +679,9 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
     // std::cout << "o " << it.key() << std::endl;
+    std::string coid = it.value()["type"];
+    coid += "|";
+    coid += it.key();
     int idgeom = 0;
     for (auto& g : it.value()["geometry"]) {
       std::string theid = it.key() + "(" + std::to_string(idgeom) + ")";
@@ -701,7 +704,7 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
           else
             s->add_ishell(sh);
         }
-        dPrimitives[it.key()].push_back(s);
+        dPrimitives[coid].push_back(s);
       }
       else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
       {
@@ -715,13 +718,13 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
         {
           MultiSurface* ms = new MultiSurface(theid);
           ms->set_surface(sh);
-          dPrimitives[it.key()].push_back(ms);
+          dPrimitives[coid].push_back(ms);
         }
         else
         {
           CompositeSurface* cs = new CompositeSurface(theid);
           cs->set_surface(sh);
-          dPrimitives[it.key()].push_back(cs);
+          dPrimitives[coid].push_back(cs);
         }
       }
       else if (g["type"] == "MultiSolid") 
@@ -748,7 +751,7 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
           }
           ms->add_solid(s);
         }
-        dPrimitives[it.key()].push_back(ms);
+        dPrimitives[coid].push_back(ms);
       }
       else if (g["type"] == "CompositeSolid") 
       {
@@ -774,7 +777,7 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
           }
           cs->add_solid(s);
         }
-        dPrimitives[it.key()].push_back(cs);
+        dPrimitives[coid].push_back(cs);
       }      
     }
     idgeom++;
