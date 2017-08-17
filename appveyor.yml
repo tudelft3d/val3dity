@@ -21,15 +21,13 @@ install:
   - set BOOST_ROOT=C:\Libraries\boost_1_60_0
   - set BOOST_INCLUDEDIR=C:\Libraries\boost_1_60_0
   - set BOOST_LIBRARYDIR=C:\Libraries\boost_1_60_0\lib64-msvc-14.0
-
+  
   ############################################################################
   # Install OSGeo4W
   ############################################################################
   - set OSGEO4W_ROOT=C:\OSGeo4W
   - appveyor DownloadFile http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -FileName osgeo4w-setup-x86_64.exe
   - osgeo4w-setup-x86_64.exe -q -k -r -A -s http://download.osgeo.org/osgeo4w/ -a x86_64 -P gdal,geos,zlib -R %OSGEO4W_ROOT% > NUL
-  - set LIBLAS_ROOT=C:\OSGeo4W
-  - set LASZIP_ROOT=C:\OSGeo4W
   - set PATH=C:\OSGeo4W\bin;%PATH%
   
   ############################################################################
@@ -46,7 +44,7 @@ install:
   
   - set PATH=C:\deps\CGAL-4.8;%PATH%
   - set CGAL_DIR=C:\deps\CGAL-4.8\
-
+  
   - msbuild "%CGAL_DIR%\build\src\CGAL_Core\CGAL_Core.vcxproj" /property:Configuration=Release /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - copy /Y "%CGAL_DIR%\build\lib\Release\libCGAL_Core-vc140-mt-4.8.lib" "%CGAL_DIR%\build\lib"
   - msbuild "%CGAL_DIR%\build\src\CGAL_Core\CGAL_Core.vcxproj" /property:Configuration=Debug /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
