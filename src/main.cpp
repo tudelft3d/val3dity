@@ -25,9 +25,10 @@
 
 #include "input.h"
 #include "Primitive.h"
-#include "Building.h"
+#include "validate_prim_toporel.h"
 #include "Surface.h"
 #include "Solid.h"
+#include "VError.h"
 #include <tclap/CmdLine.h>
 #include <time.h>  
 
@@ -35,8 +36,8 @@ using namespace std;
 using namespace val3dity;
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives);
-std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
-std::string print_unit_tests(vector<Building*>& lsBuilding);
+// std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
+// std::string print_unit_tests(vector<Building*>& lsBuilding);
 void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
 
 
@@ -388,6 +389,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- now the validation starts
+    std::map<std::string, VError > dPrimitivesErrors;
     if ( (dPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
     {
       // std::cout << "Validating " << dPrimitives.size();
@@ -397,12 +399,7 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(dPrimitives.size())));
         i++;
-        // std::cout << "id: " << co.first << std::endl;
-        if (co.first.find("Building|") != std::string::npos)
-        {
-          std::cout << "A BUILDING" << std::endl;
-          
-        }
+        bool bValid = true;
         for (auto& p : co.second)
         {
           std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
@@ -410,9 +407,22 @@ int main(int argc, char* const argv[])
           if (p->get_id() != "")
             std::clog << "id: " << p->get_id() << std::endl;
           if (p->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
+          {
             std::clog << "======== INVALID ========" << std::endl;
+            bValid = false;
+          }
           else
             std::clog << "========= VALID =========" << std::endl;
+        }
+        //-- if Building then do extra checks  
+        if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
+        {
+          std::clog << "--extra building validation" << std::endl;
+          VError coerrs;
+          if (do_primitives_overlap(co.second, coerrs, overlap_tolerance.getValue()) == true)
+          {
+            dPrimitivesErrors[co.first] = coerrs;
+          }
         }
       }
       if (verbose.getValue() == false)
@@ -459,8 +469,8 @@ int main(int argc, char* const argv[])
 }
 
 // TODO: fix the unit_test function
-std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
-{
+// std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
+// {
 //   int bValid = 0;
 //   std::stringstream ss;
 //   std::map<int,int> errors;
@@ -507,7 +517,7 @@ std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
 //   }
 //   ss << std::endl;
 //   return ss.str();
-}
+// }
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives)
 {
