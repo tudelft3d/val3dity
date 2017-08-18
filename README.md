@@ -1,4 +1,4 @@
-# val3dity
+# val3dity 
 
 Validation of 3D primitives according to the international standard ISO19107.
 Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS is only for 2D ones).
