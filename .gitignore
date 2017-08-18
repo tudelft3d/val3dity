@@ -23,6 +23,7 @@ cmake_install.cmake
 *.report.txt
 
 # Visual studio files
+build/
 vs_build/.vs
 *.VC.opendb
 *.VC.db
