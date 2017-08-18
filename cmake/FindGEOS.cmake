@@ -22,8 +22,10 @@ IF(WIN32)
   ENDIF (MINGW)
 
   IF (MSVC)
-    FIND_PATH(GEOS_INCLUDE_DIR geos_c.h $ENV{LIB_DIR}/include $ENV{INCLUDE})
-    FIND_LIBRARY(GEOS_LIBRARY NAMES geos geos_c_i PATHS 
+    FIND_PATH(GEOS_INCLUDE_DIR geos_c.h $ENV{LIB_DIR}/include $ENV{INCLUDE} C:/OSGeo4W/include C:/OSGeo4W64/include)
+    FIND_LIBRARY(GEOS_LIBRARY NAMES geos geos_c_i geos_c PATHS 
+      C:/OSGeo4W/lib
+      C:/OSGeo4W64/lib
       "$ENV{LIB}/lib"
       $ENV{LIB}
       #mingw
