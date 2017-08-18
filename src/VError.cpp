@@ -26,7 +26,8 @@ bool VError::has_errors()
 
 void VError::add_error(int code, std::string info, std::string whichgeoms) 
 {
-  _errors[code].push_back(info);
+  std::tuple<std::string, std::string> a(info, whichgeoms);
+  _errors[code].push_back(a);
   std::clog << "ERROR " << code << " : " << info << std::endl;
 }
 
