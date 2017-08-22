@@ -3,6 +3,25 @@
 Using val3dity
 ==============
 
+Input files
+-----------
+
+val3dity accepts as input:
+
+  - `CityGML <https://www.citygml.org>`_ 
+  - `CityJSON <http://www.cityjson.org>`_
+  - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
+  - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
+  - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
+  - `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_
+
+For CityGML/CityJSON files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
+
+For GML files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
+
+For OBJ, OFF, and POLY files, each primitive will be validated according to the ISO19107 rules, one must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
+
+
 How are 3D primitives validated?
 --------------------------------
 
@@ -22,13 +41,6 @@ For a ``CompositeSurface``, the surface formed by the individual surfaces must b
 For ``MultiSurfaces``, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar (we use a tolerance that can be defined)?
 
 
-Input files
------------
-
-val3dity accepts as input any `GML files <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ (or one of the formats built upon it, such as `CityGML <http://www.citygml.org>`_), `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_, `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_, and `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_.
-It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
-
-In OBJ, OFF, and POLY files, each primitive will be validated according to the ISO19107 rules, as if they were either a Solid or a CompositeSurface.
 
 
 
