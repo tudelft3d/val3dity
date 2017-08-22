@@ -83,38 +83,39 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
-    'logo': 'val3dity-logo.png',
+# html_theme_options = {
+    # 'rightsidebar': 'false'
+    # 'logo': 'val3dity-logo.png',
     # 'logo_text_align': 'left-align',
     # 'body_text_align': 'left-align',
-    'description': 'val3dity: geometric and topological validation of GML 3D primitives',
+    # 'description': 'val3dity: geometric and topological validation of GML 3D primitives',
     # 'logo_name': 'true',
-    'github_user': 'tudelft3d',
-    'github_repo': 'val3dity',
-    'show_powered_by': 'false',
-    'extra_nav_links': {
-        'online validator': 'http://geovalidation.bk.tudelft.nl/val3dity/',
-        'GitHub code': 'https://github.com/tudelft3d/val3dity',
-    },
-    'font_family': 'helvetica',
-    'head_font_family': 'helvetica',
-}
+    # 'github_user': 'tudelft3d',
+    # 'github_repo': 'val3dity',
+    # 'show_powered_by': 'false',
+    # 'extra_nav_links': {
+        # 'online validator': 'http://geovalidation.bk.tudelft.nl/val3dity/',
+        # 'GitHub code': 'https://github.com/tudelft3d/val3dity',
+    # },
+    # 'font_family': 'helvetica',
+    # 'head_font_family': 'helvetica',
+# }
 
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        # 'relations.html',
-        'searchbox.html',
-        # 'donate.html',
-    ]
-}
+# html_sidebars = {
+#     '**': [
+#         'about.html',
+#         'navigation.html',
+#         # 'relations.html',
+#         'searchbox.html',
+#         # 'donate.html',
+#     ]
+# }
 
 
 
