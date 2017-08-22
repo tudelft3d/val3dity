@@ -4,8 +4,10 @@
    contain the root `toctree` directive.
 
 
-.. image:: _static/val3dity.png
-   :width: 50%
+========
+val3dity
+========
+
 
 (version |release|)
 

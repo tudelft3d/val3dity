@@ -197,3 +197,35 @@ Conceptually the same as 205: the configuration of the interior shells makes the
 ------------------------------
 The polygon/surfaces forming an outer shell should have their normals pointing outwards, and for an interior shell inwards. 
 Conceptually the same as 208.
+
+501 -- INTERSECTION_SOLIDS
+--------------------------
+The interior of 2 Solids part of a CompositeSolid intersects.
+
+502 -- DUPLICATED_SOLIDS
+------------------------
+Two Solids in a CompositeSolid are identical.
+
+503 -- DISCONNECTED_SOLIDS
+--------------------------
+Two Solids in a CompositeSolid are disconnected.
+
+601 -- BUILDINGPARTS_OVERLAP
+----------------------------
+Some primitives in a Building and/or BuildingPart have their interior overlapping.
+
+901 -- INVALID_INPUT_FILE
+-------------------------
+Input file is not valid, most likely not a valid CityGML file. `Check here for CityGML files <http://geovalidation.bk.tudelft.nl/schemacitygml/>`_.
+
+902 -- EMPTY_PRIMITIVE
+----------------------
+The input file contains empty primitives, which is perhaps due to a complex GML representation.
+
+903 -- WRONG_INPUT_PARAMETERS
+-----------------------------
+The parameters used for the validation are not valid.
+
+999 -- UNKNOWN_ERROR
+--------------------
+If none of the above but something went bad. If this happens `please report it <https://github.com/tudelft3d/val3dity/issues>`_.
