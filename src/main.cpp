@@ -211,12 +211,12 @@ int main(int argc, char* const argv[])
     else if (primitives.getValue() == "CompositeSurface")
       prim3d = COMPOSITESURFACE;
     if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
-      ioerrs.add_error(999, "the type of 3D primitives to validate is not possible: all are validated in CityGML/CityJSON");
+      ioerrs.add_error(903, "the type of 3D primitives to validate is not possible: all are validated in CityGML/CityJSON");
     if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == OFF) || (inputtype == POLY)) )
-      ioerrs.add_error(999, "the type of 3D primitives to validate wasn't specified (option '-p')");
+      ioerrs.add_error(903, "the type of 3D primitives to validate wasn't specified (option '-p')");
 
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
-      ioerrs.add_error(999, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
+      ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
      
     if (info.getValue() == true)
     {

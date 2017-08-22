@@ -127,6 +127,7 @@ std::string errorcode2description(int code) {
     //-- OTHERS
     case 901: return string("INVALID_INPUT_FILE"); break;
     case 902: return string("EMPTY_PRIMITIVE"); break;
+    case 903: return string("WRONG_INPUT_PARAMETERS"); break;
     case 999: return string("UNKNOWN_ERROR"); break;
     default:  return string("UNKNOWN_ERROR"); break;
   }
