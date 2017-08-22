@@ -10,17 +10,17 @@ We offer CMake and it's trivial to compile val3dity.
 
 To compile val3dity yourself, you first need to install the following free libraries:
 
-  1. [CGAL](http://www.cgal.org)
-  1. [GEOS](http://trac.osgeo.org/geos/) 
-  1. [CMake](http://www.cmake.org)
+  1. `CGAL <http://www.cgal.org>`_
+  1. `GEOS <http://trac.osgeo.org/geos/)>`_
+  1. `CMake <http://www.cmake.org>`_
 
 Under Mac we suggest using `Homebrew <http://brew.sh/>`_:
 
 .. code-block:: bash
 
-  $ homebrew install cmake 
-  $ homebrew install cgal
-  $ homebrew install geos
+  $ brew install cmake 
+  $ brew install cgal
+  $ brew install geos
 
 Afterwards run:
 
@@ -30,7 +30,7 @@ Afterwards run:
   $ cd build
   $ cmake ..
   $ make
-  $ ./val3dity 
+  $ ./val3dity ../data/cityjson/cube.json
 
 
 Windows

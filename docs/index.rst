@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-========
-val3dity
-========
+
+.. image:: _static/val3dity.png
+   :width: 50%
 
 (version |release|)
 
@@ -46,8 +46,8 @@ val3dity accepts as input:
 
   install
   usage
-  faq
   errors
+  faq
   changelog
   contact
 
