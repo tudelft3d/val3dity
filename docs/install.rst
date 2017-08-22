@@ -8,7 +8,6 @@ macOS & Linux
 
 We offer CMake and it's trivial to compile val3dity.
 
-
 To compile val3dity yourself, you first need to install the following free libraries:
 
   1. [CGAL](http://www.cgal.org)

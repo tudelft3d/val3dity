@@ -3,6 +3,10 @@
 Using val3dity
 ==============
 
+.. note::
+
+  val3dity is a command-line program only, there is not graphical interface.
+
 How to run val3dity?
 --------------------
 
@@ -10,37 +14,36 @@ To execute val3dity and see its options:
 
 .. code-block:: bash
 
-  $ ./val3dity --help
+  $ val3dity --help
     
-To validate all the ``<gml:Solid>`` in a GML or CityGML file and see a summary output:
+
+To validate all the 3D primitives in a CityGML file and see a summary output:
 
 .. code-block:: bash
 
-  $ ./val3dity input.gml -p Solid
+  $ val3dity citygmlinput.gml 
 
-Each ``<gml:Solid>`` in the file will be individually validated and a summary report will be output. 
 
-For a full report in XML format:
+To validate all the 3D primitives in a GML file and get a report ``report.xml``:
 
 .. code-block:: bash
 
-  $ ./val3dity input.gml -p Solid -r myreport.xml
+  $ val3dity input.gml -r report.xml
 
-val3dity accepts as input:
 
-  - `CityGML <https://www.citygml.org>`_ 
-  - `CityJSON <http://www.cityjson.org>`_
-  - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
-  - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
-  - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
-  - `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_
+To validates each 3D primitive in input.gml, and to merge/snap the vertices closer than 0.1unit:
 
-For CityGML/CityJSON files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
+.. code-block:: bash
 
-For GML files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
+  $ val3dity input.gml --snap_tolerance 0.1
 
-For OBJ, OFF, and POLY files, each primitive will be validated according to the ISO19107 rules, one must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
 
+To validate an OBJ file and verify whether the 3D primitives from a ``Solid``:
+
+.. code-block:: bash
+
+  $ val3dity input.obj -p Solid
+    
 
 How are 3D primitives validated?
 --------------------------------
@@ -64,15 +67,22 @@ For ``MultiSurfaces``, only the validation of the individual polygons is perform
 Input files
 -----------
 
-val3dity accepts as input any `GML files <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ (or one of the formats built upon it, such as `CityGML <http://www.citygml.org>`_), `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_, `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_, and `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_.
-It simply scans the file looking for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
+val3dity accepts as input:
 
-In OBJ, OFF, and POLY files, each primitive will be validated according to the ISO19107 rules, as if they were either a Solid or a CompositeSurface
+  - `CityGML <https://www.citygml.org>`_ 
+  - `CityJSON <http://www.cityjson.org>`_
+  - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
+  - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
+  - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
+  - `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_
 
-  1. OBJ: a file can contain more than 1 object (lines starting with "o", eg `o myobject`), each will be validated individually
-  2. POLY: there are several examples of test datasets in the folder `data/poly/`, see the `README.txt`. Only one primitive can be represented in one file
+For CityGML/CityJSON files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
+The 3D primitives are bundled under their City Objects in the report.
 
-In an OBJ file, each primitive will be validated according to the ISO19107 rules. 
+For GML files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
+
+For OBJ, OFF, and POLY files, each primitive will be validated according to the ISO19107 rules, one must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
+In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option) will validate individually each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
 If your OBJ contains only triangles (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (error ``309: VERTICES_NOT_USED``), cases where triangles are collapsed to a line/point.
@@ -82,13 +92,10 @@ Validating it as a solid verify whether the primitive is a 2-manifold, ie whethe
 Options for the validation
 --------------------------
 
-Validation of CityGML Buildings
-*******************************
+Validation of CityGML/CityJSON Buildings
+****************************************
 
-By using the ``--buildings`` option, the validator will--instead of searching for specific 3D primitives--validate each CityGML ``Building``, and produce a report per building.
-Every 3D primitive of a building will be validated (be it a ``gml:Solid``, ``gml:CompositeSolid``, or ``gml:MultiSurface``) and included in the report.
-Furthermore, if a building is composed of ``BuildingPart``, then these are also validated and the topological relationships between all the parts are analysed to ensure that they do not overlap (technically that the interior of each part does not intersect with the interior of any other part).
-
+If your CityGML/CityJSON contains ``Buildings`` having one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
 
 Snapping tolerance
 ******************
