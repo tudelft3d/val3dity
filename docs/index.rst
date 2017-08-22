@@ -42,11 +42,12 @@ val3dity accepts as input:
 .. rubric:: Content
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   usage
-   faq
-   errors
-   changelog
-   contact
+  install
+  usage
+  faq
+  errors
+  changelog
+  contact
 
