@@ -211,24 +211,19 @@ int main(int argc, char* const argv[])
     else if (primitives.getValue() == "CompositeSurface")
       prim3d = COMPOSITESURFACE;
     if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
-      ioerrs.add_error(999, "option '-p' not possible with CityJSON, CityGML, and GML input since all 3D primitives are validated.");
+      ioerrs.add_error(999, "the type of 3D primitives to validate is not possible: all are validated in CityGML/CityJSON");
     if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == OFF) || (inputtype == POLY)) )
-      ioerrs.add_error(999, "option '-p' must be used to specify how to validate the primitives given as input.");
+      ioerrs.add_error(999, "the type of 3D primitives to validate wasn't specified (option '-p')");
 
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
       ioerrs.add_error(999, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
-    
-    if (ioerrs.has_errors() == true)
-    {
-      std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors) << std::endl;
-      return(1);
-    }
      
     if (info.getValue() == true)
     {
       print_information(inputfile.getValue());
       return (1);
     }
+
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
@@ -237,12 +232,113 @@ int main(int argc, char* const argv[])
       std::clog.rdbuf(mylog.rdbuf());
     }
 
-    if (inputtype == GML)
+    if (ioerrs.has_errors() == false)
     {
-      try
+      if (inputtype == GML)
       {
-        read_file_gml(inputfile.getValue(), 
-                      dPrimitives,
+        try
+        {
+          read_file_gml(inputfile.getValue(), 
+                        dPrimitives,
+                        ioerrs, 
+                        snap_tolerance.getValue());
+          if (ioerrs.has_errors() == true) {
+            std::cout << "Errors while reading the input file, aborting." << std::endl;
+            std::cout << ioerrs.get_report_text() << std::endl;
+          }
+          if (ishellfiles.getValue().size() > 0)
+          {
+            std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+            ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+          }
+        }
+        catch (int e)
+        {
+          if (e == 901)
+            ioerrs.add_error(901, "Invalid GML structure, or that particular construction of GML is not supported yet. Please report at https://github.com/tudelft3d/val3dity/issues and provide the file.");
+        }
+      }
+      else if (inputtype == JSON)
+      {
+        read_file_cityjson(inputfile.getValue(), 
+                           dPrimitives,
+                           ioerrs, 
+                           snap_tolerance.getValue());
+        if (ioerrs.has_errors() == true) {
+          std::cout << "Errors while reading the input file, aborting." << std::endl;
+          std::cout << ioerrs.get_report_text() << std::endl;
+        }
+        if (ishellfiles.getValue().size() > 0)
+        {
+          std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+          ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+        }
+      }
+      else if (inputtype == POLY)
+      {
+        Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
+        if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
+        {
+          Solid* s = new Solid;
+          s->set_oshell(sh);
+          int sid = 1;
+          for (auto ifile : ishellfiles.getValue())
+          {
+            Surface* sh = read_file_poly(ifile, sid, ioerrs);
+            if (ioerrs.has_errors() == false)
+            {
+              s->add_ishell(sh);
+              sid++;
+            }
+          }
+          if (ioerrs.has_errors() == false)
+            dPrimitives["Primitives"].push_back(s);
+        }
+        else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+        {
+          CompositeSurface* cs = new CompositeSurface;
+          cs->set_surface(sh);
+          if (ioerrs.has_errors() == false)
+            dPrimitives["Primitives"].push_back(cs);
+        }
+        else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+        {
+          MultiSurface* ms = new MultiSurface;
+          ms->set_surface(sh);
+          if (ioerrs.has_errors() == false)
+            dPrimitives["Primitives"].push_back(ms);
+        }      
+      }
+      else if (inputtype == OFF)
+      {
+        Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
+        if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
+        {
+          Solid* s = new Solid;
+          s->set_oshell(sh);
+          if (ioerrs.has_errors() == false)
+            dPrimitives["Primitives"].push_back(s);
+        }
+        else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+        {
+          CompositeSurface* cs = new CompositeSurface;
+          cs->set_surface(sh);
+          if (ioerrs.has_errors() == false)
+            dPrimitives["Primitives"].push_back(cs);
+        }
+        else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+        {
+          MultiSurface* ms = new MultiSurface;
+          ms->set_surface(sh);
+          if (ioerrs.has_errors() == false)
+            dPrimitives["Primitives"].push_back(ms);
+        }
+      }    
+      else if (inputtype == OBJ)
+      {
+        read_file_obj(dPrimitives,
+                      inputfile.getValue(), 
+                      prim3d,
                       ioerrs, 
                       snap_tolerance.getValue());
         if (ioerrs.has_errors() == true) {
@@ -254,104 +350,6 @@ int main(int argc, char* const argv[])
           std::cout << "No inner shells allowed when GML file used as input." << std::endl;
           ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
         }
-      }
-      catch (int e)
-      {
-        if (e == 901)
-          ioerrs.add_error(901, "Invalid GML structure, or that particular construction of GML is not supported yet. Please report at https://github.com/tudelft3d/val3dity/issues and provide the file.");
-      }
-    }
-    else if (inputtype == JSON)
-    {
-      read_file_cityjson(inputfile.getValue(), 
-                         dPrimitives,
-                         ioerrs, 
-                         snap_tolerance.getValue());
-      if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
-      }
-      if (ishellfiles.getValue().size() > 0)
-      {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
-      }
-    }
-    else if (inputtype == POLY)
-    {
-      Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
-      if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
-      {
-        Solid* s = new Solid;
-        s->set_oshell(sh);
-        int sid = 1;
-        for (auto ifile : ishellfiles.getValue())
-        {
-          Surface* sh = read_file_poly(ifile, sid, ioerrs);
-          if (ioerrs.has_errors() == false)
-          {
-            s->add_ishell(sh);
-            sid++;
-          }
-        }
-        if (ioerrs.has_errors() == false)
-          dPrimitives["Primitives"].push_back(s);
-      }
-      else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
-      {
-        CompositeSurface* cs = new CompositeSurface;
-        cs->set_surface(sh);
-        if (ioerrs.has_errors() == false)
-          dPrimitives["Primitives"].push_back(cs);
-      }
-      else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
-      {
-        MultiSurface* ms = new MultiSurface;
-        ms->set_surface(sh);
-        if (ioerrs.has_errors() == false)
-          dPrimitives["Primitives"].push_back(ms);
-      }      
-    }
-    else if (inputtype == OFF)
-    {
-      Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
-      if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
-      {
-        Solid* s = new Solid;
-        s->set_oshell(sh);
-        if (ioerrs.has_errors() == false)
-          dPrimitives["Primitives"].push_back(s);
-      }
-      else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
-      {
-        CompositeSurface* cs = new CompositeSurface;
-        cs->set_surface(sh);
-        if (ioerrs.has_errors() == false)
-          dPrimitives["Primitives"].push_back(cs);
-      }
-      else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
-      {
-        MultiSurface* ms = new MultiSurface;
-        ms->set_surface(sh);
-        if (ioerrs.has_errors() == false)
-          dPrimitives["Primitives"].push_back(ms);
-      }
-    }    
-    else if (inputtype == OBJ)
-    {
-      read_file_obj(dPrimitives,
-                    inputfile.getValue(), 
-                    prim3d,
-                    ioerrs, 
-                    snap_tolerance.getValue());
-      if (ioerrs.has_errors() == true) {
-        std::cout << "Errors while reading the input file, aborting." << std::endl;
-        std::cout << ioerrs.get_report_text() << std::endl;
-      }
-      if (ishellfiles.getValue().size() > 0)
-      {
-        std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-        ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
       }
     }
 
