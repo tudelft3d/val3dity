@@ -7,39 +7,84 @@ FAQ
 How should I interpret the report?
 ----------------------------------
 
+All reports are XML files with the following headers, it contains the information used for the validation.
+The errors in the input file are listed with ``<Error>`` tags in the XML report, depending on the type of errors it will be a child of:
+  - ``<val3dity>``: for errors with the input file (errors 9xx);
+  - ``<Solid>`` (or other 3D primitives): for errors in a specific 3D primitives (errors 1xx --> 5xx);
+  - ``<Building>``: for errors related to ``Buildings`` and ``BuildingParts`` (errors 6xx);
+
+By default, the report lists all the primitives and/or city objects in the file, whether it contains an error or not. 
+To list only the ones with errors, use the option ``--onlyinvalid``.
+
 .. code-block:: xml
 
   <val3dity>
     <inputFile>delft.gml</inputFile>
-    <primitives>gml:Solid</primitives>
     <snap_tolerance>0.001</snap_tolerance>
+    <overlap_tolerance>-1</overlap_tolerance>
     <planarity_d2p>0.01</planarity_d2p>
     <planarity_n>1</planarity_n>
-    <totalprimitives>111</totalprimitives>
-    <validprimitives>86</validprimitives>
-    <invalidprimitives>25</invalidprimitives>
-    <time>Fri Mar 11 09:31:01 2016 CET</time>
-    <Primitive>
-      <id>0</id>
-      <numbershells>1</numbershells>
-      <numberfaces>7</numberfaces>
-      <numbervertices>10</numbervertices>
-    </Primitive>
-    <Primitive>
-      <id>1</id>
-      <numbershells>1</numbershells>
-      <numberfaces>127</numberfaces>
-      <numbervertices>192</numbervertices>
-      <Error>
-        <code>102</code>
-        <type>CONSECUTIVE_POINTS_SAME</type>
-        <shell>0</shell>
-        <face>774f3cebd44a</face>
-        <info></info>
-      </Error>
-    </Primitive>
+    <totalprimitives>0</totalprimitives>
+    <validprimitives>0</validprimitives>
+    <invalidprimitives>0</invalidprimitives>
+    <totalcityobjects>0</totalcityobjects>
+    <validcityobjects>0</validcityobjects>
+    <invalidcityobjects>0</invalidcityobjects>
+    <time>Tue Aug 22 14:38:17 2017 CEST</time>
     ...
-    <Primitive>
+  </val3dity>
+
+CityGML and CityJSON
+********************
+
+The City Objects (``Building``, ``GenericCityObject``, ``LandUse``, etc) are listed and their primitives listed. 
+In the following, the ``Building`` with ``gml:id = myhouse`` has one ``Solid`` containing one error, and a city object of type ``GenericCityObject`` has one ``CompositeSolid`` containing one error.
+
+.. code-block:: xml
+
+  <val3dity>
+    ...
+    <Building>
+      <id>myhouse</id>
+      <Solid>
+        <id>5</id>
+        <numbershells>1</numbershells>
+        <numberfaces>15</numberfaces>
+        <numbervertices>35</numbervertices>
+        <Error>
+          <code>203</code>
+          <type>NON_PLANAR_POLYGON_DISTANCE_PLANE</type>
+          <shell>0</shell>
+          <face>c6e90d82</face>
+          <info>distance to fitted plane: 0.0129827 (tolerance=0.01)</info>
+        </Error>
+      </Solid>
+    </Building>
+    ...
+    <GenericCityObject>
+      <id>something</id>
+      <CompositeSolid>
+        <id>elvisisalive</id>
+        <numbersolids>3</numbersolids>
+        <Error>
+          <code>501</code>
+          <type>INTERSECTION_SOLIDS</type>
+          <id>1;2</id>
+          <info></info>
+        </Error>
+      </CompositeSolid>  
+    </GenericCityObject>  
+  </val3dity>
+
+
+GML, OBJ, OFF, and POLY
+***********************
+
+.. code-block:: xml
+
+  <val3dity>
+    ...
+    <Solid>
       <id>5</id>
       <numbershells>1</numbershells>
       <numberfaces>15</numberfaces>
@@ -51,40 +96,18 @@ How should I interpret the report?
         <face>c6e90d82</face>
         <info>distance to fitted plane: 0.0129827 (tolerance=0.01)</info>
       </Error>
-    </Primitive>
+    </Solid>
     ...
-    <Primitive>
+    <Solid>
       <id>68</id>
       <numbershells>1</numbershells>
       <numberfaces>9</numberfaces>
       <numbervertices>21</numbervertices>
-      <Error>
-        <code>302</code>
-        <type>SHELL_NOT_CLOSED</type>
-        <shell>0</shell>
-        <face></face>
-        <info>Location hole: 8.59499 11.5695 13.7672</info>
-      </Error>
-      <Error>
-        <code>302</code>
-        <type>SHELL_NOT_CLOSED</type>
-        <shell>0</shell>
-        <face></face>
-        <info>Location hole: 10.405 8.5995 0</info>
-      </Error>
-    </Primitive>
-    ...
+    </Solid>
   </val3dity>
 
-The report lists all the 3D primitives with some statistics about them, and gives if invalid one or more errors for each. 
 
 If your your file is a GML file and the primitives have ``gml:id`` (for ``gml:Solid`` and ``gml:Shell`` and ``gml:Polygon``) then these are used to report the errors, if not then the number means the order of the primitives in the file (the first one being 0). 
-Some examples, referring to the example above. 
-The first (ID #0) solid in the file is valid, and some of its properties are shown.
-The solid with ID #1 is invalid with error 102.
-The solid with ID #5 is invalid because its face ID #c6e90d82 is non-planar; if the tolerance was modified to 0.20m then it would be.
-The solid with ID #68 is invalid its exterior shell (ID #0) has holes (2 of them).
-
 
 I get many errors 203 and 204, but my planes look planar to me. Why is that?
 ----------------------------------------------------------------------------
@@ -134,8 +157,8 @@ Yes, all the 3D primitives in the file will be validated, one by one.
 Do you validate the topological relationships between the solids?
 -----------------------------------------------------------------
 
-If these solids are part of a ``gml:CompositeSolid`` yes, otherwise no.
-We do verify whether 2 BuildingParts forming a Building overlap though.
+If these solids are part of a ``gml:CompositeSolid`` then yes, otherwise no.
+We do verify whether 2 ``BuildingParts`` forming a ``Building`` overlap though.
 
 We however plan to offer in the future this for all primitives/buildings in a file, so that one can verify whether 2 different buildings overlap for instance.
 

@@ -5,7 +5,7 @@ Using val3dity
 
 .. note::
 
-  val3dity is a command-line program only, there is not graphical interface.
+  val3dity is a command-line program only, there is no graphical interface.
 
 How to run val3dity?
 --------------------
