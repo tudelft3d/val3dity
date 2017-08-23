@@ -38,7 +38,7 @@ using namespace val3dity;
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors);
 // std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
 // std::string print_unit_tests(vector<Building*>& lsBuilding);
-void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, double snap_tolerance, double overlap_tolerance, double planarity_d2p, double planarity_n, IOErrors ioerrs, bool onlyinvalid);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -66,7 +66,7 @@ public:
     std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml" << std::endl;
     std::cout << "\t\tand outputs a detailed report in XML" << std::endl;
-    std::cout << "\tval3dity input.gml --overlap_tolerance 0.05" << std::endl;
+    std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
     std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts." << std::endl;
     std::cout << "\tval3dity input.gml --verbose" << std::endl;
@@ -75,7 +75,7 @@ public:
     std::cout << "\t\tValidates the geometries in input.obj as if they were a Solid" << std::endl;
     std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
     std::cout << "\t\tValidates the geometries in input.off individually" << std::endl;
-    std::cout << "\tval3dity input.gml --snap_tolerance 0.1" << std::endl;
+    std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
     std::cout << "\tval3dity input.gml --info" << std::endl;
     std::cout << "\t\tOutputs information about the GML file (no validation performed)." << std::endl;
@@ -138,44 +138,43 @@ int main(int argc, char* const argv[])
                                               false);
     TCLAP::SwitchArg                        notranslate("",
                                               "notranslate",
-                                              "do not translate to (minx,"
-                                              "miny)",
+                                              "do not translate to (minx, miny)",
                                               false);
     TCLAP::SwitchArg                        onlyinvalid("",
                                               "onlyinvalid",
                                               "only invalid primitives are reported",
                                               false);
-    TCLAP::ValueArg<double>                 snap_tolerance("",
-                                              "snap_tolerance",
+    TCLAP::ValueArg<double>                 snap_tol("",
+                                              "snap_tol",
                                               "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
                                               false,
                                               0.001,
                                               "double");
-    TCLAP::ValueArg<double>                 overlap_tolerance("",
-                                              "overlap_tolerance",
+    TCLAP::ValueArg<double>                 overlap_tol("",
+                                              "overlap_tol",
                                               "tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)",
                                               false,
                                               -1,
                                               "double");
-    TCLAP::ValueArg<double>                 planarity_d2p("",
-                                              "planarity_d2p",
+    TCLAP::ValueArg<double>                 planarity_d2p_tol("",
+                                              "planarity_d2p_tol",
                                               "tolerance for planarity distance_to_plane (default=0.01)",
                                               false,
                                               0.01,
                                               "double");
-    TCLAP::ValueArg<double>                 planarity_n("",
-                                              "planarity_n",
+    TCLAP::ValueArg<double>                 planarity_n_tol("",
+                                              "planarity_n_tol",
                                               "tolerance for planarity based on normals deviation (default=1.0degree)",
                                               false,
                                               1.0,
                                               "double");
 
     cmd.add(info);
-    cmd.add(planarity_d2p);
-    cmd.add(planarity_n);
-    cmd.add(snap_tolerance);
+    cmd.add(planarity_d2p_tol);
+    cmd.add(planarity_n_tol);
+    cmd.add(snap_tol);
+    cmd.add(overlap_tol);
     cmd.add(notranslate);
-    cmd.add(overlap_tolerance);
     cmd.add(verbose);
     cmd.add(primitives);
     cmd.add(unittests);
@@ -241,7 +240,7 @@ int main(int argc, char* const argv[])
           read_file_gml(inputfile.getValue(), 
                         dPrimitives,
                         ioerrs, 
-                        snap_tolerance.getValue());
+                        snap_tol.getValue());
           if (ioerrs.has_errors() == true) {
             std::cout << "Errors while reading the input file, aborting." << std::endl;
             std::cout << ioerrs.get_report_text() << std::endl;
@@ -263,7 +262,7 @@ int main(int argc, char* const argv[])
         read_file_cityjson(inputfile.getValue(), 
                            dPrimitives,
                            ioerrs, 
-                           snap_tolerance.getValue());
+                           snap_tol.getValue());
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
@@ -340,7 +339,7 @@ int main(int argc, char* const argv[])
                       inputfile.getValue(), 
                       prim3d,
                       ioerrs, 
-                      snap_tolerance.getValue());
+                      snap_tol.getValue());
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;
@@ -380,16 +379,16 @@ int main(int argc, char* const argv[])
     if (ioerrs.has_errors() == false)
     {
       std::cout << "Parameters used for validation:" << std::endl;
-      if (snap_tolerance.getValue() < 1e-8)
-        std::cout << "   snap_tolerance"    << setw(12)  << "none" << std::endl;
+      if (snap_tol.getValue() < 1e-8)
+        std::cout << "   snap_tol"    << setw(12)  << "none" << std::endl;
       else
-        std::cout << "   snap_tolerance"    << setw(12)  << snap_tolerance.getValue() << std::endl;
-      std::cout << "   planarity_d2p"     << setw(13)  << planarity_d2p.getValue() << std::endl;
-      std::cout << "   planarity_n"       << setw(15) << planarity_n.getValue() << std::endl;
-      if (overlap_tolerance.getValue() < 1e-8)
-        std::cout << "   overlap_tolerance" << setw(9)  << "none" << std::endl;
+        std::cout << "   snap_tol"    << setw(12)  << snap_tol.getValue() << std::endl;
+      std::cout << "   planarity_d2p_tol"     << setw(13)  << planarity_d2p_tol.getValue() << std::endl;
+      std::cout << "   planarity_n_tol"       << setw(15) << planarity_n_tol.getValue() << std::endl;
+      if (overlap_tol.getValue() < 1e-8)
+        std::cout << "   overlap_tol" << setw(9)  << "none" << std::endl;
       else
-        std::cout << "   overlap_tolerance" << setw(9)  << overlap_tolerance.getValue() << std::endl;
+        std::cout << "   overlap_tol" << setw(9)  << overlap_tol.getValue() << std::endl;
     }
 
     //-- now the validation starts
@@ -409,7 +408,7 @@ int main(int argc, char* const argv[])
           std::clog << "type: ";
           if (p->get_id() != "")
             std::clog << "id: " << p->get_id() << std::endl;
-          if (p->validate(planarity_d2p.getValue(), planarity_n.getValue(), overlap_tolerance.getValue()) == false)
+          if (p->validate(planarity_d2p_tol.getValue(), planarity_n_tol.getValue(), overlap_tol.getValue()) == false)
           {
             std::clog << "======== INVALID ========" << std::endl;
             bValid = false;
@@ -422,7 +421,7 @@ int main(int argc, char* const argv[])
         {
           std::clog << "--extra building validation" << std::endl;
           VError coerrs;
-          if (do_primitives_overlap(co.second, coerrs, overlap_tolerance.getValue()) == true)
+          if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
             std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
             dPrimitivesErrors[co.first] = coerrs;
@@ -443,10 +442,10 @@ int main(int argc, char* const argv[])
                        inputfile.getValue(),
                        dPrimitives,
                        dPrimitivesErrors,
-                       snap_tolerance.getValue(),
-                       overlap_tolerance.getValue(),
-                       planarity_d2p.getValue(),
-                       planarity_n.getValue(),
+                       snap_tol.getValue(),
+                       overlap_tol.getValue(),
+                       planarity_d2p_tol.getValue(),
+                       planarity_n_tol.getValue(),
                        ioerrs,
                        onlyinvalid.getValue());
       thereport.close();
@@ -617,19 +616,19 @@ void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
                       std::map<std::string, std::vector<Primitive*> >& dPrimitives,
                       std::map<std::string, VError >& dPrimitivesErrors,
-                      double snap_tolerance,
-                      double overlap_tolerance,
-                      double planarity_d2p,
-                      double planarity_n,
+                      double snap_tol,
+                      double overlap_tol,
+                      double planarity_d2p_tol,
+                      double planarity_n_tol,
                       IOErrors ioerrs,
                       bool onlyinvalid)
 {
   ss << "<val3dity>" << std::endl;
   ss << "\t<inputFile>" << ifile << "</inputFile>" << std::endl;
-  ss << "\t<snap_tolerance>" << snap_tolerance << "</snap_tolerance>" << std::endl;
-  ss << "\t<overlap_tolerance>" << overlap_tolerance << "</overlap_tolerance>" << std::endl;
-  ss << "\t<planarity_d2p>" << planarity_d2p << "</planarity_d2p>" << std::endl;
-  ss << "\t<planarity_n>" << planarity_n << "</planarity_n>" << std::endl;
+  ss << "\t<snap_tol>" << snap_tol << "</snap_tol>" << std::endl;
+  ss << "\t<overlap_tol>" << overlap_tol << "</overlap_tol>" << std::endl;
+  ss << "\t<planarity_d2p_tol>" << planarity_d2p_tol << "</planarity_d2p_tol>" << std::endl;
+  ss << "\t<planarity_n_tol>" << planarity_n_tol << "</planarity_n_tol>" << std::endl;
   int noprim = 0;
   for (auto& co : dPrimitives)
     for (auto& p : co.second)
