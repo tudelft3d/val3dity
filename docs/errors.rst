@@ -70,20 +70,20 @@ A special case of self-intersection (104): the ring is collapsed to a line. If t
 
 .. image:: _static/105.png
 
-201: INTERSECTION_RINGS
------------------------
+201 -- INTERSECTION_RINGS
+-------------------------
 Two or more rings intersect, these can be either the exterior ring with an interior ring or only interior rings. 
 
 .. image:: _static/201.png
 
-202: DUPLICATED_RINGS
----------------------
+202 -- DUPLICATED_RINGS
+-----------------------
 Two or more rings are identical.
 
 .. _error_203:
 
-203: NON_PLANAR_POLYGON_DISTANCE_PLANE
---------------------------------------
+203 -- NON_PLANAR_POLYGON_DISTANCE_PLANE
+----------------------------------------
 A polygon must be planar, ie all its points (used for both the exterior and interior rings) must lie on a plane. 
 To verify this, we must ensure that the the distance between every point and a plane is less than a given *tolerance* (eg 1cm). 
 In the validator, this plane is fitted with least-square adjustment, and then the distance between each of the point to the plane is calculated. 
@@ -92,8 +92,8 @@ The distance to the plane, if larger than the threshold, is also reported in the
 
 .. _error_204:
 
-204: NON_PLANAR_POLYGON_NORMALS_DEVIATION
------------------------------------------
+204 -- NON_PLANAR_POLYGON_NORMALS_DEVIATION
+-------------------------------------------
 To ensure that cases such as that below are detected, error 204 is introduced. In the solid, the top surface containining 8 vertices (*abcdefgh*) is clearly non-planar since there is a vertical "fold" in the middle. 
 The normal of the sub-surface *abgh* points upwards, while that of *bcfg* is perpendicular to it. 
 But this surface would not be detected the error 203 test and a tolerance of 1cm for instance, since all the vertices are within that thresfold. 
@@ -107,28 +107,28 @@ That usually means that you have vertices that are very close (say 0.1mm) and th
 .. image:: _static/204.png
 
 
-205: INTERIOR_DISCONNECTED
---------------------------
+205 -- INTERIOR_DISCONNECTED
+----------------------------
 The interior of a polygon must be connected. The combinaison of different valid rings can create such an error, for example:
 
 .. image:: _static/205.png
 
 
-206: INNER_RING_OUTSIDE
------------------------
+206 -- INNER_RING_OUTSIDE
+-------------------------
 One or more interior ring(s) is(are) located completely outside the exterior ring. If the interior ring intersects the exterior ring, then error 201 should be returned.
 
 .. image:: _static/206.png
 
 
-207: INNER_RINGS_NESTED
------------------------
+207 -- INNER_RINGS_NESTED
+-------------------------
 One or more interior ring(s) is(are) located completely inside another interior ring.
 
 .. image:: _static/207.png
 
-208: ORIENTATION_RINGS_SAME 
----------------------------
+208 -- ORIENTATION_RINGS_SAME 
+-----------------------------
 The interior rings must have the opposite direction (clockwise vs counterclockwise) when viewed from a given point-of-view. 
 When the polygon is used as a bounding surface of a shell, then the rings have to have a specified orientation (see 307/308).
 
