@@ -12,6 +12,7 @@ All the 3D primitives of GML are supported:
   - `<gml:MultiSolid>`
   - `<gml:CompositeSolid>`
 
+Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported, and so are cavities in solids (also called voids or inner shells).
 However, as is the case for CityGML, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported (and there is no plan to do so!).
 
 val3dity accepts as input:
@@ -24,11 +25,16 @@ val3dity accepts as input:
   - [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
 
 
-## How do I compile and use val3dity?
+## Installation
 
 It is a command-line program, which we provide as source code, with CMake.
 It's trivial to compile under Mac and Linux.
-[For Windows, we do offer an executable](https://github.com/tudelft3d/val3dity/releases).
+
+[For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile yourself.
+
+If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity); upload your file to our server and get a validation report back.
+We delete the file as soon as it has been validated.
+However, a file is limited to 50MB.
 
 To compile val3dity yourself, you first need to install the following free libraries:
 
