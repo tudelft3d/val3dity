@@ -20,10 +20,10 @@ To list only the ones with errors, use the option ``--onlyinvalid``.
 
   <val3dity>
     <inputFile>delft.gml</inputFile>
-    <snap_tolerance>0.001</snap_tolerance>
-    <overlap_tolerance>-1</overlap_tolerance>
-    <planarity_d2p>0.01</planarity_d2p>
-    <planarity_n>1</planarity_n>
+    <snap_tol>0.001</snap_tol>
+    <overlap_tol>-1</overlap_tol>
+    <planarity_d2p_tol>0.01</planarity_d2p_tol>
+    <planarity_n_tol>1</planarity_n_tol>
     <totalprimitives>0</totalprimitives>
     <validprimitives>0</validprimitives>
     <invalidprimitives>0</invalidprimitives>
@@ -112,11 +112,12 @@ If your your file is a GML file and the primitives have ``gml:id`` (for ``gml:So
 I get many errors 203 and 204, but my planes look planar to me. Why is that?
 ----------------------------------------------------------------------------
 
-This is a very common error, actually 203 is the most common error for `all the files so far uploaded to our web application <http://geovalidation.bk.tudelft.nl/val3dity/stats>`_.
+This is a very common error, actually :ref:`error_203` is the most common error for `all the files so far uploaded to our web application <http://geovalidation.bk.tudelft.nl/val3dity/stats>`_.
 
-Read carefully the explanations of the errors 203 and 204.
+Read carefully the explanations of the errors :ref:`error_203` and :ref:`error_204`.
 
-A surface is first check for error 203, if valid then error 204 is checked. By definition, if an error 204 is reported then all the vertices are within 1cm (tolerance you used), thus you wouldn’t be able to visualise them. 
+A surface is first check for error 203, if valid then error 204 is checked. 
+By definition, if an error 204 is reported then all the vertices are within 1cm (tolerance you used), thus you wouldn’t be able to visualise them. 
 That usually means that you have vertices that are very close (say 0.1mm) and thus it’s easy to get a large deviation (say 80degree; the report contains the deviation).  
 
 

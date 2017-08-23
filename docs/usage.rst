@@ -35,7 +35,7 @@ To validates each 3D primitive in input.gml, and to merge/snap the vertices clos
 
 .. code-block:: bash
 
-  $ val3dity input.gml --snap_tolerance 0.1
+  $ val3dity input.gml --snap_tol 0.1
 
 
 To validate an OBJ file and verify whether the 3D primitives from a ``Solid``:
@@ -85,20 +85,28 @@ For OBJ, OFF, and POLY files, each primitive will be validated according to the 
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option) will validate individually each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
-If your OBJ contains only triangles (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (error ``309: VERTICES_NOT_USED``), cases where triangles are collapsed to a line/point.
+If your OBJ contains only triangles (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid; validation could however catch cases where vertices are not referenced by faces (:ref:`error_309`), cases where triangles are collapsed to a line/point.
 Validating it as a solid verify whether the primitive is a 2-manifold, ie whether it is closed/watertight and whether all normals are pointing outwards.
+
+
+Validation of CityGML/CityJSON Buildings
+----------------------------------------
+
+If your CityGML/CityJSON contains ``Buildings`` having one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
+If there is one or more intersections, then :ref:`error_601` will be reported.
 
 
 Options for the validation
 --------------------------
 
-Validation of CityGML/CityJSON Buildings
-****************************************
+.. _snap_tol:
 
-If your CityGML/CityJSON contains ``Buildings`` having one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
+``--snap_tol``
+**************
+|  Tolerance for snapping vertices that are close to each others
+|  default = 0.001
+|  to disable snapping = -1 
 
-Snapping tolerance
-******************
 Geometries modelled in GML store amazingly very little topological relationships. 
 A cube is for instance represented with 6 surfaces, all stored independently. 
 This means that the coordinates xyz of a single vertex (where 3 surfaces "meet") is stored 3 times. 
@@ -106,32 +114,46 @@ It is possible that these 3 vertices are not exactly at the same location (eg (0
 The snap tolerance basically gives a threshold that says: "if 2 points are closer then *X*, then we assume that they are the same". 
 It's setup by default to be 1mm. 
 
-It can be changed with ``--snap_tolerance 0.08`` (which would mean to use 0.08unit; default is 1mm).
-If no snapping is wanted, use ``--snap_tolerance 0``
+----
 
-Planarity tolerances
-********************
-It is possible to define 2 tolerances for the planarity of surfaces with the flags: 
+``--planarity_d2p_tol``
+***********************
+|  Tolerance for planarity based on a distance to a plane 
+|  default = 0.01
 
-  1. ``--planarity_d2s`` the distance between every point forming a surface and a plane is less than a given tolerance (eg 1cm, which is the default).
-  2. ``--planarity_n`` the surface is triangulated and the normal of each triangle must not deviate more than than a certain usef-defined tolerance (eg 1 degree, which is the default).
+The distance between every point forming a surface and a plane is less than a given tolerance (eg 1cm, which is the default).
+This plane is fitted with least-square adjustment, and the distance between each of the point to the plane is calculated.
+If this distance is larger than the value defined then :ref:`error_203` is reported.
 
-Tolerance for 3D distance between Solids and/or BuildingParts
-*************************************************************
+.. note::  
+  Planarity is defined with two tolerances: ``--planarity_d2p_tol`` and ``--planarity_n_tol``.
+
+----
+
+``--planarity_n_tol``
+*********************
+|  Tolerance for planarity based on normals deviation 
+|  default = 1 degree
+
+As explained in :ref:`error_204`  to ensure that small folds in a surface are detected, another tolerance needs to be defined.
+The tolerance given refers to the normal of each triangle after the surface has been triangulated; if they deviate more than the given tolerance then error :ref:error_204` is reported.
+
+.. note::  
+  Planarity is defined with two tolerances: ``--planarity_d2p_tol`` and ``--planarity_n_tol``.
+
+----
+
+``--overlap_tol``
+*****************
+|  Tolerance for testing overlap between primitives in ``CompositeSolids`` and ``BuildingParts`` 
+|  default = 0.0 (none)
+
+For the validation of the topological relationships between ``Solids`` forming a ``CompositeSolid``, or the different ``BuildingParts`` of a building, one can define a tolerance.
+This is used to prevent the validator reporting that 2 parts of a building overlap, while they are simply overlapping by 0.1mm for instance.
+The tolerance ``--overlap_tol 0.05`` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating.
+Its default is 0.0unit (thus the original boundaries are used).
+Observe that using an overlap tolerance significantly reduces the speed of the validator, as rather complex geometric operations are performed.
 
 .. image:: _static/vcsol_2.png
    :width: 100%
-
-For the validation of the topological relationships between Solids forming a CompositeSolid, or the different `BuildingParts` of a building, one can define a tolerance.
-This is used to prevent the validator reporting that 2 parts of a building overlap, while they are simply overlapping by 0.1mm for instance.
-The tolerance ``--overlap_tolerance 0.05`` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating.
-Its default is 0.0unit.
-Observe that using an overlap tolerance significantly reduces the speed of the validator, as rather complex geometric operations are performed.
-
-To validate only the buildings in a CityGML file (and ignore all the rest) with a tolerance for the overlap of 1cm (0.01unit), and to obtain a report for each building:
-
-.. code-block:: bash
-
-  $ ./val3dity input.gml -b --overlap-tolerance 0.01 -r myreport.xml
-
 

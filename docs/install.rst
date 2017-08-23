@@ -36,7 +36,7 @@ Afterwards run:
 Windows
 -------
 
-For Windows, we do offer an `executable <https://github.com/tudelft3d/val3dity/releases>`_, and there's a Visual Studio project code in the folder ``vs_build``, although installation the dependencies is slightly more complex than for macOS/Linux.
+For Windows, we do offer an `executable <https://github.com/tudelft3d/val3dity/releases>`_, and there's a Visual Studio project code in the folder ``vs_build``, although installating the dependencies is slightly more complex than for macOS/Linux.
 
 
 Web-application
