@@ -23,6 +23,15 @@ bool VError::has_errors()
     return true;
 }
 
+std::set<int> VError::get_unique_error_codes()
+{
+  std::set<int> errs;
+  for (auto& err : _errors)
+    for (auto i : err.second)
+      errs.insert(std::get<0>(err));
+  return errs;
+}
+
 
 void VError::add_error(int code, std::string info, std::string whichgeoms) 
 {

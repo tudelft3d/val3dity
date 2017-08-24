@@ -45,10 +45,11 @@ namespace val3dity
 class IOErrors {
   std::map<int, std::vector<std::string> >  _errors;
 public:
-  bool        has_errors();
-  void        add_error(int code, std::string info);
-  std::string get_report_text();
-  std::string get_report_xml();
+  bool          has_errors();
+  void          add_error(int code, std::string info);
+  std::string   get_report_text();
+  std::string   get_report_xml();
+  std::set<int> get_unique_error_codes();
 };
 
   

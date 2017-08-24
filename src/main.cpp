@@ -35,9 +35,8 @@
 using namespace std;
 using namespace val3dity;
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors);
-// std::string print_unit_tests(vector<Primitive*>& lsPrimitives);
-// std::string print_unit_tests(vector<Building*>& lsBuilding);
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs);
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs);
 void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
@@ -184,6 +183,14 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
+    //-- if verbose == false then log to a file
+    if (verbose.getValue() == false)
+    {
+      savedBufferCLOG = clog.rdbuf();
+      mylog.open("val3dity.log");
+      std::clog.rdbuf(mylog.rdbuf());
+    }
+
     std::map<std::string, std::vector<Primitive*> > dPrimitives;
     std::map<std::string, VError > dPrimitivesErrors;
 
@@ -221,14 +228,6 @@ int main(int argc, char* const argv[])
     {
       print_information(inputfile.getValue());
       return (1);
-    }
-
-    //-- if verbose == false then log to a file
-    if (verbose.getValue() == false)
-    {
-      savedBufferCLOG = clog.rdbuf();
-      mylog.open("val3dity.log");
-      std::clog.rdbuf(mylog.rdbuf());
     }
 
     if (ioerrs.has_errors() == false)
@@ -380,15 +379,15 @@ int main(int argc, char* const argv[])
     {
       std::cout << "Parameters used for validation:" << std::endl;
       if (snap_tol.getValue() < 1e-8)
-        std::cout << "   snap_tol"    << setw(12)  << "none" << std::endl;
+        std::cout << "   snap_tol"    << setw(22)  << "none" << std::endl;
       else
-        std::cout << "   snap_tol"    << setw(12)  << snap_tol.getValue() << std::endl;
+        std::cout << "   snap_tol"    << setw(22)  << snap_tol.getValue() << std::endl;
       std::cout << "   planarity_d2p_tol"     << setw(13)  << planarity_d2p_tol.getValue() << std::endl;
       std::cout << "   planarity_n_tol"       << setw(15) << planarity_n_tol.getValue() << std::endl;
       if (overlap_tol.getValue() < 1e-8)
-        std::cout << "   overlap_tol" << setw(9)  << "none" << std::endl;
+        std::cout << "   overlap_tol" << setw(19)  << "none" << std::endl;
       else
-        std::cout << "   overlap_tol" << setw(9)  << overlap_tol.getValue() << std::endl;
+        std::cout << "   overlap_tol" << setw(19)  << overlap_tol.getValue() << std::endl;
     }
 
     //-- now the validation starts
@@ -432,37 +431,39 @@ int main(int argc, char* const argv[])
         printProgressBar(100);
     }
 
-    //-- print summary of errors
-    std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors) << std::endl;        
-    if (report.getValue() != "")
+    if (unittests.getValue() == true)
     {
-      std::ofstream thereport;
-      thereport.open(report.getValue());
-      write_report_xml(thereport, 
-                       inputfile.getValue(),
-                       dPrimitives,
-                       dPrimitivesErrors,
-                       snap_tol.getValue(),
-                       overlap_tol.getValue(),
-                       planarity_d2p_tol.getValue(),
-                       planarity_n_tol.getValue(),
-                       ioerrs,
-                       onlyinvalid.getValue());
-      thereport.close();
-      std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+      std::cout << "\n" << unit_test(dPrimitives, dPrimitivesErrors, ioerrs) << std::endl;
     }
-    else
-      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+    else {
+      //-- print summary of errors
+      std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors, ioerrs) << std::endl;        
+      if (report.getValue() != "")
+      {
+        std::ofstream thereport;
+        thereport.open(report.getValue());
+        write_report_xml(thereport, 
+                         inputfile.getValue(),
+                         dPrimitives,
+                         dPrimitivesErrors,
+                         snap_tol.getValue(),
+                         overlap_tol.getValue(),
+                         planarity_d2p_tol.getValue(),
+                         planarity_n_tol.getValue(),
+                         ioerrs,
+                         onlyinvalid.getValue());
+        thereport.close();
+        std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+      }
+      else
+        std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+    }
 
     if (verbose.getValue() == false)
     {
       clog.rdbuf(savedBufferCLOG);
       mylog.close();
     }
-    // if (unittests.getValue() == true)
-    // {
-    //   std::cout << "\n" << print_unit_tests(lsPrimitives) << std::endl;
-    // }
     return(1);
   }
   catch (TCLAP::ArgException &e) 
@@ -472,58 +473,42 @@ int main(int argc, char* const argv[])
   }
 }
 
-// TODO: fix the unit_test function
-// std::string print_unit_tests(vector<Primitive*>& lsPrimitives)
-// {
-//   int bValid = 0;
-//   std::stringstream ss;
-//   std::map<int,int> errors;
-//   for (auto& s : lsPrimitives)
-//   {
-//     if (s->is_valid() == true)
-//       bValid++;
-//     for (auto& code : s->get_unique_error_codes())
-//       errors[code] = 0;
-//   }
-//   if (errors.size() > 0)
-//   {
-//     ss << "@INVALID " << lsPrimitives.size() << " " << (lsPrimitives.size() - bValid) << " ";
-//     for (auto e : errors)
-//       ss << e.first << " ";
-//   }
-//   else {
-//     ss << "@VALID " << lsPrimitives.size() << " " << (lsPrimitives.size() - bValid) << " ";
-//   }
-//   ss << std::endl;
-//   return ss.str();
-// }
 
-// std::string print_unit_tests(vector<Building*>& lsBuilding)
-// {
-//   int bValid = 0;
-//   std::stringstream ss;
-//   std::map<int,int> errors;
-//   for (auto& s : lsBuilding)
-//   {
-//     if (s->is_valid() == true)
-//       bValid++;
-//     for (auto& code : s->get_unique_error_codes())
-//       errors[code] = 0;
-//   }
-//   if (errors.size() > 0)
-//   {
-//     ss << "@INVALID " << lsBuilding.size() << " " << (lsBuilding.size() - bValid) << " ";
-//     for (auto e : errors)
-//       ss << e.first << " ";
-//   }
-//   else {
-//     ss << "@VALID " << lsBuilding.size() << " " << (lsBuilding.size() - bValid) << " ";
-//   }
-//   ss << std::endl;
-//   return ss.str();
-// }
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs)
+{
+  std::stringstream ss;
+  ss << std::endl;
+  std::set<int> theerrors;
+  if (ioerrs.has_errors() == true)
+  {
+    for (auto& each : ioerrs.get_unique_error_codes())
+      theerrors.insert(each);
+  }
 
-std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors)
+  for (auto& co : dPrimitives)
+  {
+    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      for (auto& each : dPrimitivesErrors[co.first].get_unique_error_codes())
+        theerrors.insert(each);
+    for (auto& p : co.second)
+      for (auto& each : p->get_unique_error_codes())
+        theerrors.insert(each);
+  }
+  if (theerrors.size() > 0)
+  {
+    ss << "@INVALID ";
+    for (auto each : theerrors)
+      ss << each << " ";
+  }
+  else {
+    ss << "@VALID";
+  }
+  ss << std::endl;
+  return ss.str();
+}
+
+
+std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -533,6 +518,14 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
       noprim++;
     
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  //-- if io errors report them 
+  if (ioerrs.has_errors() == true)
+  {
+    ss << "Errors with input file:" << std::endl;
+    for (auto& each : ioerrs.get_unique_error_codes())
+      ss << "\t" << each << " -- " << errorcode2description(each) << std::endl;
+    ss << "+++++" << std::endl;
+  }
   //-- if a CityGML/CityJSON report also CityObjects
   if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
   {

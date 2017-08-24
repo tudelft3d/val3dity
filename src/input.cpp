@@ -43,6 +43,16 @@ bool IOErrors::has_errors()
 }
 
 
+std::set<int> IOErrors::get_unique_error_codes()
+{
+  std::set<int> errs;
+  for (auto& err : _errors)
+    for (auto i : err.second)
+      errs.insert(std::get<0>(err));
+  return errs;
+}
+
+
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
