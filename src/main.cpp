@@ -518,14 +518,6 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
       noprim++;
     
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  //-- if io errors report them 
-  if (ioerrs.has_errors() == true)
-  {
-    ss << "Errors with input file:" << std::endl;
-    for (auto& each : ioerrs.get_unique_error_codes())
-      ss << "\t" << each << " -- " << errorcode2description(each) << std::endl;
-    ss << "+++++" << std::endl;
-  }
   //-- if a CityGML/CityJSON report also CityObjects
   if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
   {
@@ -590,16 +582,21 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
       for (auto& code : p->get_unique_error_codes())
         errors[code] += 1;
 
-  if (errors.size() > 0)
+  if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
   {
     ss << "+++++" << std::endl;
     ss << "Errors present:" << std::endl;
     for (auto e : errors)
     {
-      ss << "  " << e.first << " --- " << errorcode2description(e.first) << std::endl;
+      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
       ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
     }
+    for (auto& e : ioerrs.get_unique_error_codes())
+    {
+      ss << "  " << e << " -- " << errorcode2description(e) << std::endl;
+    }
   }
+
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
 }
