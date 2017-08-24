@@ -33,7 +33,7 @@
 namespace val3dity
 {
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, VError& coerrs, double tol_overlap)
+bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerrs, double tol_overlap)
 {
   bool isValid = true;
   //-- 1. create Nef for all primitives and erode if necessary

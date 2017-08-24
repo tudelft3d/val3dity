@@ -28,16 +28,16 @@
 #include "validate_prim_toporel.h"
 #include "Surface.h"
 #include "Solid.h"
-#include "VError.h"
+#include "COError.h"
 #include <tclap/CmdLine.h>
 #include <time.h>  
 
 using namespace std;
 using namespace val3dity;
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs);
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs);
-void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs);
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -192,7 +192,7 @@ int main(int argc, char* const argv[])
     }
 
     std::map<std::string, std::vector<Primitive*> > dPrimitives;
-    std::map<std::string, VError > dPrimitivesErrors;
+    std::map<std::string, COError > dPrimitivesErrors;
 
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
@@ -419,7 +419,7 @@ int main(int argc, char* const argv[])
         if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
         {
           std::clog << "--extra building validation" << std::endl;
-          VError coerrs;
+          COError coerrs;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
             std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
@@ -474,7 +474,7 @@ int main(int argc, char* const argv[])
 }
 
 
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs)
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -508,7 +508,7 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
 }
 
 
-std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, VError >& dPrimitivesErrors, IOErrors& ioerrs)
+std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -608,7 +608,7 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
                       std::map<std::string, std::vector<Primitive*> >& dPrimitives,
-                      std::map<std::string, VError >& dPrimitivesErrors,
+                      std::map<std::string, COError >& dPrimitivesErrors,
                       double snap_tol,
                       double overlap_tol,
                       double planarity_d2p_tol,

@@ -1,12 +1,12 @@
 //
-//  VError.cpp
+//  COError.cpp
 //  val3dity
 //
 //  Created by Hugo Ledoux on 17/08/2017.
 //
 //
 
-#include "VError.h"
+#include "COError.h"
 #include "input.h"
 
 using namespace std;
@@ -15,7 +15,7 @@ namespace val3dity
 {
 
 
-bool VError::has_errors()
+bool COError::has_errors()
 {
   if (_errors.size() == 0)
     return false;
@@ -23,7 +23,7 @@ bool VError::has_errors()
     return true;
 }
 
-std::set<int> VError::get_unique_error_codes()
+std::set<int> COError::get_unique_error_codes()
 {
   std::set<int> errs;
   for (auto& err : _errors)
@@ -33,7 +33,7 @@ std::set<int> VError::get_unique_error_codes()
 }
 
 
-void VError::add_error(int code, std::string info, std::string whichgeoms) 
+void COError::add_error(int code, std::string info, std::string whichgeoms) 
 {
   std::tuple<std::string, std::string> a(info, whichgeoms);
   _errors[code].push_back(a);
@@ -41,7 +41,7 @@ void VError::add_error(int code, std::string info, std::string whichgeoms)
 }
 
 
-std::string VError::get_report_text()
+std::string COError::get_report_text()
 {
   std::stringstream ss;
   for (auto& err : _errors)
@@ -60,7 +60,7 @@ std::string VError::get_report_text()
 }
 
 
-std::string VError::get_report_xml()
+std::string COError::get_report_xml()
 {
   std::stringstream ss;
   for (auto& err : _errors)

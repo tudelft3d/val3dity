@@ -1,13 +1,13 @@
 //
-//  VError.hpp
+//  COError.hpp
 //  val3dity
 //
 //  Created by Hugo Ledoux on 17/08/2017.
 //
 //
 
-#ifndef VError_hpp
-#define VError_hpp
+#ifndef COError_hpp
+#define COError_hpp
 
 
 #include <vector>
@@ -20,7 +20,8 @@
 namespace val3dity
 {
 
-class VError {
+//-- City Object Errors
+class COError {
   std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
 public:
   bool          has_errors();
@@ -32,4 +33,4 @@ public:
 
 }
 
-#endif /* VError_hpp */
+#endif /* COError_hpp */

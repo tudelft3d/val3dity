@@ -28,13 +28,13 @@
 
 #include "definitions.h"
 #include "Primitive.h"
-#include "VError.h"
+#include "COError.h"
 
 namespace val3dity
 {
 
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, VError& coerrs, double tol_overlap);
+bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerrs, double tol_overlap);
 
 
 } // namespace val3dity
