@@ -183,17 +183,8 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-    //-- if verbose == false then log to a file
-    if (verbose.getValue() == false)
-    {
-      savedBufferCLOG = clog.rdbuf();
-      mylog.open("val3dity.log");
-      std::clog.rdbuf(mylog.rdbuf());
-    }
-
     std::map<std::string, std::vector<Primitive*> > dPrimitives;
     std::map<std::string, COError > dPrimitivesErrors;
-
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
@@ -206,6 +197,29 @@ int main(int argc, char* const argv[])
       inputtype = OBJ;
     else if ( (extension == "off") || (extension == "OFF") ) 
       inputtype = OFF;
+
+    //-- if info then only this and ignore everything
+    if (info.getValue() == true)
+    {
+      if (inputtype == GML)
+      {
+        std::cout << "\nInformation about input file, ignoring all other options." << std::endl;
+        print_information(inputfile.getValue());
+      }
+      else
+      {
+        std::cout << "Statistics/information only GML files." << std::endl;
+      }
+      return (1);
+    }
+
+    //-- if verbose == false then log to a file
+    if (verbose.getValue() == false)
+    {
+      savedBufferCLOG = clog.rdbuf();
+      mylog.open("val3dity.log");
+      std::clog.rdbuf(mylog.rdbuf());
+    }
     if (inputtype == OTHER)
       ioerrs.add_error(901, "File type not supported");
 
@@ -224,12 +238,6 @@ int main(int argc, char* const argv[])
     if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
       ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
      
-    if (info.getValue() == true)
-    {
-      print_information(inputfile.getValue());
-      return (1);
-    }
-
     if (ioerrs.has_errors() == false)
     {
       if (inputtype == GML)
