@@ -1,4 +1,4 @@
-/*
+ /*
  val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerr
   }
   //-- 2. check whether pairwise intersection of interiors is empty
   Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
-  for (int i = 0; i < (lsNefs.size() - 1); i++)
+  for (int i = 0; i < lsNefs.size(); i++)
   {
     Nef_polyhedron* a = lsNefs[i];
     for (int j = i + 1; j < lsNefs.size(); j++) 
