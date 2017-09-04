@@ -35,3 +35,6 @@ x64/
 x86/
 /build
 /docs/_build
+
+# Visual studio Balázs
+.vscode/
