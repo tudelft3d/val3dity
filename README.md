@@ -3,7 +3,7 @@
 Validation of 3D primitives according to the international standard ISO19107.
 Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS only validates 2D primitives).
 
-It allows you to validate a 3D primitive, i.e. to verify whether it respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
+It allows us to validate a 3D primitive, ie to verify whether it respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
 All the 3D primitives of GML are supported:
 
   - `<gml:MultiSurface>`
