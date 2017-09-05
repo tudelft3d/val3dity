@@ -107,7 +107,7 @@ GML, OBJ, OFF, and POLY
   </val3dity>
 
 
-If your your file is a GML file and the primitives have ``gml:id`` (for ``gml:Solid`` and ``gml:Shell`` and ``gml:Polygon``) then these are used to report the errors, if not then the number means the order of the primitives in the file (the first one being 0). 
+If your file is a GML file and the primitives have ``gml:id`` (for ``gml:Solid`` and ``gml:Shell`` and ``gml:Polygon``) then these are used to report the errors, if not then the number means the order of the primitives in the file (the first one being 0). 
 
 I get many errors 203 and 204, but my planes look planar to me. Why is that?
 ----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ I don't see all the errors in my solid
 --------------------------------------
 
 It's normal: as shown in the figure below, a solid is validated *hierarchically*, ie first every surface (a polygon embedded in 3D) is validated in 2D (by projecting it to a plane), then every shell is validated, and finally the interactions between the shells are analysed to verify whether the solid is valid. 
-If at one stage there are errors, then the validation stops to avoid "cascading errors". So if you get the error `203 NON_PLANAR_POLYGON_DISTANCE_PLANE`, then fix it and re-run the validator again. 
+If at one stage there are errors, then the validation stops to avoid "cascading errors". So if you get the error :ref:`error_203`, then fix it and re-run the validator again. 
 That does mean that you might have to upload your file and get it validated several times---if that becomes too tedious we strongly suggest you to download the `code <https://github.com/tudelft3d/val3dity>`_, compile it and run it locally (it's open-source and free to use).
 
 
@@ -159,9 +159,9 @@ Do you validate the topological relationships between the solids?
 -----------------------------------------------------------------
 
 If these solids are part of a ``gml:CompositeSolid`` then yes, otherwise no.
-We do verify whether 2 ``BuildingParts`` forming a ``Building`` overlap though.
+We do verify whether two ``BuildingParts`` forming a ``Building`` overlap though.
 
-We however plan to offer in the future this for all primitives/buildings in a file, so that one can verify whether 2 different buildings overlap for instance.
+We however plan to offer in the future this for all primitives/buildings in a file, so that one can verify whether two different buildings overlap for instance.
 
 
 The IDs for the shells and surfaces in the report, are they 0-based or 1-based?
