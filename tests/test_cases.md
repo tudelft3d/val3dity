@@ -2,11 +2,13 @@
 
 The intention is to isolate the geometry from the file format. The POLY format is simple, supports inner rings and the parser is reliable. Therefore each geometry [error case](http://val3dity.readthedocs.io/en/v2/errors/#) is tested with the POLY format *only*. Don't replicate these geometry error cases in different file formats, because test maintenance will become very error prone (ie update one file but forget the other...).
 
-## 101
+## [101 – TOO_FEW_POINTS](http://val3dity.readthedocs.io/en/v2/errors/#too-few-points)
+
+- [ ] polygon with 1 point
+- [ ] polygon with 2 points
+- [ ] polygon with 3 points
 
 ## 102
-
-## 103
 
 ## 104
 
@@ -79,6 +81,8 @@ Try to break val3dity by giving it (partially) empty files in each format.
 # Format specific geometry errors
 
 Error cases that are only relevant for a particular format and cannot be modelled by each format, thus don't belong to *Geometry errors* (eg 601).
+
+## 103
 
 ## 601
 
