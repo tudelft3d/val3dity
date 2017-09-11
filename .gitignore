@@ -36,5 +36,8 @@ x86/
 /build
 /docs/_build
 
-# Visual studio Balázs
+# Balázs (Visual Studio etc)
 .vscode/
+.settings/
+.cproject
+.project
