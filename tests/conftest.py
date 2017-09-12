@@ -9,7 +9,7 @@ def val3dity():
     # TODO: find out how can the path to the val3dity exec. passed as an argument to pytest
     return("path to val3dity executable as argument")
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def data_geometry_generic():
     return("../data/test_geometry_generic")
 
@@ -58,4 +58,8 @@ def validate(val3dity, data_path, file, options_solid):
 r = validate("cube28.poly", options_solid)
 r = validate("cube.poly", options_solid)
 r = validate("DenHaag_1BwBP.gml", options_citymodel)
+
+
+# TODO: write custom assertion based on validate
+
 
