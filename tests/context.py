@@ -1,8 +1,6 @@
 import pytest
 import subprocess
 import os.path
-import re
-import pprint
 
 @pytest.fixture(scope="session")
 def val3dity():
@@ -33,6 +31,7 @@ SOLIDFOLDER = "/home/bdukai/Development/val3dity/tests/test_geometry_generic"
 options_solid = ["--unittests", "-p Solid"]
 options_citymodel = ["--unittests"]
 val3dity_exe = VAL3DITYEXE
+data_path = "../data/test_geometry_generic"
 
 def validate(val3dity, data_path, file, options_solid):
     file_path = os.path.join(data_path, file)
@@ -40,14 +39,14 @@ def validate(val3dity, data_path, file, options_solid):
     
     cp = subprocess.run(command, stdout=subprocess.PIPE,
                         universal_newlines=True)
-    re = cp.stdout
+    summary = cp.stdout
     
     output = []
-    if (re != ''):
-        if (re.find('@VALID') != -1):
+    if (summary != ''):
+        if (summary.find('@VALID') != -1):
             return(output)
-        i = re.find('@INVALID')
-        s = re[i+9:]
+        i = summary.find('@INVALID')
+        s = summary[i+9:]
         tmp = s.split(" ")
         codes = map(int, tmp[:-1])
         for each in codes:
