@@ -24,6 +24,10 @@ Within the folder of its test suite, the subordinate **test cases** are living. 
 
 Every test case must have at least one basic **test** and arbitrary many *corner cases*. Ideally every test has its own data file, where the data file contains *only* the error that the test is testing.
 
+<!-- TODO: it would actually make more  sense to have all test suite in a single script. 
+In this case, fixtures can be separately invoked just for the module that requires them. No
+need to keep all of them across the whole session. -->
+
 This hierarchy gives space to the following file structure:
 
 ```
