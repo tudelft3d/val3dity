@@ -8,14 +8,19 @@ import pprint
 def val3dity():
     # or just ../build/val3dity
     # or find the executable in the val3dity folder
+    # TODO: find out how can the path to the val3dity exec. passed as an argument to pytest
     return("path to val3dity executable as argument")
 
+@pytest.fixture(scope="session")
+def data_geometry_generic():
+    return("../data/test_geometry_generic")
 
-@pytest.fixtures(scope="module")
+
+@pytest.fixture(scope="module")
 def options_solid():
     return(["--unittests", "-p Solid"])
 
-@pytest.fixtures(scope="module")
+@pytest.fixture(scope="module")
 def options_citymodel():
     return(["--unittests"])
 
@@ -27,10 +32,11 @@ SOLIDFOLDER = "/home/bdukai/Development/val3dity/tests/test_geometry_generic"
 
 options_solid = ["--unittests", "-p Solid"]
 options_citymodel = ["--unittests"]
+val3dity_exe = VAL3DITYEXE
 
-def validate(file, options_solid):
-    file_path = os.path.join(SOLIDFOLDER, file)
-    command = [VAL3DITYEXE] + options_solid + [file_path]
+def validate(val3dity, data_path, file, options_solid):
+    file_path = os.path.join(data_path, file)
+    command = [val3dity] + options_solid + [file_path]
     
     cp = subprocess.run(command, stdout=subprocess.PIPE,
                         universal_newlines=True)
