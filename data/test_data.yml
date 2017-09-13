@@ -1,0 +1,6 @@
+# please quote the nodes, particularly if you are using numbers only, eg "101"
+
+# test case
+test_geometry_generic:
+  "101": cube top face a line (with only 2 vertices)
+  "101_1": cube with top face having only 2 points

@@ -4,13 +4,17 @@ This README is solely concerned with the integration tests for val3dity. These t
 
 Run basic set of tests:
 ```
-pytest path/to/val3dityexe
+pytest
 ```
-<!-- TODO: how to pass pytest and arbitrary argument that the tests can take -->
 
 Run full set of tests:
 ```
-pytest --runfull path/to/val3dityexe
+pytest --runfull
+```
+
+Run in verbose mode to see which tests are executed or skipped:
+```
+pytest -v
 ```
 
 Run a single test case, eg *test_101* that is part of the *test_geometry_generic* test suite:
@@ -22,21 +26,22 @@ For more info see [pytest docs on markers](https://docs.pytest.org/en/latest/exa
 
 The tests are organised in the hierarchy:
 
-+ test suite
-    + test case
-        + test
++ test case
+    + test
 
-In these integration tests a **test suite** is a collection of *test cases* that test a conceptually related set of errors. For example the geometry errors of 3D primitives that are relevant for each accepted file format. Each test suite has its own module, named as `test_<test suite>.py` (eg `test_geometry_generic.py`). Every test suite has a description in form of a docstring that briefly clarifies its goal.
+In these integration tests a **test case** is a collection of *tests* that test a conceptually related set of errors. For example the geometry errors of 3D primitives that are relevant for each accepted file format. Each test case has its own module, named as `test_<test case>.py` (eg `test_geometry_generic.py`). Every test case has a description in form of a docstring that briefly clarifies its goal.
 
-In the module of the test suite, the **test cases** are living. Every test case tests a particular error, bug. For example the error *101_TOO_FEW_POINTS* has its own test case. Technically, every test case consists of:
+Every **test** tests a particular error, bug. For example the error *101_TOO_FEW_POINTS* has its own test `test_101`. Technically, every test case consists of:
 
-+ A test function named as `test_<test case>()`, eg `test_101()`.
-+ A collection of data files that are used by the *tests* of the test case. Each file is named as `<test case>_<corner case>.<format>`, and stored at `data/test_<test suite>/`.
++ A collection of test function named as `test_<test>()`, eg `test_101()`.
++ A collection of data files that are used by the *tests* of the test case. Each file is named as `<test case>_<corner case>.<format>`, and stored at `data/test_<test case>/`, `data/test_geometry_generic/101.poly`.
 
 A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often corner cases of the geometric primitives with certain errors (eg 101).
 Ideally every test has its own data file, where the data file contains *only* the error that the test is testing. The data files are stored separately from the test modules.
 
-This hierarchy gives space to the following file structure:
+Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_data.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
+
+The test hierarchy yields the following file structure:
 
 ```
 data/
@@ -51,6 +56,7 @@ data/
 |–– test_empty_files/
 |–– test_valid/
 |–– test_<test suite>/
+|-- test_data.yml
 |–– ...
 ...
 tests/
@@ -63,6 +69,8 @@ tests/
 |–– test_<test suite>.py
 |–– ...
 ```
+
+*The main purpose of structuring the tests in the described way is to provide clarity for the developers and help with systematic testing. Certainly there are other possible approaches.*
 
 ## A few details
 
@@ -78,9 +86,15 @@ def test_102():
 
 If you add a new marker, make sure you register it in `pytest.ini`.
 
-<!-- TODO: write custom assertion based on validate -->
+In `test_data.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
 
-*The main purpose of structuring the tests in the described way is to provide clarity for the developers and help with systematic testing. Certainly there are other possible approaches.*
+```yaml
+# test case
+test_geometry_generic:
+  # test file: description
+  "101": cube top face a line (with only 2 vertices)
+  "101_1": cube with top face having only 2 points
+```
 
 ------
 
@@ -94,4 +108,3 @@ geometry_generic:
         case2: 101_2.poly
 ...
 ```
-use a session-fixture for VAL3DITYEXE and DATAFOLDER
