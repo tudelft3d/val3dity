@@ -1,6 +1,18 @@
 import pytest
 import subprocess
 import os.path
+import sys
+
+
+# # use concurrent test execution if xdist is installed
+# def pytest_cmdline_preparse(args):
+#     if 'xdist' in sys.modules:  # pytest-xdist plugin
+#         print("using xdist")
+#         import multiprocessing
+#         num = int(max(multiprocessing.cpu_count() / 2, 1))
+#         args[:] = ["-n", str(num)] + args
+#     else:
+#         print("xdist not installed")
 
 @pytest.fixture(scope="session")
 def val3dity():

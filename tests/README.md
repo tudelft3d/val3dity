@@ -31,10 +31,6 @@ In the module of the test suite, the **test cases** are living. Every test case 
 A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often corner cases of the geometric primitives with certain errors (eg 101).
 Ideally every test has its own data file, where the data file contains *only* the error that the test is testing. The data files are stored separately from the test modules.
 
-<!-- TODO: it would actually make more  sense to have all test suite in a single script. 
-In this case, fixtures can be separately invoked just for the module that requires them. No
-need to keep all of them across the whole session. -->
-
 This hierarchy gives space to the following file structure:
 
 ```
