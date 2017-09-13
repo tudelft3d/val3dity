@@ -17,7 +17,7 @@ Run in verbose mode to see which tests are executed or skipped:
 pytest -v
 ```
 
-Run a single test case, eg *test_101* that is part of the *test_geometry_generic* test suite:
+Run a single test case, eg *test_101* that is part of the *test_geometry_generic* test case:
 ```
 pytest test_geometry_generic.py::test_101
 ```
@@ -55,7 +55,7 @@ data/
 |–– test_file_format/
 |–– test_empty_files/
 |–– test_valid/
-|–– test_<test suite>/
+|–– test_<test case>/
 |-- test_data.yml
 |–– ...
 ...
@@ -66,7 +66,7 @@ tests/
 |–– test_file_format.py
 |–– test_empty_files.py
 |–– test_valid.py
-|–– test_<test suite>.py
+|–– test_<test case>.py
 |–– ...
 ```
 
