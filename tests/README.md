@@ -95,16 +95,3 @@ test_geometry_generic:
   "101": cube top face a line (with only 2 vertices)
   "101_1": cube with top face having only 2 points
 ```
-
-------
-
-possibly define tests in a yaml file, sth like
-
-```
-geometry_generic:
-    101:
-        basic: 101.poly
-        case1: 101_1.poly
-        case2: 101_2.poly
-...
-```
