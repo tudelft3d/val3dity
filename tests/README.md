@@ -1,12 +1,18 @@
 Run basic set of tests:
 ```
-pytest
+pytest path/to/val3dityexe
 ```
+<!-- TODO: how to pass pytest and arbitrary argument that the tests can take>
 <!-- TODO: how to define the basic set of tests --> 
 
 Run full set of tests:
 ```
-pytest
+pytest path/to/val3dityexe --full
+```
+
+Run a single test case, eg *test_101* that is part of the *test_geometry_generic* test suite:
+```
+pytest test_geometry_generic.py::test_101
 ```
 
 The tests are organised in the hierarchy:
@@ -15,14 +21,15 @@ The tests are organised in the hierarchy:
     + test case
         + test
 
-In these integration tests a **test suite** is a collection of *test cases* that test a conceptually related set of errors. For example the geometry errors of 3D primitives that are relevant for each accepted file format. Each test suite has its own folder, named as `test_<test suite>` (eg `test_geometry_generic`). Every test suite has a `DESCRIPTION` that briefly clarifies its goal.
+In these integration tests a **test suite** is a collection of *test cases* that test a conceptually related set of errors. For example the geometry errors of 3D primitives that are relevant for each accepted file format. Each test suite has its own module, named as `test_<test suite>.py` (eg `test_geometry_generic.py`). Every test suite has a description in form of a docstring that briefly clarifies its goal.
 
-Within the folder of its test suite, the subordinate **test cases** are living. Every test case tests a particular error, bug. For example the error *101_TOO_FEW_POINTS* has its own test case. Technically, every test case consists of:
+In the module of the test suite, the **test cases** are living. Every test case tests a particular error, bug. For example the error *101_TOO_FEW_POINTS* has its own test case. Technically, every test case consists of:
 
-+ A single python script named as `test_<test case>.py`.
++ A test function named as `test_<test case>()`, eg `test_101()`.
 + A collection of data files that are used by the *tests* of the test case. Each file is named as `<test case>_<corner case>.<format>`, and stored at `data/test_<test suite>/`.
 
-Every test case must have at least one basic **test** and arbitrary many *corner cases*. Ideally every test has its own data file, where the data file contains *only* the error that the test is testing.
+A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often corner cases of the geometric primitives with certain errors (eg 101).
+Ideally every test has its own data file, where the data file contains *only* the error that the test is testing. The data files are stored separately from the test modules.
 
 <!-- TODO: it would actually make more  sense to have all test suite in a single script. 
 In this case, fixtures can be separately invoked just for the module that requires them. No
@@ -46,18 +53,19 @@ data/
 |–– ...
 ...
 tests/
-|–– test_geometry_generic/
-    |–– DESCRIPTION.txt
-    |–– test_101.py
-    |–– test_<test case>.py
-    |–– ...
-|–– test_geometry_specific/
-|–– test_file_format/
-|–– test_empty_files/
-|–– test_valid/
-|–– test_<test suite>/
+|-- conftest.py
+|–– test_geometry_generic.py
+|–– test_geometry_specific.py
+|–– test_file_format.py
+|–– test_empty_files.py
+|–– test_valid.py
+|–– test_<test suite>.py
 |–– ...
 ```
+
+Test configuration parameters are in `conftest.py`.
+
+<!-- TODO: write custom assertion based on validate -->
 
 *The main purpose of structuring the tests in the described way is to provide clarity for the developers and help with systematic testing. Certainly there are other possible approaches.*
 
