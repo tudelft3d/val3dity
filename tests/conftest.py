@@ -18,7 +18,7 @@ import sys
 #------------------------------------ add option for running the full test set
 def pytest_addoption(parser):
     parser.addoption("--runfull", action="store_true",
-                     default=False, help="run all tests")
+                     default=False, help="run full set of tests")
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--runfull"):
         # --runslow given in cli: do not skip slow tests

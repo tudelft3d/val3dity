@@ -1,3 +1,7 @@
+# Testing val3dity
+
+This README is solely concerned with the integration tests for val3dity. These tests are implemented in python, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its corner cases. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
+
 Run basic set of tests:
 ```
 pytest path/to/val3dityexe
@@ -58,6 +62,8 @@ tests/
 |–– ...
 ```
 
+## A few details
+
 Test configuration parameters are in `conftest.py`.
 
 To mark a test as part of the *full* superset, mark it as `full`. In this case the test is only run when the `--runfull` command line argument is passed to pytest. For example:
@@ -67,6 +73,8 @@ To mark a test as part of the *full* superset, mark it as `full`. In this case t
 def test_102():
     assert 0
 ```
+
+If you add a new marker, make sure you register it in `pytest.ini`.
 
 <!-- TODO: write custom assertion based on validate -->
 
