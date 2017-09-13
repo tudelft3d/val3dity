@@ -18,6 +18,8 @@ Run a single test case, eg *test_101* that is part of the *test_geometry_generic
 pytest test_geometry_generic.py::test_101
 ```
 
+For more info see [pytest docs on markers](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run).
+
 The tests are organised in the hierarchy:
 
 + test suite

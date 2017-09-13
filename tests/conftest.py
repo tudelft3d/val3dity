@@ -3,7 +3,6 @@ import subprocess
 import os.path
 import sys
 
-
 #------------------------- use concurrent test execution if xdist is installed
 # def pytest_cmdline_preparse(args):
 #     if 'xdist' in sys.modules:  # pytest-xdist plugin
@@ -28,53 +27,54 @@ def pytest_collection_modifyitems(config, items):
         if "full" in item.keywords:
             item.add_marker(skip_full)
 
+#-------------------------------------------------------- get path to val3dity
+def val3dity():
+    """path to val3dity executable"""
+    root = os.getcwd()
+    p = os.path.join(root, "build/val3dity")
+    return(os.path.abspath(p))
+
+val3dityexe = val3dity()
 
 #------------------------------------------------------------ session fixtures
 @pytest.fixture(scope="session")
-def val3dity():
-    # or just ../build/val3dity
-    # or find the executable in the val3dity folder
-    # TODO: find out how can the path to the val3dity exec. passed as an argument to pytest
-    return("path to val3dity executable as argument")
-
-@pytest.fixture(scope="session")
 def options_solid():
+    """val3dity options for validating a solid"""
     return(["--unittests", "-p Solid"])
 
 @pytest.fixture(scope="session")
 def options_citymodel():
+    """val3dity options for validating a solid"""
     return(["--unittests"])
 
-
-VAL3DITYEXE = "/home/bdukai/Development/val3dity/build/val3dity"
-# VAL3DITYEXE = os.path.abspath(VAL3DITYEXE)
-SOLIDFOLDER = "/home/bdukai/Development/val3dity/tests/test_geometry_generic"
-# SOLIDFOLDER = os.path.abspath(SOLIDFOLDER)
-
-options_solid = ["--unittests", "-p Solid"]
-options_citymodel = ["--unittests"]
-val3dity_exe = VAL3DITYEXE
-data_path = "../data/test_geometry_generic"
-
-def validate(val3dity, data_path, file, options_solid):
-    file_path = os.path.join(data_path, file)
-    command = [val3dity] + options_solid + [file_path]
+@pytest.fixture(scope="session")
+def validate():
+    def _validate(file_path, options, val3dity=val3dityexe):
+        """Validate a file
+        
+        :return: The error numbers. Empty list if the file is valid.
+        :rtype: list
+        """
+        
+        command = [val3dity] + options + [file_path]
+        print(command)
+        
+        cp = subprocess.run(command, stdout=subprocess.PIPE,
+                            universal_newlines=True)
+        summary = cp.stdout
+        
+        output = []
+        if (summary != ''):
+            if (summary.find('@VALID') != -1):
+                return(output)
+            i = summary.find('@INVALID')
+            s = summary[i+9:]
+            tmp = s.split(" ")
+            codes = map(int, tmp[:-1])
+            for each in codes:
+                if output.count(each) == 0:
+                    output.append(each)
+        return(output)
     
-    cp = subprocess.run(command, stdout=subprocess.PIPE,
-                        universal_newlines=True)
-    summary = cp.stdout
-    
-    output = []
-    if (summary != ''):
-        if (summary.find('@VALID') != -1):
-            return(output)
-        i = summary.find('@INVALID')
-        s = summary[i+9:]
-        tmp = s.split(" ")
-        codes = map(int, tmp[:-1])
-        for each in codes:
-            if output.count(each) == 0:
-                output.append(each)
-    return(output)
-
+    return(_validate)
 
