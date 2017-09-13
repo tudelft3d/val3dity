@@ -43,5 +43,6 @@ def test_101(data_101):
     assert 0
     
 
+@pytest.mark.full
 def test_102():
     print("not implemented")

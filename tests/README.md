@@ -2,12 +2,11 @@ Run basic set of tests:
 ```
 pytest path/to/val3dityexe
 ```
-<!-- TODO: how to pass pytest and arbitrary argument that the tests can take>
-<!-- TODO: how to define the basic set of tests --> 
+<!-- TODO: how to pass pytest and arbitrary argument that the tests can take -->
 
 Run full set of tests:
 ```
-pytest path/to/val3dityexe --full
+pytest --runfull path/to/val3dityexe
 ```
 
 Run a single test case, eg *test_101* that is part of the *test_geometry_generic* test suite:
@@ -60,6 +59,14 @@ tests/
 ```
 
 Test configuration parameters are in `conftest.py`.
+
+To mark a test as part of the *full* superset, mark it as `full`. In this case the test is only run when the `--runfull` command line argument is passed to pytest. For example:
+
+```python
+@pytest.mark.full
+def test_102():
+    assert 0
+```
 
 <!-- TODO: write custom assertion based on validate -->
 

@@ -4,7 +4,7 @@ import os.path
 import sys
 
 
-# # use concurrent test execution if xdist is installed
+#------------------------- use concurrent test execution if xdist is installed
 # def pytest_cmdline_preparse(args):
 #     if 'xdist' in sys.modules:  # pytest-xdist plugin
 #         print("using xdist")
@@ -14,6 +14,22 @@ import sys
 #     else:
 #         print("xdist not installed")
 
+
+#------------------------------------ add option for running the full test set
+def pytest_addoption(parser):
+    parser.addoption("--runfull", action="store_true",
+                     default=False, help="run all tests")
+def pytest_collection_modifyitems(config, items):
+    if config.getoption("--runfull"):
+        # --runslow given in cli: do not skip slow tests
+        return
+    skip_full = pytest.mark.skip(reason="need --runfull option to run")
+    for item in items:
+        if "full" in item.keywords:
+            item.add_marker(skip_full)
+
+
+#------------------------------------------------------------ session fixtures
 @pytest.fixture(scope="session")
 def val3dity():
     # or just ../build/val3dity
