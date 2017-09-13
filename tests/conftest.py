@@ -27,29 +27,27 @@ def pytest_collection_modifyitems(config, items):
         if "full" in item.keywords:
             item.add_marker(skip_full)
 
-#-------------------------------------------------------- get path to val3dity
+#------------------------------------------------------------ session fixtures
+@pytest.fixture
 def val3dity():
     """path to val3dity executable"""
     root = os.getcwd()
     p = os.path.join(root, "build/val3dity")
     return(os.path.abspath(p))
 
-val3dityexe = val3dity()
-
-#------------------------------------------------------------ session fixtures
-@pytest.fixture(scope="session")
-def options_solid():
+@pytest.fixture
+def solid():
     """val3dity options for validating a solid"""
     return(["--unittests", "-p Solid"])
 
-@pytest.fixture(scope="session")
-def options_citymodel():
+@pytest.fixture
+def citymodel():
     """val3dity options for validating a solid"""
     return(["--unittests"])
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def validate():
-    def _validate(file_path, options, val3dity=val3dityexe):
+    def _validate(file_path, options=solid(), val3dity=val3dity()):
         """Validate a file
         
         :return: The error numbers. Empty list if the file is valid.
@@ -57,7 +55,6 @@ def validate():
         """
         
         command = [val3dity] + options + [file_path]
-        print(command)
         
         cp = subprocess.run(command, stdout=subprocess.PIPE,
                             universal_newlines=True)

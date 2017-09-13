@@ -113,7 +113,7 @@ it explicitly.
   * cube with -100.0 as z-coordinates
   * valid
 
-# cube28
+# cube28 / 101
   * cube top face a line (with only 2 vertices)
   * invalid
 
@@ -141,7 +141,7 @@ it explicitly.
   * cube with one duplicate vertex (repeated in a ring)
   * invalid
 
-# toofewpts
+# toofewpts / 101_1
   * cube with top face having only 2 points
   * invalid
 
