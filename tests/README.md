@@ -41,6 +41,16 @@ Ideally every test has its own data file, where the data file contains *only* th
 
 Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_data.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
 
+In `test_data.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
+
+```yaml
+# test case
+test_geometry_generic:
+  # test file: description
+  "101": cube top face a line (with only 2 vertices)
+  "101_1": cube with top face having only 2 points
+```
+
 The test hierarchy yields the following file structure:
 
 ```
@@ -86,12 +96,3 @@ def test_102():
 
 If you add a new marker, make sure you register it in `pytest.ini`.
 
-In `test_data.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
-
-```yaml
-# test case
-test_geometry_generic:
-  # test file: description
-  "101": cube top face a line (with only 2 vertices)
-  "101_1": cube with top face having only 2 points
-```

@@ -28,24 +28,24 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip_full)
 
 #------------------------------------------------------------ session fixtures
-@pytest.fixture
+@pytest.fixture(scope="session")
 def val3dity():
     """path to val3dity executable"""
     root = os.getcwd()
     p = os.path.join(root, "build/val3dity")
     return(os.path.abspath(p))
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def solid():
     """val3dity options for validating a solid"""
     return(["--unittests", "-p Solid"])
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def citymodel():
     """val3dity options for validating a solid"""
     return(["--unittests"])
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def validate():
     def _validate(file_path, options=solid(), val3dity=val3dity()):
         """Validate a file
