@@ -76,6 +76,7 @@ tests/
 |–– test_file_format.py
 |–– test_empty_files.py
 |–– test_valid.py
+|–– test_user_input.py
 |–– test_<test case>.py
 |–– ...
 ```
