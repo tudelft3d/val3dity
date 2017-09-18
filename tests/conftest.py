@@ -37,13 +37,13 @@ def val3dity():
 
 @pytest.fixture(scope="session")
 def solid():
-    """val3dity options for validating a solid"""
+    """val3dity options for validating a Solid"""
     return(["--unittests", "-p Solid"])
 
 @pytest.fixture(scope="session")
-def citymodel():
-    """val3dity options for validating a solid"""
-    return(["--unittests"])
+def multisurface():
+    """val3dity options for validating a MultiSurface"""
+    return(["--unittests", "-p MultiSurface"])
 
 @pytest.fixture(scope="session")
 def validate():

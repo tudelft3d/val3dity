@@ -11,7 +11,7 @@ in different file formats, because test maintenance will become very error prone
 import pytest
 import os.path
 
-
+#----------------------------------------------------------------- Data folder
 @pytest.fixture(scope="module")
 def data_geometry_generic():
     """path to the data for test_geometry_generic"""
@@ -19,26 +19,72 @@ def data_geometry_generic():
     dir_path = os.path.join(root, "data/test_geometry_generic")
     return(dir_path)
 
+#------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
-                params=["101.poly",
-                        "101_1.poly"])
+                params=["101.poly"])
 def data_101(request, data_geometry_generic):
-    file_path = os.path.abspath(os.path.join(data_geometry_generic, request.param))
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
     return(file_path)
+# TODO: add GML ring where the first and the last points are the same
+
+
+@pytest.fixture(scope="module",
+                params=["102.poly"])
+def data_102(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+# TODO: add GML ring where consecutive points are the same
+
+
+@pytest.fixture(scope="module",
+                params=["104.poly",
+                        "104_1.poly",
+                        "104_2.poly",
+                        "104_3.poly"])
+def data_104(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["105.poly",
+                        "105_1.poly"])
+def data_105(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
 
 #----------------------------------------------------------------------- Tests
 def test_101(validate, data_101):
     error = validate(data_101)
     assert(error == [101])
 
-@pytest.mark.full
-def test_102():
-    print("not implemented")
-        
-        
-## 102
+def test_102(validate, data_102):
+    error = validate(data_102)
+    assert(error == [102])
 
-## 104
+def test_104(validate, data_104):
+    error = validate(data_104)
+    assert(error == [104])
+
+def test_105(validate, data_105):
+    error = validate(data_105)
+    assert(error == [105])
+
+
+
 
 ## 105
 

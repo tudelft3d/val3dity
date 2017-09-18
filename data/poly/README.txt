@@ -73,11 +73,11 @@ it explicitly.
   * cube with one extra face "floating" in the air, not touching
   * invalid
 
-# cube17
+# cube17 / 105
   * cube3 where inner ring is collapsed to a line
   * invalid
 
-# cube18
+# cube18 / 104
   * cube1 where top face has a bow tie 
   * invalid
 
@@ -97,7 +97,7 @@ it explicitly.
   * unit cube with top face having 3 triangles forming the square
   * valid
 
-# cube23
+# cube23 / 104_1
   * unit cube with top face having a self-intersecting surface (2D invalid), 2 of the faces of cube22 are 'bundled' as one polygon (which self-intersects)
   * invalid: 2D projected surface is not valid, but whole in 3D is
 
@@ -137,11 +137,11 @@ it explicitly.
   * unit cube with a polygon with nested rings in top face
   * invalid
 
-# duplicates
+# duplicates / 102
   * cube with one duplicate vertex (repeated in a ring)
   * invalid
 
-# toofewpts / 101_1
+# toofewpts / 101
   * cube with top face having only 2 points
   * invalid
 
