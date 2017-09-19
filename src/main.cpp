@@ -31,13 +31,17 @@
 #include "COError.h"
 #include <tclap/CmdLine.h>
 #include <time.h>  
+#include "nlohmann-json/json.hpp"
 
 using namespace std;
 using namespace val3dity;
+using json = nlohmann::json;
+
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs);
 void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+void write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -448,19 +452,32 @@ int main(int argc, char* const argv[])
       std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors, ioerrs) << std::endl;        
       if (report.getValue() != "")
       {
-        std::ofstream thereport;
-        thereport.open(report.getValue());
-        write_report_xml(thereport, 
-                         inputfile.getValue(),
-                         dPrimitives,
-                         dPrimitivesErrors,
-                         snap_tol.getValue(),
-                         overlap_tol.getValue(),
-                         planarity_d2p_tol.getValue(),
-                         planarity_n_tol.getValue(),
-                         ioerrs,
-                         onlyinvalid.getValue());
-        thereport.close();
+        json jr;
+        write_report_json(jr, 
+                          inputfile.getValue(),
+                          dPrimitives,
+                          dPrimitivesErrors,
+                          snap_tol.getValue(),
+                          overlap_tol.getValue(),
+                          planarity_d2p_tol.getValue(),
+                          planarity_n_tol.getValue(),
+                          ioerrs,
+                          onlyinvalid.getValue());  
+        std::ofstream o(report.getValue());
+        o << jr.dump(2) << std::endl;                                
+        // std::ofstream thereport;
+        // thereport.open(report.getValue());
+        // write_report_xml(thereport, 
+        //                  inputfile.getValue(),
+        //                  dPrimitives,
+        //                  dPrimitivesErrors,
+        //                  snap_tol.getValue(),
+        //                  overlap_tol.getValue(),
+        //                  planarity_d2p_tol.getValue(),
+        //                  planarity_n_tol.getValue(),
+        //                  ioerrs,
+        //                  onlyinvalid.getValue());
+        // thereport.close();
         std::cout << "Full validation report saved to " << report.getValue() << std::endl;
       }
       else
@@ -608,6 +625,113 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
 }
+
+
+void write_report_json(json& jr,
+                       std::string ifile, 
+                       std::map<std::string, std::vector<Primitive*> >& dPrimitives,
+                       std::map<std::string, COError >& dPrimitivesErrors,
+                       double snap_tol,
+                       double overlap_tol,
+                       double planarity_d2p_tol,
+                       double planarity_n_tol,
+                       IOErrors ioerrs,
+                       bool onlyinvalid)
+{
+  std::cout << "JSON report" << std::endl;
+
+  jr["type"] = "val3dity report";
+  jr["val3dity-version"] = "2.0 beta 1"; // TODO : put version automatically
+  jr["inputFile"] = ifile;
+  //-- time
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  jr["time"] = buffer;
+  //-- user-defined param
+  jr["snap_tol"] = snap_tol;
+  jr["overlap_tol"] = overlap_tol;
+  jr["planarity_d2p_tol"] = planarity_d2p_tol;
+  jr["planarity_n_tol"] = planarity_n_tol;
+  int noprim = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      noprim++;
+  jr["totalprimitives"] = noprim;
+  int bValid = 0;
+  for (auto& co : dPrimitives)
+    for (auto& p : co.second)
+      if (p->is_valid() == true)
+        bValid++;
+  jr["validprimitives"] = bValid;
+  jr["invalidprimitives"] = noprim - bValid;
+  //-- if a CityGML/CityJSON report also CityObjects
+  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
+  {
+    int coInvalid = 0;
+    for (auto& co : dPrimitives)
+    {
+      if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      {
+        coInvalid++;
+        continue;
+      }
+      for (auto& p : co.second)
+      {
+        if (p->is_valid() == false)
+        {
+          coInvalid++;
+          break;
+        }
+      }
+    }
+    jr["totalcityobjects"] = dPrimitives.size();
+    jr["validcityobjects"] = dPrimitives.size() - coInvalid;
+    jr["invalidcityobjects"] = coInvalid;
+  }
+
+  if (ioerrs.has_errors() == true)
+  {
+    jr["InputErrors"] = ioerrs.get_report_json();
+  }
+  else
+  {
+    //-- only primitives (no CityObjects)
+    if ( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) )
+    {
+      for (auto& p : dPrimitives["Primitives"])
+      {
+        if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+          ss << p->get_report_xml();
+      }
+    }
+    else //-- with CityObjects (CityJSON + CityGML)
+    {
+      for (auto& co : dPrimitives)
+      {
+        std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
+        std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+        ss << "<" << cotype << ">" << std::endl;
+        ss << "<id>" << coid << "</id>" << std::endl;
+        if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+          ss << dPrimitivesErrors[co.first].get_report_xml();
+        for (auto& p : co.second)
+        {
+          if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+            ss << p->get_report_xml();
+        }
+        ss << "</" << cotype << ">" << std::endl;
+      }
+
+    }
+  }
+
+
+}
+
 
 
 void write_report_xml(std::ofstream& ss,

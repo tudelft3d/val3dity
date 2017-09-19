@@ -75,6 +75,25 @@ std::string IOErrors::get_report_text()
 }
 
 
+json IOErrors::get_report_json()
+{
+  json j;
+  for (auto& err : _errors)
+  {
+    for (auto i : err.second)
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = err.first;
+      jj["description"] = errorcode2description(err.first);
+      jj["info"] = i;
+      j.push_back(jj);
+    }
+  }
+  return j;
+}
+
+
 std::string IOErrors::get_report_xml()
 {
   std::stringstream ss;
