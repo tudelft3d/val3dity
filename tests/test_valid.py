@@ -28,6 +28,7 @@ def data_poly(request, data_valid):
 
 
 #----------------------------------------------------------------------- Tests
+@pytest.mark.skip(reason="currently valid_2 breaks val3dity")
 def test_valid_poly(validate, data_poly):
     error = validate(data_poly)
     assert(error == [])

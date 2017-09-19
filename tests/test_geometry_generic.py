@@ -66,6 +66,37 @@ def data_105(request, data_geometry_generic):
     return(file_path)
 
 
+@pytest.fixture(scope="module",
+                params=["201.poly",
+                        "201_1.poly"])
+def data_201(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["202.poly"])
+def data_202(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["205.poly"])
+def data_205(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
 #----------------------------------------------------------------------- Tests
 def test_101(validate, data_101):
     error = validate(data_101)
@@ -83,12 +114,19 @@ def test_105(validate, data_105):
     error = validate(data_105)
     assert(error == [105])
 
+def test_201(validate, data_201):
+    error = validate(data_201)
+    assert(error == [201])
+
+def test_202(validate, data_202):
+    error = validate(data_202)
+    assert(error == [202])
+
+def test_205(validate, data_205):
+    error = validate(data_205)
+    assert(error == [205])
 
 
-
-## 105
-
-## 201
 
 ## 202
 

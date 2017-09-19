@@ -121,15 +121,15 @@ it explicitly.
   * 2 unit cubes touching at one vertex
   * invalid
 
-# cube30
+# cube30 / 202
   * unit cube with a duplicate inner ring top face
   * invalid
 
-# cube31
+# cube31 / 201
   * unit cube with a intersecting rings in top face
   * invalid
 
-# cube32
+# cube32 / 205
   * unit cube with a polygon with interior disconnected in top face
   * invalid
 
