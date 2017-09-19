@@ -434,7 +434,7 @@ int main(int argc, char* const argv[])
           COError coerrs;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
-            std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
+            // std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
             dPrimitivesErrors[co.first] = coerrs;
           }
         }
@@ -598,14 +598,22 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   //-- overview of errors
   std::map<int,int> errors;
-  for (auto& co : dPrimitives)
+  for (auto& co : dPrimitives) {
+    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+        errors[code] = 0;
     for (auto& p : co.second)
       for (auto& code : p->get_unique_error_codes())
         errors[code] = 0;
-  for (auto& co : dPrimitives)
+  }
+  for (auto& co : dPrimitives) {
+    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+        errors[code] += 1;
     for (auto& p : co.second)
       for (auto& code : p->get_unique_error_codes())
         errors[code] += 1;
+  }
 
   if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
   {
@@ -666,6 +674,39 @@ void write_report_json(json& jr,
         bValid++;
   jr["valid_primitives"] = bValid;
   jr["invalid_primitives"] = noprim - bValid;
+  //-- overview of errors
+  // "overview-errors": [101, 203],
+  // "overview-errors-primitives": [5, 1],
+  std::map<int,int> errors;
+  for (auto& co : dPrimitives) {
+    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+        errors[code] = 0;
+    for (auto& p : co.second)
+      for (auto& code : p->get_unique_error_codes())
+        errors[code] = 0;
+  }
+  for (auto& co : dPrimitives) {
+    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+        errors[code] += 1;
+    for (auto& p : co.second)
+      for (auto& code : p->get_unique_error_codes())
+        errors[code] += 1;
+  }
+  jr["overview-errors"];    
+  jr["overview-errors-no-primitives"];    
+  for (auto e : errors)
+  {
+    jr["overview-errors"].push_back(e.first);
+    jr["overview-errors-no-primitives"].push_back(e.second);
+  }
+  for (auto& e : ioerrs.get_unique_error_codes())
+  {
+    jr["overview-errors"].push_back(e);
+    jr["overview-errors-no-primitives"].push_back(-1);
+  }
+  
   //-- if a CityGML/CityJSON report also CityObjects
   if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
   {
