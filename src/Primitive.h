@@ -10,10 +10,14 @@
 #define Primitive_h
 
 #include "definitions.h"
+#include "nlohmann-json/json.hpp"
 #include <map>
 #include <vector>
 #include <set>
 #include <string>
+
+using json = nlohmann::json;
+
 
 namespace val3dity
 {
@@ -28,6 +32,7 @@ public:
   virtual int           is_valid() = 0;
   virtual bool          is_empty() = 0;
   virtual std::string   get_report_xml() = 0;
+  virtual json          get_report_json() = 0;
   virtual Primitive3D   get_type() = 0;
 
   virtual void          get_min_bbox(double& x, double& y) = 0;

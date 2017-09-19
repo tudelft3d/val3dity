@@ -24,11 +24,12 @@ public:
               MultiSurface(std::string id = ""); 
               ~MultiSurface(); 
 
-  bool        validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
-  int         is_valid();
-  bool        is_empty();
-  std::string get_report_xml();
-  Primitive3D get_type();
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
+  int           is_valid();
+  bool          is_empty();
+  std::string   get_report_xml();
+  json          get_report_json();
+  Primitive3D   get_type();
 
   void          get_min_bbox(double& x, double& y);
   void          translate_vertices(double minx, double miny);

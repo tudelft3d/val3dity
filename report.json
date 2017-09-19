@@ -2,17 +2,33 @@
   "type": "val3dity report",
   "val3dity-version": "2.0.0",
   "inputFile": "../data/gml/DenHaag_1BwBP.gml",
-  "snap_tol": "0.001",
-  "planarity_d2p_tol": "0.01",
-  "planarity_n_tol": "1",
-  "overlap_tol": "-1",
-  "totalprimitives": "6",
-  "validprimitives": "6",
-  "invalidprimitives": "0",
-  "totalcityobjects": "1",
-  "validcityobjects": "0",
-  "invalidcityobjects": "1",
   "time": "Mon Sep 11 16:11:48 2017 CEST",
+  
+  "snap_tol": 0.001,
+  "planarity_d2p_tol": 0.01,
+  "planarity_n_tol": 1,
+  "overlap_tol": -1,
+  
+  "totalprimitives": 6,
+  "validprimitives": 6,
+  "invalidprimitives": 0,
+  "totalcityobjects": 1,
+  "validcityobjects": 0,
+  "invalidcityobjects": 1,
+
+  "overview-errors": [101, 203],
+  "overview-errors-primitives": [5, 1],
+
+  "InputErrors":[
+    {
+      "type": "Error",
+      "code": 901,
+      "description": "INVALID_INPUT_FILE",
+      "info": "Input file not found."
+    }
+  ],
+  
+  "Primitives": null,
 
   "CityObjects": {
     "GUID_7F91F413-F839-48F6-A36A-E0F2F090C6B0": {
@@ -30,10 +46,10 @@
         {
           "type": "Solid",
           "id": "0",
+          "errors": [],
           "numbershells": 1,
           "numberfaces": 6,
-          "numbervertices": 8,
-          "errors": []
+          "numbervertices": 8
         },
         {
           "type": "Solid",

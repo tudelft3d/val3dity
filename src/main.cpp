@@ -641,8 +641,8 @@ void write_report_json(json& jr,
   std::cout << "JSON report" << std::endl;
 
   jr["type"] = "val3dity report";
-  jr["val3dity-version"] = "2.0 beta 1"; // TODO : put version automatically
-  jr["inputFile"] = ifile;
+  jr["val3dity_version"] = "2.0 beta 1"; // TODO : put version automatically
+  jr["input_file"] = ifile;
   //-- time
   std::time_t rawtime;
   struct tm * timeinfo;
@@ -660,14 +660,14 @@ void write_report_json(json& jr,
   for (auto& co : dPrimitives)
     for (auto& p : co.second)
       noprim++;
-  jr["totalprimitives"] = noprim;
+  jr["total_primitives"] = noprim;
   int bValid = 0;
   for (auto& co : dPrimitives)
     for (auto& p : co.second)
       if (p->is_valid() == true)
         bValid++;
-  jr["validprimitives"] = bValid;
-  jr["invalidprimitives"] = noprim - bValid;
+  jr["valid_primitives"] = bValid;
+  jr["invalid_primitives"] = noprim - bValid;
   //-- if a CityGML/CityJSON report also CityObjects
   if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
   {
@@ -688,45 +688,47 @@ void write_report_json(json& jr,
         }
       }
     }
-    jr["totalcityobjects"] = dPrimitives.size();
-    jr["validcityobjects"] = dPrimitives.size() - coInvalid;
-    jr["invalidcityobjects"] = coInvalid;
+    jr["total_cityobjects"] = dPrimitives.size();
+    jr["valid_cityobjects"] = dPrimitives.size() - coInvalid;
+    jr["invalid_cityobjects"] = coInvalid;
   }
 
+  jr["InputErrors"];
+  jr["CityObjects"];
+  jr["Primitives"];
   if (ioerrs.has_errors() == true)
   {
     jr["InputErrors"] = ioerrs.get_report_json();
   }
+  
   else
   {
     //-- only primitives (no CityObjects)
     if ( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) )
     {
       for (auto& p : dPrimitives["Primitives"])
-      {
-        if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
-          ss << p->get_report_xml();
-      }
+        if ( !((onlyinvalid == true) && (p->is_valid() == true)) ) 
+          jr["Primitives"].push_back(p->get_report_json());
     }
-    else //-- with CityObjects (CityJSON + CityGML)
-    {
-      for (auto& co : dPrimitives)
-      {
-        std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
-        std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
-        ss << "<" << cotype << ">" << std::endl;
-        ss << "<id>" << coid << "</id>" << std::endl;
-        if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-          ss << dPrimitivesErrors[co.first].get_report_xml();
-        for (auto& p : co.second)
-        {
-          if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
-            ss << p->get_report_xml();
-        }
-        ss << "</" << cotype << ">" << std::endl;
-      }
 
-    }
+    // else //-- with CityObjects (CityJSON + CityGML)
+  //   {
+  //     for (auto& co : dPrimitives)
+  //     {
+  //       std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
+  //       std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+  //       ss << "<" << cotype << ">" << std::endl;
+  //       ss << "<id>" << coid << "</id>" << std::endl;
+  //       if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+  //         ss << dPrimitivesErrors[co.first].get_report_xml();
+  //       for (auto& p : co.second)
+  //       {
+  //         if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+  //           ss << p->get_report_xml();
+  //       }
+  //       ss << "</" << cotype << ">" << std::endl;
+  //     }
+  //   }
   }
 
 

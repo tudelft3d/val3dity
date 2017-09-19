@@ -189,6 +189,19 @@ bool CompositeSolid::is_empty() {
 }
 
 
+json CompositeSolid::get_report_json()
+{
+  json j;
+  j["type"] = "CompositeSolid";
+  if (this->get_id() != "")
+    j["id"] = this->_id;
+  else
+    j["id"] = "none";
+  // j["errors"];
+  return j;
+}
+
+
 std::string CompositeSolid::get_report_xml()
 {
   std::stringstream ss;

@@ -72,6 +72,18 @@ bool CompositeSurface::is_empty() {
 }
 
 
+json CompositeSurface::get_report_json()
+{
+  json j;
+  j["type"] = "CompositeSurface";
+  if (this->get_id() != "")
+    j["id"] = this->_id;
+  else
+    j["id"] = "none";
+  // j["errors"];
+  return j;
+}
+
 std::string CompositeSurface::get_report_xml() {
   std::stringstream ss;
   ss << "\t<CompositeSurface>" << std::endl;

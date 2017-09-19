@@ -77,6 +77,18 @@ bool MultiSolid::is_empty()
 }
 
 
+json MultiSolid::get_report_json()
+{
+  json j;
+  j["type"] = "MultiSolid";
+  if (this->get_id() != "")
+    j["id"] = this->_id;
+  else
+    j["id"] = "none";
+  // j["errors"];
+  return j;
+}
+
 std::string MultiSolid::get_report_xml() 
 {
     std::stringstream ss;
