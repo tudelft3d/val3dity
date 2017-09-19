@@ -16,9 +16,13 @@ test_geometry_generic:
   "105_2": as 105_2, but with 4 points in a line (8-11), the 4th point is intersecting one edge (5-6) (currently val3dity cannot parse it). This is 104 & 105
   "201": unit cube with intersecting rings in top face
   "201_1": a single 3D polygon with an interior ring that instersects its exterior
+  "201_2": unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point
   "202": unit cube with a duplicate inner ring top face
   "205": unit cube with a polygon with interior disconnected in top face
-
+  "206": unit cube with a hole in top face located outside (in 2D the top face is not acc. to SFS)
+  "207": unit cube with a polygon with nested rings in top face
+  "207_1" unit cube with a polygon with a nested ring in a nested ring in the top face
+  "207_2" same as 207_1 but the holes are defined according to the .poly manual
   "302": unit cube with a top surface composed of 2 polygons
   "304": unit cube with one corner as a disconnected part
 

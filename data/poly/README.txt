@@ -7,7 +7,7 @@ All the datasets are stored in the [POLY](http://tetgen.berlios.de/fformats.poly
   * unit cube with 6 faces
   * valid
 
-# cube2
+# cube2 / 206
   * unit cube with a hole in top face located outside
   * invalid (in 2D the top face is not acc. to SFS)
 
@@ -133,7 +133,7 @@ it explicitly.
   * unit cube with a polygon with interior disconnected in top face
   * invalid
 
-# cube33
+# cube33 / 207
   * unit cube with a polygon with nested rings in top face
   * invalid
 

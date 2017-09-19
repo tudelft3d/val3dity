@@ -68,7 +68,8 @@ def data_105(request, data_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["201.poly",
-                        "201_1.poly"])
+                        "201_1.poly",
+                        "201_2.poly"])
 def data_201(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -96,6 +97,27 @@ def data_205(request, data_geometry_generic):
             request.param))
     return(file_path)
 
+
+@pytest.fixture(scope="module",
+                params=["206.poly"])
+def data_206(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["207.poly",
+                        "207_1.poly"])
+def data_207(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+# TODO: add 207_2.poly once val3dity can parse the holes in a poly file
 
 #----------------------------------------------------------------------- Tests
 def test_101(validate, data_101):
@@ -126,19 +148,21 @@ def test_205(validate, data_205):
     error = validate(data_205)
     assert(error == [205])
 
+def test_206(validate, data_206):
+    error = validate(data_206)
+    assert(error == [206])
+
+def test_207(validate, data_207):
+    error = validate(data_207)
+    assert(error == [207])
 
 
-## 202
 
 ## 203
 
 ## 204
 
-## 205
 
-## 206
-
-## 207
 
 ## 208
 
