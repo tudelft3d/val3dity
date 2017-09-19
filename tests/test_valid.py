@@ -28,6 +28,6 @@ def data_poly(request, data_valid):
 
 
 #----------------------------------------------------------------------- Tests
-def test_poly(validate, data_poly):
+def test_valid_poly(validate, data_poly):
     error = validate(data_poly)
     assert(error == [])

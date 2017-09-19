@@ -2,7 +2,7 @@
 
 # test case
 test_file_format:
-  "poly_hole": .poly unit cube with invalid definition of the hole in the top face
+  "poly_hole": .poly unit cube with invalid definition of the hole in the top face. TetView doesnt open the file with an error as Hole 1 in facet 1 has no coordinatesNothing to draw!
 
 test_geometry_generic:
   "101": cube top face a line (with only 2 vertices)
@@ -14,9 +14,12 @@ test_geometry_generic:
   "105": unit cube with a hole (inner ring) in the top face, where inner ring is collapsed to a line of 3 points
   "105_1": a single 3D polygon collapsed into a line
   "105_2": as 105_2, but with 4 points in a line (8-11), the 4th point is intersecting one edge (5-6) (currently val3dity cannot parse it). This is 104 & 105
+  "201": unit cube with intersecting rings in top face
   "302": unit cube with a top surface composed of 2 polygons
 
+# TODO: write composite test for 105_2
+
 test_valid:
-  "valid_1": .poly unit cube with comments (#) in it
-  "valid_2": .poly unit cube with a hole in the top surface
-  "valid_3": .poly unit cube with the top surface composed of 2 polygons
+  "valid_1": .poly unit cube with comments in it
+  "valid_2": .poly unit cube with a hole in the top surface and inline comments
+  "valid_3": .poly unit cube with the top surface composed of 2 polygons. TetView can display it correctly as a closed Solid.
