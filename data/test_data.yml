@@ -18,8 +18,9 @@ test_geometry_generic:
   "201_1": a single 3D polygon with an interior ring that instersects its exterior
   "202": unit cube with a duplicate inner ring top face
   "205": unit cube with a polygon with interior disconnected in top face
-  "205_1": unit cube with one corner as a disconnected part
+
   "302": unit cube with a top surface composed of 2 polygons
+  "304": unit cube with one corner as a disconnected part
 
 # TODO: write composite test for 105_2
 
