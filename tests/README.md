@@ -2,25 +2,33 @@
 
 This README is solely concerned with the integration tests for val3dity. These tests are implemented in python, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its corner cases. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
 
+Due to the current setup of file referencing in the tests, `pytest` need to be run from the `/val3dity` root directory.
+
 Run basic set of tests:
 ```
-pytest
+$ pytest
 ```
 
 Run full set of tests:
 ```
-pytest --runfull
+$ pytest --runfull
 ```
 
 Run in verbose mode to see which tests are executed or skipped:
 ```
-pytest -v
+$ pytest -v
 ```
 
-Run a single test case, eg *test_101* that is part of the *test_geometry_generic* test case:
+Run a single test case, eg *test_101*:
 ```
-pytest test_geometry_generic.py::test_101
+$ pytest -k "test_101"
 ```
+
+Run a single test case, eg *test_104* with only one of its inputs:
+```
+$ pytest -k "test_104[104_2.poly]"
+```
+
 
 For more info see [pytest docs on markers](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run).
 
