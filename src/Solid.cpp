@@ -169,7 +169,11 @@ json Solid::get_report_json()
   }
   for (auto& sh : _shells)
     for (auto& each: sh->get_report_json())
-     j["errors"].push_back(each); 
+      j["errors"].push_back(each); 
+  if (j["errors"].is_null() == true)
+    j["validity"] = true;
+  else 
+    j["validity"] = false;
   return j;
 }
 

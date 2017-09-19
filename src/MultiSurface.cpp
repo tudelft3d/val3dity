@@ -75,12 +75,32 @@ bool MultiSurface::is_empty() {
 json MultiSurface::get_report_json()
 {
   json j;
+  bool isValid = true;
   j["type"] = "MultiSurface";
   if (this->get_id() != "")
     j["id"] = this->_id;
   else
     j["id"] = "none";
-  // j["errors"];
+  j["numbersurfaces"] = this->number_faces();
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j["errors"].push_back(jj);
+      isValid = false;
+    }
+  }
+  for (auto& each: _surface->get_report_json())
+    j["errors"].push_back(each); 
+  if (_surface->has_errors() == true)
+    isValid = false;
+  j["validity"] = isValid;  
   return j;
 }
 

@@ -46,7 +46,7 @@
         {
           "type": "Solid",
           "id": "0",
-          "errors": [],
+          "errors": null,
           "numbershells": 1,
           "numberfaces": 6,
           "numbervertices": 8

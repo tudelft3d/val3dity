@@ -60,6 +60,26 @@ std::string COError::get_report_text()
 }
 
 
+json COError::get_report_json()
+{
+  json j;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j["errors"].push_back(jj);
+    }
+  }
+  return j;
+}
+
+
 std::string COError::get_report_xml()
 {
   std::stringstream ss;

@@ -638,8 +638,6 @@ void write_report_json(json& jr,
                        IOErrors ioerrs,
                        bool onlyinvalid)
 {
-  std::cout << "JSON report" << std::endl;
-
   jr["type"] = "val3dity report";
   jr["val3dity_version"] = "2.0 beta 1"; // TODO : put version automatically
   jr["input_file"] = ifile;
@@ -710,36 +708,47 @@ void write_report_json(json& jr,
         if ( !((onlyinvalid == true) && (p->is_valid() == true)) ) 
           jr["Primitives"].push_back(p->get_report_json());
     }
+    else //-- with CityObjects (CityJSON + CityGML)
+    {
+      for (auto& co : dPrimitives)
+      {
+        json j;
+        std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
+        std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+        bool isValid = true;
+        j["type"] = cotype;
+        j["errors"];
+        if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+        {
+          for (auto& each: dPrimitivesErrors[co.first].get_report_json())
+          {
+            j["errors"].push_back(each);
+            isValid = false;
+          }
 
-    // else //-- with CityObjects (CityJSON + CityGML)
-  //   {
-  //     for (auto& co : dPrimitives)
-  //     {
-  //       std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
-  //       std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
-  //       ss << "<" << cotype << ">" << std::endl;
-  //       ss << "<id>" << coid << "</id>" << std::endl;
-  //       if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-  //         ss << dPrimitivesErrors[co.first].get_report_xml();
-  //       for (auto& p : co.second)
-  //       {
-  //         if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
-  //           ss << p->get_report_xml();
-  //       }
-  //       ss << "</" << cotype << ">" << std::endl;
-  //     }
-  //   }
+        }
+        for (auto& p : co.second)
+        {
+          if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
+          {
+            j["primitives"].push_back(p->get_report_json());
+            if (p->is_valid() == false)
+              isValid = false;
+          }
+        }
+        j["validity"] = isValid;
+        jr["CityObjects"][coid] = j;
+      }
+    }
   }
-
-
 }
 
 
 
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
-                      std::map<std::string, std::vector<Primitive*> >& dPrimitives,
-                      std::map<std::string, COError >& dPrimitivesErrors,
+                      std::map<std::string, std::vector<Primitive*>>& dPrimitives,
+                      std::map<std::string, COError>& dPrimitivesErrors,
                       double snap_tol,
                       double overlap_tol,
                       double planarity_d2p_tol,
