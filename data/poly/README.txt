@@ -81,7 +81,7 @@ it explicitly.
   * cube1 where top face has a bow tie 
   * invalid
 
-# cube19
+# cube19 / 208
   * unit cube with a hole (inner ring) in the top face having same orientation as outer ring
   * invalid
 

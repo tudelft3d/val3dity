@@ -18,7 +18,8 @@ def data_valid():
 @pytest.fixture(scope="module",
                 params=["valid_1.poly",
                         "valid_2.poly",
-                        "valid_3.poly"])
+                        "valid_3.poly",
+                        "valid_4.poly"])
 def data_poly(request, data_valid):
     file_path = os.path.abspath(
         os.path.join(
@@ -27,8 +28,21 @@ def data_poly(request, data_valid):
     return(file_path)
 
 
+@pytest.fixture(scope="module",
+                params=["self_fold.obj"])
+def data_self_fold(request, data_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_valid,
+            request.param))
+    return(file_path)
+
 #----------------------------------------------------------------------- Tests
 @pytest.mark.skip(reason="currently valid_2 breaks val3dity")
 def test_valid_poly(validate, data_poly):
     error = validate(data_poly)
+    assert(error == [])
+
+def test_valid_self_fold(validate, data_self_fold):
+    error = validate(data_self_fold)
     assert(error == [])
