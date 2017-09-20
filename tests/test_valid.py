@@ -1,6 +1,8 @@
 """Testing valid files and geometries.
 
-One per format should be enough.
+These are rather general tests on valid geometry. To test whether val3dity
+returns VALID in a boundary condition of a specific error, better include
+those validity checks in the relevant test case.
 """
 
 import pytest

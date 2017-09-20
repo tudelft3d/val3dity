@@ -90,8 +90,19 @@ def data_202(request, data_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["203.poly",
-                        "203_1.poly"])
+                        "203_1.poly",
+                        "203_2.poly"])
 def data_203(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["203_valid.poly"])
+def data_203_valid(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
             data_geometry_generic,
@@ -103,8 +114,19 @@ def data_203(request, data_geometry_generic):
                 params=["204.poly",
                         "204_1.poly",
                         "204_2.poly",
-                        "204_3.poly"])
+                        "204_3.poly",
+                        "204_4.poly"])
 def data_204(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["204_valid.poly"])
+def data_204_valid(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
             data_geometry_generic,
@@ -182,9 +204,17 @@ def test_203(validate, data_203):
     error = validate(data_203)
     assert(error == [203])
 
+def test_203_valid(validate, data_203_valid):
+    error = validate(data_203_valid)
+    assert(error == [])
+
 def test_204(validate, data_204):
     error = validate(data_204)
     assert(error == [204])
+
+def test_204_valid(validate, data_204_valid):
+    error = validate(data_204_valid)
+    assert(error == [])
 
 def test_205(validate, data_205):
     error = validate(data_205)
