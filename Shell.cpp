@@ -620,7 +620,14 @@ bool Shell::does_self_intersect()
                                 each->halfedge()->next()->vertex()->point(),
                                 each->halfedge()->next()->next()->vertex()->point()); 
       std::stringstream st;
-      st << "Location close to: (" << c << ")"; 
+      // st << "Location close to: (" << c << ")"; 
+      st << "Location close to: (";
+      st << (c.x() + _minx);
+      st << ", ";
+      st << (c.y() + _miny);
+      st << ", ";
+      st << c.z();
+      st << ")";
       this->add_error(306, "", st.str());
     }
     return false;
