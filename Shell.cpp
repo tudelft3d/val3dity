@@ -407,6 +407,8 @@ void Shell::get_min_bbox(double& x, double& y)
 
 void Shell::translate_vertices(double minx, double miny)
 {
+  _minx = minx;
+  _miny = miny;
   vector<Point3>::iterator it = _lsPts.begin();
   for (it = _lsPts.begin(); it != _lsPts.end(); it++)
   {
@@ -668,7 +670,14 @@ bool Shell::validate_as_shell(double tol_planarity_d2p, double tol_planarity_nor
             _polyhedron->normalize_border();
             while (_polyhedron->size_of_border_edges() > 0) {
               CgalPolyhedron::Halfedge_handle he = ++(_polyhedron->border_halfedges_begin());
-              st << "Location hole: " << he->vertex()->point();
+              st << "Location hole: (";
+              // he->vertex()->point();
+              st << (he->vertex()->point().x() + _minx);
+              st << ", ";
+              st << (he->vertex()->point().y() + _miny);
+              st << ", ";
+              st << he->vertex()->point().z();
+              st << ")";
               this->add_error(302, "", st.str());
               st.str("");
               _polyhedron->fill_hole(he);

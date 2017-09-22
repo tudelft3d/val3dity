@@ -68,6 +68,8 @@ private:
   double                                  _tol_snap;
   int                                     _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
   int                                     _vertices_added;
+  double                                  _minx;
+  double                                  _miny;
 
   std::map<int, vector<std::tuple<std::string, std::string> > > _errors;
 
