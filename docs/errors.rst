@@ -65,17 +65,10 @@ This ring is for instance invalid:
 
 104 -- SELF_INTERSECTION 
 ------------------------
-A ring should be *simple*, ie it should not self-intersect. The self-intersection can be at the location of an explicit point, or not.
+A ring should be *simple*, ie it should not self-intersect. The self-intersection can be at the location of an explicit point, or not. This case includes rings that are (partly) collapsed to a line for instance.
 
 .. image:: _static/104.png
 
-.. _error_105:
-
-105 -- COLLAPSED_TO_LINE 
-------------------------
-A special case of :ref:`error_104`: the ring is collapsed to a line. If the geometry is collapsed to a point, then :ref:`error_101`/:ref:`error_102` is used. 
-
-.. image:: _static/105.png
 
 .. _error_201:
 

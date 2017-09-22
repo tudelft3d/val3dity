@@ -431,11 +431,11 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     size_t numf = _lsFaces[i].size();
     std::vector<int> &ids = _lsFaces[i][0]; // helpful alias for the outer boundary
 
-    //-- if only 3 pts it's now valid, no need to process further
+    //-- if only 3 pts it's not valid, no need to process further
     if ( (numf == 1) && (ids.size() == 3)) 
     {
       if (CGAL::collinear(_lsPts[ids[0]], _lsPts[ids[1]], _lsPts[ids[2]]) == true) {
-        this->add_error(104, _lsFacesID[i], " outer ring (a triangle) is collapsed to a point or a line");
+        this->add_error(104, _lsFacesID[i], " outer ring (a triangle) is collapsed to a line");
         isValid = false;
       }
       continue;
@@ -471,7 +471,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     std::vector<Polygon> lsRings;
     if (false == create_polygon(_lsPts, ids, pgn))
     {
-      this->add_error(104, _lsFacesID[i], " outer ring self-intersects or is collapsed to a point or a line");
+      this->add_error(104, _lsFacesID[i], " outer ring self-intersects or is collapsed to a line");
       isValid = false;
       continue;
     }
@@ -484,7 +484,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       Polygon pgn;
       if (false == create_polygon(_lsPts, ids2, pgn))
       {
-        this->add_error(104, _lsFacesID[i], "Inner ring self-intersects or is collapsed to a point or a line");
+        this->add_error(104, _lsFacesID[i], "Inner ring self-intersects or is collapsed to a line");
         isValid = false;
         continue;
       }
