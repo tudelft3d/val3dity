@@ -100,7 +100,6 @@ def data_203(request, data_geometry_generic):
     return(file_path)
 
 
-@pytest.mark.skip(reason="reports 204 which is fine")
 @pytest.fixture(scope="module",
                 params=["203_valid.poly"])
 def data_203_valid(request, data_geometry_generic):
@@ -189,6 +188,7 @@ def test_104(validate, data_104):
     error = validate(data_104)
     assert(error == [104])
 
+@pytest.mark.skip(reason="error 105 is a subclass of 104 and not possible to ditinguish")
 def test_105(validate, data_105):
     error = validate(data_105)
     assert(error == [105])
