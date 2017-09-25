@@ -11,11 +11,11 @@ All the datasets are stored in the [POLY](http://tetgen.berlios.de/fformats.poly
   * unit cube with a hole in top face located outside
   * invalid (in 2D the top face is not acc. to SFS)
 
-# cube3
+# cube3 / 302_1
   * unit cube with a hole (inner ring) in the top face
   * invalid (the inner ring isn't filled by another face, so not watertight)
 
-# cube4
+# cube4 / 306_2
   * unit cube with one extra face inside another face
   * invalid 
 
@@ -27,25 +27,25 @@ All the datasets are stored in the [POLY](http://tetgen.berlios.de/fformats.poly
   * cube5 where hole (inner ring) is touching the outer ring of a face
   * valid
 
-# cube8
+# cube8 / 304
   * unit cube with an extra vertex on an edge. Only one of the 2 incident faces has
 it explicitly. 
   * invalid (geometrically valid, but topologically invalid. Thus: invalid) 
   * note: Oracle Spatial reports valid 
 
-# cube9
+# cube9 / 307
   * unit cube with one face (face #0) with opposite orientation
   * invalid
 
-# cube10
+# cube10 / 302
   * unit cube with one face missing (bottom one)
   * invalid
 
-# cube11
+# cube11 / 304_1
   * unit cube with one extra face in the middle, splitting the cube in two parts
   * invalid
 
-# cube12
+# cube12 / 303
   * unit cube with one dangling face touching the cube at one point only; the dangling face is the last in the list
   * invalid
 
@@ -69,7 +69,7 @@ it explicitly.
   * cube with one dangling face, touching only at one point; the dangling face is the 1st in the list
   * invalid
 
-# cube16
+# cube16 / 305
   * cube with one extra face "floating" in the air, not touching
   * invalid
 
@@ -85,11 +85,11 @@ it explicitly.
   * unit cube with a hole (inner ring) in the top face having same orientation as outer ring
   * invalid
 
-# cube20
+# cube20 / 301
   * flat cube, ie with volume of 0, only 2 surfaces
   * invalid
 
-# cube21
+# cube21 / 305_1
   * 2 unit cubes not touching at all, one above the other separated by 1unit
   * invalid
 
@@ -117,7 +117,7 @@ it explicitly.
   * cube top face a line (with only 2 vertices)
   * invalid
 
-# cube29
+# cube29 / 303_1
   * 2 unit cubes touching at one vertex
   * invalid
 
@@ -145,7 +145,7 @@ it explicitly.
   * cube with top face having only 2 points
   * invalid
 
-# toofewpolys
+# toofewpolys / 301_1
   * cube with only 3 surfaces
   * invalid
 
@@ -185,7 +185,7 @@ it explicitly.
   * a "squared donut", genus of the shell is 1
   * valid
 
-# torus2
+# torus2 / 306_3
   * torus where the hole in the top/bottom faces touches the side surfaces
   * invalid
 
@@ -193,11 +193,11 @@ it explicitly.
   * cube with a pyramidal roof
   * valid
 
-# house2
+# house2 / 306
   * house with tip below the ground
   * invalid
 
-# house3
+# house3 /306_1
   * house with tip touching the bottom faces
   * invalid
 

@@ -46,6 +46,11 @@ def multisurface():
     return(["--unittests", "-p MultiSurface"])
 
 @pytest.fixture(scope="session")
+def citymodel():
+    """val3dity options for validating a CityModel"""
+    return(["--unittests"])
+
+@pytest.fixture(scope="session")
 def validate():
     def _validate(file_path, options=solid(), val3dity=val3dity()):
         """Validate a file

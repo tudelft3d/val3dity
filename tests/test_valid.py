@@ -48,6 +48,16 @@ def data_self_fold(request, data_valid):
             request.param))
     return(file_path)
 
+
+@pytest.fixture(scope="module",
+                params=["closed_top.poly"])
+def data_closed_top(request, data_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_valid,
+            request.param))
+    return(file_path)
+
 #----------------------------------------------------------------------- Tests
 @pytest.mark.skip(reason="POLY files are not intended for citymodels, just for geometry testing")
 def test_valid_poly(validate, data_poly):
@@ -60,4 +70,8 @@ def test_valid_planar(validate, data_planar):
 
 def test_valid_self_fold(validate, data_self_fold):
     error = validate(data_self_fold)
+    assert(error == [])
+
+def test_valid_closed_top(validate, data_closed_top):
+    error = validate(data_closed_top)
     assert(error == [])

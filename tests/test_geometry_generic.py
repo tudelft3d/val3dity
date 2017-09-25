@@ -175,6 +175,106 @@ def data_208(request, data_geometry_generic):
             request.param))
     return(file_path)
 
+
+@pytest.fixture(scope="module",
+                params=["301.poly",
+                        "301_1.poly"])
+def data_301(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["302.poly",
+                        "302_1.poly"])
+def data_302(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["302_2.gml"])
+def data_302_gml(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["303.poly",
+                        "303_1.poly"])
+def data_303(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["304.poly",
+                        "304_1.poly",
+                        "304_2.obj"])
+def data_304(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["305.poly",
+                        "305_1.poly"])
+def data_305(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["306.poly",
+                        "306_1.poly",
+                        "306_2.poly",
+                        "306_3.poly"])
+def data_306(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["307.poly",
+                        "307_1.poly"])
+def data_307(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["309.off",
+                        "309_1.obj"])
+def data_309(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
 #----------------------------------------------------------------------- Tests
 def test_101(validate, data_101):
     error = validate(data_101)
@@ -234,22 +334,41 @@ def test_208(validate, data_208):
     error = validate(data_208)
     assert(error == [208])
 
+def test_301(validate, data_301):
+    error = validate(data_301)
+    assert(error == [301])
 
-## 301
+def test_302(validate, data_302):
+    error = validate(data_302)
+    assert(error == [302])
 
-## 302
+def test_302_gml(validate, data_302_gml, citymodel):
+    error = validate(data_302_gml, options=citymodel)
+    assert(error == [302])
 
-## 303
+def test_303(validate, data_303):
+    error = validate(data_303)
+    assert(error == [303])
 
-## 304
+def test_304(validate, data_304):
+    error = validate(data_304)
+    assert(error == [304])
 
-## 305
+def test_305(validate, data_305):
+    error = validate(data_305)
+    assert(error == [305])
 
-## 306
+def test_306(validate, data_306):
+    error = validate(data_306)
+    assert(error == [306])
 
-## 307
+def test_307(validate, data_307):
+    error = validate(data_307)
+    assert(error == [307])
 
-## 309
+def test_309(validate, data_309):
+    error = validate(data_309)
+    assert(error == [309])
 
 ## 401
 
