@@ -20,9 +20,18 @@ def data_valid():
 @pytest.fixture(scope="module",
                 params=["valid_1.poly",
                         "valid_2.poly",
-                        "valid_3.poly",
-                        "valid_4.poly"])
+                        "valid_3.poly"])
 def data_poly(request, data_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_valid,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["planar.poly"])
+def data_planar(request, data_valid):
     file_path = os.path.abspath(
         os.path.join(
             data_valid,
@@ -40,9 +49,13 @@ def data_self_fold(request, data_valid):
     return(file_path)
 
 #----------------------------------------------------------------------- Tests
-@pytest.mark.skip(reason="currently valid_2 breaks val3dity")
+@pytest.mark.skip(reason="POLY files are not intended for citymodels, just for geometry testing")
 def test_valid_poly(validate, data_poly):
     error = validate(data_poly)
+    assert(error == [])
+
+def test_valid_planar(validate, data_planar):
+    error = validate(data_planar)
     assert(error == [])
 
 def test_valid_self_fold(validate, data_self_fold):

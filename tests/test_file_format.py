@@ -32,6 +32,7 @@ def data_poly_hole(request, data_file_format):
 
 
 #----------------------------------------------------------------------- Tests
+@pytest.mark.skip(reason="POLY files are not intended for citymodels, just for geometry testing")
 def test_poly_hole(validate, data_poly_hole):
     error = validate(data_poly_hole)
     assert(error == [901])

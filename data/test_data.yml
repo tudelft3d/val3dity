@@ -18,7 +18,7 @@ test_geometry_generic:
   "201_1": a single 3D polygon with an interior ring that instersects its exterior
   "201_2": unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point
   "202": unit cube with a duplicate inner ring top face
-  "203": unit cube where the top face has 5 vertices, one of them (8) is not on the plane of the other 4 (+0.5)
+  "203": unit cube where the top face has 5 vertices, one of them (8) is not on the plane of the other 4 (+0.05)
   "203_1": unit cube with a rectangular hole drilled through it, where one vertex (8) on the inner ring in the top face of the cube is not on the plane of the face (+0.5)
   "203_2": same as 203 but non-planar vertex is +0.1
   "203_valid": same as 203 but non-planar vertex is +0.0999
@@ -43,5 +43,5 @@ test_valid:
   "valid_1": .poly unit cube with comments in it
   "valid_2": .poly unit cube with a hole in the top surface and inline comments
   "valid_3": .poly unit cube with the top surface composed of 2 polygons. TetView can display it correctly as a closed Solid.
-  "valid_4": same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold
+  "planar": same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005
   "self_fold": .obj unit cube with a whirl
