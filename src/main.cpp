@@ -79,6 +79,18 @@ public:
     std::cout << "\tval3dity input.gml --info" << std::endl;
     std::cout << "\t\tOutputs information about the GML file (no validation performed)." << std::endl;
   }
+
+  virtual void failure(TCLAP::CmdLineInterface& c, TCLAP::ArgException& e)
+  {
+    std::cout << "ERROR: " << e.argId() << std::endl; 
+    std::cout << "       " << e.error() << endl;
+    std::cout << std::endl;
+    std::cout << "USAGE: val3dity [OPTION] myinput.json" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Try `val3dity --help` for more options" << std::endl;
+    exit(1);
+  }
+
 };
 
 
@@ -182,6 +194,7 @@ int main(int argc, char* const argv[])
     cmd.add(ishellfiles);
     cmd.add(report);
     cmd.parse( argc, argv );
+
 
     std::map<std::string, std::vector<Primitive*> > dPrimitives;
     std::map<std::string, COError > dPrimitivesErrors;
