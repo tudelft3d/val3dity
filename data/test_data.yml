@@ -63,6 +63,11 @@ test_geometry_generic:
   "401_6": Unit cube with a pyramid cavity which bottom face is shared with the bottom face of the cube
   "402": Duplicate unit cubes
   "402_1": Unit cube with duplicate cavities
+  "403": Unit cube with a pyramid cavity that is completely outside of the outer shell of the cube
+  "403_1": Unit cube with a pyramid cavity that is completely outside of the outer shell of the cube, but one face is adjacent to it
+  "404": Unit cube with a cavity that is disconnected (like the diagram for error 205, but in 3D)
+  "405": Pyramid with the normals pointing inwards
+  "405_1": Unit cube with a cavity (pyramid). The normals of the exterior are pointing inwards, the normals of the inner-shell are pointing outwards of the cube.
 
 # TODO: write composite test for 105_2
 

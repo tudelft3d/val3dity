@@ -247,12 +247,12 @@ it explicitly.
   * sharing *partly* a face with py1 
   * cube + py1 + py8 = invalid (2 holes face touching)
 
-# py9
+# py9 / 403
   * invalid as outer shell (all normals pointing inwards)
   * pyramid complete outside the outer shell of cube
   * cube + py9 = invalid
 
-# py10
+# py10 / 403_1
   * invalid as outer shell (all normals pointing inwards)
   * pyramid outside the outer shell of cube, but face adjacent
   * cube + py10 = invalid
