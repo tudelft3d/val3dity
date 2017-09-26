@@ -57,7 +57,7 @@ test_geometry_generic:
   "401": Two unit cubes share a face
   "401_1": "Unit cube with a an inner-pyramid that pierces through the cube top (by 0.00001). Oracle agrees: oracle=54512"
   "401_2": Unit cube and a pyramid that pierces inside it (by 0.00001)
-  "401_3": Two unit cube partially inside each other (by 0.1)
+  "401_3": Two unit cube partially inside each other (by 0.5)
   "401_4": Unit cube with two cavities that share a face
   "401_5": Unit cube with two cavities that partly share a face
   "401_6": Unit cube with a pyramid cavity which bottom face is shared with the bottom face of the cube
