@@ -32,7 +32,6 @@ val3dity accepts as input:
   - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
-  - `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_
 
 .. note::  
   Most of the details are available in this scientific article, if you use val3dity for scientific purposes please cite this article:
