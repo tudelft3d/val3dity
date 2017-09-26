@@ -58,6 +58,20 @@ def data_closed_top(request, data_valid):
             request.param))
     return(file_path)
 
+
+@pytest.fixture(scope="module",
+                params=["inner_pyramid.poly",
+                        "inner_pyramid_1.poly",
+                        "inner_pyramid_2.poly",
+                        "inner_pyramid_3.poly",
+                        "inner_pyramid_4.poly"])
+def data_inner_shell(request, data_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_valid,
+            request.param))
+    return(file_path)
+
 #----------------------------------------------------------------------- Tests
 @pytest.mark.skip(reason="POLY files are not intended for citymodels, just for geometry testing")
 def test_valid_poly(validate, data_poly):
@@ -74,4 +88,8 @@ def test_valid_self_fold(validate, data_self_fold):
 
 def test_valid_closed_top(validate, data_closed_top):
     error = validate(data_closed_top)
+    assert(error == [])
+
+def test_valid_inner_shell(validate, data_inner_shell):
+    error = validate(data_inner_shell)
     assert(error == [])

@@ -205,44 +205,44 @@ it explicitly.
   * house with a flat roof (4 triangular faces)
   * valid
 
-# py1
+# py1 / inner_pyramid
   * invalid as outer shell (all normals pointing inwards)
   * a pyramid used as inner shell for cube
   * cube + py1 = valid
 
-# py2
+# py2 / inner_pyramid_1
   * invalid as outer shell (all normals pointing inwards)
   * pyramid touching top face one point. 
   * cube + py2 = valid
   * (Oracle is wrong on that one: oracle=54513)
 
-# py3
+# py3 / 401_1
   * invalid as outer shell (all normals pointing inwards)
   * pyramid intersecting the cube (tip goes through the top face)
   * cube + py3 = invalid
   * (Oracle agrees: oracle=54512)
 
-# py4
+# py4 / 401_6
   * invalid as outer shell (all normals pointing inwards)
   * bottom face is shared with bottom face of the cube
   * cube + py4 = invalid
 
-# py5
+# py5 / inner_pyramid_2
   * invalid as outer shell (all normals pointing inwards)
   * touching py1 at one point
   * cube + py1 + py5 = valid
 
-# py6
+# py6 / inner_pyramid_3
   * invalid as outer shell (all normals pointing inwards)
   * touching py1 along an edge
   * cube + py1 + py6 = valid
 
-# py7 
+# py7 / 401_4
   * invalid as outer shell (all normals pointing inwards)
   * sharing a face with py1 (face connected)
   * cube + py1 + py7 = invalid (2 holes face touching)
 
-# py8
+# py8 / 401_5
   * invalid as outer shell (all normals pointing inwards)
   * sharing *partly* a face with py1 
   * cube + py1 + py8 = invalid (2 holes face touching)
