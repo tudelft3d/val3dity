@@ -50,6 +50,8 @@ public:
     std::cout << "OPTIONS" << std::endl;
     std::list<TCLAP::Arg*> args = c.getArgList();
     for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
+      if ((*it)->getName() == "ishell")
+        continue;
       if ((*it)->getFlag() == "")
         std::cout << "\t--" << (*it)->getName() << std::endl;
       else
@@ -113,7 +115,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either GML (containing several solids/objects), CityJSON, OBJ, OFF, or POLY (one exterior shell only)", 
+                                              "input file in either GML (containing several solids/objects), CityJSON, OBJ, or OFF", 
                                               true, 
                                               "", 
                                               "string");
