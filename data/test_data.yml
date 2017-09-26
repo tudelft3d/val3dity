@@ -61,6 +61,8 @@ test_geometry_generic:
   "401_4": Unit cube with two cavities that share a face
   "401_5": Unit cube with two cavities that partly share a face
   "401_6": Unit cube with a pyramid cavity which bottom face is shared with the bottom face of the cube
+  "402": Duplicate unit cubes
+  "402_1": Unit cube with duplicate cavities
 
 # TODO: write composite test for 105_2
 

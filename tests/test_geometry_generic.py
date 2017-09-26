@@ -291,6 +291,17 @@ def data_401(request, data_geometry_generic):
             data_geometry_generic,
             request.param))
     return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["402.poly",
+                        "402_1.poly"])
+def data_402(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
 #----------------------------------------------------------------------- Tests
 def test_101(validate, data_101):
     error = validate(data_101)
@@ -390,7 +401,9 @@ def test_401(validate, data_401):
     error = validate(data_401)
     assert(error == [401])
 
-## 402
+def test_402(validate, data_402):
+    error = validate(data_402)
+    assert(error == [402])
 
 ## 403
 
