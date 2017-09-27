@@ -739,7 +739,6 @@ bool Surface::validate_ring(Polygon &pgn, std::string id)
   {
     if ( (vi->x() == c1) && (vi->y() == c2))
     {
-      std::cout << "DUPLICATE" << std::endl;
       this->add_error(204, id, " one ring has a 'fold' in it");
       isValid = false;
       break;
