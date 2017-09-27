@@ -1,9 +1,9 @@
 # please quote the nodes, particularly if you are using numbers only, eg "101"
 
 # test case
-test_file_format:
-  
+
 test_geometry_generic:
+  "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
   "101": Cube top face a line (with only 2 vertices)
   "102": Cube with one duplicate vertex (repeated in a ring)
   "104": Unit cube where top face has a bow tie
@@ -53,24 +53,23 @@ test_geometry_generic:
   "307_1": Unit cube with a top surface composed of 2 polygons with opposite orientation
   "309": Unit cube with an unused vertex in OFF
   "309_1": Unit cube with an unused vertex in OBJ
-  "401": Two unit cubes share a face
-  "401_1": "Unit cube with a an inner-pyramid that pierces through the cube top (by 0.00001). Oracle agrees: oracle=54512"
-  "401_2": Unit cube and a pyramid that pierces inside it (by 0.00001)
-  "401_3": Two unit cube partially inside each other (by 0.5)
-  "401_4": Unit cube with two cavities that share a face
-  "401_5": Unit cube with two cavities that partly share a face
-  "401_6": Unit cube with a pyramid cavity which bottom face is shared with the bottom face of the cube
-  "402": Duplicate unit cubes
-  "402_1": Unit cube with duplicate cavities
-  "403": Unit cube with a pyramid cavity that is completely outside of the outer shell of the cube
-  "403_1": Unit cube with a pyramid cavity that is completely outside of the outer shell of the cube, but one face is adjacent to it
-  "404": Unit cube with a cavity that is disconnected (like the diagram for error 205, but in 3D)
+  "401": "+ basecube = An inner-pyramid that pierces through the top of basecube (by 0.00001). Oracle agrees: oracle=54512"
+  "401_1": "+ basecube = An inner-pyramid that is outside of the shell of basecube, but pierces inside it (by 0.00001)"
+  "401_2": "+ inner_shell + basecube = Two cavities in basecube that share a face"
+  "401_3": "+ inner_shell + basecube = Two cavities in basecube that partly share a face"
+  "401_4": "+ basecube = A cavity which bottom face is shared with the bottom face of basecube"
+  "402": "+ basecube = Duplicate unit cubes"
+  "402_1": "+ inner_shell + basecube = Duplicate cavities in basecube"
+  "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
+  "403_1": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube, but one face is adjacent to it"
+  "404": "+ basecube = A cavity that is disconnected (like the diagram for error 205, but in 3D) in basecube"
   "405": Pyramid with the normals pointing inwards
-  "405_1": Unit cube with a cavity (pyramid). The normals of the exterior are pointing inwards, the normals of the inner-shell are pointing outwards of the cube.
 
+# TODO: test 401 with gml, because it is not possible with obj/poly/off
 # TODO: write composite test for 105_2
 
 test_valid:
+  "basecube": Valid unit cube. Used in combination with other shells.
   "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005
   "self_fold": .obj unit cube with a whirl
   "closed_top": Unit cube with a top surface composed of 2 polygons
@@ -79,6 +78,11 @@ test_valid:
   "inner_pyramid_2": Unit cube with two cavities touching at a single point (duplicate vertex)
   "inner_pyramid_3": Unit cube with two cavities touching along an edge (shared edge)
   "inner_pyramid_4": Unit cube with two cavities, one touches a face of the other
+  "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
+  "inner_shell_1": "+ basecube = Unit cube with a cavity where the pyramid touching top face one point. Oracle is wrong on that one: oracle=54513"
+  "inner_shell_2": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching at a single point (duplicate vertex)"
+  "inner_shell_3": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching along an edge (shared edge)"
+  "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
   
   
   

@@ -277,25 +277,62 @@ def data_309(request, data_geometry_generic):
     return(file_path)
 
 
+# @pytest.fixture(scope="module",
+#                 params=["401.poly",
+#                         "401_1.poly",
+#                         "401_2.poly",
+#                         "401_3.poly",
+#                         "401_4.poly",
+#                         "401_5.poly",
+#                         "401_6.poly"])
+# def data_401(request, data_geometry_generic):
+#     file_path = os.path.abspath(
+#         os.path.join(
+#             data_geometry_generic,
+#             request.param))
+#     return(file_path)
+# 
+# 
+# @pytest.fixture(scope="module",
+#                 params=["401_inner1.poly",
+#                         "401_inner2.poly"])
+# def data_401_temp(request, data_geometry_generic, data_basecube):
+#     ishell_path = ["--ishell",
+#                    os.path.abspath(
+#                        os.path.join(data_geometry_generic, request.param)
+#                        )
+#                    ]
+#     inner_outer_path = ishell_path + data_basecube
+#     return(inner_outer_path)
+
+
 @pytest.fixture(scope="module",
                 params=["401.poly",
                         "401_1.poly",
-                        "401_2.poly",
-                        "401_3.poly",
-                        "401_4.poly",
-                        "401_5.poly",
-                        "401_6.poly"])
-def data_401(request, data_geometry_generic):
-    file_path = os.path.abspath(
-        os.path.join(
-            data_geometry_generic,
-            request.param))
-    return(file_path)
+                        ["401_2.poly", "inner_shell.poly"],
+                        ["401_3.poly", "inner_shell.poly"],
+                        "401_4.poly"])
+def data_401(request, data_geometry_generic, data_basecube):
+    ishell = request.param
+    ishell_path = []
+    if isinstance(ishell, list):
+        for i in ishell:
+            i_path = os.path.abspath(
+                        os.path.join(data_geometry_generic, i)
+                        )
+            ishell_path = ishell_path + ["--ishell", i_path]
+    else:
+        ishell_path = ["--ishell",
+                       os.path.abspath(
+                           os.path.join(data_geometry_generic, ishell)
+                           )
+                       ]
+    inner_outer_path = ishell_path + data_basecube
+    return(inner_outer_path)
 
 
 @pytest.fixture(scope="module",
-                params=["402.poly",
-                        "402_1.poly"])
+                params=["402.poly"])
 def data_402(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -305,29 +342,73 @@ def data_402(request, data_geometry_generic):
 
 
 @pytest.fixture(scope="module",
+                params=[["402_1.poly", "inner_shell.poly"]])
+def data_402_1(request, data_geometry_generic, data_basecube):
+    ishell = request.param
+    ishell_path = []
+    if isinstance(ishell, list):
+        for i in ishell:
+            i_path = os.path.abspath(
+                        os.path.join(data_geometry_generic, i)
+                        )
+            ishell_path = ishell_path + ["--ishell", i_path]
+    else:
+        ishell_path = ["--ishell",
+                       os.path.abspath(
+                           os.path.join(data_geometry_generic, ishell)
+                           )
+                       ]
+    inner_outer_path = ishell_path + data_basecube
+    return(inner_outer_path)
+
+
+# @pytest.fixture(scope="module",
+#                 params=["403.poly",
+#                         "403_1.poly"])
+# def data_403(request, data_geometry_generic):
+#     file_path = os.path.abspath(
+#         os.path.join(
+#             data_geometry_generic,
+#             request.param))
+#     return(file_path)
+
+
+@pytest.fixture(scope="module",
                 params=["403.poly",
                         "403_1.poly"])
-def data_403(request, data_geometry_generic):
-    file_path = os.path.abspath(
-        os.path.join(
-            data_geometry_generic,
-            request.param))
-    return(file_path)
+def data_403(request, data_geometry_generic, data_basecube):
+    ishell_path = ["--ishell",
+                   os.path.abspath(
+                       os.path.join(data_geometry_generic, request.param)
+                       )
+                   ]
+    inner_outer_path = ishell_path + data_basecube
+    return(inner_outer_path)
 
+
+# @pytest.fixture(scope="module",
+#                 params=["404.poly"])
+# def data_404(request, data_geometry_generic):
+#     file_path = os.path.abspath(
+#         os.path.join(
+#             data_geometry_generic,
+#             request.param))
+#     return(file_path)
 
 @pytest.fixture(scope="module",
                 params=["404.poly"])
-def data_404(request, data_geometry_generic):
-    file_path = os.path.abspath(
-        os.path.join(
-            data_geometry_generic,
-            request.param))
-    return(file_path)
+def data_404(request, data_geometry_generic, data_basecube):
+    ishell_path = ["--ishell",
+                   os.path.abspath(
+                       os.path.join(data_geometry_generic, request.param)
+                       )
+                   ]
+    inner_outer_path = ishell_path + data_basecube
+    return(inner_outer_path)
 
 
 @pytest.fixture(scope="module",
-                params=["405.poly",
-                        "405_1.poly"])
+                params=["405.poly"])
 def data_405(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -433,8 +514,10 @@ def test_401(validate, data_401):
     error = validate(data_401)
     assert(error == [401])
 
-def test_402(validate, data_402):
+def test_402(validate, data_402, data_402_1):
     error = validate(data_402)
+    assert(error == [402])
+    error = validate(data_402_1)
     assert(error == [402])
 
 def test_403(validate, data_403):

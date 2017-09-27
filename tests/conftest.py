@@ -36,6 +36,15 @@ def val3dity():
     return(os.path.abspath(p))
 
 @pytest.fixture(scope="session")
+def data_basecube():
+    """unit cube that is used in combination with inner-shell testing"""
+    root = os.getcwd()
+    file_path = os.path.abspath(
+        os.path.join(root, "data/test_valid/basecube.poly")
+        )
+    return([file_path])
+
+@pytest.fixture(scope="session")
 def solid():
     """val3dity options for validating a Solid"""
     return(["--unittests", "-p Solid"])
@@ -58,8 +67,16 @@ def validate():
         :return: The error numbers. Empty list if the file is valid.
         :rtype: list
         """
+        try: 
+            assert isinstance(file_path, str)
+            file_path = [file_path]
+        except AssertionError:
+            assert isinstance(file_path, list)
+        except:
+            return
+        assert isinstance(options, list)
         
-        command = [val3dity] + options + [file_path]
+        command = [val3dity] + options + file_path
         
         cp = subprocess.run(command, stdout=subprocess.PIPE,
                             universal_newlines=True)
