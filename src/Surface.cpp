@@ -245,7 +245,7 @@ bool Surface::triangulate_shell()
     //-- get projected Polygon
     Polygon pgn;
     std::vector<Polygon> lsRings;
-    create_polygon(_lsPts, idsob, pgn);
+    create_cgal_polygon(_lsPts, idsob, pgn);
     //-- all polygons should be cw for Triangle
     //-- if reversed then re-reversed later
     bool reversed = false;
@@ -262,7 +262,7 @@ bool Surface::triangulate_shell()
       std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected Polygon
       Polygon pgn;
-      create_polygon(_lsPts, ids2, pgn);
+      create_cgal_polygon(_lsPts, ids2, pgn);
       if (pgn.is_counterclockwise_oriented() == false) {
         pgn.reverse_orientation();
       }
@@ -469,9 +469,9 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     //-- get projected oring
     Polygon pgn;
     std::vector<Polygon> lsRings;
-    if (false == create_polygon(_lsPts, ids, pgn))
+    create_cgal_polygon(_lsPts, ids, pgn);
+    if (validate_ring(pgn, _lsFacesID[i]) == false)
     {
-      this->add_error(104, _lsFacesID[i], " outer ring self-intersects or is collapsed to a line");
       isValid = false;
       continue;
     }
@@ -482,9 +482,9 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected iring
       Polygon pgn;
-      if (false == create_polygon(_lsPts, ids2, pgn))
+      create_cgal_polygon(_lsPts, ids, pgn);
+      if (validate_ring(pgn, _lsFacesID[i]) == false)
       {
-        this->add_error(104, _lsFacesID[i], "Inner ring self-intersects or is collapsed to a line");
         isValid = false;
         continue;
       }
@@ -730,6 +730,33 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
   return true;
 }
 
+bool Surface::validate_ring(Polygon &pgn, std::string id)
+{
+  double c1 = -9999;
+  double c2 = -9999;
+  bool isValid = true;
+  for (Polygon::Vertex_iterator vi = pgn.vertices_begin(); vi != pgn.vertices_end(); ++vi)
+  {
+    if ( (vi->x() == c1) && (vi->y() == c2))
+    {
+      std::cout << "DUPLICATE" << std::endl;
+      this->add_error(204, id, " one ring has a 'fold' in it");
+      isValid = false;
+      break;
+
+    }
+    c1 = vi->x();
+    c2 = vi->y();
+  }
+  if (isValid == false)
+    return false;
+  if ( (!pgn.is_simple()) || (pgn.orientation() == CGAL::COLLINEAR) )
+  {
+    this->add_error(104, id, " outer ring self-intersects or is collapsed to a line");
+    return false;
+  }
+  return true;
+}
 
 bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid)
 {

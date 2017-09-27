@@ -36,7 +36,7 @@ namespace val3dity
 
 bool    cmpPoint3(Point3 &p1, Point3 &p2, double tol);
 int     projection_plane(const std::vector< Point3 > &lsPts, const std::vector<int> &ids);
-bool    create_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn);
+void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn);
 bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance);
 bool    is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance);
 bool    polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &ids, Vector &n);

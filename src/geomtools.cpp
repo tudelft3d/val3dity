@@ -278,7 +278,7 @@ bool polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &
 }  
 
 
-bool create_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn)
+void create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn)
 {
   int proj = projection_plane(lsPts, ids);
   std::vector<int>::const_iterator it = ids.begin();
@@ -292,13 +292,8 @@ bool create_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& id
     else if (proj == 0)
       pgn.push_back(Point2(p.y(), p.z()));
   }
-  
-  if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
-    return false;
-  if (pgn.orientation() == CGAL::COLLINEAR)
-    return false;
-  return true;
 }
+
 
 bool is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance)
 {
