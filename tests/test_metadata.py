@@ -8,7 +8,7 @@ def test_metadata():
     """Check that every test file in /data/test_*/ is documented in test_data.yml"""
     root = os.getcwd()
     data_dir = os.path.join(root, "data")
-    file = os.path.abspath(os.path.join(root, data_dir, "test_data.yml"))
+    file = os.path.abspath(os.path.join(root, data_dir, "test_metadata.yml"))
     
     with open(file, "r") as stream:
         ds = yaml.load(stream)

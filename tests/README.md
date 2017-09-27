@@ -47,9 +47,9 @@ Every **test** tests a particular error, bug. For example the error *101_TOO_FEW
 A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often corner cases of the geometric primitives with certain errors (eg 101).
 Ideally every test has its own data file, where the data file contains *only* the error that the test is testing. The data files are stored separately from the test modules.
 
-Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_data.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
+Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_metadata.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
 
-In `test_data.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
+In `test_metadata.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
 
 ```yaml
 # test case
@@ -74,7 +74,7 @@ data/
 |–– test_empty_files/
 |–– test_valid/
 |–– test_<test case>/
-|-- test_data.yml
+|-- test_metadata.yml
 |–– ...
 ...
 tests/
