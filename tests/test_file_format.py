@@ -21,18 +21,7 @@ def data_file_format():
     return(dir_path)
 
 #------------------------------------------------------------------------ Data
-@pytest.fixture(scope="module",
-                params=["poly_hole.poly"])
-def data_poly_hole(request, data_file_format):
-    file_path = os.path.abspath(
-        os.path.join(
-            data_file_format,
-            request.param))
-    return(file_path)
+
 
 
 #----------------------------------------------------------------------- Tests
-@pytest.mark.skip(reason="POLY files are not intended for citymodels, just for geometry testing")
-def test_poly_hole(validate, data_poly_hole):
-    error = validate(data_poly_hole)
-    assert(error == [901])
