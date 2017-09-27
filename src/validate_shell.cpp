@@ -329,10 +329,13 @@ void ConstructShell<HDS>::add_one_face(CGAL::Polyhedron_incremental_builder_3<HD
   return ;
 } 
 
-bool check_global_orientation_normals( CgalPolyhedron* p, bool bOuter)
+bool check_global_orientation_normals(CgalPolyhedron* p, bool bOuter)
 {
-  return CGAL::Polygon_mesh_processing::is_outward_oriented(*p);
-	   }
+  if (bOuter == true)
+    return CGAL::Polygon_mesh_processing::is_outward_oriented(*p);
+  else
+    return !(CGAL::Polygon_mesh_processing::is_outward_oriented(*p));
+}
 
 
 CgalPolyhedron* construct_CgalPolyhedron_batch(const std::vector< std::vector<int*> >&lsTr, const std::vector<Point3>& lsPts)
