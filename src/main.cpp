@@ -177,9 +177,9 @@ int main(int argc, char* const argv[])
                                               "double");
     TCLAP::ValueArg<double>                 planarity_n_tol("",
                                               "planarity_n_tol",
-                                              "tolerance for planarity based on normals deviation (default=1.0degree)",
+                                              "tolerance for planarity based on normals deviation (default=20.0degree)",
                                               false,
-                                              1.0,
+                                              20.0,
                                               "double");
 
     cmd.add(info);
