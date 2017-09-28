@@ -47,7 +47,7 @@ This ring is for instance invalid:
 
 103 -- NOT_CLOSED 
 -----------------
-*This applies only to GML rings, in OBJ/OFF it's ignored*. The first and last points have to be identical (at the same location). 
+*This applies only to GML rings, in OBJ/OFF it's ignored. The first and last points have to be identical (at the same location). 
 This is verified after the points have been merged with the :ref:`snap_tol` option (default is 0.001unit). 
 
 This ring is for instance invalid:
@@ -67,7 +67,17 @@ This ring is for instance invalid:
 ------------------------
 A ring should be *simple*, ie it should not self-intersect. The self-intersection can be at the location of an explicit point, or not. This case includes rings that are (partly) collapsed to a line for instance.
 
+Observe that self-intersection in 3D and 2D is different, ie a bowtie (the first polygon below) has a self-intersection "in the middle" in 2D, but in 3D if the 4 vertices are not on a plane then there is no intersection.
+
 .. image:: _static/104.png
+
+A ring is self-intersecting if its projection to the best-fitted plane (done with least-square) through the vertices of the polygon containing the ring has a self-intersection.
+This rule is there because if it is not possible to project the rings/polygons to a plane, then it is not possible to triangulate it (which is necessary, at least by val3dity, to validate 3D primitives).
+In the figure below, the left example shows one polygon (the top one) where a projection (let say to the xy-plane) would not cause any self-intersection.
+However, the right example does cause a self-intersection.
+It is the same is the vertices *b* and *c* are projected to the same location: a self-intersection is also returned.
+
+.. image:: _static/104b.png
 
 
 .. _error_201:
