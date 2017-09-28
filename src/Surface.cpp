@@ -237,15 +237,29 @@ bool Surface::triangulate_shell()
       _lsTr.push_back(oneface);
       continue;
     }
-
-    int proj = projection_plane(_lsPts, idsob);
-    Vector v0; 
-    polygon_normal(_lsPts, idsob, v0);
+    
+    std::vector<Point3> allpts;
+    std::vector<int>::const_iterator itp = idsob.begin();
+    for ( ; itp != idsob.end(); itp++)
+      allpts.push_back(_lsPts[*itp]);
+    //-- irings
+    for (int j = 1; j < static_cast<int>(numf); j++)
+    {
+      std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
+      std::vector<int>::const_iterator itp2 = ids2.begin();
+      for ( ; itp2 != ids2.end(); itp2++)
+        allpts.push_back(_lsPts[*itp2]);
+    }
+    CgalPolyhedron::Plane_3 bestfitplane;
+    get_best_fitted_plane(allpts, bestfitplane);
+    
+    // int proj = projection_plane(_lsPts, idsob);
+    // Vector v0 = bestfitplane.orthogonal_vector();
 
     //-- get projected Polygon
     Polygon pgn;
     std::vector<Polygon> lsRings;
-    create_cgal_polygon(_lsPts, idsob, pgn);
+    create_cgal_polygon(_lsPts, idsob, bestfitplane, pgn);
     //-- all polygons should be cw for Triangle
     //-- if reversed then re-reversed later
     bool reversed = false;
@@ -262,7 +276,7 @@ bool Surface::triangulate_shell()
       std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected Polygon
       Polygon pgn;
-      create_cgal_polygon(_lsPts, ids2, pgn);
+      create_cgal_polygon(_lsPts, ids2, bestfitplane, pgn);
       if (pgn.is_counterclockwise_oriented() == false) {
         pgn.reverse_orientation();
       }
@@ -271,7 +285,7 @@ bool Surface::triangulate_shell()
     }
     //-- get projected CT
     std::vector<int*> oneface;
-    if (construct_ct(pgnids, lsRings, oneface, i) == false)
+    if (construct_ct(pgnids, lsRings, oneface, i, bestfitplane) == false)
     {
       this->add_error(999, _lsFacesID[i], "face does not have an outer boundary.");
       return false;
@@ -295,11 +309,11 @@ bool Surface::triangulate_shell()
 }
 
 
-bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum)
+bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane)
 {
   bool isValid = true;
   std::vector<int> ids = pgnids[0];
-  int proj = projection_plane(_lsPts, ids);
+  // int proj = projection_plane(_lsPts, ids);
   CT ct;
   std::vector< std::vector<int> >::const_iterator it = pgnids.begin();
   size_t numpts = 0;
@@ -313,13 +327,8 @@ bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const 
     std::vector<int>::const_iterator it2 = it->begin();
     for ( ; it2 != it->end(); it2++)
     {
-      Point3 p1  = _lsPts[*it2];
-      if (proj == 2)
-        pts2d.push_back( Point2(p1.x(), p1.y()) );
-      else if (proj == 1)
-        pts2d.push_back( Point2(p1.x(), p1.z()) );
-      else
-        pts2d.push_back( Point2(p1.y(), p1.z()) );
+      Point3 p1 = _lsPts[*it2];
+      pts2d.push_back(plane.to_2d(p1));
     }
     std::vector<Point2>::const_iterator itPt;
     CT::Vertex_handle v0;
@@ -458,7 +467,9 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       }
     }
     double value;
-    if (false == is_face_planar_distance2plane(allpts, value, tol_planarity_d2p))
+    CgalPolyhedron::Plane_3 bestfitplane;
+    get_best_fitted_plane(allpts, bestfitplane);
+    if (false == is_face_planar_distance2plane(allpts, bestfitplane, value, tol_planarity_d2p))
     {
       std::stringstream msg;
       msg << "distance to fitted plane: " << value << " (tolerance=" << tol_planarity_d2p << ")";
@@ -469,8 +480,8 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     //-- get projected oring
     Polygon pgn;
     std::vector<Polygon> lsRings;
-    create_cgal_polygon(_lsPts, ids, pgn);
-    if (validate_ring(pgn, _lsFacesID[i]) == false)
+    create_cgal_polygon(_lsPts, ids, bestfitplane, pgn);
+    if (validate_projected_ring(pgn, _lsFacesID[i]) == false)
     {
       isValid = false;
       continue;
@@ -482,8 +493,8 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected iring
       Polygon pgn;
-      create_cgal_polygon(_lsPts, ids, pgn);
-      if (validate_ring(pgn, _lsFacesID[i]) == false)
+      create_cgal_polygon(_lsPts, ids2, bestfitplane, pgn);
+      if (validate_projected_ring(pgn, _lsFacesID[i]) == false)
       {
         isValid = false;
         continue;
@@ -730,32 +741,17 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
   return true;
 }
 
-bool Surface::validate_ring(Polygon &pgn, std::string id)
-{
-  double c1 = -9999;
-  double c2 = -9999;
-  bool isValid = true;
-  for (Polygon::Vertex_iterator vi = pgn.vertices_begin(); vi != pgn.vertices_end(); ++vi)
-  {
-    if ( (vi->x() == c1) && (vi->y() == c2))
-    {
-      this->add_error(204, id, " one ring has a 'fold' in it");
-      isValid = false;
-      break;
 
-    }
-    c1 = vi->x();
-    c2 = vi->y();
-  }
-  if (isValid == false)
-    return false;
+bool Surface::validate_projected_ring(Polygon &pgn, std::string id)
+{
   if ( (!pgn.is_simple()) || (pgn.orientation() == CGAL::COLLINEAR) )
   {
-    this->add_error(104, id, " outer ring self-intersects or is collapsed to a line");
+    this->add_error(104, id, "ring self-intersects or is collapsed to a line");
     return false;
   }
   return true;
 }
+
 
 bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid)
 {

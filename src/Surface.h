@@ -70,9 +70,9 @@ private:
   bool validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
   std::string get_coords_key(Point3* p);
   bool triangulate_shell();
-  bool construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum);
+  bool construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane);
   bool validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid);
-  bool validate_ring(Polygon &pgn, std::string id);
+  bool validate_projected_ring(Polygon &pgn, std::string id);
   bool has_face_rings_toofewpoints(const std::vector< std::vector<int> >& theface);
   bool has_face_2_consecutive_repeated_pts(const std::vector< std::vector<int> >& theface);
   bool contains_nonmanifold_vertices();

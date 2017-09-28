@@ -36,8 +36,11 @@ namespace val3dity
 
 bool    cmpPoint3(Point3 &p1, Point3 &p2, double tol);
 int     projection_plane(const std::vector< Point3 > &lsPts, const std::vector<int> &ids);
-void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn);
-bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance);
+void    get_best_fitted_plane(const std::vector< Point3 > &lsPts, CgalPolyhedron::Plane_3 &plane);
+// void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &outpgn);
+void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, Polygon &outpgn);
+// bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance);
+bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, const CgalPolyhedron::Plane_3 &plane, double& value, float tolerance);
 bool    is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance);
 bool    polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &ids, Vector &n);
 
