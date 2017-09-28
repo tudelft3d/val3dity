@@ -238,26 +238,6 @@ bool is_face_planar_distance2plane(const std::vector<Point3> &pts, const CgalPol
 }
 
 
-int projection_plane(const std::vector< Point3 > &lsPts, const std::vector<int> &ids)
-{
-  Vector n;
-  polygon_normal(lsPts, ids, n);
-  double maxcomp = std::abs(n.x());
-  int proj = 0;
-  if (std::abs(n.y()) > maxcomp)
-  {
-    maxcomp = std::abs(n.y());
-    proj = 1;
-  }
-  if (std::abs(n.z()) > maxcomp)
-  {
-    maxcomp = std::abs(n.z());
-    proj = 2;
-  }
-  return proj;
-}
-
-
 bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 {
   if ( (p1 == p2) || (CGAL::squared_distance(p1, p2) <= (tol * tol)) )
@@ -265,19 +245,6 @@ bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
   else
     return false;
 }
-
-
-bool polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &ids, Vector &n)
-{
-  std::vector<Point3> pts;
-  for (auto& i : ids) 
-    pts.push_back(lsPts[i]);
-  CgalPolyhedron::Plane_3 plane;
-  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>()); 
-  n = plane.orthogonal_vector();
-  // Vector order = CGAL::unit_normal()
-  return true;
-}  
 
 
 void create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, Polygon &outpgn)
