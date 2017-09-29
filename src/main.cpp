@@ -35,9 +35,9 @@
 using namespace std;
 using namespace val3dity;
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs);
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs);
-void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -543,7 +543,7 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
 }
 
 
-std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs)
+std::string print_summary_validation(std::map<std::string,std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -639,8 +639,8 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
 
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
-                      std::map<std::string, std::vector<Primitive*> >& dPrimitives,
-                      std::map<std::string, COError >& dCOerrors,
+                      std::map<std::string, std::vector<Primitive*>>& dPrimitives,
+                      std::map<std::string, COError>& dCOerrors,
                       double snap_tol,
                       double overlap_tol,
                       double planarity_d2p_tol,
