@@ -73,7 +73,7 @@ void ConstructShell<HDS>::operator()( HDS& hds)
   if (isValid)
   {
     if (B.check_unconnected_vertices() == true) {
-      sh->add_error(309);
+      // sh->add_error(309);
       B.remove_unconnected_vertices();
     }
   }

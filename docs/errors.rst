@@ -211,13 +211,6 @@ The left shell is valid while the right one is invalid.
 --------------------------------
 If one polygon is used to construct a shell, its exterior ring must be oriented in such as way that when viewed from outside the shell the points are ordered counterclockwise.
 
-.. _error_309:
-
-309 -- VERTICES_NOT_USED
-------------------------
-In an OBJ/OFF/POLY, all the vertices are listed and the primitives use references to these. 
-If some vertices are not used then this error is reported.
-(City)GML cannot report this error
 
 .. _error_401:
 

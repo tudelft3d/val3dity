@@ -121,7 +121,7 @@ std::string errorcode2description(int code) {
     case 305: return string("SEPARATE_PARTS"); break;
     case 306: return string("SHELL_SELF_INTERSECTION"); break;
     case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
-    case 309: return string("VERTICES_NOT_USED"); break;
+    // case 309: return string("VERTICES_NOT_USED"); break;
     //-- SOLID & MULTISOLID
     case 401: return string("INTERSECTION_SHELLS"); break;
     case 402: return string("DUPLICATED_SHELLS"); break;
