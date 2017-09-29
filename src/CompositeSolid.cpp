@@ -93,7 +93,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         if (*lsNefs[i] == *lsNefs[j])
         {
           std::stringstream msg;
-          msg << _lsSolids[i]->get_id() << " & " << _lsSolids[j]->get_id();
+          msg << _lsSolids[i]->get_id() << " and " << _lsSolids[j]->get_id();
           this->add_error(502, msg.str(), "");
           isValid = false;
         }
@@ -123,7 +123,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           if (a->interior() * b->interior() != emptynef)
           {
             std::stringstream msg;
-            msg << _lsSolids[i]->get_id() << " & " << _lsSolids[j]->get_id();
+            msg << _lsSolids[i]->get_id() << " and " << _lsSolids[j]->get_id();
             this->add_error(501, msg.str(), "");
             isValid = false;
           }
@@ -155,7 +155,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
       if (unioned.number_of_volumes() != 2)
       {
         std::stringstream msg;
-        msg << "-->CompositeSolid is formed of " << (unioned.number_of_volumes() - 1) << " parts";
+        msg << "CompositeSolid is formed of " << (unioned.number_of_volumes() - 1) << " parts";
         this->add_error(503, "", msg.str());
         isValid = false;
       }
