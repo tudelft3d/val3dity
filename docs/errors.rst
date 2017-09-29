@@ -47,7 +47,8 @@ This ring is for instance invalid:
 
 103 -- NOT_CLOSED 
 -----------------
-*This applies only to GML rings, in OBJ/OFF it's ignored. The first and last points have to be identical (at the same location). 
+*This applies only to GML rings, in OBJ/OFF it's ignored.* 
+The first and last points have to be identical (at the same location). 
 This is verified after the points have been merged with the :ref:`snap_tol` option (default is 0.001unit). 
 
 This ring is for instance invalid:
