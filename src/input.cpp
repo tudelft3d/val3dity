@@ -137,7 +137,7 @@ std::string errorcode2description(int code) {
     case 302: return string("SHELL_NOT_CLOSED"); break;
     case 303: return string("NON_MANIFOLD_VERTEX"); break;
     case 304: return string("NON_MANIFOLD_EDGE"); break;
-    case 305: return string("SEPARATE_PARTS"); break;
+    case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
     case 306: return string("SHELL_SELF_INTERSECTION"); break;
     case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
     // case 309: return string("VERTICES_NOT_USED"); break;
