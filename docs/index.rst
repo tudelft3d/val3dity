@@ -10,10 +10,10 @@ val3dity
 
 (version |release|)
 
-Validation of 3D primitives according to the international standard ISO19107.
+val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
 Think of it as `PostGIS ST_IsValid  <http://postgis.net/docs/ST_IsValid.html>`_, but for 3D primitives (PostGIS is only for 2D ones).
 
-It allows us to validate a 3D primitive, ie to verify whether it respects the definition as given in `ISO19107 <http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012>`_ and GML/CityGML.
+In short, it verifies whether a 3D primitive respects the definition as given in `ISO19107 <http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012>`_ and GML/CityGML.
 All the 3D primitives of GML are supported:
 
   - ``<gml:MultiSurface>``
@@ -23,7 +23,7 @@ All the 3D primitives of GML are supported:
   - ``<gml:CompositeSolid>``
 
 Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported, and so are cavities in solids (also called voids or inner shells).
-However, as is the case for CityGML, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported (and there is no plan to do so!).
+However, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported (and there is no plan to do so!).
 
 val3dity accepts as input:
 
@@ -47,6 +47,5 @@ val3dity accepts as input:
   usage
   errors
   faq
-  changelog
   contact
 
