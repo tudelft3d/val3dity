@@ -1,6 +1,5 @@
-
 /*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -97,87 +96,6 @@ void ConstructShell<HDS>::construct_faces_order_given(CGAL::Polyhedron_increment
   }
 }
 
-//  void construct_faces_keep_adjcent(CGAL::Polyhedron_incremental_builder_3<HDS>& B, cbf cb)
-//  {
-//    //-- build a 2D-matrix of usage for each edge
-//    int size = static_cast<int>((*lsPts).size());
-//    bool halfedges[size*size];
-//    for (int i = 0; i <= (size*size); i++)
-//      halfedges[i] = false;
-//    
-//    //-- start with the first face (not only 1st triangle, first original face)
-//    std::vector< std::vector<int*> >::const_iterator itF = faces->begin();
-//    std::vector<int*>::const_iterator itF2 = itF->begin();
-//    for ( ; itF2 != itF->end(); itF2++)
-//    {
-//      int* a = *itF2;
-//      std::std::vector< std::size_t> faceids(3);        
-//      faceids[0] = a[0];
-//      faceids[1] = a[1];
-//      faceids[2] = a[2];
-//      B.add_facet(faceids.begin(), faceids.end());
-//      halfedges[m2a(a[0], a[1])] = true;
-//      halfedges[m2a(a[1], a[2])] = true;
-//      halfedges[m2a(a[2], a[0])] = true;
-//    }
-//    itF++;
-//
-//    //-- process the other faces
-//    int faceID = 0;
-//    for ( ; itF != faces->end(); itF++)
-//    {
-//      itF2 = itF->begin();
-//      for ( ; itF2 != itF->end(); itF2++)
-//      {
-//        int* a = *itF2;
-//        std::std::vector< std::size_t> faceids(3);        
-//        faceids[0] = a[0];
-//        faceids[1] = a[1];
-//        faceids[2] = a[2];
-//        if ( (B.test_facet(faceids.begin(), faceids.end()) ==  true) && (is_connected(a, halfedges) == true) )
-//        {
-//          B.add_facet(faceids.begin(), faceids.end());
-//          halfedges[m2a(a[0], a[1])] = true;
-//          halfedges[m2a(a[1], a[2])] = true;
-//          halfedges[m2a(a[2], a[0])] = true;
-//        }
-//      }
-//      faceID++;
-//    }
-//    
-//    /////////////////////////////////////////////////
-//    
-//
-//    while (trFaces.size() > 0)
-//    {
-//      bool success = false;
-//      for (list<int*>::iterator it1 = trFaces.begin(); it1 != trFaces.end(); it1++)
-//      {
-//        int* a = *it1;
-//        std::std::vector< std::size_t> faceids(3);        
-//        faceids[0] = a[0];
-//        faceids[1] = a[1];
-//        faceids[2] = a[2];
-////        cout << B.test_facet(faceids.begin(), faceids.end()) << endl;
-////        cout << is_connected(a, halfedges) << endl;
-//        if ( (B.test_facet(faceids.begin(), faceids.end()) ==  true) && (is_connected(a, halfedges) == true) )
-//        {
-//          B.add_facet(faceids.begin(), faceids.end());
-//          cout << "face added\n";
-//          halfedges[m2a(a[0],a[1])] = true;
-//          halfedges[m2a(a[1],a[2])] = true;
-//          halfedges[m2a(a[2],a[0])] = true;
-//          trFaces.erase(it1);
-//          success = true;
-//          break;
-//        }
-//      }
-//      if (success == false)
-//      {
-//        (*cb)(304, shellID, 0, "");       
-//      }
-//    }
-//  }
 
 template <class HDS>
 int ConstructShell<HDS>::m2a(int m, int n)
