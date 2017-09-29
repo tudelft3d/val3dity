@@ -141,6 +141,43 @@ std::string Solid::get_poly_representation()
   return s.str();
 }
 
+
+json Solid::get_report_json()
+{
+  json j;
+  j["type"] = "Solid";
+  if (this->get_id() != "")
+    j["id"] = this->_id;
+  else
+    j["id"] = "none";
+  j["numbershells"] = (this->num_ishells() + 1);
+  j["numberfaces"] = this->num_faces();
+  j["numbervertices"] = this->num_vertices();
+  j["errors"];
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j["errors"].push_back(jj);
+    }
+  }
+  for (auto& sh : _shells)
+    for (auto& each: sh->get_report_json())
+      j["errors"].push_back(each); 
+  if (j["errors"].is_null() == true)
+    j["validity"] = true;
+  else 
+    j["validity"] = false;
+  return j;
+}
+
+
 std::string Solid::get_report_xml()
 {
   std::stringstream ss;

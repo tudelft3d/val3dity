@@ -75,6 +75,25 @@ std::string IOErrors::get_report_text()
 }
 
 
+json IOErrors::get_report_json()
+{
+  json j;
+  for (auto& err : _errors)
+  {
+    for (auto i : err.second)
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = err.first;
+      jj["description"] = errorcode2description(err.first);
+      jj["info"] = i;
+      j.push_back(jj);
+    }
+  }
+  return j;
+}
+
+
 std::string IOErrors::get_report_xml()
 {
   std::stringstream ss;
@@ -774,6 +793,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
   citygml_objects_walker walker;
   doc.traverse(walker);
   std::cout << "# City Objects found: " << walker.lsNodes.size() << std::endl;
+  int cocounter = 0;
   //-- for each City Object parse its primitives
   for (auto& co : walker.lsNodes)
   {
@@ -781,6 +801,12 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
     coid += "|";
     if (co.attribute("gml:id") != 0)
       coid += co.attribute("gml:id").value();
+    else
+    {
+      coid += "ATTRIBUTE_MISSING_";
+      coid += std::to_string(cocounter);
+      cocounter++;
+    }
     primitives_walker walker2;
     co.traverse(walker2);
     for (auto& prim : walker2.lsNodes)
@@ -813,7 +839,6 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
       } 
     }
   }
-
 }
 
 void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)

@@ -17,6 +17,8 @@
 
 using namespace std;
 
+
+
 namespace val3dity
 {
 
@@ -79,6 +81,26 @@ std::set<int> Surface::get_unique_error_codes()
     errs.insert(std::get<0>(err));
   }
   return errs;
+}
+
+
+json Surface::get_report_json()
+{
+  json j;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])    
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j.push_back(jj);
+    }
+  }
+  return j;
 }
 
 
