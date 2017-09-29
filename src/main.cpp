@@ -157,6 +157,10 @@ int main(int argc, char* const argv[])
                                               "onlyinvalid",
                                               "only invalid primitives are reported",
                                               false);
+    TCLAP::SwitchArg                        ignore204("",
+                                              "ignore204",
+                                              "ignore error 204",
+                                              false);    
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
                                               "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
@@ -190,6 +194,7 @@ int main(int argc, char* const argv[])
     cmd.add(notranslate);
     cmd.add(verbose);
     cmd.add(primitives);
+    cmd.add(ignore204);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(inputfile);
@@ -397,16 +402,19 @@ int main(int argc, char* const argv[])
       std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
     }
     
+    double planarity_n_tol_updated = planarity_n_tol.getValue();
     //-- report on parameters used
     if (ioerrs.has_errors() == false)
     {
+      if (ignore204.getValue() == true)
+        planarity_n_tol_updated = 180.0;
       std::cout << "Parameters used for validation:" << std::endl;
       if (snap_tol.getValue() < 1e-8)
         std::cout << "   snap_tol"    << setw(22)  << "none" << std::endl;
       else
         std::cout << "   snap_tol"    << setw(22)  << snap_tol.getValue() << std::endl;
       std::cout << "   planarity_d2p_tol"     << setw(13)  << planarity_d2p_tol.getValue() << std::endl;
-      std::cout << "   planarity_n_tol"       << setw(15) << planarity_n_tol.getValue() << std::endl;
+      std::cout << "   planarity_n_tol"       << setw(15) << planarity_n_tol_updated << std::endl;
       if (overlap_tol.getValue() < 1e-8)
         std::cout << "   overlap_tol" << setw(19)  << "none" << std::endl;
       else
@@ -430,7 +438,7 @@ int main(int argc, char* const argv[])
           std::clog << "type: ";
           if (p->get_id() != "")
             std::clog << "id: " << p->get_id() << std::endl;
-          if (p->validate(planarity_d2p_tol.getValue(), planarity_n_tol.getValue(), overlap_tol.getValue()) == false)
+          if (p->validate(planarity_d2p_tol.getValue(), planarity_n_tol_updated, overlap_tol.getValue()) == false)
           {
             std::clog << "======== INVALID ========" << std::endl;
             bValid = false;
@@ -472,7 +480,7 @@ int main(int argc, char* const argv[])
                          snap_tol.getValue(),
                          overlap_tol.getValue(),
                          planarity_d2p_tol.getValue(),
-                         planarity_n_tol.getValue(),
+                         planarity_n_tol_updated,
                          ioerrs,
                          onlyinvalid.getValue());
         thereport.close();
