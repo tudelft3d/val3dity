@@ -642,9 +642,11 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
       {
         Solid* s = new Solid(theid);
         bool oshell = true;
+        int c = 0;
         for (auto& shell : g["boundaries"]) 
         {
-          Surface* sh = new Surface(-1, tol_snap);
+          Surface* sh = new Surface(c, tol_snap);
+          c++;
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, j, sh);
