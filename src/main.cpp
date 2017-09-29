@@ -39,7 +39,7 @@ using json = nlohmann::json;
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
-void write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+void write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -611,16 +611,16 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
   //-- overview of errors
   std::map<int,int> errors;
   for (auto& co : dPrimitives) {
-    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+    if (dCOerrors.find(co.first) != dCOerrors.end())
+      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
         errors[code] = 0;
     for (auto& p : co.second)
       for (auto& code : p->get_unique_error_codes())
         errors[code] = 0;
   }
   for (auto& co : dPrimitives) {
-    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+    if (dCOerrors.find(co.first) != dCOerrors.end())
+      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
         errors[code] += 1;
     for (auto& p : co.second)
       for (auto& code : p->get_unique_error_codes())
@@ -650,7 +650,7 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
 void write_report_json(json& jr,
                        std::string ifile, 
                        std::map<std::string, std::vector<Primitive*> >& dPrimitives,
-                       std::map<std::string, COError >& dPrimitivesErrors,
+                       std::map<std::string, COError >& dCOerrors,
                        double snap_tol,
                        double overlap_tol,
                        double planarity_d2p_tol,
@@ -691,16 +691,16 @@ void write_report_json(json& jr,
   // "overview-errors-primitives": [5, 1],
   std::map<int,int> errors;
   for (auto& co : dPrimitives) {
-    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+    if (dCOerrors.find(co.first) != dCOerrors.end())
+      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
         errors[code] = 0;
     for (auto& p : co.second)
       for (auto& code : p->get_unique_error_codes())
         errors[code] = 0;
   }
   for (auto& co : dPrimitives) {
-    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-      for (auto& code : dPrimitivesErrors[co.first].get_unique_error_codes())
+    if (dCOerrors.find(co.first) != dCOerrors.end())
+      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
         errors[code] += 1;
     for (auto& p : co.second)
       for (auto& code : p->get_unique_error_codes())
@@ -725,7 +725,7 @@ void write_report_json(json& jr,
     int coInvalid = 0;
     for (auto& co : dPrimitives)
     {
-      if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      if (dCOerrors.find(co.first) != dCOerrors.end())
       {
         coInvalid++;
         continue;
@@ -771,9 +771,9 @@ void write_report_json(json& jr,
         bool isValid = true;
         j["type"] = cotype;
         j["errors"];
-        if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+        if (dCOerrors.find(co.first) != dCOerrors.end())
         {
-          for (auto& each: dPrimitivesErrors[co.first].get_report_json())
+          for (auto& each: dCOerrors[co.first].get_report_json())
           {
             j["errors"].push_back(each);
             isValid = false;
