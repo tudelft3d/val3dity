@@ -20,6 +20,7 @@ using namespace std;
 namespace val3dity
 {
 
+
 Surface::Surface(int id, double tol_snap)
 {
   _id = id;
@@ -311,9 +312,7 @@ bool Surface::triangulate_shell()
 
 bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane)
 {
-  bool isValid = true;
   std::vector<int> ids = pgnids[0];
-  // int proj = projection_plane(_lsPts, ids);
   CT ct;
   std::vector< std::vector<int> >::const_iterator it = pgnids.begin();
   size_t numpts = 0;
@@ -338,53 +337,37 @@ bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const 
     v0 = ct.insert(*itPt);
     firstv = v0;
     it2 = it->begin();
-    v0->info() = *it2;
+    v0->id() = *it2;
     itPt++;
     it2++;
     for (; itPt != pts2d.end(); itPt++)
     {
       v1 = ct.insert(*itPt);
-      v1->info() = *it2;
+      v1->id() = *it2;
       ct.insert_constraint(v0, v1);
       v0 = v1;
       it2++;
     }
     ct.insert_constraint(v0,firstv);
-  } 
-  //-- fetch all the triangles forming the polygon (with holes)
-  CT::Finite_faces_iterator fi = ct.finite_faces_begin();
-  for( ; fi != ct.finite_faces_end(); fi++)
+  }
+  //Mark facets that are inside the domain bounded by the polygon
+  mark_domains(ct); 
+  if (!ct.is_valid()) 
+    return false;
+    
+  for (CT::Finite_faces_iterator fit = ct.finite_faces_begin();
+       fit != ct.finite_faces_end(); 
+       ++fit) 
   {
-    Point2 centre = barycenter( ct.triangle(fi).vertex(0), 1,
-                               ct.triangle(fi).vertex(1), 1,
-                               ct.triangle(fi).vertex(2), 1);
-    bool inside = true;
-    if (lsRings[0].has_on_negative_side(centre))
-      inside = false;
-    else
-    {
-      std::vector<Polygon>::const_iterator itpgn = lsRings.begin();
-      itpgn++;
-      for ( ; itpgn != lsRings.end(); itpgn++)   //-- check irings
-      {
-        if (itpgn->has_on_positive_side(centre))
-        {
-          inside = false;
-          break;
-        }
-      }
-    }
-    if (inside == true)
-    {
-      //-- add the IDs to the face
+    if (fit->info().in_domain()) {
       int* tr = new int[3];
-      tr[0] = fi->vertex(0)->info();
-      tr[1] = fi->vertex(1)->info();
-      tr[2] = fi->vertex(2)->info();
+      tr[0] = fit->vertex(0)->id();
+      tr[1] = fit->vertex(1)->id();
+      tr[2] = fit->vertex(2)->id();
       oneface.push_back(tr);
     }
   }
-  return isValid;
+  return true;
 }
 
 

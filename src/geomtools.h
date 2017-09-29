@@ -40,6 +40,9 @@ void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<
 bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, const CgalPolyhedron::Plane_3 &plane, double& value, float tolerance);
 bool    is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance);
 
+void mark_domains(CT& ct);
+void mark_domains(CT& ct, CT::Face_handle start, int index, std::list<CT::Edge>& border);
+
 Nef_polyhedron* dilate_nef_polyhedron(Nef_polyhedron* nef, float r);
 Nef_polyhedron* erode_nef_polyhedron (Nef_polyhedron* nef, float r);
 Nef_polyhedron* get_structuring_element_cube(float r);

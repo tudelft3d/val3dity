@@ -33,6 +33,55 @@
 namespace val3dity
 {
 
+void mark_domains(CT& ct,
+  CT::Face_handle start,
+  int index,
+  std::list<CT::Edge>& border) 
+{
+  if (start->info().nesting_level != -1) {
+    return;
+  }
+  std::list<CT::Face_handle> queue;
+  queue.push_back(start);
+  while (!queue.empty()) {
+    CT::Face_handle fh = queue.front();
+    queue.pop_front();
+    if (fh->info().nesting_level == -1) {
+      fh->info().nesting_level = index;
+      for (int i = 0; i < 3; i++) {
+        CT::Edge e(fh, i);
+        CT::Face_handle n = fh->neighbor(i);
+        if (n->info().nesting_level == -1) {
+          if (ct.is_constrained(e)) border.push_back(e);
+          else queue.push_back(n);
+        }
+      }
+    }
+  }
+}
+
+//explore set of facets connected with non constrained edges,
+//and attribute to each such set a nesting level.
+//We start from facets incident to the infinite vertex, with a nesting
+//level of 0. Then we recursively consider the non-explored facets incident 
+//to constrained edges bounding the former set and increase the nesting level by 1.
+//Facets in the domain are those with an odd nesting level.
+void mark_domains(CT& ct) {
+  for (CT::All_faces_iterator it = ct.all_faces_begin(); it != ct.all_faces_end(); ++it) {
+    it->info().nesting_level = -1;
+  }
+  std::list<CT::Edge> border;
+  mark_domains(ct, ct.infinite_face(), 0, border);
+  while (!border.empty()) {
+    CT::Edge e = border.front();
+    border.pop_front();
+    CT::Face_handle n = e.first->neighbor(e.second);
+    if (n->info().nesting_level == -1) {
+      mark_domains(ct, n, e.first->info().nesting_level + 1, border);
+    }
+  }
+}  
+
 Nef_polyhedron* get_structuring_element_dodecahedron(float r)
 {
   std::stringstream ss;
