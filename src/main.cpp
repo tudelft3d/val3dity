@@ -35,9 +35,9 @@
 using namespace std;
 using namespace val3dity;
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs);
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs);
-void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+std::string print_summary_validation(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs);
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs);
+void write_report_xml(std::ofstream& ss, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -202,9 +202,13 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-
-    std::map<std::string, std::vector<Primitive*> > dPrimitives;
-    std::map<std::string, COError > dPrimitivesErrors;
+    //-- dico with Primitives
+    //-- ["Primitives"] --> [] if there are no CityObjects, thus dPrimitives.size() == 1
+    //-- ["Building|id2"] --> [] if there are CityObjects
+    std::map<std::string, std::vector<Primitive*>> dPrimitives;
+    //-- if a CO has errors specific to it (6xx), then its key is also in that dico
+    std::map<std::string, COError> dCOerrors;
+    
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
     if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
@@ -454,7 +458,7 @@ int main(int argc, char* const argv[])
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
             std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
-            dPrimitivesErrors[co.first] = coerrs;
+            dCOerrors[co.first] = coerrs;
           }
         }
       }
@@ -464,11 +468,11 @@ int main(int argc, char* const argv[])
 
     if (unittests.getValue() == true)
     {
-      std::cout << "\n" << unit_test(dPrimitives, dPrimitivesErrors, ioerrs) << std::endl;
+      std::cout << "\n" << unit_test(dPrimitives, dCOerrors, ioerrs) << std::endl;
     }
     else {
       //-- print summary of errors
-      std::cout << "\n" << print_summary_validation(dPrimitives, dPrimitivesErrors, ioerrs) << std::endl;        
+      std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
       if (report.getValue() != "")
       {
         std::ofstream thereport;
@@ -476,7 +480,7 @@ int main(int argc, char* const argv[])
         write_report_xml(thereport, 
                          inputfile.getValue(),
                          dPrimitives,
-                         dPrimitivesErrors,
+                         dCOerrors,
                          snap_tol.getValue(),
                          overlap_tol.getValue(),
                          planarity_d2p_tol.getValue(),
@@ -505,7 +509,7 @@ int main(int argc, char* const argv[])
 }
 
 
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs)
+std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -518,8 +522,8 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
 
   for (auto& co : dPrimitives)
   {
-    if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-      for (auto& each : dPrimitivesErrors[co.first].get_unique_error_codes())
+    if (dCOerrors.find(co.first) != dCOerrors.end())
+      for (auto& each : dCOerrors[co.first].get_unique_error_codes())
         theerrors.insert(each);
     for (auto& p : co.second)
       for (auto& each : p->get_unique_error_codes())
@@ -539,7 +543,7 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
 }
 
 
-std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dPrimitivesErrors, IOErrors& ioerrs)
+std::string print_summary_validation(std::map<std::string,std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -555,7 +559,7 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
     int coInvalid = 0;
     for (auto& co : dPrimitives)
     {
-      if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      if (dCOerrors.find(co.first) != dCOerrors.end())
       {
         coInvalid++;
         continue;
@@ -636,7 +640,7 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
 void write_report_xml(std::ofstream& ss,
                       std::string ifile, 
                       std::map<std::string, std::vector<Primitive*> >& dPrimitives,
-                      std::map<std::string, COError >& dPrimitivesErrors,
+                      std::map<std::string, COError >& dCOerrors,
                       double snap_tol,
                       double overlap_tol,
                       double planarity_d2p_tol,
@@ -669,7 +673,7 @@ void write_report_xml(std::ofstream& ss,
     int coInvalid = 0;
     for (auto& co : dPrimitives)
     {
-      if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
+      if (dCOerrors.find(co.first) != dCOerrors.end())
       {
         coInvalid++;
         continue;
@@ -717,8 +721,8 @@ void write_report_xml(std::ofstream& ss,
         std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
         ss << "<" << cotype << ">" << std::endl;
         ss << "<id>" << coid << "</id>" << std::endl;
-        if (dPrimitivesErrors.find(co.first) != dPrimitivesErrors.end())
-          ss << dPrimitivesErrors[co.first].get_report_xml();
+        if (dCOerrors.find(co.first) != dCOerrors.end())
+          ss << dCOerrors[co.first].get_report_xml();
         for (auto& p : co.second)
         {
           if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
