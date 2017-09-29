@@ -803,40 +803,30 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
       coid += co.attribute("gml:id").value();
     else
     {
-      coid += "ATTRIBUTE_MISSING_";
+      coid += "MISSING_ID_";
       coid += std::to_string(cocounter);
       cocounter++;
     }
     primitives_walker walker2;
     co.traverse(walker2);
+    int pcounter = 0;
     for (auto& prim : walker2.lsNodes)
     {
-      std::string typeprim = remove_xml_namespace(prim.name());
+      Primitive* p;
       if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
-      {
-        Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
-        dPrimitives[coid].push_back(p);
-      }
+        p = process_gml_solid(prim, dallpoly, tol_snap, errs);
       else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
-      {
-        MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
-        dPrimitives[coid].push_back(p);
-      }      
+        p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
       else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
-      {
-        CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
-        dPrimitives[coid].push_back(p);
-      }
+        p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
       else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
-      {
-        MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
-        dPrimitives[coid].push_back(p);
-      } 
+        p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
       else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
-      {
-        CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
-        dPrimitives[coid].push_back(p);
-      } 
+        p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+      if (p->get_id() == "")
+        p->set_id("MISSING_ID_" + std::to_string(pcounter));
+      dPrimitives[coid].push_back(p);
+      pcounter++;
     }
   }
 }
