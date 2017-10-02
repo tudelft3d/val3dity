@@ -10,9 +10,6 @@ test_geometry_generic:
   "104_1": Unit cube with top face having a self-intersecting surface (2D invalid), where 2 out of 3 triangles that are forming a square are bundled as one polygon (which self-intersects)
   "104_2": One face closing in itself before the last vertex
   "104_3": Similar to 104_1 but triangles meet in one corner of the square
-  "105": Unit cube with a hole (inner ring) in the top face, where inner ring is collapsed to a line of 3 points
-  "105_1": A single 3D polygon collapsed into a line
-  "105_2": As 105_2, but with 4 points in a line (8-11), the 4th point is intersecting one edge (5-6) (currently val3dity cannot parse it). This is 104 & 105
   "201": Unit cube with intersecting rings in top face
   "201_1": A single 3D polygon with an interior ring that instersects its exterior
   "201_2": Unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point

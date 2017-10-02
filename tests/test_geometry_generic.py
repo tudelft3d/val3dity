@@ -56,17 +56,6 @@ def data_104(request, data_geometry_generic):
 
 
 @pytest.fixture(scope="module",
-                params=["105.poly",
-                        "105_1.poly"])
-def data_105(request, data_geometry_generic):
-    file_path = os.path.abspath(
-        os.path.join(
-            data_geometry_generic,
-            request.param))
-    return(file_path)
-
-
-@pytest.fixture(scope="module",
                 params=["201.poly",
                         "201_1.poly",
                         "201_2.poly"])
@@ -374,11 +363,6 @@ def test_102(validate, data_102):
 def test_104(validate, data_104):
     error = validate(data_104)
     assert(error == [104])
-
-@pytest.mark.skip(reason="error 105 is a subclass of 104 and not possible to ditinguish")
-def test_105(validate, data_105):
-    error = validate(data_105)
-    assert(error == [105])
 
 def test_201(validate, data_201):
     error = validate(data_201)
