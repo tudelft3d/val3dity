@@ -4,6 +4,59 @@ Error cases that are only relevant for a particular format and
 cannot be modelled by each format, thus don't belong to *Geometry errors*
 (eg 601).
 """
+import pytest
+import os.path
+
+#----------------------------------------------------------------- Data folder
+@pytest.fixture(scope="module")
+def data_geometry_specific():
+    """path to the data for test_geometry_specific"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_geometry_specific")
+    return(dir_path)
+
+#------------------------------------------------------------------------ Data
+@pytest.fixture(scope="module",
+                params=["501.gml",
+                        "501_1.gml"])
+def data_501(request, data_geometry_specific):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_specific,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["502.gml"])
+def data_502(request, data_geometry_specific):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_specific,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["503.gml"])
+def data_503(request, data_geometry_specific):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_specific,
+            request.param))
+    return(file_path)
+#----------------------------------------------------------------------- Tests
+def test_501(validate, data_501, citymodel):
+    error = validate(data_501, options=citymodel)
+    assert(error == [501])
+
+def test_502(validate, data_502, citymodel):
+    error = validate(data_502, options=citymodel)
+    assert(error == [502])
+
+def test_503(validate, data_503, citymodel):
+    error = validate(data_503, options=citymodel)
+    assert(error == [503])
 
 ## 103
 

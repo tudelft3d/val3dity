@@ -351,6 +351,7 @@ def data_405(request, data_geometry_generic):
             data_geometry_generic,
             request.param))
     return(file_path)
+
 #----------------------------------------------------------------------- Tests
 def test_101(validate, data_101):
     error = validate(data_101)
@@ -463,9 +464,3 @@ def test_404(validate, data_404):
 def test_405(validate, data_405):
     error = validate(data_405)
     assert(error == [405])
-
-## 501
-
-## 502
-
-## 503

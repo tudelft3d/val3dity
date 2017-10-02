@@ -60,8 +60,15 @@ test_geometry_generic:
   "404": "+ basecube = A cavity that is disconnected (like the diagram for error 205, but in 3D) in basecube"
   "405": Pyramid with the normals pointing inwards
 
+
 # TODO: test 401 with gml, because it is not possible with obj/poly/off
 # TODO: write composite test for 105_2
+
+test_geometry_specific:
+  "501": CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
+  "501_1": CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
+  "502": CompositeSolid with 3 cubes, where cube 1-2 are identical
+  "503": CompositeSolid with 3 cubes, where cube 1 is not connected to other
 
 test_valid:
   "basecube": Valid unit cube. Used in combination with other shells.

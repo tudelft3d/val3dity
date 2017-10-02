@@ -9,17 +9,17 @@ a dummy GenericGML is put instead
 valid
 
 
-# csol2.gml
+# csol2.gml / 501
 CompositeSolid with 3 cubes adjacent
 cube 1-2 overlap by 1cm
 invalid: 501
 
-# csol3.gml
+# csol3.gml / 503
 CompositeSolid with 3 cubes 
 cube 1 is not connected to other
 invalid: 503
 
-# csol4.gml
+# csol4.gml / 502
 CompositeSolid with 3 cubes
 cube 1-2 are identical 
 invalid: 502
@@ -38,7 +38,7 @@ invalid: 302
 CompositeSolid with: (1) cube+py1; (2) py1 filling the void
 valid
 
-# csol8.gml
+# csol8.gml / 501_1
 CompositeSolid with: (1) cube+py1; (2) py1 filling the void
 but intersection of the two
 invalid: 501
