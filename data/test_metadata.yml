@@ -51,8 +51,6 @@ test_geometry_generic:
   "306_3": Torus where the hole in the top/bottom faces touches the side surfaces
   "307": Unit cube with one face (face 0) with opposite orientation
   "307_1": Unit cube with a top surface composed of 2 polygons with opposite orientation
-  "309": Unit cube with an unused vertex in OFF
-  "309_1": Unit cube with an unused vertex in OBJ
   "401": "+ basecube = An inner-pyramid that pierces through the top of basecube (by 0.00001). Oracle agrees: oracle=54512"
   "401_1": "+ basecube = An inner-pyramid that is outside of the shell of basecube, but pierces inside it (by 0.00001)"
   "401_2": "+ inner_shell + basecube = Two cavities in basecube that share a face"
