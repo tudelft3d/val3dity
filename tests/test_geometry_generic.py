@@ -256,8 +256,7 @@ def data_306(request, data_geometry_generic):
 
 
 @pytest.fixture(scope="module",
-                params=["307.poly",
-                        "307_1.poly"])
+                params=["307.poly"])
 def data_307(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -265,6 +264,14 @@ def data_307(request, data_geometry_generic):
             request.param))
     return(file_path)
 
+@pytest.fixture(scope="module",
+                params=["307_1.poly"])
+def data_307_1(request, data_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_generic,
+            request.param))
+    return(file_path)
 
 @pytest.fixture(scope="module",
                 params=["309.off",
@@ -503,7 +510,12 @@ def test_306(validate, data_306):
     assert(error == [306])
 
 def test_307(validate, data_307):
+    """See #62"""
     error = validate(data_307)
+    assert(error == [304, 307])
+
+def test_307_1(validate, data_307_1):
+    error = validate(data_307_1)
     assert(error == [307])
 
 def test_309(validate, data_309):
