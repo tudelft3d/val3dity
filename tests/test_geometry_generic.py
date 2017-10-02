@@ -273,35 +273,6 @@ def data_307_1(request, data_geometry_generic):
             request.param))
     return(file_path)
 
-# @pytest.fixture(scope="module",
-#                 params=["401.poly",
-#                         "401_1.poly",
-#                         "401_2.poly",
-#                         "401_3.poly",
-#                         "401_4.poly",
-#                         "401_5.poly",
-#                         "401_6.poly"])
-# def data_401(request, data_geometry_generic):
-#     file_path = os.path.abspath(
-#         os.path.join(
-#             data_geometry_generic,
-#             request.param))
-#     return(file_path)
-# 
-# 
-# @pytest.fixture(scope="module",
-#                 params=["401_inner1.poly",
-#                         "401_inner2.poly"])
-# def data_401_temp(request, data_geometry_generic, data_basecube):
-#     ishell_path = ["--ishell",
-#                    os.path.abspath(
-#                        os.path.join(data_geometry_generic, request.param)
-#                        )
-#                    ]
-#     inner_outer_path = ishell_path + data_basecube
-#     return(inner_outer_path)
-
-
 @pytest.fixture(scope="module",
                 params=["401.poly",
                         "401_1.poly",
@@ -358,17 +329,6 @@ def data_402_1(request, data_geometry_generic, data_basecube):
     return(inner_outer_path)
 
 
-# @pytest.fixture(scope="module",
-#                 params=["403.poly",
-#                         "403_1.poly"])
-# def data_403(request, data_geometry_generic):
-#     file_path = os.path.abspath(
-#         os.path.join(
-#             data_geometry_generic,
-#             request.param))
-#     return(file_path)
-
-
 @pytest.fixture(scope="module",
                 params=["403.poly",
                         "403_1.poly"])
@@ -381,15 +341,6 @@ def data_403(request, data_geometry_generic, data_basecube):
     inner_outer_path = ishell_path + data_basecube
     return(inner_outer_path)
 
-
-# @pytest.fixture(scope="module",
-#                 params=["404.poly"])
-# def data_404(request, data_geometry_generic):
-#     file_path = os.path.abspath(
-#         os.path.join(
-#             data_geometry_generic,
-#             request.param))
-#     return(file_path)
 
 @pytest.fixture(scope="module",
                 params=["404.poly"])
