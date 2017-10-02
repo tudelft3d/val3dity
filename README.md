@@ -1,9 +1,9 @@
 # val3dity 
 
-Validation of 3D primitives according to the international standard ISO19107.
+val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
 Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS only validates 2D primitives).
 
-It allows us to validate a 3D primitive, ie to verify whether it respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
+In short, it verifies whether a 3D primitive respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and GML/CityGML.
 All the 3D primitives of GML are supported:
 
   - `<gml:MultiSurface>`
@@ -22,14 +22,14 @@ val3dity accepts as input:
   - any [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) 
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file), 
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
-  - [POLY](http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly).
 
 
 ## Installation of the command-line tool
 
-We provide the source code that you need to compile with CMake. This is straightforward under Mac and Linux.
+We provide the source code that you need to compile with CMake. 
+This is straightforward under Mac and Linux.
 
-[For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile yourself.
+[For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile val3dity yourself.
 
 To compile val3dity yourself, you first need to install the following free libraries:
 
@@ -51,12 +51,22 @@ Afterwards navigate to the folder with val3dity and run:
     $ make
     $ ./val3dity ../data/cityjson/cube.json
 
+The summary of the validation is reported, and you should see that `cube.json` contains one valid primitive.
+
+To see all the options:
+
+    $ ./val3dity --help
+
 ## Web application
 
-If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). Simply upload your file to our server and get a validation report back.
+If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
+Simply upload your file to our server and get a validation report back.
 We delete the file as soon as it has been validated.
 However, a file is limited to 50MB.
     
 ## Documentation and help
 
-Read the full documentation at [http://val3dity.rtfd.io](http://val3dity.rtfd.io) The primary channel to communicate with the developers is the Issues section. If you have a question or came across a bug, please submit an issue there. However we ask you check first whether your problem has already been solved by someone else.
+Read the full documentation at [http://val3dity.rtfd.io](http://val3dity.rtfd.io). 
+The primary channel to communicate with the developers is the Issues section. 
+If you have a question or came across a bug, please submit an issue there. 
+However we ask you check first whether your problem has already been solved by someone else.

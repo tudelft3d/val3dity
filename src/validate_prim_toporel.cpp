@@ -68,7 +68,7 @@ bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerr
       if (a->interior() * b->interior() != emptynef)
       {
         std::stringstream msg;
-        msg << lsPrimitives[i]->get_id() << " & " << lsPrimitives[j]->get_id();
+        msg << lsPrimitives[i]->get_id() << " and " << lsPrimitives[j]->get_id();
         coerrs.add_error(601, msg.str(), "");
         isValid = false;
       }

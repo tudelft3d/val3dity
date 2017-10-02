@@ -93,7 +93,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         if (*lsNefs[i] == *lsNefs[j])
         {
           std::stringstream msg;
-          msg << _lsSolids[i]->get_id() << " & " << _lsSolids[j]->get_id();
+          msg << _lsSolids[i]->get_id() << " and " << _lsSolids[j]->get_id();
           this->add_error(502, msg.str(), "");
           isValid = false;
         }
@@ -123,7 +123,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           if (a->interior() * b->interior() != emptynef)
           {
             std::stringstream msg;
-            msg << _lsSolids[i]->get_id() << " & " << _lsSolids[j]->get_id();
+            msg << _lsSolids[i]->get_id() << " and " << _lsSolids[j]->get_id();
             this->add_error(501, msg.str(), "");
             isValid = false;
           }
@@ -155,7 +155,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
       if (unioned.number_of_volumes() != 2)
       {
         std::stringstream msg;
-        msg << "-->CompositeSolid is formed of " << (unioned.number_of_volumes() - 1) << " parts";
+        msg << "CompositeSolid is formed of " << (unioned.number_of_volumes() - 1) << " parts";
         this->add_error(503, "", msg.str());
         isValid = false;
       }
@@ -186,6 +186,42 @@ int CompositeSolid::is_valid()
 
 bool CompositeSolid::is_empty() {
   return _lsSolids.empty();
+}
+
+
+json CompositeSolid::get_report_json()
+{
+  json j;
+  bool isValid = true;
+  j["type"] = "CompositeSolid";
+  if (this->get_id() != "")
+    j["id"] = this->_id;
+  else
+    j["id"] = "none";
+  j["numbersolids"] = this->number_of_solids();
+  j["errors"];
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j["errors"].push_back(jj);
+      isValid = false;
+    }
+  }
+  for (auto& s : _lsSolids)
+  {
+    j["primitives"].push_back(s->get_report_json());
+    if (s->is_valid() == false)
+      isValid = false;
+  }
+  j["validity"] = isValid;
+  return j;
 }
 
 

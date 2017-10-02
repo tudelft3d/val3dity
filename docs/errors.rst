@@ -47,7 +47,8 @@ This ring is for instance invalid:
 
 103 -- NOT_CLOSED 
 -----------------
-*This applies only to GML rings, in OBJ/OFF it's ignored*. The first and last points have to be identical (at the same location). 
+*This applies only to GML rings, in OBJ/OFF it's ignored.* 
+The first and last points have to be identical (at the same location). 
 This is verified after the points have been merged with the :ref:`snap_tol` option (default is 0.001unit). 
 
 This ring is for instance invalid:
@@ -65,17 +66,20 @@ This ring is for instance invalid:
 
 104 -- SELF_INTERSECTION 
 ------------------------
-A ring should be *simple*, ie it should not self-intersect. The self-intersection can be at the location of an explicit point, or not.
+A ring should be *simple*, ie it should not self-intersect. The self-intersection can be at the location of an explicit point, or not. This case includes rings that are (partly) collapsed to a line for instance.
+
+Observe that self-intersection in 3D and 2D is different, ie a bowtie (the first polygon below) has a self-intersection "in the middle" in 2D, but in 3D if the 4 vertices are not on a plane then there is no intersection.
 
 .. image:: _static/104.png
 
-.. _error_105:
+A ring is self-intersecting if its projection to the best-fitted plane (done with least-square) through the vertices of the polygon containing the ring has a self-intersection.
+This rule is there because if it is not possible to project the rings/polygons to a plane, then it is not possible to triangulate it (which is necessary, at least by val3dity, to validate 3D primitives).
+In the figure below, the left example shows one polygon (the top one) where a projection (let say to the xy-plane) would not cause any self-intersection.
+However, the right example does cause a self-intersection.
+It is the same is the vertices *b* and *c* are projected to the same location: a self-intersection is also returned.
 
-105 -- COLLAPSED_TO_LINE 
-------------------------
-A special case of :ref:`error_104`: the ring is collapsed to a line. If the geometry is collapsed to a point, then :ref:`error_101`/:ref:`error_102` is used. 
+.. image:: _static/104b.png
 
-.. image:: _static/105.png
 
 .. _error_201:
 
@@ -109,11 +113,12 @@ To ensure that small folds on a surface are detected. Consider the example that 
 The normal of the sub-surface *abgh* points upwards, while that of *bcfg* is perpendicular to it. 
 But this surface would not be detected by the :ref:`error_203` test and a tolerance of 1cm for instance, since all the vertices are within that threshold. 
 Thus, another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinations of 3 non-colinear points is less than a given tolerance. 
-In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain user-defined tolerance; this tolerance is in val3dity set to 1 degree, but can be defined (not in the web-version), but in the executable. 
+In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain user-defined tolerance; this tolerance is in val3dity set to 1 degree, but can be defined.
 
-A surface is first checked for :ref:`error_203`, if valid then error *204* is checked. 
-By definition, if an error *204* is reported then all the vertices are within 1cm (tolerance you used), thus you wouldn’t be able to visualise them. 
-That usually means that you have vertices that are very close (say 0.1mm) and thus it’s easy to get a large deviation (say 80degree; the report contains the deviation).
+A surface is first checked for :ref:`error_203`, if it’s valid then :ref:`error_204` is checked. 
+By definition, if :ref:`error_204` is reported then all the vertices are within 1cm (or the tolerance you gave as input), thus you wouldn’t be able to visualise them.
+
+This error usually means that you have vertices that are *very* close to each other (say 0.1mm) and thus it’s easy to get a large deviation (say 80 degree; the report contains the actual deviation).
 
 .. image:: _static/204.png
 
@@ -206,13 +211,6 @@ The left shell is valid while the right one is invalid.
 --------------------------------
 If one polygon is used to construct a shell, its exterior ring must be oriented in such as way that when viewed from outside the shell the points are ordered counterclockwise.
 
-.. _error_309:
-
-309 -- VERTICES_NOT_USED
-------------------------
-In an OBJ/OFF/POLY, all the vertices are listed and the primitives use references to these. 
-If some vertices are not used then this error is reported.
-(City)GML cannot report this error
 
 .. _error_401:
 

@@ -55,7 +55,6 @@ val3dity accepts as input:
   - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
-  - `POLY <http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_poly>`_
 
 For **CityGML/CityJSON** files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
 The 3D primitives are bundled under their City Objects in the report.
