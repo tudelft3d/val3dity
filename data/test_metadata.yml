@@ -60,9 +60,7 @@ test_geometry_generic:
   "404": "+ basecube = A cavity that is disconnected (like the diagram for error 205, but in 3D) in basecube"
   "405": Pyramid with the normals pointing inwards
 
-
 # TODO: test 401 with gml, because it is not possible with obj/poly/off
-# TODO: write composite test for 105_2
 
 test_geometry_specific:
   "103": A unit cube where the bottom surface is not closed
@@ -88,6 +86,7 @@ test_valid:
   "inner_shell_3": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching along an edge (shared edge)"
   "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
   
-  
+test_empty:
+  "completely_empty": Completely empty files
   
   

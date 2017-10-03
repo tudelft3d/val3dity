@@ -85,5 +85,3 @@ def test_503(validate, data_503, citymodel):
 def test_601(validate, data_601, citymodel):
     error = validate(data_601, options=citymodel)
     assert(error == [601])
-
-## 103
