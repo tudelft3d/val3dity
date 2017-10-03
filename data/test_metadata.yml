@@ -65,6 +65,7 @@ test_geometry_generic:
 # TODO: write composite test for 105_2
 
 test_geometry_specific:
+  "103": A unit cube where the bottom surface is not closed
   "501": CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
   "501_1": CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
   "502": CompositeSolid with 3 cubes, where cube 1-2 are identical
