@@ -64,7 +64,7 @@ If there is one or more intersections, then :ref:`error_601` will be reported.
 
 For **GML** files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
 
-For **OBJ**, **OFF**, and **POLY** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
+For **OBJ** and **OFF** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option) will individually validate each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
