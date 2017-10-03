@@ -33,6 +33,55 @@
 namespace val3dity
 {
 
+void mark_domains(CT& ct,
+  CT::Face_handle start,
+  int index,
+  std::list<CT::Edge>& border) 
+{
+  if (start->info().nesting_level != -1) {
+    return;
+  }
+  std::list<CT::Face_handle> queue;
+  queue.push_back(start);
+  while (!queue.empty()) {
+    CT::Face_handle fh = queue.front();
+    queue.pop_front();
+    if (fh->info().nesting_level == -1) {
+      fh->info().nesting_level = index;
+      for (int i = 0; i < 3; i++) {
+        CT::Edge e(fh, i);
+        CT::Face_handle n = fh->neighbor(i);
+        if (n->info().nesting_level == -1) {
+          if (ct.is_constrained(e)) border.push_back(e);
+          else queue.push_back(n);
+        }
+      }
+    }
+  }
+}
+
+//explore set of facets connected with non constrained edges,
+//and attribute to each such set a nesting level.
+//We start from facets incident to the infinite vertex, with a nesting
+//level of 0. Then we recursively consider the non-explored facets incident 
+//to constrained edges bounding the former set and increase the nesting level by 1.
+//Facets in the domain are those with an odd nesting level.
+void mark_domains(CT& ct) {
+  for (CT::All_faces_iterator it = ct.all_faces_begin(); it != ct.all_faces_end(); ++it) {
+    it->info().nesting_level = -1;
+  }
+  std::list<CT::Edge> border;
+  mark_domains(ct, ct.infinite_face(), 0, border);
+  while (!border.empty()) {
+    CT::Edge e = border.front();
+    border.pop_front();
+    CT::Face_handle n = e.first->neighbor(e.second);
+    if (n->info().nesting_level == -1) {
+      mark_domains(ct, n, e.first->info().nesting_level + 1, border);
+    }
+  }
+}  
+
 Nef_polyhedron* get_structuring_element_dodecahedron(float r)
 {
   std::stringstream ss;
@@ -210,15 +259,17 @@ Nef_polyhedron* get_aabb(Nef_polyhedron* mynef)
 }
 
 
-bool is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value, float tolerance)
+void get_best_fitted_plane(const std::vector< Point3 > &lsPts, CgalPolyhedron::Plane_3 &plane)
+{
+  linear_least_squares_fitting_3(lsPts.begin(), lsPts.end(), plane, CGAL::Dimension_tag<0>());  
+}
+
+
+bool is_face_planar_distance2plane(const std::vector<Point3> &pts, const CgalPolyhedron::Plane_3 &plane, double& value, float tolerance)
 {
   if (pts.size() == 3) {
     return true;
   }
-  //-- find a fitted plane with least-square adjustment
-  CgalPolyhedron::Plane_3 plane;
-  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>());  
-
   //-- test distance to that plane for each point
   std::vector<Point3>::const_iterator it = pts.begin();
   bool isPlanar = true;
@@ -236,26 +287,6 @@ bool is_face_planar_distance2plane(const std::vector<Point3> &pts, double& value
 }
 
 
-int projection_plane(const std::vector< Point3 > &lsPts, const std::vector<int> &ids)
-{
-  Vector n;
-  polygon_normal(lsPts, ids, n);
-  double maxcomp = std::abs(n.x());
-  int proj = 0;
-  if (std::abs(n.y()) > maxcomp)
-  {
-    maxcomp = std::abs(n.y());
-    proj = 1;
-  }
-  if (std::abs(n.z()) > maxcomp)
-  {
-    maxcomp = std::abs(n.z());
-    proj = 2;
-  }
-  return proj;
-}
-
-
 bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 {
   if ( (p1 == p2) || (CGAL::squared_distance(p1, p2) <= (tol * tol)) )
@@ -265,40 +296,17 @@ bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 }
 
 
-bool polygon_normal(const std::vector< Point3 > &lsPts, const std::vector<int> &ids, Vector &n)
+void create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, Polygon &outpgn)
 {
-  std::vector<Point3> pts;
-  for (auto& i : ids) 
-    pts.push_back(lsPts[i]);
-  CgalPolyhedron::Plane_3 plane;
-  linear_least_squares_fitting_3(pts.begin(), pts.end(), plane, CGAL::Dimension_tag<0>()); 
-  n = plane.orthogonal_vector();
-  // Vector order = CGAL::unit_normal()
-  return true;
-}  
-
-
-bool create_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, Polygon &pgn)
-{
-  int proj = projection_plane(lsPts, ids);
+  // int proj = projection_plane(lsPts, ids);
   std::vector<int>::const_iterator it = ids.begin();
   for ( ; it != ids.end(); it++)
   {
     Point3 p = lsPts[*it];
-    if (proj == 2)
-      pgn.push_back(Point2(p.x(), p.y()));
-    else if (proj == 1)
-      pgn.push_back(Point2(p.x(), p.z()));
-    else if (proj == 0)
-      pgn.push_back(Point2(p.y(), p.z()));
+    outpgn.push_back(plane.to_2d(p));
   }
-  
-  if (!pgn.is_simple()) //-- CGAL polygon requires that a polygon be simple to test orientation
-    return false;
-  if (pgn.orientation() == CGAL::COLLINEAR)
-    return false;
-  return true;
 }
+
 
 bool is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance)
 {

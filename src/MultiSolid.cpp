@@ -77,6 +77,41 @@ bool MultiSolid::is_empty()
 }
 
 
+json MultiSolid::get_report_json()
+{
+  json j;
+  bool isValid = true;
+  j["type"] = "MultiSolid";
+  if (this->get_id() != "")
+    j["id"] = this->_id;
+  else
+    j["id"] = "none";
+  j["numbersolids"] = this->number_of_solids();
+  j["errors"];
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j["errors"].push_back(jj);
+      isValid = false;
+    }
+  }
+  for (auto& s : _lsSolids)
+  {
+    j["primitives"].push_back(s->get_report_json());
+    if (s->is_valid() == false)
+      isValid = false;
+  }
+  j["validity"] = isValid;
+  return j;
+}
+
 std::string MultiSolid::get_report_xml() 
 {
     std::stringstream ss;

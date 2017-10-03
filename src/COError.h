@@ -16,6 +16,9 @@
 #include <tuple>
 #include <string>
 #include <fstream>
+#include "nlohmann-json/json.hpp"
+
+using json = nlohmann::json;
 
 namespace val3dity
 {
@@ -27,6 +30,7 @@ public:
   bool          has_errors();
   void          add_error(int code, std::string info, std::string whichgeoms);
   std::string   get_report_text();
+  json          get_report_json();
   std::string   get_report_xml();
   std::set<int> get_unique_error_codes();
 };
