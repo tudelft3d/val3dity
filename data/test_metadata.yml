@@ -69,6 +69,7 @@ test_geometry_specific:
   "501_1": CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
   "502": CompositeSolid with 3 cubes, where cube 1-2 are identical
   "503": CompositeSolid with 3 cubes, where cube 1 is not connected to other
+  "601": A Building with 2 BuildingParts that overlap by 50 units
 
 test_valid:
   "basecube": Valid unit cube. Used in combination with other shells.

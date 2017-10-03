@@ -45,6 +45,16 @@ def data_503(request, data_geometry_specific):
             data_geometry_specific,
             request.param))
     return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["601.gml"])
+def data_601(request, data_geometry_specific):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_geometry_specific,
+            request.param))
+    return(file_path)
 #----------------------------------------------------------------------- Tests
 def test_501(validate, data_501, citymodel):
     error = validate(data_501, options=citymodel)
@@ -58,6 +68,8 @@ def test_503(validate, data_503, citymodel):
     error = validate(data_503, options=citymodel)
     assert(error == [503])
 
-## 103
+def test_601(validate, data_601, citymodel):
+    error = validate(data_601, options=citymodel)
+    assert(error == [601])
 
-## 601
+## 103
