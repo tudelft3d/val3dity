@@ -63,37 +63,54 @@ def citymodel():
 def validate():
     def _validate(file_path, options=solid(), val3dity=val3dity()):
         """Validate a file
-        
+
         :return: The error numbers. Empty list if the file is valid.
         :rtype: list
         """
-        try: 
+        try:
             assert isinstance(file_path, str)
             file_path = [file_path]
         except AssertionError:
             assert isinstance(file_path, list)
-        except:
+        except Exception:
             return
         assert isinstance(options, list)
-        
+
         command = [val3dity] + options + file_path
         
-        cp = subprocess.run(command, stdout=subprocess.PIPE,
-                            universal_newlines=True)
-        summary = cp.stdout
+        try:
+            proc = subprocess.run(command,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE,
+                                  universal_newlines=True,
+                                  timeout=6)
+        except subprocess.TimeoutExpired:
+            return([" ".join(["Something went really wrong.",
+                             "Validate the file separately with val3dity.",
+                             "Or set a higher timeout in conftest.py."])])
         
-        output = []
-        if (summary != ''):
-            if (summary.find('@VALID') != -1):
+        out = proc.stdout
+        err = proc.stderr
+        rcode = proc.returncode
+        
+        if rcode < 0:
+            # For example Segmentation fault
+            return(["Something went really wrong. Validate the file separately with val3dity."])
+        else:
+            output = []
+            if (out != ''):
+                if (out.find('@VALID') != -1):
+                    return(output)
+                elif (out.find('@INVALID') != -1):
+                    i = out.find('@INVALID')
+                    s = out[i + 9:]
+                    tmp = s.split(" ")
+                    codes = map(int, tmp[:-1])
+                    for each in codes:
+                        if output.count(each) == 0:
+                            output.append(each)
+                    return(output)
+            else:
                 return(output)
-            i = summary.find('@INVALID')
-            s = summary[i+9:]
-            tmp = s.split(" ")
-            codes = map(int, tmp[:-1])
-            for each in codes:
-                if output.count(each) == 0:
-                    output.append(each)
-        return(output)
     
     return(_validate)
-
