@@ -3,6 +3,7 @@
 # test case
 test_empty:
   "completely_empty": Completely empty files
+  "empty_primitive": A CompositeSolid where one Solid is empty
 
 test_file_format:
   "invalid_json_1": Invalid CityJSON v0.2
