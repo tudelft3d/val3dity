@@ -5,7 +5,7 @@ from os import walk
 
 @pytest.mark.full
 def test_metadata():
-    """Check that every test file in /data/test_*/ is documented in test_data.yml"""
+    """Check that every test file in /data/test_*/ is documented in test_metadata.yml"""
     root = os.getcwd()
     data_dir = os.path.join(root, "data")
     file = os.path.abspath(os.path.join(root, data_dir, "test_metadata.yml"))
@@ -26,7 +26,7 @@ for the test case {case}. Compare test_data.yml with the contents of \
 the {case} folder.".format(case=case)
         for test in tests:
             if not ds[case][test]:
-                raise AssertionError('test %s must have a description in test_data.yml' % test)
+                raise AssertionError('test %s must have a description in test_metadata.yml' % test)
             else:
                 assert len(ds[case][test]) > 0, \
-                'test %s must have a description in test_data.yml' % test
+                'test %s must have a description in test_metadata.yml' % test

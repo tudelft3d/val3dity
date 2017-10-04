@@ -1,6 +1,15 @@
 # please quote the nodes, particularly if you are using numbers only, eg "101"
 
 # test case
+test_empty:
+  "completely_empty": Completely empty files
+
+test_file_format:
+  "invalid_json_1": Invalid CityJSON v0.2
+  "invalid_json_2": Invalid CityJSON v0.2
+  "invalid_citygml_1": "A GenericCityObject where the first surfaceMember missing a gml:Polygon tag"
+  "invalid_citygml_2": "CityGML with missing City/GML namespace declarations"
+  "invalid_citygml_3": "CityGML v2.0 but with xmlns:bldg='http://www.opengis.net/citygml/building/1.0' "
 
 test_geometry_generic:
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
@@ -85,8 +94,4 @@ test_valid:
   "inner_shell_2": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching at a single point (duplicate vertex)"
   "inner_shell_3": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching along an edge (shared edge)"
   "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
-  
-test_empty:
-  "completely_empty": Completely empty files
-  
   

@@ -100,7 +100,7 @@ def test_closed_top(validate, data_closed_top):
     error = validate(data_closed_top)
     assert(error == [])
 
-@pytest.mark.skip(reason="inner_pyramid_2 and _3 break val3dity")
+# @pytest.mark.skip(reason="inner_pyramid_2 and _3 break val3dity")
 def test_valid_inner_shell(validate, data_inner_pyramid):
     error = validate(data_inner_pyramid)
     assert(error == [])
