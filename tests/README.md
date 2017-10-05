@@ -1,6 +1,6 @@
 # Testing val3dity
 
-This README is solely concerned with the integration tests for val3dity. These tests are implemented in python, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its corner cases. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
+This README is solely concerned with the integration tests for val3dity. These tests are implemented in python, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its boundary conditions. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
 
 Due to the current setup of file referencing in the tests, `pytest` need to be run from the `/val3dity` root directory.
 
@@ -42,9 +42,9 @@ In these integration tests a **test case** is a collection of *tests* that test 
 Every **test** tests a particular error, bug. For example the error *101_TOO_FEW_POINTS* has its own test `test_101`. Technically, every test case consists of:
 
 + A collection of test function named as `test_<test>()`, eg `test_101()`.
-+ A collection of data files that are used by the *tests* of the test case. Each file is named as `<test case>_<corner case>.<format>`, and stored at `data/test_<test case>/`, `data/test_geometry_generic/101.poly`.
++ A collection of data files that are used by the *tests* of the test case. Each file is named as `<test case>_<boundary condition>.<format>`, and stored at `data/test_<test case>/`, `data/test_geometry_generic/101.poly`.
 
-A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often corner cases of the geometric primitives with certain errors (eg 101).
+A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often boundary conditions of the geometric primitives with certain errors (eg 101).
 Ideally every test has its own data file, where the data file contains *only* the error that the test is testing. The data files are stored separately from the test modules.
 
 Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_metadata.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
@@ -66,9 +66,9 @@ data/
 |–– test_geometry_generic/
     |–– 101.poly
     |–– 101_1.poly
-    |–– 101_<corner case>.poly
+    |–– 101_<boundary condition>.poly
     |–– <test case>.poly
-    |–– <test case>_<corner case>.poly
+    |–– <test case>_<boundary condition>.poly
 |–– test_geometry_specific/
 |–– test_file_format/
 |–– test_empty_files/
