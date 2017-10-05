@@ -135,9 +135,9 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S)",
+                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface)",
                                               false,
-                                              "S",
+                                              "",
                                               &primVals);
     TCLAP::SwitchArg                        info("i",
                                               "info",
@@ -249,21 +249,21 @@ int main(int argc, char* const argv[])
     if (inputtype == OTHER)
       ioerrs.add_error(901, "File type not supported");
 
-    Primitive3D prim3d = ALL;
-    if (primitives.getValue() == "Solid")
-      prim3d = SOLID;
-    else if (primitives.getValue() == "MultiSurface")
-      prim3d = MULTISURFACE;
-    else if (primitives.getValue() == "CompositeSurface")
-      prim3d = COMPOSITESURFACE;
-    if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
-      ioerrs.add_error(903, "the type of 3D primitives to validate is not possible: all are validated in CityGML/CityJSON");
-    if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == OFF) || (inputtype == POLY)) )
-      ioerrs.add_error(903, "the type of 3D primitives to validate wasn't specified (option '-p')");
+    Primitive3D prim3d;
+    if ( (primitives.getValue() != "") && ((inputtype == JSON) || (inputtype == GML)) )
+    {
+      std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
+      prim3d = ALL;
+    }
+    else {
+      if (primitives.getValue() == "MultiSurface")
+        prim3d = MULTISURFACE;
+      else if (primitives.getValue() == "CompositeSurface")
+        prim3d = COMPOSITESURFACE;
+      if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
+        ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
+    }
 
-    if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
-      ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
-     
     if (ioerrs.has_errors() == false)
     {
       if (inputtype == GML)
@@ -383,6 +383,19 @@ int main(int argc, char* const argv[])
           ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
         }
       }
+    }
+
+    if (ioerrs.has_errors() == false) 
+    {
+      std::cout << "Primitive(s) validated: ";
+      if (prim3d == SOLID)        
+        std::cout << "Solid" << std::endl;
+      else if (prim3d == MULTISURFACE)        
+        std::cout << "MultiSurface" << std::endl;
+      else if (prim3d == COMPOSITESURFACE)        
+        std::cout << "CompositeSurface" << std::endl;
+      else
+        std::cout << "All" << std::endl;
     }
 
     if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
