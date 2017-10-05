@@ -95,4 +95,5 @@ test_valid:
   "inner_shell_2": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching at a single point (duplicate vertex)"
   "inner_shell_3": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching along an edge (shared edge)"
   "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
+  "composite_solid": Two unit cubes in a CompositeSolid as CityJSON
   

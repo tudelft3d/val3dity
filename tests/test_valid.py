@@ -87,6 +87,15 @@ def data_inner_shell(request, data_valid, data_basecube):
     inner_outer_path = ishell_path + data_basecube
     return(inner_outer_path)
 
+
+@pytest.fixture(scope="module",
+                params=["composite_solid.json"])
+def data_composite_solid(request, data_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            data_valid,
+            request.param))
+    return(file_path)
 #----------------------------------------------------------------------- Tests
 def test_planar(validate, data_planar):
     error = validate(data_planar)
@@ -100,11 +109,14 @@ def test_closed_top(validate, data_closed_top):
     error = validate(data_closed_top)
     assert(error == [])
 
-# @pytest.mark.skip(reason="inner_pyramid_2 and _3 break val3dity")
 def test_valid_inner_shell(validate, data_inner_pyramid):
     error = validate(data_inner_pyramid)
     assert(error == [])
 
 def test_inner_shell(validate, data_inner_shell):
     error = validate(data_inner_shell)
+    assert(error == [])
+
+def test_composite_solid(validate, data_composite_solid):
+    error = validate(data_composite_solid)
     assert(error == [])
