@@ -80,8 +80,6 @@ public:
     std::cout << "\t\tValidates the geometries in input.off individually" << std::endl;
     std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
-    std::cout << "\tval3dity input.gml --info" << std::endl;
-    std::cout << "\t\tOutputs information about the GML file (no validation performed)." << std::endl;
   }
 
   virtual void failure(TCLAP::CmdLineInterface& c, TCLAP::ArgException& e)
@@ -139,10 +137,6 @@ int main(int argc, char* const argv[])
                                               false,
                                               "",
                                               &primVals);
-    TCLAP::SwitchArg                        info("i",
-                                              "info",
-                                              "prints information about the file",
-                                              false);
     TCLAP::SwitchArg                        verbose("",
                                               "verbose",
                                               "verbose output",
@@ -188,7 +182,6 @@ int main(int argc, char* const argv[])
                                               20.0,
                                               "double");
 
-    cmd.add(info);
     cmd.add(planarity_d2p_tol);
     cmd.add(planarity_n_tol);
     cmd.add(snap_tol);
@@ -223,21 +216,6 @@ int main(int argc, char* const argv[])
       inputtype = OBJ;
     else if ( (extension == "off") || (extension == "OFF") ) 
       inputtype = OFF;
-
-    //-- if info then only this and ignore everything
-    if (info.getValue() == true)
-    {
-      if (inputtype == GML)
-      {
-        std::cout << "\nInformation about input file, ignoring all other options." << std::endl;
-        print_information(inputfile.getValue());
-      }
-      else
-      {
-        std::cout << "Statistics/information only GML files." << std::endl;
-      }
-      return (1);
-    }
 
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
