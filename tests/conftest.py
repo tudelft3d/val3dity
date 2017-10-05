@@ -45,6 +45,15 @@ def data_basecube():
     return([file_path])
 
 @pytest.fixture(scope="session")
+def data_composite_solid():
+    """two unit cubes as a composite solid"""
+    root = os.getcwd()
+    file_path = os.path.abspath(
+        os.path.join(root, "data/test_valid/composite_solid.json")
+        )
+    return([file_path])
+
+@pytest.fixture(scope="session")
 def solid():
     """val3dity options for validating a Solid"""
     return(["--unittests", "-p Solid"])
@@ -58,6 +67,11 @@ def multisurface():
 def citymodel():
     """val3dity options for validating a CityModel"""
     return(["--unittests"])
+
+command = ["./build/val3dity",
+            "--unittests",
+             "--planarity_n_tol 18degree",
+              "./data/test_valid/composite_solid.json"]
 
 @pytest.fixture(scope="session")
 def validate():
@@ -73,7 +87,7 @@ def validate():
         except AssertionError:
             assert isinstance(file_path, list)
         except Exception:
-            return
+            return(["Something went really wrong. Validate the file separately with val3dity."])
         assert isinstance(options, list)
 
         command = [val3dity] + options + file_path
@@ -110,6 +124,8 @@ def validate():
                         if output.count(each) == 0:
                             output.append(each)
                     return(output)
+                else:
+                    return([out.replace('\n', ' ')])
             else:
                 return(output)
     
