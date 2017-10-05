@@ -467,7 +467,7 @@ int main(int argc, char* const argv[])
           COError coerrs;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
-            std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
+            // std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
             dCOerrors[co.first] = coerrs;
           }
         }
