@@ -69,6 +69,8 @@ int Solid::is_valid()
 
 bool Solid::is_empty()
 {
+  if (_shells.size() == 0)
+    return true;
   for (auto& sh : _shells)
   {
     if (sh->is_empty() == true)

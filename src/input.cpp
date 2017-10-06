@@ -704,7 +704,15 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
             else
               s->add_ishell(sh);
           }
-          ms->add_solid(s);
+          if (s->is_empty() == true)
+          {
+            std::clog << "WARNING: empty solid detected, skipping it. CityObject #";
+            std::clog << it.key() << " geometry #" << idgeom << std::endl;
+          }
+          else
+          {
+            ms->add_solid(s);
+          }
         }
         dPrimitives[coid].push_back(ms);
       }
@@ -730,7 +738,15 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
             else
               s->add_ishell(sh);
           }
-          cs->add_solid(s);
+          if (s->is_empty() == true)
+          {
+            std::clog << "WARNING: empty solid detected, skipping it. CityObject #";
+            std::clog << it.key() << " geometry #" << idgeom << std::endl;
+          }
+          else
+          {
+            cs->add_solid(s);
+          }
         }
         dPrimitives[coid].push_back(cs);
       }      
