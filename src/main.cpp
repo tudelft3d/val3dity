@@ -228,10 +228,11 @@ int main(int argc, char* const argv[])
       ioerrs.add_error(901, "File type not supported");
 
     Primitive3D prim3d;
-    if ( (primitives.getValue() != "") && ((inputtype == JSON) || (inputtype == GML)) )
+    if ( (inputtype == JSON) || (inputtype == GML) )
     {
-      std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
       prim3d = ALL;
+      if (primitives.getValue() != "")
+        std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
     }
     else {
       if (primitives.getValue() == "MultiSurface")
