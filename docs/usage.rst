@@ -38,11 +38,17 @@ To validate each 3D primitive in input.gml, and to merge/snap the vertices close
   $ val3dity input.gml --snap_tol 0.1
 
 
-To validate an OBJ file and verify whether the 3D primitives from a ``Solid``:
+To validate an OBJ file and verify whether the 3D primitives from a ``Solid`` (this is the default):
 
 .. code-block:: bash
 
-  $ val3dity input.obj -p Solid
+  $ val3dity input.obj 
+
+The same file could be validated as a ``MultiSurface``, ie each of its surface are validated independently
+
+.. code-block:: bash
+
+  $ val3dity input.obj -p MultiSurface
     
 
 Accepted input
@@ -119,7 +125,7 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ``--overlap_tol``
 *****************
-|  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts`` 
+|  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts``
 |  default = 0.0
 
 The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid`` or the ``BuildingParts`` of a building.
@@ -128,6 +134,26 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 
 .. image:: _static/vcsol_2.png
    :width: 100%
+
+----
+
+``--verbose``
+*************
+|  The validation outputs to the console the status of each step of the validation. If this option is not set, then this goes to a file `val3dity.log` in the same folder as the executable.
+
+----
+
+``-r, --report``
+****************
+|  Outputs the validation report to the file given. The report is in JSON file_format
+
+
+----
+
+``--notranslate``
+*****************
+|  By default, all coordinates are translated by the (minx, miny) of the input file. This is to avoid precision error with floating-point numbers. This option skips the translation; we advise not to use this though.
+
 
 
 How are 3D primitives validated?
