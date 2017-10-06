@@ -66,7 +66,7 @@ public:
     std::cout << "\tval3dity citygmlinput.gml" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in citygmlinput.gml" << std::endl;
     std::cout << "\t\tand outputs a summary per city object" << std::endl;
-    std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
+    std::cout << "\tval3dity input.gml -r report.json" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml" << std::endl;
     std::cout << "\t\tand outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
@@ -127,7 +127,7 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "output report in XML format",
+                                              "output report in JSON format",
                                               false,
                                               "",
                                               "string");
