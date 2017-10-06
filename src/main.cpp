@@ -501,7 +501,7 @@ int main(int argc, char* const argv[])
       clog.rdbuf(savedBufferCLOG);
       mylog.close();
     }
-    return(1);
+    return(0);
   }
   catch (TCLAP::ArgException &e) 
   {
