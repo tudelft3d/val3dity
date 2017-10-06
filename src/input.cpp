@@ -1094,7 +1094,6 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   Surface* sh = new Surface(shellid);  
   //-- read the points
   int numpt, numf, tmpint;
-  float tmpfloat;
   std::string s;
   infile >> s;
   infile >> numpt >> numf >> tmpint;
@@ -1111,6 +1110,11 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   {
     infile >> tmpint;
     std::vector<int> ids(tmpint);
+    if (ids.empty() == true)
+    {
+      errs.add_error(901, "Some surfaces not defined correctly or are empty");
+      return NULL;
+    }
     for (int k = 0; k < tmpint; k++)
       infile >> ids[k];
     std::vector< std::vector<int> > pgnids;
