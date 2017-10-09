@@ -71,6 +71,7 @@ A ring should be *simple*, ie it should not self-intersect. The self-intersectio
 Observe that self-intersection in 3D and 2D is different, ie a bowtie (the first polygon below) has a self-intersection "in the middle" in 2D, but in 3D if the 4 vertices are not on a plane then there is no intersection.
 
 .. image:: _static/104.png
+   :width: 80%
 
 A ring is self-intersecting if its projection to the best-fitted plane (done with least-square) through the vertices of the polygon containing the ring has a self-intersection.
 This rule is there because if it is not possible to project the rings/polygons to a plane, then it is not possible to triangulate it (which is necessary, at least by val3dity, to validate 3D primitives).
@@ -88,6 +89,7 @@ It is the same is the vertices *b* and *c* are projected to the same location: a
 Two or more rings intersect, these can be either the exterior ring with an interior ring or only interior rings. 
 
 .. image:: _static/201.png
+   :width: 50%
 
 .. _error_202:
 
@@ -120,7 +122,7 @@ By definition, if :ref:`error_204` is reported then all the vertices are within 
 
 This error usually means that you have vertices that are *very* close to each other (say 0.1mm) and thus it’s easy to get a large deviation (say 80 degree; the report contains the actual deviation).
 
-.. image:: _static/204.png
+.. image:: _static/104b.png
 
 .. _error_205:
 
@@ -129,6 +131,7 @@ This error usually means that you have vertices that are *very* close to each ot
 The interior of a polygon must be connected. The combination of different valid rings can create such an error, for example:
 
 .. image:: _static/205.png
+   :width: 25%
 
 .. _error_206:
 
@@ -137,6 +140,7 @@ The interior of a polygon must be connected. The combination of different valid 
 One or more interior ring(s) is(are) located completely outside the exterior ring. If the interior ring intersects the exterior ring, then error :ref:`error_201` should be returned.
 
 .. image:: _static/206.png
+   :width: 25%
 
 .. _error_207:
 
@@ -145,6 +149,7 @@ One or more interior ring(s) is(are) located completely outside the exterior rin
 One or more interior ring(s) is(are) located completely inside another interior ring.
 
 .. image:: _static/207.png
+   :width: 25%
 
 .. _error_208:
 
@@ -154,6 +159,7 @@ The interior rings must have the opposite direction (clockwise vs counterclockwi
 When the polygon is used as a bounding surface of a shell, then the rings have to have a specified orientation (see 307/308).
 
 .. image:: _static/208.png
+   :width: 25%
 
 .. _error_301:
 
