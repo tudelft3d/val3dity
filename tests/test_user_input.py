@@ -4,30 +4,6 @@ import pytest
 import subprocess, os
 import re
 
-@pytest.fixture(scope="module")
-def validate_full():
-    def _validate(command):
-        try:
-            proc = subprocess.run(command,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  universal_newlines=True,
-                                  timeout=6)
-        except subprocess.TimeoutExpired:
-            return([" ".join(["Something went really wrong.",
-                             "Validate the file separately with val3dity.",
-                             "Or set a higher timeout in conftest.py."])])
-        out = proc.stdout
-        err = proc.stderr
-        rcode = proc.returncode
-        if rcode < 0:
-            # For example Segmentation fault
-            return(["Something went really wrong. Validate the file separately with val3dity."])
-        else:
-            return([out, err])
-        
-    return(_validate)
-
 
 @pytest.fixture(scope="module",
                 params=[
@@ -77,11 +53,11 @@ def data_ignore_204():
                 params=["basecube.off",
                         "basecube.obj",
                         "basecube.poly"])
-def data_basecube(request):
+def data_basecube(request, dir_valid):
     """Unit cube"""
     root = os.getcwd()
     file_path = os.path.abspath(
-        os.path.join(root, "data/test_valid/", request.param)
+        os.path.join(root, dir_valid, request.param)
         )
     return([file_path])
 

@@ -8,42 +8,34 @@ those validity checks in the relevant test case.
 import pytest
 import os.path
 
-#----------------------------------------------------------------- Data folder
-@pytest.fixture(scope="module")
-def data_valid():
-    """path to the data for test_valid"""
-    root = os.getcwd()
-    dir_path = os.path.join(root, "data/test_valid")
-    return(dir_path)
-
 
 #------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
                 params=["planar.poly"])
-def data_planar(request, data_valid):
+def data_planar(request, dir_valid):
     file_path = os.path.abspath(
         os.path.join(
-            data_valid,
+            dir_valid,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["self_fold.obj"])
-def data_self_fold(request, data_valid):
+def data_self_fold(request, dir_valid):
     file_path = os.path.abspath(
         os.path.join(
-            data_valid,
+            dir_valid,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["closed_top.poly"])
-def data_closed_top(request, data_valid):
+def data_closed_top(request, dir_valid):
     file_path = os.path.abspath(
         os.path.join(
-            data_valid,
+            dir_valid,
             request.param))
     return(file_path)
 
@@ -55,19 +47,19 @@ def data_closed_top(request, data_valid):
                         ["inner_shell_3.poly", "inner_shell.poly"],
                         ["inner_shell_4.poly", "inner_shell.poly"]
                         ])
-def data_inner_shell(request, data_valid, data_basecube):
+def data_inner_shell(request, dir_valid, data_basecube):
     ishell = request.param
     ishell_path = []
     if isinstance(ishell, list):
         for i in ishell:
             i_path = os.path.abspath(
-                        os.path.join(data_valid, i)
+                        os.path.join(dir_valid, i)
                         )
             ishell_path = ishell_path + ["--ishell", i_path]
     else:
         ishell_path = ["--ishell",
                        os.path.abspath(
-                           os.path.join(data_valid, ishell)
+                           os.path.join(dir_valid, ishell)
                            )
                        ]
     inner_outer_path = ishell_path + data_basecube

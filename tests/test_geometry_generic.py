@@ -11,21 +11,14 @@ in different file formats, because test maintenance will become very error prone
 import pytest
 import os.path
 
-#----------------------------------------------------------------- Data folder
-@pytest.fixture(scope="module")
-def data_geometry_generic():
-    """path to the data for test_geometry_generic"""
-    root = os.getcwd()
-    dir_path = os.path.join(root, "data/test_geometry_generic")
-    return(dir_path)
 
 #------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
                 params=["101.poly"])
-def data_101(request, data_geometry_generic):
+def data_101(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 # TODO: add GML ring where the first and the last points are the same
@@ -33,10 +26,10 @@ def data_101(request, data_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["102.poly"])
-def data_102(request, data_geometry_generic):
+def data_102(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 # TODO: add GML ring where consecutive points are the same
@@ -47,10 +40,10 @@ def data_102(request, data_geometry_generic):
                         "104_1.poly",
                         "104_2.poly",
                         "104_3.poly"])
-def data_104(request, data_geometry_generic):
+def data_104(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -59,20 +52,20 @@ def data_104(request, data_geometry_generic):
                 params=["201.poly",
                         "201_1.poly",
                         "201_2.poly"])
-def data_201(request, data_geometry_generic):
+def data_201(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["202.poly"])
-def data_202(request, data_geometry_generic):
+def data_202(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -81,10 +74,10 @@ def data_202(request, data_geometry_generic):
                 params=["203.poly",
                         "203_1.poly",
                         "203_2.poly"])
-def data_203(request, data_geometry_generic):
+def data_203(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -92,10 +85,10 @@ def data_203(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["204_1.poly",
                         "204_2.poly"])
-def data_204(request, data_geometry_generic):
+def data_204(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -103,30 +96,30 @@ def data_204(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["204_valid_1.poly",
                         "204_valid_2.poly"])
-def data_204_valid(request, data_geometry_generic):
+def data_204_valid(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["205.poly"])
-def data_205(request, data_geometry_generic):
+def data_205(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["206.poly"])
-def data_206(request, data_geometry_generic):
+def data_206(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -134,10 +127,10 @@ def data_206(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["207.poly",
                         "207_1.poly"])
-def data_207(request, data_geometry_generic):
+def data_207(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 # TODO: add 207_2.poly once val3dity can parse the holes in a poly file
@@ -145,10 +138,10 @@ def data_207(request, data_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["208.poly"])
-def data_208(request, data_geometry_generic):
+def data_208(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -156,10 +149,10 @@ def data_208(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["301.poly",
                         "301_1.poly"])
-def data_301(request, data_geometry_generic):
+def data_301(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -167,20 +160,20 @@ def data_301(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["302.poly",
                         "302_1.poly"])
-def data_302(request, data_geometry_generic):
+def data_302(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["302_2.gml"])
-def data_302_gml(request, data_geometry_generic):
+def data_302_gml(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -188,10 +181,10 @@ def data_302_gml(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["303.poly",
                         "303_1.poly"])
-def data_303(request, data_geometry_generic):
+def data_303(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -200,10 +193,10 @@ def data_303(request, data_geometry_generic):
                 params=["304.poly",
                         "304_1.poly",
                         "304_2.obj"])
-def data_304(request, data_geometry_generic):
+def data_304(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -211,10 +204,10 @@ def data_304(request, data_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["305.poly",
                         "305_1.poly"])
-def data_305(request, data_geometry_generic):
+def data_305(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -224,29 +217,29 @@ def data_305(request, data_geometry_generic):
                         "306_1.poly",
                         "306_2.poly",
                         "306_3.poly"])
-def data_306(request, data_geometry_generic):
+def data_306(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["307.poly"])
-def data_307(request, data_geometry_generic):
+def data_307(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 @pytest.fixture(scope="module",
                 params=["307_1.poly"])
-def data_307_1(request, data_geometry_generic):
+def data_307_1(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
@@ -256,19 +249,19 @@ def data_307_1(request, data_geometry_generic):
                         ["401_2.poly", "inner_shell.poly"],
                         ["401_3.poly", "inner_shell.poly"],
                         "401_4.poly"])
-def data_401(request, data_geometry_generic, data_basecube):
+def data_401(request, dir_geometry_generic, data_basecube):
     ishell = request.param
     ishell_path = []
     if isinstance(ishell, list):
         for i in ishell:
             i_path = os.path.abspath(
-                        os.path.join(data_geometry_generic, i)
+                        os.path.join(dir_geometry_generic, i)
                         )
             ishell_path = ishell_path + ["--ishell", i_path]
     else:
         ishell_path = ["--ishell",
                        os.path.abspath(
-                           os.path.join(data_geometry_generic, ishell)
+                           os.path.join(dir_geometry_generic, ishell)
                            )
                        ]
     inner_outer_path = ishell_path + data_basecube
@@ -277,29 +270,29 @@ def data_401(request, data_geometry_generic, data_basecube):
 
 @pytest.fixture(scope="module",
                 params=["402.poly"])
-def data_402(request, data_geometry_generic):
+def data_402(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=[["402_1.poly", "inner_shell.poly"]])
-def data_402_1(request, data_geometry_generic, data_basecube):
+def data_402_1(request, dir_geometry_generic, data_basecube):
     ishell = request.param
     ishell_path = []
     if isinstance(ishell, list):
         for i in ishell:
             i_path = os.path.abspath(
-                        os.path.join(data_geometry_generic, i)
+                        os.path.join(dir_geometry_generic, i)
                         )
             ishell_path = ishell_path + ["--ishell", i_path]
     else:
         ishell_path = ["--ishell",
                        os.path.abspath(
-                           os.path.join(data_geometry_generic, ishell)
+                           os.path.join(dir_geometry_generic, ishell)
                            )
                        ]
     inner_outer_path = ishell_path + data_basecube
@@ -309,10 +302,10 @@ def data_402_1(request, data_geometry_generic, data_basecube):
 @pytest.fixture(scope="module",
                 params=["403.poly",
                         "403_1.poly"])
-def data_403(request, data_geometry_generic, data_basecube):
+def data_403(request, dir_geometry_generic, data_basecube):
     ishell_path = ["--ishell",
                    os.path.abspath(
-                       os.path.join(data_geometry_generic, request.param)
+                       os.path.join(dir_geometry_generic, request.param)
                        )
                    ]
     inner_outer_path = ishell_path + data_basecube
@@ -321,10 +314,10 @@ def data_403(request, data_geometry_generic, data_basecube):
 
 @pytest.fixture(scope="module",
                 params=["404.poly"])
-def data_404(request, data_geometry_generic, data_basecube):
+def data_404(request, dir_geometry_generic, data_basecube):
     ishell_path = ["--ishell",
                    os.path.abspath(
-                       os.path.join(data_geometry_generic, request.param)
+                       os.path.join(dir_geometry_generic, request.param)
                        )
                    ]
     inner_outer_path = ishell_path + data_basecube
@@ -333,10 +326,10 @@ def data_404(request, data_geometry_generic, data_basecube):
 
 @pytest.fixture(scope="module",
                 params=["405.poly"])
-def data_405(request, data_geometry_generic):
+def data_405(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_generic,
+            dir_geometry_generic,
             request.param))
     return(file_path)
 

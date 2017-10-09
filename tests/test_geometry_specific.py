@@ -7,21 +7,14 @@ cannot be modelled by each format, thus don't belong to *Geometry errors*
 import pytest
 import os.path
 
-#----------------------------------------------------------------- Data folder
-@pytest.fixture(scope="module")
-def data_geometry_specific():
-    """path to the data for test_geometry_specific"""
-    root = os.getcwd()
-    dir_path = os.path.join(root, "data/test_geometry_specific")
-    return(dir_path)
 
 #------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
                 params=["103.gml"])
-def data_103(request, data_geometry_specific):
+def data_103(request, dir_geometry_specific):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_specific,
+            dir_geometry_specific,
             request.param))
     return(file_path)
 
@@ -29,40 +22,40 @@ def data_103(request, data_geometry_specific):
 @pytest.fixture(scope="module",
                 params=["501.gml",
                         "501_1.gml"])
-def data_501(request, data_geometry_specific):
+def data_501(request, dir_geometry_specific):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_specific,
+            dir_geometry_specific,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["502.gml"])
-def data_502(request, data_geometry_specific):
+def data_502(request, dir_geometry_specific):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_specific,
+            dir_geometry_specific,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["503.gml"])
-def data_503(request, data_geometry_specific):
+def data_503(request, dir_geometry_specific):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_specific,
+            dir_geometry_specific,
             request.param))
     return(file_path)
 
 
 @pytest.fixture(scope="module",
                 params=["601.gml"])
-def data_601(request, data_geometry_specific):
+def data_601(request, dir_geometry_specific):
     file_path = os.path.abspath(
         os.path.join(
-            data_geometry_specific,
+            dir_geometry_specific,
             request.param))
     return(file_path)
 #----------------------------------------------------------------------- Tests

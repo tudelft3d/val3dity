@@ -27,13 +27,53 @@ def pytest_collection_modifyitems(config, items):
         if "full" in item.keywords:
             item.add_marker(skip_full)
 
-#------------------------------------------------------------ session fixtures
 @pytest.fixture(scope="session")
 def val3dity():
     """path to val3dity executable"""
     root = os.getcwd()
     p = os.path.join(root, "build/val3dity")
     return(os.path.abspath(p))
+
+#-------------------------------------------------------------- data & folders
+@pytest.fixture(scope="session")
+def dir_file_format():
+    """path to the data for test_file_format"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_file_format")
+    return(dir_path)
+
+
+@pytest.fixture(scope="session")
+def dir_valid():
+    """path to the data for test_valid"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_valid")
+    return(dir_path)
+
+
+@pytest.fixture(scope="session")
+def dir_empty():
+    """path to the data for test_empty"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_empty")
+    return(dir_path)
+
+
+@pytest.fixture(scope="session")
+def dir_geometry_generic():
+    """path to the data for test_geometry_generic"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_geometry_generic")
+    return(dir_path)
+
+
+@pytest.fixture(scope="session")
+def dir_geometry_specific():
+    """path to the data for test_geometry_specific"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_geometry_specific")
+    return(dir_path)
+
 
 @pytest.fixture(scope="session")
 def data_basecube():
@@ -53,6 +93,8 @@ def data_composite_solid():
         )
     return([file_path])
 
+
+#------------------------------------------------------------- va3dity options
 @pytest.fixture(scope="session")
 def solid():
     """val3dity options for validating a Solid"""
@@ -68,11 +110,7 @@ def citymodel():
     """val3dity options for validating a CityModel"""
     return(["--unittests"])
 
-command = ["./build/val3dity",
-            "--unittests",
-             "--planarity_n_tol 18degree",
-              "./data/test_valid/composite_solid.json"]
-
+#-------------------------------------------------------- validation functions
 @pytest.fixture(scope="session")
 def validate():
     def _validate(file_path, options=solid(), val3dity=val3dity()):
@@ -129,4 +167,33 @@ def validate():
             else:
                 return(output)
     
+    return(_validate)
+
+
+@pytest.fixture(scope="session")
+def validate_full():
+    """Validate a file and return the full stdout, stderr
+    
+    :rtype: list of strings
+    """
+    def _validate(command):
+        try:
+            proc = subprocess.run(command,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE,
+                                  universal_newlines=True,
+                                  timeout=6)
+        except subprocess.TimeoutExpired:
+            return([" ".join(["Something went really wrong.",
+                             "Validate the file separately with val3dity.",
+                             "Or set a higher timeout in conftest.py."])])
+        out = proc.stdout
+        err = proc.stderr
+        rcode = proc.returncode
+        if rcode < 0:
+            # For example Segmentation fault
+            return(["Something went really wrong. Validate the file separately with val3dity."])
+        else:
+            return([out, err])
+        
     return(_validate)
