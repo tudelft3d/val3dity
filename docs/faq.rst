@@ -121,6 +121,13 @@ By definition, if an error 204 is reported then all the vertices are within 1cm 
 That usually means that you have vertices that are very close (say 0.1mm) and thus it’s easy to get a large deviation (say 80degree; the report contains the deviation).  
 
 
+Who validates the validator, huh?
+---------------------------------
+
+We wrote a comprehensive suite of unit tests using the pytest framework.
+This tests, among many others, the following:
+
+
 I don't see all the errors in my solid
 --------------------------------------
 
