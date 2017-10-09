@@ -289,7 +289,7 @@ bool Solid::validate_solid_with_nef()
   if (this->num_ishells() == 0)
     return true;
     
-  std::clog << "-----Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
+  std::clog << "---Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   std::vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {
