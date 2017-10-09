@@ -100,11 +100,8 @@ def data_203_valid(request, data_geometry_generic):
 
 
 @pytest.fixture(scope="module",
-                params=["204.poly",
-                        "204_1.poly",
-                        "204_2.poly",
-                        "204_3.poly",
-                        "204_4.poly"])
+                params=["204_1.poly",
+                        "204_2.poly"])
 def data_204(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -114,7 +111,8 @@ def data_204(request, data_geometry_generic):
 
 
 @pytest.fixture(scope="module",
-                params=["204_valid.poly"])
+                params=["204_valid_1.poly",
+                        "204_valid_2.poly"])
 def data_204_valid(request, data_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(

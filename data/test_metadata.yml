@@ -16,7 +16,7 @@ test_geometry_generic:
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
   "101": Cube top face a line (with only 2 vertices)
   "102": Cube with one duplicate vertex (repeated in a ring)
-  "104": Unit cube where top face has a bow tie
+  "104": Unit cube where top face has a bow tie 
   "104_1": Unit cube with top face having a self-intersecting surface (2D invalid), where 2 out of 3 triangles that are forming a square are bundled as one polygon (which self-intersects)
   "104_2": One face closing in itself before the last vertex
   "104_3": Similar to 104_1 but triangles meet in one corner of the square
@@ -28,12 +28,10 @@ test_geometry_generic:
   "203_1": Unit cube with a rectangular hole drilled through it, where one vertex (8) on the inner ring in the top face of the cube is not on the plane of the face (+0.5)
   "203_2": Same as 203 but non-planar vertex is +0.1
   "203_valid": Same as 203 but non-planar vertex is +0.0999
-  "204": Unit cube with a hump in the top face, which results in an ~1.4° normal difference
-  "204_1": Unit cube with a hump (+0.00699) in the top face, which results in an 1.00114° normal difference
-  "204_2": Unit cube with a depression (-0.00699) in the top face, which results in an 1.00114° normal difference
-  "204_3": Unit cube with a vertical fold (0.0099) in the top face
-  "204_4": Unit cube with a vertical fold (0.0009) in the top face
-  "204_valid": Unit cube with a hump (+0.00698) in the top face, which results in an 0.99971° normal difference
+  "204_valid_1": Unit cube with a hump (+0.00699) in the top face, which results in an 1.00114° normal difference
+  "204_valid_2": Unit cube with a depression (-0.00699) in the top face, which results in an 1.00114° normal difference
+  "204_1": Unit cube with a vertical fold (0.0099) in the top face
+  "204_2": Unit cube with a vertical fold (0.0009) in the top face
   "205": Unit cube with a polygon with interior disconnected in top face
   "206": Unit cube with a hole in top face located outside (in 2D the top face is not acc. to SFS)
   "207": Unit cube with a polygon with nested rings in top face

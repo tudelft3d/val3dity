@@ -28,6 +28,7 @@ def validate_full():
         
     return(_validate)
 
+
 @pytest.fixture(scope="module",
                 params=[
                     ["--unittests", "--notranslate"],
@@ -39,6 +40,7 @@ def validate_full():
 def options_valid(request):
     return(request.param)
 
+
 @pytest.fixture(scope="module",
                 params=[
                     ["--unittests", "-p", "Solid"],
@@ -47,6 +49,7 @@ def options_valid(request):
                     ])
 def options_primitive(request):
     return(request.param)
+
 
 @pytest.fixture(scope="module",
                 params=[
@@ -59,14 +62,16 @@ def options_primitive(request):
 def options_invalid(request):
     return(request.param)
 
+
 @pytest.fixture(scope="module")
 def data_ignore_204():
     """Unit cube with a vertical fold (0.0099) in the top face"""
     root = os.getcwd()
     file_path = os.path.abspath(
-        os.path.join(root, "data/test_geometry_generic/204_3.poly")
+        os.path.join(root, "data/test_geometry_generic/204_1.poly")
         )
     return([file_path])
+
 
 @pytest.fixture(scope="module",
                 params=["basecube.off",
@@ -79,6 +84,7 @@ def data_basecube(request):
         os.path.join(root, "data/test_valid/", request.param)
         )
     return([file_path])
+
 
 @pytest.fixture(scope="module")
 def verbose_reference():
@@ -111,6 +117,7 @@ id: id-1(0)
 """
     return reference
 
+
 @pytest.fixture(scope="module",
                 params=["empty_primitive.json",
                         "empty_primitive.obj",
@@ -122,6 +129,7 @@ def data_no_information(request):
         os.path.join(root, "data/test_empty", request.param)
         )
     return([file_path])
+
 
 @pytest.fixture(scope="module")
 def info_reference():
@@ -162,6 +170,7 @@ LOD3
 """
     return reference
 
+
 #----------------------------------------------------------------------- Tests
 # TODO: add tests on the report content
 
@@ -171,6 +180,7 @@ def test_options_valid(validate, data_composite_solid, options_valid):
     assert(error == [])
 
 def test_default_options_primitive(val3dity, validate_full, data_basecube):
+    """See issue  #72"""
     p_option = 'Solid' # default -p is Solid
     pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
     options = ["--unittests"]
@@ -181,6 +191,7 @@ def test_default_options_primitive(val3dity, validate_full, data_basecube):
 
 def test_options_primitive(val3dity, validate_full, data_basecube,
                            options_primitive):
+    """See issue  #72"""
     p_option = options_primitive[2]
     pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
     command = [val3dity] + options_primitive + data_basecube
