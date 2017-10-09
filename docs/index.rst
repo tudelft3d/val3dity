@@ -29,7 +29,7 @@ val3dity accepts as input:
 
   - `CityGML <https://www.citygml.org>`_ 
   - `CityJSON <http://www.cityjson.org>`_
-  - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
+  - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
 
