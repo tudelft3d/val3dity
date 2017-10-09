@@ -235,7 +235,9 @@ int main(int argc, char* const argv[])
         std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
     }
     else {
-      if (primitives.getValue() == "MultiSurface")
+      if (primitives.getValue() == "Solid")
+        prim3d = SOLID;
+      else if (primitives.getValue() == "MultiSurface")
         prim3d = MULTISURFACE;
       else if (primitives.getValue() == "CompositeSurface")
         prim3d = COMPOSITESURFACE;
