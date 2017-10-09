@@ -870,7 +870,7 @@ void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primiti
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
-  if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["cgml"] + "CityModel")) )
+  if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["citygml"] + "CityModel")) )
   {
     std::cout << "CityGML input file" << std::endl;
     process_gml_file_city_objects(doc, dPrimitives, dallpoly, errs, tol_snap);
