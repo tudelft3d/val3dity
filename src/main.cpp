@@ -66,7 +66,7 @@ public:
     std::cout << "\tval3dity citygmlinput.gml" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in citygmlinput.gml" << std::endl;
     std::cout << "\t\tand outputs a summary per city object" << std::endl;
-    std::cout << "\tval3dity input.gml -r report.xml" << std::endl;
+    std::cout << "\tval3dity input.gml -r report.json" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml" << std::endl;
     std::cout << "\t\tand outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
@@ -80,8 +80,6 @@ public:
     std::cout << "\t\tValidates the geometries in input.off individually" << std::endl;
     std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
-    std::cout << "\tval3dity input.gml --info" << std::endl;
-    std::cout << "\t\tOutputs information about the GML file (no validation performed)." << std::endl;
   }
 
   virtual void failure(TCLAP::CmdLineInterface& c, TCLAP::ArgException& e)
@@ -129,20 +127,16 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "output report in XML format",
+                                              "output report in JSON format",
                                               false,
                                               "",
                                               "string");
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface) (default=S)",
+                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface)",
                                               false,
-                                              "S",
+                                              "",
                                               &primVals);
-    TCLAP::SwitchArg                        info("i",
-                                              "info",
-                                              "prints information about the file",
-                                              false);
     TCLAP::SwitchArg                        verbose("",
                                               "verbose",
                                               "verbose output",
@@ -188,7 +182,6 @@ int main(int argc, char* const argv[])
                                               20.0,
                                               "double");
 
-    cmd.add(info);
     cmd.add(planarity_d2p_tol);
     cmd.add(planarity_n_tol);
     cmd.add(snap_tol);
@@ -224,21 +217,6 @@ int main(int argc, char* const argv[])
     else if ( (extension == "off") || (extension == "OFF") ) 
       inputtype = OFF;
 
-    //-- if info then only this and ignore everything
-    if (info.getValue() == true)
-    {
-      if (inputtype == GML)
-      {
-        std::cout << "\nInformation about input file, ignoring all other options." << std::endl;
-        print_information(inputfile.getValue());
-      }
-      else
-      {
-        std::cout << "Statistics/information only GML files." << std::endl;
-      }
-      return (1);
-    }
-
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
@@ -249,21 +227,22 @@ int main(int argc, char* const argv[])
     if (inputtype == OTHER)
       ioerrs.add_error(901, "File type not supported");
 
-    Primitive3D prim3d = ALL;
-    if (primitives.getValue() == "Solid")
-      prim3d = SOLID;
-    else if (primitives.getValue() == "MultiSurface")
-      prim3d = MULTISURFACE;
-    else if (primitives.getValue() == "CompositeSurface")
-      prim3d = COMPOSITESURFACE;
-    if ( (prim3d != ALL) && ((inputtype == JSON) || (inputtype == GML)) )
-      ioerrs.add_error(903, "the type of 3D primitives to validate is not possible: all are validated in CityGML/CityJSON");
-    if ( (prim3d == ALL) && ((inputtype == OBJ) || (inputtype == OFF) || (inputtype == POLY)) )
-      ioerrs.add_error(903, "the type of 3D primitives to validate wasn't specified (option '-p')");
+    Primitive3D prim3d;
+    if ( (inputtype == JSON) || (inputtype == GML) )
+    {
+      prim3d = ALL;
+      if (primitives.getValue() != "")
+        std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
+    }
+    else {
+      if (primitives.getValue() == "MultiSurface")
+        prim3d = MULTISURFACE;
+      else if (primitives.getValue() == "CompositeSurface")
+        prim3d = COMPOSITESURFACE;
+      if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
+        ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
+    }
 
-    if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
-      ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
-     
     if (ioerrs.has_errors() == false)
     {
       if (inputtype == GML)
@@ -385,6 +364,19 @@ int main(int argc, char* const argv[])
       }
     }
 
+    if (ioerrs.has_errors() == false) 
+    {
+      std::cout << "Primitive(s) validated: ";
+      if (prim3d == SOLID)        
+        std::cout << "Solid" << std::endl;
+      else if (prim3d == MULTISURFACE)        
+        std::cout << "MultiSurface" << std::endl;
+      else if (prim3d == COMPOSITESURFACE)        
+        std::cout << "CompositeSurface" << std::endl;
+      else
+        std::cout << "All" << std::endl;
+    }
+
     if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
     {
       //-- translate all vertices to avoid potential problems
@@ -467,7 +459,7 @@ int main(int argc, char* const argv[])
           COError coerrs;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
-            std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
+            // std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
             dCOerrors[co.first] = coerrs;
           }
         }
@@ -509,7 +501,7 @@ int main(int argc, char* const argv[])
       clog.rdbuf(savedBufferCLOG);
       mylog.close();
     }
-    return(1);
+    return(0);
   }
   catch (TCLAP::ArgException &e) 
   {
