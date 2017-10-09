@@ -135,7 +135,7 @@ int main(int argc, char* const argv[])
                                               "primitive",
                                               "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface)",
                                               false,
-                                              "",
+                                              "Solid",
                                               &primVals);
     TCLAP::SwitchArg                        verbose("",
                                               "verbose",
