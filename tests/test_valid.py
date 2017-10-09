@@ -49,20 +49,6 @@ def data_closed_top(request, data_valid):
 
 
 @pytest.fixture(scope="module",
-                params=["inner_pyramid.poly",
-                        "inner_pyramid_1.poly",
-                        "inner_pyramid_2.poly",
-                        "inner_pyramid_3.poly",
-                        "inner_pyramid_4.poly"])
-def data_inner_pyramid(request, data_valid):
-    file_path = os.path.abspath(
-        os.path.join(
-            data_valid,
-            request.param))
-    return(file_path)
-
-
-@pytest.fixture(scope="module",
                 params=["inner_shell.poly",
                         "inner_shell_1.poly",
                         ["inner_shell_2.poly", "inner_shell.poly"],
@@ -99,10 +85,6 @@ def test_self_fold(validate, data_self_fold):
 
 def test_closed_top(validate, data_closed_top):
     error = validate(data_closed_top)
-    assert(error == [])
-
-def test_valid_inner_shell(validate, data_inner_pyramid):
-    error = validate(data_inner_pyramid)
     assert(error == [])
 
 def test_inner_shell(validate, data_inner_shell):

@@ -82,11 +82,6 @@ test_valid:
   "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005
   "self_fold": .obj unit cube with a whirl
   "closed_top": Unit cube with a top surface composed of 2 polygons
-  "inner_pyramid": Unit cube with a cavity (pyramid)
-  "inner_pyramid_1": "Unit cube with a cavity where the pyramid touching top face one point. Oracle is wrong on that one: oracle=54513"
-  "inner_pyramid_2": Unit cube with two cavities touching at a single point (duplicate vertex)
-  "inner_pyramid_3": Unit cube with two cavities touching along an edge (shared edge)
-  "inner_pyramid_4": Unit cube with two cavities, one touches a face of the other
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
   "inner_shell_1": "+ basecube = Unit cube with a cavity where the pyramid touching top face one point. Oracle is wrong on that one: oracle=54513"
   "inner_shell_2": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching at a single point (duplicate vertex)"
