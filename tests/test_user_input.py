@@ -2,6 +2,7 @@
 """
 import pytest
 import subprocess, os
+import re
 
 @pytest.fixture(scope="module")
 def validate_full():
@@ -29,9 +30,6 @@ def validate_full():
 
 @pytest.fixture(scope="module",
                 params=[
-                    ["--unittests", "-p Solid"],
-                    ["--unittests", "-p MultiSurface"],
-                    ["--unittests", "-p CompositeSurface"],
                     ["--unittests", "--notranslate"],
                     ["--unittests", "--overlap_tol 1.0"],
                     ["--unittests", "--snap_tol 1"],
@@ -39,6 +37,15 @@ def validate_full():
                     ["--unittests", "--planarity_d2p_tol 0.5"]
                     ])
 def options_valid(request):
+    return(request.param)
+
+@pytest.fixture(scope="module",
+                params=[
+                    ["--unittests", "-p", "Solid"],
+                    ["--unittests", "-p", "MultiSurface"],
+                    ["--unittests", "-p", "CompositeSurface"]
+                    ])
+def options_primitive(request):
     return(request.param)
 
 @pytest.fixture(scope="module",
@@ -58,6 +65,18 @@ def data_ignore_204():
     root = os.getcwd()
     file_path = os.path.abspath(
         os.path.join(root, "data/test_geometry_generic/204_3.poly")
+        )
+    return([file_path])
+
+@pytest.fixture(scope="module",
+                params=["basecube.off",
+                        "basecube.obj",
+                        "basecube.poly"])
+def data_basecube(request):
+    """Unit cube"""
+    root = os.getcwd()
+    file_path = os.path.abspath(
+        os.path.join(root, "data/test_valid/", request.param)
         )
     return([file_path])
 
@@ -150,6 +169,25 @@ LOD3
 def test_options_valid(validate, data_composite_solid, options_valid):
     error = validate(data_composite_solid, options=options_valid)
     assert(error == [])
+
+def test_default_options_primitive(val3dity, validate_full, data_basecube):
+    p_option = 'Solid' # default -p is Solid
+    pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
+    options = ["--unittests"]
+    command = [val3dity] + options + data_basecube
+    out, err = validate_full(command)
+    p_validated = pat_re.search(out).group()
+    assert p_validated == p_option
+
+def test_options_primitive(val3dity, validate_full, data_basecube,
+                           options_primitive):
+    p_option = options_primitive[2]
+    pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
+    command = [val3dity] + options_primitive + data_basecube
+    out, err = validate_full(command)
+    p_validated = pat_re.search(out).group()
+    assert p_validated == p_option
+    
 
 def test_options_invalid(validate, data_composite_solid, options_invalid):
     error = validate(data_composite_solid, options=options_invalid)
