@@ -21,7 +21,7 @@ def data_invalid_json(request, dir_file_format):
         os.path.join(
             dir_file_format,
             request.param))
-    return(file_path)
+    return([file_path])
 
 
 @pytest.fixture(scope="module",
@@ -33,9 +33,17 @@ def data_invalid_citygml(request, dir_file_format):
         os.path.join(
             dir_file_format,
             request.param))
-    return(file_path)
+    return([file_path])
 
-
+@pytest.fixture(scope="module",
+                params=["composite_solid.gml",
+                        "composite_solid_1.gml"])
+def data_namespace(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return([file_path])
 
 #----------------------------------------------------------------------- Tests
 def test_invalid_json(validate, data_invalid_json, citymodel):
@@ -45,3 +53,10 @@ def test_invalid_json(validate, data_invalid_json, citymodel):
 def test_invalid_citygml(validate, data_invalid_citygml, citymodel):
     error = validate(data_invalid_citygml, options=citymodel)
     assert(error == [901])
+
+def test_namespace(val3dity, validate_full, data_namespace):
+    message = "CityGML input file"
+    command = [val3dity] + data_namespace
+    out, err = _validate(command)
+    assert message in out
+    
