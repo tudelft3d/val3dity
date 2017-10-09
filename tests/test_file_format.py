@@ -57,6 +57,6 @@ def test_invalid_citygml(validate, data_invalid_citygml, citymodel):
 def test_namespace(val3dity, validate_full, data_namespace):
     message = "CityGML input file"
     command = [val3dity] + data_namespace
-    out, err = _validate(command)
+    out, err = validate_full(command)
     assert message in out
     
