@@ -42,7 +42,6 @@ test_geometry_generic:
   "302_2": A vertex in the top surface does not close the shell (0.00001 discrepancy), GML cube
   "303": Unit cube with one dangling face touching the cube at one point only. The dangling face is the last in the list
   "303_1": 2 unit cubes touching at one vertex
-  "304": Unit cube with an extra vertex on an edge. Only one of the 2 incident faces has it explicitly. Geometrically valid, but topologically invalid, thus invalid. Note that Oracle Spatial reports valid.
   "304_1": Unit cube with one extra face in the middle, splitting the cube in two parts
   "304_2": Unit cube with one corner as a separate part
   "305": Cube with one extra face floating in the air, not touching
