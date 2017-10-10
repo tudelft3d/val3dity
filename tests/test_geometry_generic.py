@@ -313,7 +313,9 @@ def data_403(request, dir_geometry_generic, data_basecube):
 
 
 @pytest.fixture(scope="module",
-                params=["404.poly"])
+                params=["404.poly",
+                        "404_1.poly",
+                        "404_2.poly"])
 def data_404(request, dir_geometry_generic, data_basecube):
     ishell_path = ["--ishell",
                    os.path.abspath(

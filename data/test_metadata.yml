@@ -63,6 +63,8 @@ test_geometry_generic:
   "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
   "403_1": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube, but one face is adjacent to it"
   "404": "+ basecube = A cavity that is disconnected (like the diagram for error 205, but in 3D) in basecube"
+  "404_1": "+ basecube = Like 404 but cavity touches the bottom surface"
+  "404_2": "+ basecube = Like 404 but cavity touches the top and bottom surfaces"
   "405": Pyramid with the normals pointing inwards
 
 # TODO: test 401 with gml, because it is not possible with obj/poly/off
