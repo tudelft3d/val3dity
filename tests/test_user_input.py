@@ -32,7 +32,6 @@ def options_primitive(request):
                     ["--unittests", "--overlap_tol 1cm"],
                     ["--unittests", "--snap_tol 1ft"],
                     ["--unittests", "--planarity_n_tol 18degree"],
-                    ["--unittests", "--planarity_n_tol 18rad"],
                     ["--unittests", "--planarity_d2p_tol 2.5mm"]
                     ])
 def options_invalid(request):
@@ -93,60 +92,6 @@ id: id-1(0)
 """
     return reference
 
-
-@pytest.fixture(scope="module",
-                params=["empty_primitive.json",
-                        "empty_primitive.obj",
-                        "empty_primitive.off",
-                        "empty_primitive.xml"])
-def data_no_information(request):
-    root = os.getcwd()
-    file_path = os.path.abspath(
-        os.path.join(root, "data/test_empty", request.param)
-        )
-    return([file_path])
-
-
-@pytest.fixture(scope="module")
-def info_reference():
-    """The part of val3dity console output that is printed when
-    val3dity --information composite_solid.gml is called"""
-    
-    reference = """
-++++++++++++++++++++ GENERAL +++++++++++++++++++++
-CityGML version: v2.0
-+++++++++++++++++++ PRIMITIVES +++++++++++++++++++
-gml:Solid                                        2
-gml:MultiSolid                                   0
-gml:CompositeSolid                               1
-gml:MultiSurface                                 0
-gml:CompositeSurface                             2
-gml:Polygon                                     12
-
-++++++++++++++++++++ BUILDINGS +++++++++++++++++++
-Building                                         0
-    without BuildingPart                         0
-    having BuildingPart                          0
-    with gml:id                                  0
-BuildingPart                                     0
-    with gml:id                                  0
-LOD1
-    Building stored in gml:Solid                 0
-    Building stored in gml:MultiSurface          0
-    Building with semantics for surfaces         0
-LOD2
-    Building stored in gml:Solid                 0
-    Building stored in gml:MultiSurface          0
-    Building with semantics for surfaces         0
-LOD3
-    Building stored in gml:Solid                 0
-    Building stored in gml:MultiSurface          0
-    Building with semantics for surfaces         0
-++++++++++++++++++++++++++++++++++++++++++++++++++
-"""
-    return reference
-
-
 #----------------------------------------------------------------------- Tests
 # TODO: add tests on the report content
 
@@ -177,8 +122,9 @@ def test_options_primitive(val3dity, validate_full, data_basecube,
     
 
 def test_options_invalid(validate, data_composite_solid, options_invalid):
+    message = "Couldn't read argument value"
     error = validate(data_composite_solid, options=options_invalid)
-    assert(error == [903])
+    assert(message in error[0]) # validate() returns a list
 
 def test_ignore_204(validate, data_ignore_204):
     error = validate(data_ignore_204, options=["--unittests",
@@ -186,30 +132,12 @@ def test_ignore_204(validate, data_ignore_204):
                                                "--ignore204"])
     assert(error == [])
 
-@pytest.mark.skip(reason="not implemented yet, see #80")
 def test_verbose(val3dity, validate_full, data_composite_solid, verbose_reference):
+    """Verbose log is redirected to stderr, see #80"""
     options = ["--verbose"]
     command = [val3dity] + options + data_composite_solid
     out, err = validate_full(command)
-    assert verbose_reference in out
-
-@pytest.mark.skip(reason="not implemented yet, see #81")
-def test_no_information(val3idity, validate_full, data_no_information):
-    info_reference = "Statistics/information only for CityGML files"
-    options = ["-i"]
-    command = [val3dity] + options + data_no_information
-    out, err = validate_full(command)
-    assert info_reference in out
-
-def test_information(val3dity, validate_full, info_reference):
-    root = os.getcwd()
-    data = os.path.abspath(
-        os.path.join(root, "data/test_valid/composite_solid.gml")
-        )
-    options = ["-i"]
-    command = [val3dity] + options + [data]
-    out, err = validate_full(command)
-    assert info_reference in out
+    assert verbose_reference in err
 
 def test_ignore_rest(val3dity, validate_full, data_composite_solid):
     options = ["--unittests"]
