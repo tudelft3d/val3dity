@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" type="text/css" href="report.css">
+    </head>
+
+    <body>
+
+    <table id="input">
+        <tr>
+            <th> Input file: </th>
+            <th id="in_file"></th>
+        </tr>
+        <tr>
+            <td>val3dity version:</td>
+            <td id=version></td>
+        </tr>
+        <tr>
+            <td>Validation time:</td>
+            <td id=time></td>
+        </tr>
+    </table>
+
+    <h3 id=param_h>Parameters used for validation</h3>
+    <table id="params">
+        <tr>
+            <td>
+                <a href="http://val3dity.readthedocs.io/en/v2/usage/#planarity-d2p-tol" target="_blank">
+                    planarity_d2p_tol:
+                </a>
+            </td>
+            <td id=planarity_d2p_tol></td>
+        </tr>
+        <tr>
+            <td>
+                <a href="http://val3dity.readthedocs.io/en/v2/usage/#planarity-n-tol" target="_blank">
+                    planarity_n_tol:
+                </a>
+            </td>
+            <td id=planarity_n_tol></td>
+        </tr>
+        <tr>
+            <td>
+                <a href="http://val3dity.readthedocs.io/en/v2/usage/#snap-tol" target="_blank">
+                    snap_tol:
+                </a>
+            </td>
+            <td id=snap_tol></td>
+        </tr>
+        <tr>
+            <td>
+                <a href="http://val3dity.readthedocs.io/en/v2/usage/#overlap-tol" target="_blank">
+                    overlap_tol:
+                </a>
+            </td>
+            <td id=overlap_tol></td>
+        </tr>
+    </table>
+
+    <h3 id=summary>Validation summary</h3>
+    <table>
+        <tr>
+            <th></th>
+            <th>Total nr.</th>
+            <th>Valid</th>
+            <th>Invalid</th>
+        </tr>
+        <tr>
+            <td>CityObjects</td>
+            <td id=CO_total></td>
+            <td id=CO_valid></td>
+            <td id=CO_invalid></td>
+        </tr>
+        <tr>
+            <td>Primitives</td>
+            <td id=p_total></td>
+            <td id=p_valid></td>
+            <td id=p_invalid></td>
+        </tr>
+    </table>
+
+    <h3 id=errors>Errors</h3>
+
+    <script type="text/javascript" src="msol2.json"></script>
+    <script type="text/javascript" src="htmlify.js"></script>
+
+    </body>
+</html>
