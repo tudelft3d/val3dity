@@ -61,7 +61,6 @@ test_geometry_generic:
   "402_out_1": "A CityJSON with two identical Solids"
   "402_in_1": "+ inner_shell + basecube = Duplicate cavities in basecube"
   "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
-  "403_1": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube, but one face is adjacent to it"
   "404": "+ basecube = A cavity that is disconnected (like the diagram for error 205, but in 3D) in basecube"
   "404_1": "+ basecube = Like 404 but cavity touches the bottom surface"
   "404_2": "+ basecube = Like 404 but cavity touches the top and bottom surfaces"
