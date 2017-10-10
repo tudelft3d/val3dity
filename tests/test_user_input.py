@@ -100,6 +100,7 @@ def test_options_valid(validate, data_composite_solid, options_valid):
     error = validate(data_composite_solid, options=options_valid)
     assert(error == [])
 
+@pytest.mark.full
 def test_default_options_primitive(val3dity, validate_full, data_basecube):
     """See issue  #72"""
     p_option = 'Solid' # default -p is Solid
@@ -121,6 +122,7 @@ def test_options_primitive(val3dity, validate_full, data_basecube,
     assert p_validated == p_option
     
 
+@pytest.mark.full
 def test_options_invalid(validate, data_composite_solid, options_invalid):
     message = "Couldn't read argument value"
     error = validate(data_composite_solid, options=options_invalid)
@@ -132,6 +134,7 @@ def test_ignore_204(validate, data_ignore_204):
                                                "--ignore204"])
     assert(error == [])
 
+@pytest.mark.full
 def test_verbose(val3dity, validate_full, data_composite_solid, verbose_reference):
     """Verbose log is redirected to stderr, see #80"""
     options = ["--verbose"]
@@ -139,6 +142,7 @@ def test_verbose(val3dity, validate_full, data_composite_solid, verbose_referenc
     out, err = validate_full(command)
     assert verbose_reference in err
 
+@pytest.mark.full
 def test_ignore_rest(val3dity, validate_full, data_composite_solid):
     options = ["--unittests"]
     command = [val3dity] + options + data_composite_solid + ["--", "-i"]
@@ -149,6 +153,7 @@ def test_ignore_rest(val3dity, validate_full, data_composite_solid):
         error = out
     assert error == []
 
+@pytest.mark.full
 def test_version(val3dity, validate_full):
     command = [val3dity] + ["--version"]
     out, err = validate_full(command)

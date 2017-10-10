@@ -3,9 +3,9 @@
 The intention is to isolate the geometry from the file format.
 The POLY format is simple, supports inner rings and the parser is reliable.
 Therefore each geometry error case (http://val3dity.readthedocs.io/en/v2/errors/#)
-is tested with the POLY format *only*. Don't replicate these geometry error cases
-in different file formats, because test maintenance will become very error prone
-(ie update one file but forget the other...).
+is tested with the POLY format. If possilbe don't replicate these geometry error cases
+in different file formats. For some cases POLY is not suitable though, eg 402,
+thus a different format is used, and the test is still here.
 """
 
 import pytest

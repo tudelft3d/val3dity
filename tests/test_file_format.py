@@ -1,10 +1,9 @@
 """Testing error cases related to file formats.
 
-1. Here each file contains the same, valid geometry. Thus the various formatting 
+- Each file contains the same, valid geometry. Thus the various formatting 
 options and errors are tested. 
 
-2. Invalid schema or geometry definitions, eg invalid definition of a hole
-in a .poly file.
+- Invalid schema or geometry definitions, eg invalid CityGML
 """
 
 ## 901
@@ -34,10 +33,12 @@ def data_namespace(request, dir_valid):
     return([file_path])
 
 #----------------------------------------------------------------------- Tests
+@pytest.mark.full
 def test_invalid_citygml(validate, data_invalid_citygml, citymodel):
     error = validate(data_invalid_citygml, options=citymodel)
     assert(error == [901])
 
+@pytest.mark.full
 def test_namespace(val3dity, validate_full, data_namespace):
     message = "CityGML input file"
     command = [val3dity] + data_namespace

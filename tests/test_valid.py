@@ -79,6 +79,7 @@ def test_closed_top(validate, data_closed_top):
     error = validate(data_closed_top)
     assert(error == [])
 
+@pytest.mark.full
 def test_inner_shell(validate, data_inner_shell):
     error = validate(data_inner_shell)
     assert(error == [])
