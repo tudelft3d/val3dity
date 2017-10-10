@@ -26,6 +26,7 @@ def data_completely_empty(request, dir_empty):
                 params=["empty_primitive.gml",
                         "empty_primitive.xml",
                         "empty_primitive.json",
+                        "empty_primitive_1.json",
                         "empty_primitive.obj",
                         "empty_primitive.off"])
 def dir_empty_primitive(request, dir_empty):
