@@ -14,20 +14,8 @@ import os.path
 
 #------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
-                params=["invalid_json_1.json",
-                        "invalid_json_2.json"])
-def data_invalid_json(request, dir_file_format):
-    file_path = os.path.abspath(
-        os.path.join(
-            dir_file_format,
-            request.param))
-    return([file_path])
-
-
-@pytest.fixture(scope="module",
                 params=["invalid_citygml_1.gml",
-                        "invalid_citygml_2.gml",
-                        "invalid_citygml_3.gml"])
+                        "invalid_citygml_2.gml"])
 def data_invalid_citygml(request, dir_file_format):
     file_path = os.path.abspath(
         os.path.join(
@@ -46,10 +34,6 @@ def data_namespace(request, dir_valid):
     return([file_path])
 
 #----------------------------------------------------------------------- Tests
-def test_invalid_json(validate, data_invalid_json, citymodel):
-    error = validate(data_invalid_json, options=citymodel)
-    assert(error == [901])
-
 def test_invalid_citygml(validate, data_invalid_citygml, citymodel):
     error = validate(data_invalid_citygml, options=citymodel)
     assert(error == [901])
