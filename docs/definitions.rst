@@ -33,8 +33,8 @@ An aggregate is an arbitrary collection of primitives of the same dimensionality
 GML (and CityGML) has classes for each dimensionality (``Multi*``).
 An aggregate does not prescribe any topological relationships between the primitives, it is simply a list of primitives (ie they can overlap or be disconnected).
 
-A composite of dimension *d* is a collection of *d*-dimensional primitives that form a *d*-manifold, which is a topological space that is locally like a *d*-dimensional Euclidean space (:math:\mathbb{R}^d`). 
-The most relevant example in a GIS context is a ``CompositeSurface``: it is a 2-manifold, or, in other words, a surface embedded in :math:\mathbb{R}^d`.
+A composite of dimension *d* is a collection of *d*-dimensional primitives that form a *d*-manifold, which is a topological space that is locally like a *d*-dimensional Euclidean space (:math:`\mathbb{R}^d`). 
+The most relevant example in a GIS context is a ``CompositeSurface``: it is a 2-manifold, or, in other words, a surface embedded in :math:`\mathbb{R}^d`.
 An obvious example is the surface of the Earth, for which near to every point the surrounding area is topologically equivalent to a plane. 
 
 
@@ -44,22 +44,25 @@ Overview of 3D primitives handled
 .. image:: _static/geomprimitives.svg
    :width: 70%
 
-
+It is important to observe that for a primitive to be valid, all its lower-dimensionality primitives should be valid.
+That is, a valid Solid cannot have as one of its surfaces a Polygon having a self-intersection (which would make it invalid).
 
 
 ``MultiSurface``
 ----------------
-
+An arbitrary collection Polygon embedded in :math:`\mathbb{R}^d` (the vertices of the Polygon have (*x, y, z*) coordinates).
+Validating a ``MultiSurface`` means that each Polygon is validated individually.
+A ``MultiSurface`` is valid if all its Polygons are valid.
 
 ``CompositeSurface`` 
 --------------------
-
-This implies that the surfaces part of a composite are not allowed to overlap and/or to be disjoint.
-Furthermore, if we store a ``CompositeSurface`` in a data structure, each edge is guaranteed to have a maximum of two incident surfaces, and around each vertex the incident faces form one umbrella.
+The Polygons part of a ``CompositeSurface`` are not allowed to overlap and/or to be disjoint.
+Furthermore, if we store a ``CompositeSurface`` in a data structure, each edge is guaranteed to have a maximum of two incident surfaces (except those on the boundaries), and around each vertex the incident faces form one umbrella.
 
 
 ``Solid``
 ---------
+
 
 ``MultiSolid``
 --------------

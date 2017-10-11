@@ -172,4 +172,4 @@ For a ``MultiSolid``, each of the ``Solid`` is validated individually, but the t
 
 For a ``CompositeSurface``, the surface formed by the individual surfaces must be a 2-manifold, and the same hierarchical validation applies.
 
-For ``MultiSurfaces``, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar (we use a tolerance that can be defined)?
+For ``MultiSurfaces``, only the validation of the individual polygon validation is performed, ie are they valid according to the 2D rules, and are they planar (we use a tolerance that can be defined)?
