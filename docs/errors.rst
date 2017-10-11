@@ -2,7 +2,7 @@
 Errors
 ======
 
-.. image:: _static/errorcodes.png
+.. image:: _static/errorcodes.svg
    :width: 100%
 
 .. contents:: :local:
