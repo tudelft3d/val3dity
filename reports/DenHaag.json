@@ -106,10 +106,10 @@ var report = {
   "invalid_cityobjects": 1,
   "invalid_primitives": 0,
   "overlap_tol": -1.0,
-  "overview-errors": [
+  "overview_errors": [
     601
   ],
-  "overview-errors-no-primitives": [
+  "overview_errors_no_primitives": [
     1
   ],
   "planarity_d2p_tol": 0.01,

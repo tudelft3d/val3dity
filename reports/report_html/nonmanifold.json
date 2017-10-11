@@ -30,10 +30,10 @@ var report = {
   "input_file": "/home/bdukai/Development/val3dity/data/obj/nonmanifold.obj",
   "invalid_primitives": 1,
   "overlap_tol": -1.0,
-  "overview-errors": [
+  "overview_errors": [
     302
   ],
-  "overview-errors-no-primitives": [
+  "overview_errors_no_primitives": [
     1
   ],
   "planarity_d2p_tol": 0.01,

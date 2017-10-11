@@ -49,11 +49,13 @@ var report = {
   "invalid_cityobjects": 1,
   "invalid_primitives": 1,
   "overlap_tol": -1.0,
-  "overview-errors": [
-    302
+  "overview_errors": [
+    302,
+    404
   ],
-  "overview-errors-no-primitives": [
-    1
+  "overview_errors_no_primitives": [
+    1,
+    2
   ],
   "planarity_d2p_tol": 0.01,
   "planarity_n_tol": 20.0,
