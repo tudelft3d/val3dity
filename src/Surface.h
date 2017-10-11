@@ -51,7 +51,8 @@ public:
   void          add_error(int code, std::string faceid = "", std::string info = "");
   bool          has_errors();
   std::set<int> get_unique_error_codes();
-  void          translate_vertices(double minx, double miny);
+  void          translate_vertices();
+  static void   set_translation_min_values(double minx, double miny);
   std::string   get_poly_representation();
 
   bool          were_vertices_merged_during_parsing();
@@ -68,6 +69,8 @@ private:
   double                                  _tol_snap;
   int                                     _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
   int                                     _vertices_added;
+  static double                           _shiftx;
+  static double                           _shifty;
 
   std::map<int, std::vector<std::tuple<std::string, std::string> > > _errors;
   

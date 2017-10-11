@@ -36,7 +36,8 @@ public:
   virtual Primitive3D   get_type() = 0;
 
   virtual void          get_min_bbox(double& x, double& y) = 0;
-  virtual void          translate_vertices(double minx, double miny) = 0;
+  virtual void          translate_vertices() = 0;
+  static void           set_translation_min_values(double minx, double miny);
 
   std::string           get_id();
   void                  set_id(std::string id);
@@ -44,12 +45,15 @@ public:
   virtual std::set<int> get_unique_error_codes();
 
 protected:
-  std::string   _id;
-  int           _is_valid; 
+  std::string           _id;
+  int                   _is_valid; 
+  static double         _shiftx;
+  static double         _shifty;
 
   std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
 
 };
+
 
 } // namespace val3dity
 

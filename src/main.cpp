@@ -396,9 +396,11 @@ int main(int argc, char* const argv[])
             miny = tmpy;
         }
       }
+      Primitive::set_translation_min_values(minx, miny);
+      Surface::set_translation_min_values(minx, miny);
       for (auto& co : dPrimitives)
         for (auto& p : co.second)
-          p->translate_vertices(minx, miny);
+          p->translate_vertices();
       std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
     }
     
