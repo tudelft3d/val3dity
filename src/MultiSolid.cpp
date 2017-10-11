@@ -65,10 +65,10 @@ void MultiSolid::get_min_bbox(double& x, double& y)
 }
 
 
-void MultiSolid::translate_vertices(double minx, double miny)
+void MultiSolid::translate_vertices()
 {
   for (auto& s : _lsSolids)
-    s->translate_vertices(minx, miny);
+    s->translate_vertices();
 }
 
 bool MultiSolid::is_empty() 

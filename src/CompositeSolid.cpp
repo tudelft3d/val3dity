@@ -64,10 +64,10 @@ void CompositeSolid::get_min_bbox(double& x, double& y)
 }
 
 
-void CompositeSolid::translate_vertices(double minx, double miny)
+void CompositeSolid::translate_vertices()
 {
   for (auto& s : _lsSolids)
-    s->translate_vertices(minx, miny);
+    s->translate_vertices();
 }
 
 

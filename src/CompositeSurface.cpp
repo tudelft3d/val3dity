@@ -62,9 +62,9 @@ void CompositeSurface::get_min_bbox(double& x, double& y)
 }
 
 
-void CompositeSurface::translate_vertices(double minx, double miny)
+void CompositeSurface::translate_vertices()
 {
-    _surface->translate_vertices(minx, miny);
+  _surface->translate_vertices();
 }
 
 bool CompositeSurface::is_empty() {

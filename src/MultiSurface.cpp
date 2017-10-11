@@ -62,9 +62,9 @@ void MultiSurface::get_min_bbox(double& x, double& y)
 }
 
 
-void MultiSurface::translate_vertices(double minx, double miny)
+void MultiSurface::translate_vertices()
 {
-    _surface->translate_vertices(minx, miny);
+  _surface->translate_vertices();
 }
 
 bool MultiSurface::is_empty() {

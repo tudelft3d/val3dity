@@ -13,11 +13,22 @@
 namespace val3dity
 {
 
+double Primitive::_shiftx = 0.0;
+double Primitive::_shifty = 0.0;
+
+
 Primitive::Primitive() {
 }
 
 Primitive::~Primitive() {
 }
+
+void Primitive::set_translation_min_values(double minx, double miny)
+{
+  Primitive::_shiftx = minx;
+  Primitive::_shifty = miny;
+}
+
 
 std::string  Primitive::get_id()
 {

@@ -98,10 +98,10 @@ void Solid::get_min_bbox(double& x, double& y)
 }
 
 
-void Solid::translate_vertices(double minx, double miny)
+void Solid::translate_vertices()
 {
   for (auto& sh : _shells)
-    sh->translate_vertices(minx, miny);
+    sh->translate_vertices();
 }
 
 
