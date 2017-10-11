@@ -1171,6 +1171,10 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
         primid++;
         sh = new Surface(0, tol_snap);
       }
+      else {
+        errs.add_error(901, "Some surfaces not defined correctly or are empty");
+        return;
+      }
     }
     else if (l.substr(0, 2) == "f ") {
       std::vector<int> r;
@@ -1195,6 +1199,10 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
       pgnids.push_back(r);
       sh->add_face(pgnids);
     }
+  }
+  if (sh->is_empty() == true) {
+    errs.add_error(901, "Some surfaces not defined correctly or are empty");
+    return;
   }
   if (prim3d == SOLID)
   {
