@@ -114,7 +114,7 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
   bool isValid = true;
   if (this->is_empty() == true)
   {
-    this->add_error(902, "", "probably error while parsing the input");
+    this->add_error(902, "", "empty Solid, contains no points and/or surfaces");
     return false;
   }
   for (auto& sh : _shells)
