@@ -46,6 +46,7 @@ val3dity accepts as input:
   install
   usage
   errors
+  definitions
   faq
   contact
 
