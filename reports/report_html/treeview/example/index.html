@@ -1,0 +1,29 @@
+<!doctype html>
+
+<title>JS TreeView Example</title>
+<link rel="stylesheet" href="../dist/treeview.min.css" />
+
+<div id="tree"></div>
+<button id="expandAll">Expand All</button>
+<button id="collapseAll">Collapse All</button>
+<script type="text/javascript" src="../src/treeview.js"></script>
+<script type="text/javascript" src="../CO_tree.js"></script>
+
+<script type="text/javascript">
+    // Grab expand/collapse buttons
+    var expandAll = document.getElementById('expandAll');
+    var collapseAll = document.getElementById('collapseAll');
+
+    // Create tree
+    var t = new TreeView(tree, 'tree');
+
+    // Attach events
+    expandAll.onclick = function () { t.expandAll(); };
+    collapseAll.onclick = function () { t.collapseAll(); };
+
+    // t.on('select', function () { alert('select'); });
+    // t.on('expand', function () { alert('expand'); });
+    // t.on('collapse', function () { alert('collapse'); });
+    // t.on('expandAll', function () { alert('expand all'); });
+    // t.on('collapseAll', function () { alert('collapse all'); });
+</script>
