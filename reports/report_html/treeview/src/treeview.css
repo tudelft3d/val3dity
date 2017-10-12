@@ -1,10 +1,51 @@
-.tree-leaf { position: relative; }
-.tree-leaf .tree-child-leaves { display: block; margin-left: 15px; }
-.tree-leaf .hidden { display: none; }
-.tree-leaf .tree-expando { background: #ddd; border-radius: 3px; cursor: pointer; float: left; height: 10px; line-height: 10px; position: relative; text-align: center; top: 5px; width: 10px; }
-.tree-leaf .hidden { visibility: hidden; }
-.tree-leaf .tree-expando:hover { background: #aaa; }
-.tree-leaf .tree-leaf-text { cursor: pointer; float: left; margin-left: 5px; }
-.tree-leaf .tree-leaf-text:hover { color: blue; }
-.tree-leaf .tree-leaf-content:before, .tree-leaf .tree-leaf-content:after { content: " "; display: table; }
-.tree-leaf .tree-leaf-content:after { clear: both; }
+.tree-leaf { position: relative;}
+.tree-leaf .tree-child-leaves {
+    display: block;
+    margin-left: 25px;
+}
+.tree-leaf .hidden {
+    display: none;
+}
+.tree-leaf .tree-expando {
+    /*background: #ddd;*/
+    border-radius: 10px;
+    cursor: pointer;
+    float: left;
+    height: 10px;
+    line-height: 10px;
+    position: relative;
+    text-align: center;
+    top: 4px;
+    width: 10px;
+}
+.tree-leaf .hidden {
+    visibility: hidden;
+}
+.tree-leaf .tree-expando:hover {
+    /*background: #aaa;*/
+}
+.tree-leaf .tree-leaf-text {
+    display: table-cell;
+    cursor: pointer;
+    float: left;
+    margin-left: 10px;
+}
+
+.tree-leaf .tree-leaf-id {
+    display: table-cell;
+    cursor: pointer;
+    float: left;
+    padding-left: 60px;
+    font-style: italic;
+}
+
+.tree-leaf .tree-leaf-text:hover {
+    color: blue;
+}
+.tree-leaf .tree-leaf-content:before, .tree-leaf .tree-leaf-content:after {
+    content: " ";
+    display: table;
+}
+.tree-leaf .tree-leaf-content:after {
+    clear: both;
+}

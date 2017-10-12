@@ -64,21 +64,25 @@
           var content = document.createElement('div');
           var text = document.createElement('div');
           var expando = document.createElement('div');
+          var id = document.createElement('div');
 
           leaf.setAttribute('class', 'tree-leaf');
           content.setAttribute('class', 'tree-leaf-content');
           content.setAttribute('data-item', JSON.stringify(item));
           text.setAttribute('class', 'tree-leaf-text');
-          text.textContent = item.name;
+          text.textContent = item.type;
+          id.setAttribute('class', 'tree-leaf-id');
+          id.textContent = item.id;
           expando.setAttribute('class', 'tree-expando ' + (item.expanded ? 'expanded' : ''));
-          expando.textContent = item.expanded ? '-' : '+';
+          expando.textContent = item.expanded ? '&#150;' : '+';
           content.appendChild(expando);
           content.appendChild(text);
+          content.appendChild(id);
           leaf.appendChild(content);
-          if (item.children && item.children.length > 0) {
+          if (item.primitives && item.primitives.length > 0) {
             var children = document.createElement('div');
             children.setAttribute('class', 'tree-child-leaves');
-            forEach(item.children, function (child) {
+            forEach(item.primitives, function (child) {
               var childLeaf = renderLeaf(child);
               children.appendChild(childLeaf);
             });

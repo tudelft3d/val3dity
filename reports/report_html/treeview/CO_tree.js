@@ -1,15 +1,31 @@
 var tree = [
-    {
-    name: "GenericCityObject",
-    children:
+{
+    type: "GenericCityObject",
+    id: "id-1",
+    primitives:
     [
         {
-            name: "MultiSolid",
-            children: []
+            type: "MultiSolid",
+            id: "id-1(0)",
+            primitives: []
         }
 
     ]
-}];
+},
+{
+    type: "GenericCityObject",
+    id: "id-2",
+    primitives:
+    [
+        {
+            type: "MultiSolid",
+            id: "id-2(0)",
+            primitives: []
+        }
+
+    ]
+}
+];
 
 // var tree = [
 //     {
