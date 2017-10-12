@@ -175,8 +175,14 @@ Validating a ``MultiSolid`` simply means that each ``Solid`` is validated indivi
 
 ``CompositeSolid``
 ------------------
-   
+Besides that each ``Solid`` must be individually valid, the ``Solids`` are not allowed to overlap and/or to be disjoint.
 
+A ``CompositeSolid``, formed by the ``Solids`` *A* and *B*, should fulfil the following two properties:
+
+  1. their interior should not overlap (:math:`A^{o} \cap B^{o} = \emptyset`)
+  2. their union should form one ``Solid`` (:math:`A \cup B =` one Solid)
+
+val3dity can validate these with a user-defined tolerance (see the option :ref:`option_overlap_tol`), to ignore small overlaps/gaps that often arise in practice.
 
 
 
