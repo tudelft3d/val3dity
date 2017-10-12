@@ -47,45 +47,53 @@ Overview of 3D primitives handled
 Observe that for a primitive to be valid, all its lower-dimensionality primitives have to be valid.
 For instance, a valid Solid cannot have as one of its surfaces a Polygon having a self-intersection (which would make it invalid).
 
+
+.. _def_polygon:
+
+``Polygon``
+-----------
+A Polygon in the context of val3dity is always embedded in :math:`\mathbb{R}^d`, ie its vertices have (*x, y, z*) coordinates.
+To be valid, it needs to fulfil the 6 assertions below, which are given on pages 27-28 of the `Simple Features document <http://portal.opengeospatial.org/files/?artifact_id=25355>`_.
+These rules are verified by first projecting each Polygon to a plane, this plane is obtained in val3dity by least-square adjustment of all the points of a Polygon.
+A Polygon must also be *planar* to be valid: its points (used for both the exterior and interior rings) have to lie on a plane (see :ref:`error_203` and :ref:`error_204` more information about this).
+
+
+.. image:: _static/ogcassertions.png
+   :width: 90%
+
+
+Some concrete examples of invalid polygons are shown below, and here are a few explanations:
+
+  - Each ring should be closed (:math:`p_{11}`): its first and its last points should be the same.
+  - Each ring defining the exterior and interior boundaries should be simple, ie non-self-intersecting (:math:`p_{1}` and :math:`p_{10}`). Notice that this prevents the existence of rings with zero-area (:math:`p_{6}`), and of rings having two consecutive points at the same location. It should be observed that the polygon :math:`p_{1}` is not allowed (in a valid representation of the polygon, the triangle should be represented as an interior boundary touching the exterior boundary).
+  - The rings of a polygon should not cross (:math:`p_{3}`, :math:`p_{7}`, :math:`p_{8}` and :math:`p_{12}`) but may intersect at one tangent point (the interior ring of :math:`p_{2}` is a valid case, although :math:`p_{2}` as a whole is not since the other interior ring is located outside the interior one). More than one tangent point is allowed, as long as the interior of the polygon stays connected (see below).
+  - A polygon may not have cut lines, spikes or punctures (:math:`p_{5}` or :math:`p_{6}`); removing these is known as the regularisation of a polygon (a standard point-set topology operation).
+  - The interior of every polygon is a connected point set (:math:`p_{4}`).
+  - Each interior ring creates a new area that is disconnected from the exterior. Thus, an interior ring cannot be located outside the exterior ring (:math:`p_{2}`) or inside other interior rings (:math:`p_{9}`).
+
+
+
+----
+
+
 .. _def_multisurface:
 
 ``MultiSurface``
 ----------------
-An arbitrary collection of Polygons embedded in :math:`\mathbb{R}^d` (the vertices of the Polygon have (*x, y, z*) coordinates).
-Validating a ``MultiSurface`` means that each Polygon is validated individually, this is done by implementing the rules in 2D, which are given as assertions (you can find on pages 27-28 of the `Simple Features document <http://portal.opengeospatial.org/files/?artifact_id=25355>`_):
-
-  1. Polygons are topologically closed;
-  2. The boundary of a Polygon consists of a set of LinearRings that make up its exterior and interior boundaries;
-  3. No two Rings in the boundary cross and the Rings in the boundary of a Polygon may intersect at a Point but only as a tangent, eg:
-
-  .. math::
-
-    \forall P \in Polygon, \forall c1, c2 \in P.Boundary(), c1 \neq c2,
-    
-    \forall p, q \in Point, p, q \in c1, p \neq q, [p \in c2 \Rightarrow q \notin c2];
-  
-  4. A Polygon may not have cut lines, spikes or punctures, eg 
-    
-    .. math::
-       
-       \forall P \in Polygon, P = P.Interior.Closure;
-
-  5. The interior of every Polygon is a connected point set;
-  6. The exterior of a Polygon with 1 or more holes is not connected. Each hole defines a connected component of the exterior.
+It is an arbitrary collection of :ref:`def_polygon`.
+Validating a ``MultiSurface`` simply means that each Polygon is validated individually; a ``MultiSurface`` is valid if all its ``Polygons`` are valid.
 
 
-These rules are verified by first projecting each Polygon to a plane (this plane is fitted with least-square adjustment of all the points of a Polygon).
-For the 3D case, the following rule must be added:
-
-  - the polygon is planar: its points (used for both the exterior and interior rings) have to lie on a plane (see :ref:`error_203` and :ref:`error_204`)
-
-A ``MultiSurface`` is valid if all its Polygons are valid.
+----
 
 
 ``CompositeSurface`` 
 --------------------
-Besides that each Polygon must be individually valid, the Polygons part of a ``CompositeSurface`` are not allowed to overlap and/or to be disjoint.
-Furthermore, if we store a ``CompositeSurface`` in a data structure, each edge is guaranteed to have a maximum of two incident surfaces (except those on the boundaries), and around each vertex the incident faces form one umbrella.
+Besides that each Polygon must be individually valid, the Polygons forming a ``CompositeSurface`` are not allowed to overlap and/or to be disjoint.
+Furthermore, if we store a ``CompositeSurface`` in a data structure, each edge is guaranteed to have a maximum of two incident surfaces, and around each vertex the incident faces form one 'umbrella'.
+
+
+----
 
 
 ``Solid``
@@ -152,8 +160,18 @@ See for instance this solid and the orientation of three of its polygons (differ
 In other words, the normal of the surface must point outwards if a right-hand system is used, ie when the ordering of points follows the direction of rotation of the curled fingers of the right hand, then the thumb points towards the outside. 
 If the polygon has interior rings, then these have to be ordered clockwise.
 
+
+----
+
+
 ``MultiSolid``
 --------------
+It is an arbitrary collection of ``Solids``.
+Validating a ``MultiSolid`` simply means that each ``Solid`` is validated individually; a ``MultiSolid`` is valid if all its ``Solids`` are valid.
+
+
+----
+
 
 ``CompositeSolid``
 ------------------
