@@ -1,5 +1,13 @@
-.tree-leaf { position: relative;}
-.tree-leaf .tree-child-leaves {
+html, body, h1, h2, h3, p, table, td, th {
+    font-family: georgia, serif;
+    vertical-align: baseline;
+}
+
+.tree-leaf {
+    position: relative;
+    padding-top: 5px;
+}
+.tree-leaf .tree-child-leaves, .tree-error-code {
     display: block;
     margin-left: 25px;
 }
@@ -24,7 +32,7 @@
 .tree-leaf .tree-expando:hover {
     /*background: #aaa;*/
 }
-.tree-leaf .tree-leaf-text {
+.tree-leaf .tree-leaf-text, .tree-error-code {
     display: table-cell;
     cursor: pointer;
     float: left;
@@ -36,7 +44,14 @@
     cursor: pointer;
     float: left;
     padding-left: 60px;
+    padding-right: 20px;
     font-style: italic;
+}
+
+.tree-leaf .tree-leaf-nrfaces, .tree-leaf-nrvertices, .tree-leaf-nrshells, .tree-leaf-nrsolids, .tree-error-info {
+    display: table-cell;
+    float: left;
+    padding-left: 20px;
 }
 
 .tree-leaf .tree-leaf-text:hover {

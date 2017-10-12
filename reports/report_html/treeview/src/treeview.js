@@ -1,3 +1,5 @@
+// Adapted from js-treeview, see: https://github.com/justinchmura/js-treeview
+
 (function (define) {
   'use strict';
 
@@ -65,27 +67,105 @@
           var text = document.createElement('div');
           var expando = document.createElement('div');
           var id = document.createElement('div');
+          var nrfaces = document.createElement('div');
+          var nrvertices = document.createElement('div');
+          var nrsolids = document.createElement('div');
+          var nrshells = document.createElement('div');
+          var colour_invalid = "#FF8C75";
+          var errcode = document.createElement('div');
+          var errinfo = document.createElement('div');
 
           leaf.setAttribute('class', 'tree-leaf');
           content.setAttribute('class', 'tree-leaf-content');
           content.setAttribute('data-item', JSON.stringify(item));
-          text.setAttribute('class', 'tree-leaf-text');
-          text.textContent = item.type;
-          id.setAttribute('class', 'tree-leaf-id');
-          id.textContent = item.id;
-          expando.setAttribute('class', 'tree-expando ' + (item.expanded ? 'expanded' : ''));
-          expando.textContent = item.expanded ? '&#150;' : '+';
-          content.appendChild(expando);
-          content.appendChild(text);
-          content.appendChild(id);
+
+          if(item.code) {
+              errcode.setAttribute('class', 'tree-error-code');
+              errcode.textContent = item.code + " " + "\u2014" + " " + item.description;
+              id.setAttribute('class', 'tree-leaf-id');
+              id.textContent = "ID:" + "\u00A0" + item.id;
+              errinfo.setAttribute('class', 'tree-error-info');
+              errinfo.textContent = "Info:" + "\u00A0" + item.info;
+              content.appendChild(errcode);
+              content.appendChild(id);
+              content.appendChild(errinfo);
+          } else {
+              text.setAttribute('class', 'tree-leaf-text');
+              text.textContent = item.type;
+              id.setAttribute('class', 'tree-leaf-id');
+              id.textContent = "ID:" + "\u00A0" + item.id;
+              expando.setAttribute('class', 'tree-expando ' + (item.expanded ? 'expanded' : ''));
+              expando.textContent = item.expanded ? '&#150;' : '+';
+              //   set colour to red if invalid
+            if(!item.validity) {
+                text.style.background = colour_invalid;
+                id.style.background = colour_invalid;
+            }
+              content.appendChild(expando);
+              content.appendChild(text);
+              content.appendChild(id);
+
+              if(item.numbersolids != undefined) {
+                  nrsolids.setAttribute('class', 'tree-leaf-nrsolids');
+                  nrsolids.textContent = "Solids:" + "\u00A0" + item.numbersolids;
+                  content.appendChild(nrsolids);
+                  if(!item.validity){
+                      nrsolids.style.background = colour_invalid;
+                  }
+              }
+              if(item.numbervertices != undefined) {
+                  nrshells.setAttribute('class', 'tree-leaf-nrshells');
+                  nrshells.textContent = "Shells:" + "\u00A0" + item.numbershells;
+                  nrfaces.setAttribute('class', 'tree-leaf-nrfaces');
+                  nrfaces.textContent = "Faces:" + "\u00A0" + item.numberfaces;
+                  nrvertices.setAttribute('class', 'tree-leaf-nrvertices');
+                  nrvertices.textContent = "Vertices:" + "\u00A0" + item.numbervertices;
+                  if(!item.validity) {
+                    nrshells.style.background = colour_invalid;
+                    nrvertices.style.background = colour_invalid;
+                    nrfaces.style.background = colour_invalid;
+                  }
+                  content.appendChild(nrshells);
+                  content.appendChild(nrfaces);
+                  content.appendChild(nrvertices);
+              } else {
+                //   nothing
+              }
+          }
+
           leaf.appendChild(content);
-          if (item.primitives && item.primitives.length > 0) {
+
+        //   if (item.errors && item.errors.length > 0) {
+        //     var errs = document.createElement('div');
+        //     errs.setAttribute('class', 'tree-error-leaves');
+        //     forEach(item.errors, function (child) {
+        //       var errLeaf = renderLeaf(child);
+        //       errs.appendChild(errLeaf);
+        //     });
+        //     if (!item.expanded) {
+        //       errs.classList.add('hidden');
+        //     }
+        //     leaf.appendChild(errs);
+        //   } else {
+        //     expando.classList.add('hidden');
+        //   }
+
+          if ((item.primitives && item.primitives.length > 0) |
+                (item.errors && item.errors.length > 0)
+            ) {
             var children = document.createElement('div');
             children.setAttribute('class', 'tree-child-leaves');
-            forEach(item.primitives, function (child) {
-              var childLeaf = renderLeaf(child);
-              children.appendChild(childLeaf);
-            });
+            if (item.primitives) {
+                forEach(item.primitives, function (child) {
+                  var childLeaf = renderLeaf(child);
+                  children.appendChild(childLeaf);
+                });
+            } else {
+                forEach(item.errors, function (child) {
+                  var childLeaf = renderLeaf(child);
+                  children.appendChild(childLeaf);
+                });
+            }
             if (!item.expanded) {
               children.classList.add('hidden');
             }
@@ -93,6 +173,7 @@
           } else {
             expando.classList.add('hidden');
           }
+
           return leaf;
         };
 
