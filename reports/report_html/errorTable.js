@@ -25,6 +25,7 @@ function tableCreate(){
         a.appendChild(linkText);
         a.title = err.name;
         a.href = err.link.href;
+        a.target = '_blank';
         td0.appendChild(a);
         td1.appendChild(document.createTextNode(nr_prims[i]));
         tr.style.background = err.colour;

@@ -3,7 +3,6 @@ var tree = [
     type: "GenericCityObject",
     id: "id-1",
     errors: [
-      [
         {
           "code": 601,
           "description": "BUILDINGPARTS_OVERLAP",
@@ -39,7 +38,6 @@ var tree = [
           "info": "",
           "type": "Error"
         }
-      ]
     ],
     validity: false,
     primitives:
