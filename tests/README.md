@@ -1,0 +1,109 @@
+# Testing val3dity
+
+This README is solely concerned with the integration tests for val3dity. These tests are implemented in python, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its boundary conditions. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
+
+Due to the current setup of file referencing in the tests, `pytest` need to be run from the `/val3dity` root directory, thus `somepath/val3dity $ pytest`
+
+Run basic set of tests:
+```
+$ pytest
+```
+
+Run full set of tests:
+```
+$ pytest --runfull
+```
+
+Run in verbose mode to see which tests are executed or skipped:
+```
+$ pytest -v
+```
+
+Run a single test case, eg *test_101*:
+```
+$ pytest -k "test_101"
+```
+
+Run a single test case, eg *test_104* with only one of its inputs:
+```
+$ pytest -k "test_104[104_2.poly]"
+```
+
+Run test on the test metadata:
+```
+$ pytest --runfull -k "metadata"
+```
+
+
+For more info see [pytest docs on markers](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run).
+
+The tests are organised in the hierarchy:
+
++ test case
+    + test
+
+In these integration tests a **test case** is a collection of *tests* that test a conceptually related set of errors. For example the geometry errors of 3D primitives that are relevant for each accepted file format. Each test case has its own module, named as `test_<test case>.py` (eg `test_geometry_generic.py`). Every test case has a description in form of a docstring that briefly clarifies its goal.
+
+Every **test** tests a particular error, bug. For example the error *101_TOO_FEW_POINTS* has its own test `test_101`. Technically, every test case consists of:
+
++ A collection of test functions named as `test_<test>()`, eg `test_101()`.
++ A collection of data files that are used by the *tests* of the test case. Each file is named as `<test case>_<boundary condition>.<format>`, and stored at `data/test_<test case>/`, `data/test_geometry_generic/101.poly`.
+
+A good way to think about the organisation is that within a test case, every **test** is expected to return the same error. In other words, a test case checks that a certain path in the software reliably returns the same output for different inputs. In *val3dity* the different inputs are most often boundary conditions of the geometric primitives with certain errors (eg 101). The data files are stored separately from the test modules.
+
+Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_metadata.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
+
+In `test_metadata.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
+
+```yaml
+test_geometry_generic:                                  # test case
+  "101": cube top face a line (with only 2 vertices)    # test file: description
+  "101_1": cube with top face having only 2 points
+```
+
+The test hierarchy yields the following file structure:
+
+```
+data/
+|–– test_geometry_generic/
+    |–– 101.poly
+    |–– 101_1.poly
+    |–– 101_<boundary condition>.poly
+    |–– <test case>.poly
+    |–– <test case>_<boundary condition>.poly
+|–– test_geometry_specific/
+|–– test_file_format/
+|–– test_empty_files/
+|–– test_valid/
+|–– test_<test case>/
+|-- test_metadata.yml
+|–– ...
+...
+tests/
+|-- conftest.py
+|–– test_geometry_generic.py
+|–– test_geometry_specific.py
+|–– test_file_format.py
+|–– test_empty_files.py
+|–– test_valid.py
+|–– test_user_input.py
+|–– test_<test case>.py
+|–– ...
+```
+
+*The main purpose of structuring the tests in the described way is to provide clarity for the developers and help with systematic testing. Certainly there are other possible approaches.*
+
+## A few details
+
+Test configuration parameters are in `conftest.py`.
+
+To mark a test as part of the *full* superset, mark it as `full`. In this case the test is only run when the `--runfull` command line argument is passed to pytest. For example:
+
+```python
+@pytest.mark.full
+def test_102():
+    assert 0
+```
+
+If you add a new marker, make sure to register it in `pytest.ini`.
+

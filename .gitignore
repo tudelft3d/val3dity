@@ -38,6 +38,7 @@ x86/
 
 # Balázs (Visual Studio etc)
 .vscode/
-.settings/
 .cproject
 .project
+.pydevproject
+.settings/

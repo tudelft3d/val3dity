@@ -22,6 +22,8 @@ using namespace std;
 namespace val3dity
 {
 
+double Surface::_shiftx = 0.0;
+double Surface::_shifty = 0.0;
 
 Surface::Surface(int id, double tol_snap)
 {
@@ -410,14 +412,21 @@ void Surface::get_min_bbox(double& x, double& y)
 }
 
 
-void Surface::translate_vertices(double minx, double miny)
+void Surface::translate_vertices()
 {
   std::vector<Point3>::iterator it = _lsPts.begin();
   for (it = _lsPts.begin(); it != _lsPts.end(); it++)
   {
-    Point3 tp(CGAL::to_double(it->x() - minx), CGAL::to_double(it->y() - miny), CGAL::to_double(it->z()));
+    Point3 tp(CGAL::to_double(it->x() - Surface::_shiftx), CGAL::to_double(it->y() - Surface::_shifty), CGAL::to_double(it->z()));
     *it = tp;
   }
+}
+
+
+void Surface::set_translation_min_values(double minx, double miny)
+{
+  Surface::_shiftx = minx;
+  Surface::_shifty = miny;
 }
 
 
@@ -632,7 +641,13 @@ bool Surface::contains_nonmanifold_vertices()
     if (v.second > 2)
     {
       std::stringstream st;
-      st << "Vertex location: " << v.first->point();
+      st << "Vertex location: (";;
+      st << (v.first->point().x() + _shiftx);
+      st << ", ";
+      st << (v.first->point().y() + _shifty);
+      st << ", ";
+      st << v.first->point().z();
+      st << ")";
       this->add_error(303, "", st.str());
     }
   }
@@ -659,7 +674,13 @@ bool Surface::does_self_intersect()
                                 each->halfedge()->next()->vertex()->point(),
                                 each->halfedge()->next()->next()->vertex()->point()); 
       std::stringstream st;
-      st << "Location close to: (" << c << ")"; 
+      st << "Location close to: (";
+      st << c.x() + _shiftx;
+      st << ", ";
+      st << c.y() + _shifty;
+      st << ", ";
+      st << c.z();
+      st << ")"; 
       this->add_error(306, "", st.str());
     }
     return false;
@@ -709,7 +730,13 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
             _polyhedron->normalize_border();
             while (_polyhedron->size_of_border_edges() > 0) {
               CgalPolyhedron::Halfedge_handle he = ++(_polyhedron->border_halfedges_begin());
-              st << "Location hole: " << he->vertex()->point();
+              st << "Location hole: (";
+              st << (he->vertex()->point().x() + _shiftx);
+              st << ", ";
+              st << (he->vertex()->point().y() + _shifty);
+              st << ", ";
+              st << he->vertex()->point().z();
+              st << ")";
               this->add_error(302, "", st.str());
               st.str("");
               _polyhedron->fill_hole(he);

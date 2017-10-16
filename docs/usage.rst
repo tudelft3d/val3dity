@@ -38,11 +38,17 @@ To validate each 3D primitive in input.gml, and to merge/snap the vertices close
   $ val3dity input.gml --snap_tol 0.1
 
 
-To validate an OBJ file and verify whether the 3D primitives from a ``Solid``:
+To validate an OBJ file and verify whether the 3D primitives from a ``Solid`` (this is the default):
 
 .. code-block:: bash
 
-  $ val3dity input.obj -p Solid
+  $ val3dity input.obj 
+
+The same file could be validated as a ``MultiSurface``, ie each of its surface are validated independently
+
+.. code-block:: bash
+
+  $ val3dity input.obj -p MultiSurface
     
 
 Accepted input
@@ -68,7 +74,7 @@ For **OBJ** and **OFF** files, each primitive will be validated according to the
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option) will individually validate each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
-If your OBJ contains triangles only (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid. Validation could however catch cases where vertices are not referenced by faces (:ref:`error_309`) and cases where triangles are collapsed to a line/point.
+If your OBJ contains triangles only (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid. Validation could however catch cases where triangles are collapsed to a line/point.
 Validating it as a solid verifies whether the primitive is a 2-manifold, ie whether it is closed/watertight and whether all normals are pointing outwards.
 
 Options for the validation
@@ -117,9 +123,11 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ----
 
+.. _option_overlap_tol:
+
 ``--overlap_tol``
 *****************
-|  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts`` 
+|  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts``
 |  default = 0.0
 
 The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid`` or the ``BuildingParts`` of a building.
@@ -129,21 +137,37 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 .. image:: _static/vcsol_2.png
    :width: 100%
 
+----
+
+``--verbose``
+*************
+|  The validation outputs to the console the status of each step of the validation. If this option is not set, then this goes to a file `val3dity.log` in the same folder as the executable.
+
+----
+
+``-r, --report``
+****************
+|  Outputs the validation report to the file given. The report is in JSON file_format
+
+
+----
+
+``--notranslate``
+*****************
+|  By default, all coordinates are translated by the (minx, miny) of the input file. This is to avoid precision error with floating-point numbers. This option skips the translation; we advise not to use this though.
+
+
 
 How are 3D primitives validated?
 --------------------------------
 
 All primitives are validated hierarchically, for instance:
 
-  1. the lower-dimensionality primitives (the polygons) are validated by first embedding every polygon in 3D and then by projecting it to a 2D plane and using `GEOS <http://trac.osgeo.org/geos/>`_;
+  1. the lower-dimensionality primitives (the polygons) are validated by projecting them to a 2D plane (obtained with least-square adjustment) and using `GEOS <http://trac.osgeo.org/geos/>`_;
   2. then these are assembled into shells/surfaces and their validity is analysed, as they must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc;
   3. then the ``Solids`` are validated
   4. finally, for ``CompositeSolids`` the interactions between the ``Solids`` are analysed.
 
 This means that if one polygon of a Solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
 
-For a ``MultiSolid``, each of the ``Solid`` is validated individually, but the topological relationships between the ``Solids`` are not verified, since a ``Multi*`` is a simple collection of primitives that does not enforce any.
-
-For a ``CompositeSurface``, the surface formed by the individual surfaces must be a 2-manifold, and the same hierarchical validation applies.
-
-For ``MultiSurfaces``, only the validation of the individual polygons is performed, ie are they valid according to the 2D rules, and are they planar (we use a tolerance that can be defined)?
+The formal definitions of the 3D primitives, along with explanations, are given in 

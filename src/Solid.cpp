@@ -69,6 +69,8 @@ int Solid::is_valid()
 
 bool Solid::is_empty()
 {
+  if (_shells.size() == 0)
+    return true;
   for (auto& sh : _shells)
   {
     if (sh->is_empty() == true)
@@ -96,10 +98,10 @@ void Solid::get_min_bbox(double& x, double& y)
 }
 
 
-void Solid::translate_vertices(double minx, double miny)
+void Solid::translate_vertices()
 {
   for (auto& sh : _shells)
-    sh->translate_vertices(minx, miny);
+    sh->translate_vertices();
 }
 
 
@@ -112,7 +114,7 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
   bool isValid = true;
   if (this->is_empty() == true)
   {
-    this->add_error(902, "", "probably error while parsing the input");
+    this->add_error(902, "", "empty Solid, contains no points and/or surfaces");
     return false;
   }
   for (auto& sh : _shells)
@@ -287,7 +289,7 @@ bool Solid::validate_solid_with_nef()
   if (this->num_ishells() == 0)
     return true;
     
-  std::clog << "-----Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
+  std::clog << "---Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   std::vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {

@@ -854,7 +854,7 @@ void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primiti
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
-  if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["cgml"] + "CityModel")) )
+  if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["citygml"] + "CityModel")) )
   {
     std::cout << "CityGML input file" << std::endl;
     process_gml_file_city_objects(doc, dPrimitives, dallpoly, errs, tol_snap);
@@ -1078,7 +1078,6 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   Surface* sh = new Surface(shellid);  
   //-- read the points
   int numpt, numf, tmpint;
-  float tmpfloat;
   std::string s;
   infile >> s;
   infile >> numpt >> numf >> tmpint;
@@ -1095,6 +1094,11 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   {
     infile >> tmpint;
     std::vector<int> ids(tmpint);
+    if (ids.empty() == true)
+    {
+      errs.add_error(901, "Some surfaces not defined correctly or are empty");
+      return NULL;
+    }
     for (int k = 0; k < tmpint; k++)
       infile >> ids[k];
     std::vector< std::vector<int> > pgnids;
@@ -1151,6 +1155,10 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
         primid++;
         sh = new Surface(0, tol_snap);
       }
+      else {
+        errs.add_error(901, "Some surfaces not defined correctly or are empty");
+        return;
+      }
     }
     else if (l.substr(0, 2) == "f ") {
       std::vector<int> r;
@@ -1175,6 +1183,10 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
       pgnids.push_back(r);
       sh->add_face(pgnids);
     }
+  }
+  if (sh->is_empty() == true) {
+    errs.add_error(901, "Some surfaces not defined correctly or are empty");
+    return;
   }
   if (prim3d == SOLID)
   {
