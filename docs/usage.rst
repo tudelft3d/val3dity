@@ -173,7 +173,7 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 
 ``-p, --primitive``
 *****************
-|  Which geometric primitive to validate.
+|  Which geometric primitive to validate. Only relevant for OBJ/OFF, because for CityGML/CityJSON all primitives are validated. Read more geometric primitives at :ref:`def`.
 |  One of ``Solid``, ``CompositeSurface``, ``MultiSurface``.
 
 ----
