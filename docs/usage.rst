@@ -147,7 +147,14 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 
 ``-r, --report``
 ****************
-|  Outputs the validation report to the file given. The report is in JSON file_format
+|  Outputs the validation report to the file given. The report is in JSON file_format.
+
+
+----
+
+``--onlyinvalid``
+****************
+|  Only the invalid primitives are reported in the validation report.
 
 
 ----
@@ -156,6 +163,30 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 *****************
 |  By default, all coordinates are translated by the (minx, miny) of the input file. This is to avoid precision error with floating-point numbers. This option skips the translation; we advise not to use this though.
 
+----
+
+``--ignore204``
+*****************
+|  Ignore the error `204 – NON_PLANAR_POLYGON_NORMALS_DEVIATION <http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-normals-deviation>`_.
+
+----
+
+``-p, --primitive``
+*****************
+|  Which geometric primitive to validate.
+|  One of ``Solid``, ``CompositeSurface``, ``MultiSurface``.
+
+----
+
+``--version``
+*****************
+|  Display version information and exit.
+
+----
+
+``-h, --help``
+*****************
+|  Display usage information and exit.
 
 
 How are 3D primitives validated?
