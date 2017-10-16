@@ -28,7 +28,23 @@ function tableCreate(){
         a.target = '_blank';
         td0.appendChild(a);
         td1.appendChild(document.createTextNode(nr_prims[i]));
-        tr.style.background = err.colour;
+
+        // set colour
+        if (l_errors[i] < 200) {
+            tr.setAttribute('class', 'linear-ring-level');
+        } else if (100 < l_errors[i] && l_errors[i] < 300) {
+            tr.setAttribute('class', 'polygon-level');
+        } else if(200 < l_errors[i] && l_errors[i] < 400) {
+            tr.setAttribute('class', 'shell-level');
+        } else if (300 < l_errors[i] && l_errors[i] < 500) {
+            tr.setAttribute('class', 'solid-level');
+        } else if (400 < l_errors[i] && l_errors[i] < 600) {
+            tr.setAttribute('class', 'solid-interactions-level');
+        } else if (500 < l_errors[i] && l_errors[i] < 700) {
+            tr.setAttribute('class', 'citygml-building');
+        } else if (800 < l_errors[i] && l_errors[i] < 1000) {
+            tr.setAttribute('class', 'others');
+        }
     }
     body.appendChild(tbl);
 }

@@ -35,3 +35,25 @@ a:hover {
     text-decoration: underline;
     color: inherit;
     }
+
+.linear-ring-level{
+    background-color: #ac2824
+}
+.polygon-level{
+    background-color: #40a635
+}
+.shell-level{
+    background-color: #f4b368
+}
+.solid-level{
+    background-color: #00d6ee
+}
+.solid-interactions-level{
+    background-color: #ffafff
+}
+.citygml-building{
+    background-color: #d6a979
+}
+.others{
+    background-color: #00e0e5
+}

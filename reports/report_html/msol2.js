@@ -113,11 +113,15 @@ var report = {
   "overlap_tol": -1.0,
   "overview_errors": [
     302,
-    404
+    404,
+    601,
+    999
   ],
   "overview_errors_no_primitives": [
     1,
-    2
+    2,
+    1,
+    4
   ],
   "planarity_d2p_tol": 0.01,
   "planarity_n_tol": 20.0,
