@@ -33,7 +33,7 @@ public:
   std::set<int> get_unique_error_codes();
 
   void          get_min_bbox(double& x, double& y);
-  void          translate_vertices(double minx, double miny);
+  void          translate_vertices();
 
   bool        add_solid(Solid* s);
   int         number_of_solids();

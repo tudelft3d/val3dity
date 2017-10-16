@@ -2,7 +2,7 @@
 Errors
 ======
 
-.. image:: _static/errorcodes.png
+.. image:: _static/errorcodes.svg
    :width: 100%
 
 .. contents:: :local:
@@ -47,7 +47,7 @@ This ring is for instance invalid:
 
 103 -- NOT_CLOSED 
 -----------------
-*This applies only to GML rings, in OBJ/OFF it's ignored.* 
+*This applies only to GML rings, in CityJSON/OBJ/OFF it is ignored.* 
 The first and last points have to be identical (at the same location). 
 This is verified after the points have been merged with the :ref:`snap_tol` option (default is 0.001unit). 
 
@@ -137,7 +137,7 @@ The interior of a polygon must be connected. The combination of different valid 
 
 206 -- INNER_RING_OUTSIDE
 -------------------------
-One or more interior ring(s) is(are) located completely outside the exterior ring. If the interior ring intersects the exterior ring, then error :ref:`error_201` should be returned.
+One or more interior rings are located *completely* outside the exterior ring. If the interior ring intersects the exterior ring (even at only one point), then error :ref:`error_201` should be returned.
 
 .. image:: _static/206.png
    :width: 25%
@@ -222,19 +222,26 @@ If one polygon is used to construct a shell, its exterior ring must be oriented 
 
 401 -- INTERSECTION_SHELLS
 --------------------------
-The interior of 2 shells intersects or they share a face, which is not allowed. 
+The interior of two or more shells intersect, these can be either the exterior shells with an interior shells or two or more interior shells. 
+Two shells sharing (part of) a face is also not allowed.
+
+Conceptually the same as :ref:`error_201`.
 
 .. _error_402:
 
 402 -- DUPLICATED_SHELLS
 ------------------------
-Two shells are identical.
+Two or more shells are identical.
+
+Conceptually the same as :ref:`error_202`.
 
 .. _error_403:
 
 403 -- INNER_SHELL_OUTSIDE
 --------------------------
-One or more interior shells are completely located outside the exterior shell. Conceptually the same as :ref:`error_206`.
+One or more interior shells are located *completely* outside the exterior shell. If the interior shell intersects the exterior shell (even at only one point), then error :ref:`error_401` should be returned.
+
+Conceptually the same as :ref:`error_206`.
 
 .. _error_404:
 
@@ -247,25 +254,28 @@ Conceptually the same as :ref:`error_205`: the configuration of the interior she
 405 -- WRONG_ORIENTATION_SHELL
 ------------------------------
 The polygon/surfaces forming an outer shell should have their normals pointing outwards, and for an interior shell inwards. 
+
+'Outwards' is as follows: if a right-hand system is used, ie when the ordering of the points on the surface follows the direction of rotation of the curled fingers of the right hand, then the thumb points towards the outside. 
+
 Conceptually the same as :ref:`error_208`.
 
 .. _error_501:
 
 501 -- INTERSECTION_SOLIDS
 --------------------------
-The interior of 2 Solids part of a CompositeSolid intersects.
+The interior of 2 ``Solids`` part of a ``CompositeSolid`` intersects.
 
 .. _error_502:
 
 502 -- DUPLICATED_SOLIDS
 ------------------------
-Two Solids in a CompositeSolid are identical.
+Two ``Solids`` in a ``CompositeSolid`` are identical.
 
 .. _error_503:
 
 503 -- DISCONNECTED_SOLIDS
 --------------------------
-Two Solids in a CompositeSolid are disconnected.
+Two ``Solids`` in a ``CompositeSolid`` are disconnected.
 
 .. _error_601:
 
@@ -283,7 +293,7 @@ Input file is not valid, most likely not a valid CityGML file. `Check here for C
 
 902 -- EMPTY_PRIMITIVE
 ----------------------
-The input file contains empty primitives, which is perhaps due to a complex GML representation.
+The input file contains empty primitives, eg an OBJ where to surfaces are defined, or a ``CompositeSolid`` in a CityJSON file containing one empty Solid.
 
 .. _error_903:
 

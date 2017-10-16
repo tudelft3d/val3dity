@@ -32,7 +32,7 @@ public:
   Primitive3D   get_type();
 
   void          get_min_bbox(double& x, double& y);
-  void          translate_vertices(double minx, double miny);
+  void          translate_vertices();
 
   int           number_faces();
   bool          set_surface(Surface* s);
