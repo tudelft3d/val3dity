@@ -240,7 +240,7 @@ Conceptually the same as :ref:`error_201`.
 
 402 -- DUPLICATED_SHELLS
 ------------------------
-Two or more shells are identical.
+Two or more shells are identical in *one* Solid. Note that for example a MultiSolid is a collection of Solids, but the topological relationships between them are not prescribed at all, they can be duplicated.
 
 Conceptually the same as :ref:`error_202`.
 
