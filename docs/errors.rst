@@ -121,7 +121,7 @@ The distance to the plane, if larger than the threshold, is also reported in the
 |  Set through ``--planarity_n_tol``
 
 To ensure that small folds on a surface are detected. Consider the example that in the solid, the top surface containing 8 vertices (*abcdefgh*) is clearly non-planar since there is a vertical "fold" in the middle. 
-The normal of the sub-surface *abgh* points upwards, while that of *bcfg* is perpendicular to it. 
+The normal of the sub-surface *abgh* points upwards, while that of *bcfg* points in a different angle. 
 But this surface would not be detected by the :ref:`error_203` test and a tolerance of 1cm for instance, since all the vertices are within that threshold. 
 Thus, another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinations of 3 non-colinear points is less than a given tolerance. 
 In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain user-defined tolerance. 
