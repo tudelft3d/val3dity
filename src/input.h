@@ -1,5 +1,3 @@
-#ifndef VAL3DITY_INPUT_DEFINITIONS_H
-#define VAL3DITY_INPUT_DEFINITIONS_H
 
 /*
  val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
@@ -26,6 +24,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
+#ifndef VAL3DITY_INPUT_DEFINITIONS_H
+#define VAL3DITY_INPUT_DEFINITIONS_H
 
 #include "Primitive.h"
 #include "Surface.h"

@@ -37,6 +37,9 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
+std::string VAL3DITY_VERSION = "2.0-rc1";
+
+
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 void write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
@@ -71,7 +74,7 @@ public:
     std::cout << "\t\tand outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
-    std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts." << std::endl;
+    std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts" << std::endl;
     std::cout << "\tval3dity input.gml --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
     std::cout << "\tval3dity input.obj -p Solid" << std::endl;
@@ -109,75 +112,75 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MultiSurface");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "2.0 beta 1");
+  TCLAP::CmdLine cmd("Allowed options", ' ', VAL3DITY_VERSION);
   MyOutput my;
   cmd.setOutput(&my);
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either GML (containing several solids/objects), CityJSON, OBJ, or OFF", 
+                                              "Input file in either GML, CityJSON, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
     TCLAP::MultiArg<std::string>            ishellfiles(
                                               "", 
                                               "ishell", 
-                                              "one interior shell (in POLY format only; more than one possible)", 
+                                              "One interior shell (in POLY format only; more than one possible)",
                                               false, 
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "output report in JSON format",
+                                              "Output report in JSON format",
                                               false,
                                               "",
                                               "string");
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface)",
+                                              "which geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
                                               false,
                                               "Solid",
                                               &primVals);
     TCLAP::SwitchArg                        verbose("",
                                               "verbose",
-                                              "verbose output",
+                                              "Verbose output",
                                               false);
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
-                                              "unit tests output",
+                                              "Unit tests output",
                                               false);
     TCLAP::SwitchArg                        notranslate("",
                                               "notranslate",
-                                              "do not translate to (minx, miny)",
+                                              "Do not translate to (minx, miny)",
                                               false);
     TCLAP::SwitchArg                        onlyinvalid("",
                                               "onlyinvalid",
-                                              "only invalid primitives are reported",
+                                              "Only invalid primitives are reported",
                                               false);
     TCLAP::SwitchArg                        ignore204("",
                                               "ignore204",
-                                              "ignore error 204",
+                                              "Ignore error 204",
                                               false);    
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
-                                              "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
+                                              "Tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
                                               false,
                                               0.001,
                                               "double");
     TCLAP::ValueArg<double>                 overlap_tol("",
                                               "overlap_tol",
-                                              "tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)",
+                                              "Tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)",
                                               false,
                                               -1,
                                               "double");
     TCLAP::ValueArg<double>                 planarity_d2p_tol("",
                                               "planarity_d2p_tol",
-                                              "tolerance for planarity distance_to_plane (default=0.01)",
+                                              "Tolerance for planarity distance_to_plane (default=0.01)",
                                               false,
                                               0.01,
                                               "double");
     TCLAP::ValueArg<double>                 planarity_n_tol("",
                                               "planarity_n_tol",
-                                              "tolerance for planarity based on normals deviation (default=20.0degree)",
+                                              "Tolerance for planarity based on normals deviation (default=20.0degree)",
                                               false,
                                               20.0,
                                               "double");
@@ -197,7 +200,7 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-    //-- dico with Primitives
+    //-- map with Primitives
     //-- ["Primitives"] --> [] if there are no CityObjects, thus dPrimitives.size() == 1
     //-- ["Building|id2"] --> [] if there are CityObjects
     std::map<std::string, std::vector<Primitive*>> dPrimitives;
@@ -663,7 +666,7 @@ void write_report_json(json& jr,
                        bool onlyinvalid)
 {
   jr["type"] = "val3dity report";
-  jr["val3dity_version"] = "2.0 beta 1"; // TODO : put version automatically
+  jr["val3dity_version"] = VAL3DITY_VERSION; 
   jr["input_file"] = ifile;
   //-- time
   std::time_t rawtime;

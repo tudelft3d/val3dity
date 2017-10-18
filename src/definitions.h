@@ -1,8 +1,5 @@
-#ifndef VAL3DITY_VALIDATE_DEFS_H
-#define VAL3DITY_VALIDATE_DEFS_H
-
 /*
- val3dity - Copyright (c) 2011-2016, Hugo Ledoux.  All rights reserved.
+ val3dity - Copyright (c) 2011-2017, Hugo Ledoux.  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -26,6 +23,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 */
 
+#ifndef VAL3DITY_VALIDATE_DEFS_H
+#define VAL3DITY_VALIDATE_DEFS_H
 
 // CGAL kernel
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>

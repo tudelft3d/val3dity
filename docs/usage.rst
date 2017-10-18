@@ -17,34 +17,34 @@ To execute val3dity and see its options:
   $ val3dity --help
     
 
-To validate all the 3D primitives in a CityGML file and see a summary output:
+To validate all the 3D primitives in a CityJSON file and see a summary output:
 
 .. code-block:: bash
 
-  $ val3dity citygmlinput.gml 
+  $ val3dity my3dcity.json 
 
 
-To validate all the 3D primitives in a GML file and get a report ``report.xml``:
-
-.. code-block:: bash
-
-  $ val3dity input.gml -r report.xml
-
-
-To validate each 3D primitive in input.gml, and to merge/snap the vertices closer than 0.1unit:
+To validate all the 3D primitives in a CityGML file and get a report (in `JSON <http://json.org/>`_ format):
 
 .. code-block:: bash
 
-  $ val3dity input.gml --snap_tol 0.1
+  $ val3dity input.gml -r report.json
 
 
-To validate an OBJ file and verify whether the 3D primitives from a ``Solid`` (this is the default):
+To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm:
+
+.. code-block:: bash
+
+  $ val3dity input.json --planarity_d2p_tol 0.2
+
+
+To validate an OBJ file and verify whether the 3D primitives from a Solid (this is the default):
 
 .. code-block:: bash
 
   $ val3dity input.obj 
 
-The same file could be validated as a ``MultiSurface``, ie each of its surface are validated independently
+The same file could be validated as a MultiSurface, ie each of its surface are validated independently
 
 .. code-block:: bash
 
@@ -56,9 +56,9 @@ Accepted input
 
 val3dity accepts as input:
 
-  - `CityGML <https://www.citygml.org>`_ 
   - `CityJSON <http://www.cityjson.org>`_
-  - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
+  - `CityGML <https://www.citygml.org>`_ 
+  - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
 
@@ -70,7 +70,7 @@ If there is one or more intersections, then :ref:`error_601` will be reported.
 
 For **GML** files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
 
-For **OBJ**, **OFF**, and **POLY** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
+For **OBJ** and **OFF** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
 Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option) will individually validate each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
@@ -79,6 +79,12 @@ Validating it as a solid verifies whether the primitive is a 2-manifold, ie whet
 
 Options for the validation
 --------------------------
+
+``-h, --help``
+*****************
+|  Display usage information and exit.
+
+----
 
 .. _snap_tol:
 
@@ -114,12 +120,58 @@ If this distance is larger than the defined value, then :ref:`error_203` is repo
 ``--planarity_n_tol``
 *********************
 |  Tolerance for planarity based on normals deviation 
-|  default = 1 (degree)
+|  default = 20 (degree)
 
 Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the normal of each triangle after the surface has been triangulated. If the triangle normals deviate from each other more than the given tolerance, then error :ref:`error_204` is reported. Read more at :ref:`error_204`.
 
 .. note::  
   Planarity is defined with two tolerances: ``--planarity_d2p_tol`` and ``--planarity_n_tol``.
+
+----
+
+
+``--verbose``
+*************
+|  The validation outputs to the console the status of each step of the validation. If this option is not set, then this goes to a file `val3dity.log` in the same folder as the executable.
+
+----
+
+``-r, --report``
+****************
+|  Outputs the validation report to the file given. The report is in JSON file_format.
+
+
+----
+
+``--onlyinvalid``
+****************
+|  Only the invalid primitives are reported in the validation report.
+
+----
+
+
+``--notranslate``
+*****************
+|  By default, all coordinates are translated by the (minx, miny) of the input file. This is to avoid precision error with floating-point numbers. This option skips the translation; we advise not to use this though.
+
+----
+
+``--ignore204``
+*****************
+|  Ignore the error `204 – NON_PLANAR_POLYGON_NORMALS_DEVIATION <http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-normals-deviation>`_.
+
+----
+
+``-p, --primitive``
+*****************
+|  Which geometric primitive to validate. Only relevant for OBJ/OFF, because for CityGML/CityJSON all primitives are validated. Read more geometric primitives at :ref:`def`.
+|  One of ``Solid``, ``CompositeSurface``, ``MultiSurface``.
+
+----
+
+``--version``
+*****************
+|  Display version information and exit.
 
 ----
 
@@ -136,26 +188,6 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 
 .. image:: _static/vcsol_2.png
    :width: 100%
-
-----
-
-``--verbose``
-*************
-|  The validation outputs to the console the status of each step of the validation. If this option is not set, then this goes to a file `val3dity.log` in the same folder as the executable.
-
-----
-
-``-r, --report``
-****************
-|  Outputs the validation report to the file given. The report is in JSON file_format
-
-
-----
-
-``--notranslate``
-*****************
-|  By default, all coordinates are translated by the (minx, miny) of the input file. This is to avoid precision error with floating-point numbers. This option skips the translation; we advise not to use this though.
-
 
 
 How are 3D primitives validated?
