@@ -107,7 +107,32 @@ var report =
   }
   ],
   "InputErrors": null,
-  "Primitives": null,
+  "Primitives": [
+    {
+      "errors": [
+        {
+          "code": 302,
+          "description": "SHELL_NOT_CLOSED",
+          "id": "",
+          "info": "Location hole: 0 0 1",
+          "type": "Error"
+        },
+        {
+          "code": 302,
+          "description": "SHELL_NOT_CLOSED",
+          "id": "",
+          "info": "Location hole: 1 1 1",
+          "type": "Error"
+        }
+      ],
+      "id": "0",
+      "numberfaces": 12,
+      "numbershells": 1,
+      "numbervertices": 9,
+      "type": "Solid",
+      "validity": false
+    }
+  ],
   "input_file": "../data/cityjson/msol2.json",
   "invalid_cityobjects": 1,
   "invalid_primitives": 1,
