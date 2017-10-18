@@ -27,7 +27,12 @@ function idx_error_table(){
         a.href = err.link.href;
         a.target = '_blank';
         td0.appendChild(a);
-        td1.appendChild(document.createTextNode(nr_prims[i]));
+        if (nr_prims[i] < 0) {
+            // this happens on input error
+            td1.appendChild(document.createTextNode("\u2014"));
+        } else {
+            td1.appendChild(document.createTextNode(nr_prims[i]));
+        }
 
         // set colour
         if (l_errors[i] < 200) {

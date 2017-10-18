@@ -106,7 +106,14 @@ var report =
       ]
   }
   ],
-  "InputErrors": null,
+  "InputErrors": [
+    {
+      "code": 901,
+      "description": "INVALID_INPUT_FILE",
+      "info": "Input file not found.",
+      "type": "Error"
+    }
+  ],
   "Primitives": [
     {
       "errors": [
@@ -147,7 +154,7 @@ var report =
     1,
     2,
     1,
-    4
+    -1
   ],
   "planarity_d2p_tol": 0.01,
   "planarity_n_tol": 20.0,
