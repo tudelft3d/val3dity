@@ -136,7 +136,7 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "whic geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
+                                              "which geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
                                               false,
                                               "Solid",
                                               &primVals);
