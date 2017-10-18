@@ -135,21 +135,6 @@
 
           leaf.appendChild(content);
 
-        //   if (item.errors && item.errors.length > 0) {
-        //     var errs = document.createElement('div');
-        //     errs.setAttribute('class', 'tree-error-leaves');
-        //     forEach(item.errors, function (child) {
-        //       var errLeaf = renderLeaf(child);
-        //       errs.appendChild(errLeaf);
-        //     });
-        //     if (!item.expanded) {
-        //       errs.classList.add('hidden');
-        //     }
-        //     leaf.appendChild(errs);
-        //   } else {
-        //     expando.classList.add('hidden');
-        //   }
-
           if ((item.primitives && item.primitives.length > 0) ||
                 (item.errors && item.errors.length > 0)
             ) {

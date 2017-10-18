@@ -2,12 +2,37 @@
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
-        <link rel="stylesheet" type="text/css" href="report.css">
+        <link rel="stylesheet" type="text/css" href="treeview.css">
         <title>Primitives</title>
     </head>
 
     <body>
         <h2>Primitives</h2>
+
+        <div id="tree"></div>
+        <button id="expandAll">Expand All</button>
+        <button id="collapseAll">Collapse All</button>
+        <script type="text/javascript" src="treeview.js"></script>
+        <script type="text/javascript" src="nonmanifold.js"></script>
+
+        <script type="text/javascript">
+
+            if (report.Primitives != null) {
+                // Grab expand/collapse buttons
+                var expandAll = document.getElementById('expandAll');
+                var collapseAll = document.getElementById('collapseAll');
+
+                // Create tree
+                var t = new TreeView(report.Primitives, 'tree');
+
+                // Attach events
+                expandAll.onclick = function () { t.expandAll(); };
+                collapseAll.onclick = function () { t.collapseAll(); };
+            } else {
+                // do nothing
+            }
+
+        </script>
 
     </body>
 </html>
