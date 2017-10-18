@@ -80,6 +80,12 @@ Validating it as a solid verifies whether the primitive is a 2-manifold, ie whet
 Options for the validation
 --------------------------
 
+``-h, --help``
+*****************
+|  Display usage information and exit.
+
+----
+
 .. _snap_tol:
 
 ``--snap_tol``
@@ -123,21 +129,6 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ----
 
-.. _option_overlap_tol:
-
-``--overlap_tol``
-*****************
-|  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts``
-|  default = 0.0
-
-The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid`` or the ``BuildingParts`` of a building.
-The tolerance ``--overlap_tol 0.05`` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating. ``0.0unit`` means that the original boundaries are used.
-Using an overlap tolerance significantly reduces the speed of the validator, because rather complex geometric operations are performed.
-
-.. image:: _static/vcsol_2.png
-   :width: 100%
-
-----
 
 ``--verbose``
 *************
@@ -156,8 +147,8 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 ****************
 |  Only the invalid primitives are reported in the validation report.
 
-
 ----
+
 
 ``--notranslate``
 *****************
@@ -184,9 +175,19 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 
 ----
 
-``-h, --help``
+.. _option_overlap_tol:
+
+``--overlap_tol``
 *****************
-|  Display usage information and exit.
+|  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts``
+|  default = 0.0
+
+The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid`` or the ``BuildingParts`` of a building.
+The tolerance ``--overlap_tol 0.05`` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating. ``0.0unit`` means that the original boundaries are used.
+Using an overlap tolerance significantly reduces the speed of the validator, because rather complex geometric operations are performed.
+
+.. image:: _static/vcsol_2.png
+   :width: 100%
 
 
 How are 3D primitives validated?
