@@ -1,4 +1,4 @@
-function index_error_table(){
+function idx_error_table(){
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "errors");
@@ -48,4 +48,4 @@ function index_error_table(){
     }
     body.appendChild(tbl);
 }
-index_error_table();
+idx_error_table();
