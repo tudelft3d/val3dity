@@ -114,7 +114,7 @@ If this distance is larger than the defined value, then :ref:`error_203` is repo
 ``--planarity_n_tol``
 *********************
 |  Tolerance for planarity based on normals deviation 
-|  default = 1 (degree)
+|  default = 20 (degree)
 
 Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the normal of each triangle after the surface has been triangulated. If the triangle normals deviate from each other more than the given tolerance, then error :ref:`error_204` is reported. Read more at :ref:`error_204`.
 

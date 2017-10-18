@@ -119,19 +119,23 @@ The distance to the plane, if larger than the threshold, is also reported in the
 -------------------------------------------
 |  Default = 1 degree
 |  Set through ``--planarity_n_tol``
+|  Disable with ``--ignore204``
 
-To ensure that small folds on a surface are detected. Consider the example that in the solid, the top surface containing 8 vertices (*abcdefgh*) is clearly non-planar since there is a vertical "fold" in the middle. 
+To ensure that small folds on a surface are detected. Consider the Solid below, the top surface containing 8 vertices (*abcdefgh*) is clearly non-planar since there is a vertical "fold" in the middle. 
 The normal of the sub-surface *abgh* points upwards, while that of *bcfg* points in a different angle. 
-But this surface would not be detected by the :ref:`error_203` test and a tolerance of 1cm for instance, since all the vertices are within that threshold. 
-Thus, another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinations of 3 non-colinear points is less than a given tolerance. 
+But this surface would not be detected by the :ref:`error_203` test (with a tolerance of 1cm for instance) since all the vertices are within that threshold. 
+Thus, another requirement is necessary: the distance between every point forming a polygon and *all* the planes defined by all possible combinations of 3 non-collinear points is less than a given tolerance. 
 In practice it can be implemented with a triangulation of the polygon (any triangulation): the orientation of the normal of each triangle must not deviate more than than a certain user-defined tolerance. 
 
 A surface is first checked for :ref:`error_203`, if it’s valid then :ref:`error_204` is checked. 
-By definition, if :ref:`error_204` is reported then all the vertices are within 1cm (or the tolerance you gave as input), thus you wouldn’t be able to visualise them.
+However, it is only checked if there are no :ref:`error_104` in the polygon, since otherwise it's not possible to triangulate the polygon.
+In the figure below, the Solid on the left could be tested for 204, while the right one couldn't (but an :ref:`error_104` would be returned).
 
-This error usually means that you have vertices that are *very* close to each other (say 0.1mm) and thus it’s easy to get a large deviation (say 80 degree; the report contains the actual deviation).
+By definition, if :ref:`error_204` is reported then all the vertices are within 1cm (or the tolerance you gave as input), thus you wouldn’t be able to visualise them.
+Also, 204 usually means that the vertices in the polygon are *very* close to each other (say 0.1mm), and thus it’s easy to get a large deviation (say 80 degree; the report contains the actual deviation).
 
 .. image:: _static/104b.png
+
 
 .. _error_205:
 
