@@ -37,6 +37,9 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
+std::string VAL3DITY_VERSION = "2.0-rc1";
+
+
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 void write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
@@ -71,7 +74,7 @@ public:
     std::cout << "\t\tand outputs a detailed report in XML" << std::endl;
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
-    std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts." << std::endl;
+    std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts" << std::endl;
     std::cout << "\tval3dity input.gml --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
     std::cout << "\tval3dity input.obj -p Solid" << std::endl;
@@ -109,7 +112,7 @@ int main(int argc, char* const argv[])
   primitivestovalidate.push_back("MultiSurface");   
   TCLAP::ValuesConstraint<std::string> primVals(primitivestovalidate);
 
-  TCLAP::CmdLine cmd("Allowed options", ' ', "2.0 beta 1");
+  TCLAP::CmdLine cmd("Allowed options", ' ', VAL3DITY_VERSION);
   MyOutput my;
   cmd.setOutput(&my);
   try {
@@ -133,7 +136,7 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "what geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
+                                              "whic geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
                                               false,
                                               "Solid",
                                               &primVals);
@@ -197,7 +200,7 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-    //-- dico with Primitives
+    //-- map with Primitives
     //-- ["Primitives"] --> [] if there are no CityObjects, thus dPrimitives.size() == 1
     //-- ["Building|id2"] --> [] if there are CityObjects
     std::map<std::string, std::vector<Primitive*>> dPrimitives;
@@ -663,7 +666,7 @@ void write_report_json(json& jr,
                        bool onlyinvalid)
 {
   jr["type"] = "val3dity report";
-  jr["val3dity_version"] = "2.0 beta 1"; // TODO : put version automatically
+  jr["val3dity_version"] = VAL3DITY_VERSION; 
   jr["input_file"] = ifile;
   //-- time
   std::time_t rawtime;
