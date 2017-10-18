@@ -1,5 +1,5 @@
 // Populate index.html with the validation results from the json report
-document.getElementById("in_file").innerHTML = report.input_file;
+document.getElementById("in_file").innerHTML = report.input_file.split("/").pop();
 document.getElementById("version").innerHTML = report.val3dity_version;
 document.getElementById("time").innerHTML = report.time;
 

@@ -129,9 +129,26 @@ div#tree {
     margin-left: 5em;
 }
 
+button {
+    font-family: sans-serif;
+    font-size: .8em;
+    cursor: pointer;
+    border: 1px solid;
+    border-color: #999 #999 #999 #999;
+    padding: .2em .35em;
+}
+
 button#expandAll {
     margin-left: 6em;
     margin-top: 1em;
+}
+
+.filter_link {
+    margin: .75em .1em;
+}
+
+button#invalid {
+    background: #FF8C75;
 }
 
 .tree-leaf {

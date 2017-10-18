@@ -89,6 +89,8 @@
               content.appendChild(errcode);
               content.appendChild(id);
               content.appendChild(errinfo);
+              // set attribute so that errors stay in the filtered tree when 'Invalid'
+              leaf.setAttribute('validity', 'false');
           } else {
               text.setAttribute('class', 'tree-leaf-text');
               text.textContent = item.type;
@@ -96,11 +98,16 @@
               id.textContent = "ID:" + "\u00A0" + item.id;
               expando.setAttribute('class', 'tree-expando ' + (item.expanded ? 'expanded' : ''));
               expando.textContent = item.expanded ? '&#150;' : '+';
-              //   set colour to red if invalid
-            if(!item.validity) {
+
+              if(!item.validity) {
+                //   set colour to red if invalid
                 text.style.background = colour_invalid;
                 id.style.background = colour_invalid;
-            }
+                leaf.setAttribute('validity', 'false');
+              } else {
+                leaf.setAttribute('validity', 'true');
+              }
+
               content.appendChild(expando);
               content.appendChild(text);
               content.appendChild(id);
@@ -160,10 +167,6 @@
                 }
                 leaf.appendChild(children);
             }
-            // if (!item.expanded) {
-            //   children.classList.add('hidden');
-            // }
-            // leaf.appendChild(children);
           } else {
             expando.classList.add('hidden');
           }
