@@ -1,4 +1,4 @@
-function tableCreate(){
+function index_error_table(){
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "errors");
@@ -48,4 +48,4 @@ function tableCreate(){
     }
     body.appendChild(tbl);
 }
-tableCreate();
+index_error_table();
