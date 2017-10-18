@@ -17,34 +17,34 @@ To execute val3dity and see its options:
   $ val3dity --help
     
 
-To validate all the 3D primitives in a CityGML file and see a summary output:
+To validate all the 3D primitives in a CityJSON file and see a summary output:
 
 .. code-block:: bash
 
-  $ val3dity citygmlinput.gml 
+  $ val3dity my3dcity.json 
 
 
-To validate all the 3D primitives in a GML file and get a report ``report.xml``:
-
-.. code-block:: bash
-
-  $ val3dity input.gml -r report.xml
-
-
-To validate each 3D primitive in input.gml, and to merge/snap the vertices closer than 0.1unit:
+To validate all the 3D primitives in a CityGML file and get a report (in `JSON <http://json.org/>`_ format):
 
 .. code-block:: bash
 
-  $ val3dity input.gml --snap_tol 0.1
+  $ val3dity input.gml -r report.json
 
 
-To validate an OBJ file and verify whether the 3D primitives from a ``Solid`` (this is the default):
+To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm:
+
+.. code-block:: bash
+
+  $ val3dity input.json --planarity_d2p_tol 0.2
+
+
+To validate an OBJ file and verify whether the 3D primitives from a Solid (this is the default):
 
 .. code-block:: bash
 
   $ val3dity input.obj 
 
-The same file could be validated as a ``MultiSurface``, ie each of its surface are validated independently
+The same file could be validated as a MultiSurface, ie each of its surface are validated independently
 
 .. code-block:: bash
 
@@ -56,9 +56,9 @@ Accepted input
 
 val3dity accepts as input:
 
-  - `CityGML <https://www.citygml.org>`_ 
   - `CityJSON <http://www.cityjson.org>`_
-  - any `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_
+  - `CityGML <https://www.citygml.org>`_ 
+  - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
 
