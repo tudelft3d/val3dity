@@ -227,8 +227,11 @@ int main(int argc, char* const argv[])
       mylog.open("val3dity.log");
       std::clog.rdbuf(mylog.rdbuf());
     }
-    if (inputtype == OTHER)
-      ioerrs.add_error(901, "File type not supported");
+    if (inputtype == OTHER) {
+      std::stringstream ss;
+      ss << "Input file (" << inputfile.getValue() << ") not supported.";
+      ioerrs.add_error(901, ss.str());
+    }
 
     Primitive3D prim3d;
     if ( (inputtype == JSON) || (inputtype == GML) )
