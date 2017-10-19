@@ -716,17 +716,17 @@ void write_report_json(json& jr,
       for (auto& code : p->get_unique_error_codes())
         errors[code] += 1;
   }
-  jr["overview-errors"];    
-  jr["overview-errors-no-primitives"];    
+  jr["overview_errors"];    
+  jr["overview_errors_no_primitives"];    
   for (auto e : errors)
   {
-    jr["overview-errors"].push_back(e.first);
-    jr["overview-errors-no-primitives"].push_back(e.second);
+    jr["overview_errors"].push_back(e.first);
+    jr["overview_errors_no_primitives"].push_back(e.second);
   }
   for (auto& e : ioerrs.get_unique_error_codes())
   {
-    jr["overview-errors"].push_back(e);
-    jr["overview-errors-no-primitives"].push_back(-1);
+    jr["overview_errors"].push_back(e);
+    jr["overview_errors_no_primitives"].push_back(-1);
   }
   
   //-- if a CityGML/CityJSON report also CityObjects
@@ -800,7 +800,8 @@ void write_report_json(json& jr,
           }
         }
         j["validity"] = isValid;
-        jr["CityObjects"][coid] = j;
+        j["id"] = coid;
+        jr["CityObjects"].push_back(j);
       }
     }
   }

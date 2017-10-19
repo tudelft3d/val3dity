@@ -90,7 +90,7 @@ json COError::get_report_json()
       jj["description"] = errorcode2description(std::get<0>(err));
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
-      j["errors"].push_back(jj);
+      j.push_back(jj);
     }
   }
   return j;
