@@ -24,6 +24,7 @@
 */
 
 #include "input.h"
+#include "reportoutput.h"
 #include "Primitive.h"
 #include "validate_prim_toporel.h"
 #include "Surface.h"
@@ -32,6 +33,7 @@
 #include <tclap/CmdLine.h>
 #include <time.h>  
 #include "nlohmann-json/json.hpp"
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace val3dity;
@@ -130,6 +132,12 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
+                                              "Output report in HTML format",
+                                              false,
+                                              "",
+                                              "string");    
+    TCLAP::ValueArg<std::string>            report_json("",
+                                              "report_json",
                                               "Output report in JSON format",
                                               false,
                                               "",
@@ -198,6 +206,7 @@ int main(int argc, char* const argv[])
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
+    cmd.add(report_json);
     cmd.parse( argc, argv );
 
     //-- map with Primitives
@@ -485,7 +494,7 @@ int main(int argc, char* const argv[])
     else {
       //-- print summary of errors
       std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
-      if (report.getValue() != "")
+      if ( (report.getValue() != "") || (report_json.getValue() != "") )
       {
         json jr;
         write_report_json(jr, 
@@ -498,12 +507,67 @@ int main(int argc, char* const argv[])
                          planarity_n_tol_updated,
                          ioerrs,
                          onlyinvalid.getValue());
-        std::ofstream o(report.getValue());
-        o << jr.dump(2) << std::endl;                                
-        std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+        // HTML report
+        if (report.getValue() != "") {
+          boost::filesystem::path outpath(report.getValue());
+          if (boost::filesystem::exists(outpath.parent_path()) == false)
+            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+          else {
+            if (boost::filesystem::extension(outpath) != ".html")
+              outpath += ".html";
+            std::ofstream o(outpath.string());
+            o << indexhtml << std::endl;                                
+            std::cout << "Full validation report (in HTML format) saved to " << outpath << std::endl;
+            o.close();
+
+            boost::filesystem::path folder = outpath.parent_path();
+            boost::filesystem::path outfile = folder / "report.js";
+            o.open(outfile.string());
+            o << "var report =" << jr << std::endl;                                
+            o.close();
+
+            outfile = folder / "CityObjects.html";
+            o.open(outfile.string());
+            o << cityobjectshtml << std::endl;                                
+            o.close();
+
+            outfile = folder / "Primitives.html";
+            o.open(outfile.string());
+            o << primitiveshtml << std::endl;                                
+            o.close();
+            
+            outfile = folder / "treeview.js";
+            o.open(outfile.string());
+            o << treeviewjs << std::endl;                                
+            o.close();
+
+            outfile = folder / "val3dityconfig.js";
+            o.open(outfile.string());
+            o << val3dityconfigjs << std::endl;                                
+            o.close();
+            
+            outfile = folder / "index.css";
+            o.open(outfile.string());
+            o << indexcss << std::endl;                                
+            o.close();
+          }
+        }
+        // JSON report
+        else {
+          boost::filesystem::path outpath(report_json.getValue());
+          if (boost::filesystem::exists(outpath.parent_path()) == false)
+            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+          else {
+            if (boost::filesystem::extension(outpath) != ".json")
+              outpath += ".json";
+            std::ofstream o(outpath.string());
+            o << jr.dump(2) << std::endl;                                
+            std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+          }
+        }
       }
       else
-        std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+        std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
     }
 
     if (verbose.getValue() == false)
@@ -716,17 +780,17 @@ void write_report_json(json& jr,
       for (auto& code : p->get_unique_error_codes())
         errors[code] += 1;
   }
-  jr["overview-errors"];    
-  jr["overview-errors-no-primitives"];    
+  jr["overview_errors"];    
+  jr["overview_errors_no_primitives"];    
   for (auto e : errors)
   {
-    jr["overview-errors"].push_back(e.first);
-    jr["overview-errors-no-primitives"].push_back(e.second);
+    jr["overview_errors"].push_back(e.first);
+    jr["overview_errors_no_primitives"].push_back(e.second);
   }
   for (auto& e : ioerrs.get_unique_error_codes())
   {
-    jr["overview-errors"].push_back(e);
-    jr["overview-errors-no-primitives"].push_back(-1);
+    jr["overview_errors"].push_back(e);
+    jr["overview_errors_no_primitives"].push_back(-1);
   }
   
   //-- if a CityGML/CityJSON report also CityObjects
@@ -800,7 +864,8 @@ void write_report_json(json& jr,
           }
         }
         j["validity"] = isValid;
-        jr["CityObjects"][coid] = j;
+        j["id"] = coid;
+        jr["CityObjects"].push_back(j);
       }
     }
   }
