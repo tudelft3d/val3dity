@@ -1,3 +1,4 @@
+
 var errors = {
     "101": {
         "name": "101 – TOO_FEW_POINTS",
@@ -192,3 +193,140 @@ var errors = {
         }
     }
 }
+
+
+function idx_error_table(){
+    var body = document.body,
+        tbl  = document.createElement('table');
+    tbl.setAttribute('id', "errors");
+
+    var tr = tbl.insertRow(0);
+    var headers = ['Error', '# of primitives'];
+    for (var i = 0; i < 2; i++){
+        var h = document.createElement('th');
+        h.appendChild(document.createTextNode(headers[i]));
+        tr.appendChild(h);
+    }
+
+    var nr_errors = report.overview_errors.length;
+    var l_errors = report.overview_errors;
+    var nr_prims = report.overview_errors_no_primitives;
+
+    for(var i = 0; i < nr_errors; i++){
+        var tr = tbl.insertRow();
+        var td0 = tr.insertCell(0);
+        var td1 = tr.insertCell(1);
+        var err = errors[l_errors[i]];
+        var a = document.createElement('a');
+        var linkText = document.createTextNode(err.name);
+        a.appendChild(linkText);
+        a.title = err.name;
+        a.href = err.link.href;
+        a.target = '_blank';
+        td0.appendChild(a);
+        if (nr_prims[i] < 0) {
+            // this happens on input error
+            td1.appendChild(document.createTextNode("\u2014"));
+        } else {
+            td1.appendChild(document.createTextNode(nr_prims[i]));
+        }
+
+        // set colour
+        if (l_errors[i] < 200) {
+            tr.setAttribute('class', 'linear-ring-level');
+        } else if (100 < l_errors[i] && l_errors[i] < 300) {
+            tr.setAttribute('class', 'polygon-level');
+        } else if(200 < l_errors[i] && l_errors[i] < 400) {
+            tr.setAttribute('class', 'shell-level');
+        } else if (300 < l_errors[i] && l_errors[i] < 500) {
+            tr.setAttribute('class', 'solid-level');
+        } else if (400 < l_errors[i] && l_errors[i] < 600) {
+            tr.setAttribute('class', 'solid-interactions-level');
+        } else if (500 < l_errors[i] && l_errors[i] < 700) {
+            tr.setAttribute('class', 'citygml-building');
+        } else if (800 < l_errors[i] && l_errors[i] < 1000) {
+            tr.setAttribute('class', 'others');
+        }
+    }
+    body.appendChild(tbl);
+}
+idx_error_table();
+
+// Populate index.html with the validation results from the json report
+document.getElementById("in_file").innerHTML = report.input_file.split("/").pop();
+document.getElementById("version").innerHTML = report.val3dity_version;
+document.getElementById("time").innerHTML = report.time;
+
+document.getElementById("planarity_d2p_tol").innerHTML = report.planarity_d2p_tol;
+document.getElementById("planarity_n_tol").innerHTML = report.planarity_n_tol;
+document.getElementById("snap_tol").innerHTML = report.snap_tol;
+document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
+
+function idx_validation_summary(){
+    var body = document.body,
+        tbl  = document.createElement('table');
+    tbl.setAttribute('id', "summary");
+
+    var tr = tbl.insertRow(0);
+    var headers = [" ", "Total", "Valid", "Invalid"];
+    for (var i = 0; i < 4; i++){
+        var h = document.createElement('th');
+        h.appendChild(document.createTextNode(headers[i]));
+        tr.appendChild(h);
+    }
+
+    if (report.CityObjects != null) {
+        var tr = tbl.insertRow();
+
+        // cell CityObjects
+        var td0 = tr.insertCell(0);
+        var a = document.createElement('a');
+        var linkText = document.createTextNode('CityObjects');
+        a.appendChild(linkText);
+        a.title = "CityObjects";
+        a.href = "CityObjects.html";
+        td0.appendChild(a);
+        // cell Total
+        var td_t = tr.insertCell(1);
+        td_t.appendChild(document.createTextNode(report.total_cityobjects));
+        // cell Valid
+        var td_v = tr.insertCell(2);
+        var CO_valid_pc = Math.round(report.valid_cityobjects / report.total_cityobjects * 100);
+        var v = report.valid_cityobjects + ' (' + CO_valid_pc + '%)';
+        td_v.appendChild(document.createTextNode(v));
+        // cell Invalid
+        var td_i = tr.insertCell(3);
+        var CO_invalid_pc = Math.round(report.invalid_cityobjects / report.total_cityobjects * 100);
+        var i = report.invalid_cityobjects + ' (' + CO_invalid_pc + '%)';
+        td_i.appendChild(document.createTextNode(i));
+    }
+
+    if (report.Primitives != null) {
+        var tr = tbl.insertRow();
+
+        // cell Primitives
+        var td0 = tr.insertCell(0);
+        var a = document.createElement('a');
+        var linkText = document.createTextNode('Primitives');
+        a.appendChild(linkText);
+        a.title = "Primitives";
+        a.href = "Primitives.html";
+        td0.appendChild(a);
+        // cell Total
+        var td_t = tr.insertCell(1);
+        td_t.appendChild(document.createTextNode(report.total_primitives));
+        // cell Valid
+        var td_v = tr.insertCell(2);
+        var p_valid_pc = Math.round(report.valid_primitives / report.total_primitives * 100);
+        var v = report.valid_primitives + ' (' + p_valid_pc + '%)';
+        td_v.appendChild(document.createTextNode(v));
+        // cell Invalid
+        var td_i = tr.insertCell(3);
+        var p_invalid_pc = Math.round(report.invalid_primitives / report.total_primitives * 100);
+        var i = report.invalid_primitives + ' (' + p_invalid_pc + '%)';
+        td_i.appendChild(document.createTextNode(i));
+    }
+
+    body.appendChild(tbl);
+}
+idx_validation_summary();
