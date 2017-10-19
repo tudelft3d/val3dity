@@ -509,13 +509,15 @@ int main(int argc, char* const argv[])
                          onlyinvalid.getValue());
         // HTML report
         if (report.getValue() != "") {
-          std::cout << "HTML report" << std::endl;
           boost::filesystem::path outpath(report.getValue());
           if (boost::filesystem::exists(outpath.parent_path()) == false)
             std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
           else {
+            if (boost::filesystem::extension(outpath) != ".html")
+              outpath += ".html";
             std::ofstream o(outpath.string());
             o << indexhtml << std::endl;                                
+            std::cout << "Full validation report (in HTML format) saved to " << outpath << std::endl;
             o.close();
 
             boost::filesystem::path folder = outpath.parent_path();
@@ -534,9 +536,9 @@ int main(int argc, char* const argv[])
             o << primitiveshtml << std::endl;                                
             o.close();
             
-            outfile = folder / "threeview.js";
+            outfile = folder / "treeview.js";
             o.open(outfile.string());
-            o << threeviewjs << std::endl;                                
+            o << treeviewjs << std::endl;                                
             o.close();
 
             outfile = folder / "val3dityconfig.js";
@@ -549,18 +551,18 @@ int main(int argc, char* const argv[])
             o << indexcss << std::endl;                                
             o.close();
           }
-          // std::cout << p << std::endl;
-          // std::cout << boost::filesystem::is_regular_file(p) << std::endl;
         }
         // JSON report
         else {
           boost::filesystem::path outpath(report_json.getValue());
-          if (boost::filesystem::is_regular_file(outpath) == false)
+          if (boost::filesystem::exists(outpath.parent_path()) == false)
             std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
           else {
-            std::ofstream o(report_json.getValue());
+            if (boost::filesystem::extension(outpath) != ".json")
+              outpath += ".json";
+            std::ofstream o(outpath.string());
             o << jr.dump(2) << std::endl;                                
-            std::cout << "Full validation report (in JSON format) saved to " << report_json.getValue() << std::endl;
+            std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
           }
         }
       }

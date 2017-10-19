@@ -434,7 +434,7 @@ std::string primitiveshtml = R"(
 </html>
 )";
 
-std::string threeviewjs = R"(
+std::string treeviewjs = R"(
 // Adapted from js-treeview, see: https://github.com/justinchmura/js-treeview
 
 (function (define) {
