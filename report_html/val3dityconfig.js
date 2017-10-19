@@ -263,6 +263,7 @@ document.getElementById("snap_tol").innerHTML = report.snap_tol;
 document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 
 function idx_validation_summary(){
+    document.write('<br><h3>'+ 'Click to have more information' +'</h3>');
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "summary");
