@@ -1081,6 +1081,10 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   std::string s;
   infile >> s;
   infile >> numpt >> numf >> tmpint;
+  if ( (s != "OFF") || (numpt <= 0) ) {
+    errs.add_error(901, "Input file not a valid OFF file.");
+    return NULL;
+  }
   std::vector< Point3 >::iterator iPoint3;
   //-- read first line to decide if 0- or 1-based indexing
   for (int i = 0; i < numpt; i++)

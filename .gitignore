@@ -42,3 +42,4 @@ x86/
 .project
 .pydevproject
 .settings/
+/.cache
