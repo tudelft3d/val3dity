@@ -1015,20 +1015,8 @@ function idx_error_table(){
     }
     body.appendChild(tbl);
 }
-idx_error_table();
-
-// Populate index.html with the validation results from the json report
-document.getElementById("in_file").innerHTML = report.input_file.split("/").pop();
-document.getElementById("version").innerHTML = report.val3dity_version;
-document.getElementById("time").innerHTML = report.time;
-
-document.getElementById("planarity_d2p_tol").innerHTML = report.planarity_d2p_tol;
-document.getElementById("planarity_n_tol").innerHTML = report.planarity_n_tol;
-document.getElementById("snap_tol").innerHTML = report.snap_tol;
-document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 
 function idx_validation_summary(){
-    document.write('<br><h3>'+ 'Click to have more information' +'</h3>');
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "summary");
@@ -1047,7 +1035,7 @@ function idx_validation_summary(){
         // cell CityObjects
         var td0 = tr.insertCell(0);
         var a = document.createElement('a');
-        var linkText = document.createTextNode('CityObjects');
+        var linkText = document.createTextNode('CityObjects (click for more details)');
         a.appendChild(linkText);
         a.title = "CityObjects";
         a.href = "CityObjects.html";
@@ -1095,6 +1083,19 @@ function idx_validation_summary(){
 
     body.appendChild(tbl);
 }
+
 idx_validation_summary();
+
+// Populate index.html with the validation results from the json report
+document.getElementById("in_file").innerHTML = report.input_file.split("/").pop();
+document.getElementById("version").innerHTML = report.val3dity_version;
+document.getElementById("time").innerHTML = report.time;
+document.getElementById("planarity_d2p_tol").innerHTML = report.planarity_d2p_tol;
+document.getElementById("planarity_n_tol").innerHTML = report.planarity_n_tol;
+document.getElementById("snap_tol").innerHTML = report.snap_tol;
+document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
+
+document.write('<br><h3>'+ 'Overview of errors' +'</h3>');
+idx_error_table();
 )";
 
