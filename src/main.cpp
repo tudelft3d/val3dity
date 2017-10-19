@@ -24,6 +24,7 @@
 */
 
 #include "input.h"
+#include "reportoutput.h"
 #include "Primitive.h"
 #include "validate_prim_toporel.h"
 #include "Surface.h"
@@ -32,6 +33,7 @@
 #include <tclap/CmdLine.h>
 #include <time.h>  
 #include "nlohmann-json/json.hpp"
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace val3dity;
@@ -130,6 +132,12 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
+                                              "Output report in HTML format",
+                                              false,
+                                              "",
+                                              "string");    
+    TCLAP::ValueArg<std::string>            report_json("",
+                                              "report_json",
                                               "Output report in JSON format",
                                               false,
                                               "",
@@ -198,6 +206,7 @@ int main(int argc, char* const argv[])
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
+    cmd.add(report_json);
     cmd.parse( argc, argv );
 
     //-- map with Primitives
@@ -485,7 +494,7 @@ int main(int argc, char* const argv[])
     else {
       //-- print summary of errors
       std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
-      if (report.getValue() != "")
+      if ( (report.getValue() != "") || (report_json.getValue() != "") )
       {
         json jr;
         write_report_json(jr, 
@@ -498,12 +507,65 @@ int main(int argc, char* const argv[])
                          planarity_n_tol_updated,
                          ioerrs,
                          onlyinvalid.getValue());
-        std::ofstream o(report.getValue());
-        o << jr.dump(2) << std::endl;                                
-        std::cout << "Full validation report saved to " << report.getValue() << std::endl;
+        // HTML report
+        if (report.getValue() != "") {
+          std::cout << "HTML report" << std::endl;
+          boost::filesystem::path outpath(report.getValue());
+          if (boost::filesystem::exists(outpath.parent_path()) == false)
+            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+          else {
+            std::ofstream o(outpath.string());
+            o << indexhtml << std::endl;                                
+            o.close();
+
+            boost::filesystem::path folder = outpath.parent_path();
+            boost::filesystem::path outfile = folder / "report.js";
+            o.open(outfile.string());
+            o << "var report =" << jr << std::endl;                                
+            o.close();
+
+            outfile = folder / "CityObjects.html";
+            o.open(outfile.string());
+            o << cityobjectshtml << std::endl;                                
+            o.close();
+
+            outfile = folder / "Primitives.html";
+            o.open(outfile.string());
+            o << primitiveshtml << std::endl;                                
+            o.close();
+            
+            outfile = folder / "threeview.js";
+            o.open(outfile.string());
+            o << threeviewjs << std::endl;                                
+            o.close();
+
+            outfile = folder / "val3dityconfig.js";
+            o.open(outfile.string());
+            o << val3dityconfigjs << std::endl;                                
+            o.close();
+            
+            outfile = folder / "index.css";
+            o.open(outfile.string());
+            o << indexcss << std::endl;                                
+            o.close();
+          }
+          // std::cout << p << std::endl;
+          // std::cout << boost::filesystem::is_regular_file(p) << std::endl;
+        }
+        // JSON report
+        else {
+          boost::filesystem::path outpath(report_json.getValue());
+          if (boost::filesystem::is_regular_file(outpath) == false)
+            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+          else {
+            std::ofstream o(report_json.getValue());
+            o << jr.dump(2) << std::endl;                                
+            std::cout << "Full validation report (in JSON format) saved to " << report_json.getValue() << std::endl;
+          }
+        }
       }
       else
-        std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+        std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
     }
 
     if (verbose.getValue() == false)
