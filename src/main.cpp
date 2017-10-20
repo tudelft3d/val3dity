@@ -513,40 +513,41 @@ int main(int argc, char* const argv[])
           if (boost::filesystem::exists(outpath.parent_path()) == false)
             std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
           else {
-            if (boost::filesystem::extension(outpath) != ".html")
-              outpath += ".html";
-            std::ofstream o(outpath.string());
+            if (boost::filesystem::exists(outpath) == false)
+              boost::filesystem::create_directory(outpath);
+            boost::filesystem::path outfile = outpath / "report.html";
+            std::cout << outfile.string() << std::endl;
+            std::ofstream o(outfile.string());
             o << indexhtml << std::endl;                                
-            std::cout << "Full validation report (in HTML format) saved to " << outpath << std::endl;
+            std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
             o.close();
 
-            boost::filesystem::path folder = outpath.parent_path();
-            boost::filesystem::path outfile = folder / "report.js";
+            outfile = outpath / "report.js";
             o.open(outfile.string());
             o << "var report =" << jr << std::endl;                                
             o.close();
 
-            outfile = folder / "CityObjects.html";
+            outfile = outpath / "CityObjects.html";
             o.open(outfile.string());
             o << cityobjectshtml << std::endl;                                
             o.close();
 
-            outfile = folder / "Primitives.html";
+            outfile = outpath / "Primitives.html";
             o.open(outfile.string());
             o << primitiveshtml << std::endl;                                
             o.close();
             
-            outfile = folder / "treeview.js";
+            outfile = outpath / "treeview.js";
             o.open(outfile.string());
             o << treeviewjs << std::endl;                                
             o.close();
 
-            outfile = folder / "val3dityconfig.js";
+            outfile = outpath / "val3dityconfig.js";
             o.open(outfile.string());
             o << val3dityconfigjs << std::endl;                                
             o.close();
             
-            outfile = folder / "index.css";
+            outfile = outpath / "index.css";
             o.open(outfile.string());
             o << indexcss << std::endl;                                
             o.close();
@@ -817,7 +818,6 @@ void write_report_json(json& jr,
     jr["valid_cityobjects"] = dPrimitives.size() - coInvalid;
     jr["invalid_cityobjects"] = coInvalid;
   }
-
   jr["InputErrors"];
   jr["CityObjects"];
   jr["Primitives"];
@@ -825,7 +825,6 @@ void write_report_json(json& jr,
   {
     jr["InputErrors"] = ioerrs.get_report_json();
   }
-  
   else
   {
     //-- only primitives (no CityObjects)
