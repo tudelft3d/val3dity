@@ -314,7 +314,7 @@ This error cannot occur with CityJSON.
 
 901 -- INVALID_INPUT_FILE
 -------------------------
-Input file is not valid, most likely not a valid CityGML file. `Check here for CityGML files <http://geovalidation.bk.tudelft.nl/schemacitygml/>`_.
+Input file is not valid or corrupted. If a CityGML file, you can `check it against the schema <http://geovalidation.bk.tudelft.nl/schemacitygml/>`_.
 
 .. _error_902:
 
