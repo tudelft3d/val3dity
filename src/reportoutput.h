@@ -207,7 +207,7 @@ h3 {
     padding: 1em 0 0 3em;
     font-size: 1em;
     font-weight: bold;
-    }
+}
 
 table {
     border-collapse: collapse;
@@ -961,9 +961,28 @@ var errors = {
 
 
 function idx_error_table(){
+    if (report.overview_errors == null) {
+      var h = document.createElement("H3")           
+      var t = document.createTextNode("No errors!");
+      h.appendChild(t);
+      document.body.appendChild(h);
+      var x = document.createElement("IMG");
+      x.setAttribute("src", "http://geovalidation.bk.tudelft.nl/val3dity/img/welldone.png");
+      x.setAttribute("alt", "The Pulpit Rock");
+      document.body.appendChild(x);
+      return;
+    }
+    else {
+      var h = document.createElement("H3")           
+      var t = document.createTextNode("Overview of errors");
+      h.appendChild(t);
+      document.body.appendChild(h);
+    }
+    
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "errors");
+
 
     var tr = tbl.insertRow(0);
     var headers = ['Error', '# of primitives'];
@@ -1095,7 +1114,7 @@ document.getElementById("planarity_n_tol").innerHTML = report.planarity_n_tol;
 document.getElementById("snap_tol").innerHTML = report.snap_tol;
 document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 
-document.write('<br><h3>'+ 'Overview of errors' +'</h3>');
+document.write('<br>');
 idx_error_table();
 )";
 
