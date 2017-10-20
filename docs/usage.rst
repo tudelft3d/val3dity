@@ -144,13 +144,13 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 ----
 
 ``--onlyinvalid``
-****************
+*****************
 |  Only the invalid primitives are reported in the validation report.
 
 ----
 
 ``--geom_is_sem_surfaces``
-****************
+**************************
 | The geometry of a CityGML object is formed by its semantic surfaces instead of the geometry (which is missing in the file). Only to be used if :ref:`error_609` occurs. If no semantic surfaces are present, then 609 can still occur even the use of this option.
 
 ----
@@ -162,13 +162,13 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 ----
 
 ``--ignore204``
-*****************
+***************
 |  Ignore the error `204 – NON_PLANAR_POLYGON_NORMALS_DEVIATION <http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-normals-deviation>`_.
 
 ----
 
 ``-p, --primitive``
-*****************
+*******************
 |  Which geometric primitive to validate. Only relevant for OBJ/OFF, because for CityGML/CityJSON all primitives are validated. Read more geometric primitives at :ref:`def`.
 |  One of ``Solid``, ``CompositeSurface``, ``MultiSurface``.
 
