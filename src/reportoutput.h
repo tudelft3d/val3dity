@@ -250,25 +250,25 @@ a:hover {
     }
 
 .linear-ring-level{
-    background-color: #ac2824
+    background-color: #FED2D2
 }
 .polygon-level{
-    background-color: #40a635
+    background-color: #76D36B
 }
 .shell-level{
-    background-color: #f4b368
+    background-color: #F2AF60
 }
 .solid-level{
-    background-color: #00d6ee
+    background-color: #1BD2FF
 }
 .solid-interactions-level{
-    background-color: #ffafff
+    background-color: #FDA4FF
 }
 .citygml-building{
-    background-color: #d6a979
+    background-color: #D2A471
 }
 .others{
-    background-color: #00e0e5
+    background-color: #1CE0E3
 }
 
 
