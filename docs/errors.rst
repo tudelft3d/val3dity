@@ -296,6 +296,20 @@ Two ``Solids`` in a ``CompositeSolid`` are disconnected.
 ----------------------------
 Some primitives in a Building and/or BuildingPart have their interior overlapping.
 
+.. _error_609:
+
+609 -- CITYOBJECT_HAS_NO_GEOMETRY
+---------------------------------
+The CityGML object (a Building, a Bridge, a Road, etc.) has no geometry defined.
+That is, it has no 3D Primitives declared as geometry, for instance for a Building there no tags ``<lod2Solid>`` or ``<lod2MultiSurface>``.
+If with a viewer you can see the geometry of the CityGML object, then that error occurs because the surfaces are *only* declared as semantic surfaces (the surfaces are children of the tag ``<boundedBy>``).
+To circumvent the issue, we advise you to add a geometry to your objects, this is an error that could affect many processes and software.
+Another option is to use the option ``--geom_is_sem_surfaces`` which gathers all the semantic surfaces of a City Object and validates them.
+We only offer this option as a convenience (and because we are nice people), and we strongly encourage you to define a geometry.
+
+This error cannot occur with CityJSON.
+
+
 .. _error_901:
 
 901 -- INVALID_INPUT_FILE

@@ -166,6 +166,10 @@ int main(int argc, char* const argv[])
                                               "ignore204",
                                               "Ignore error 204",
                                               false);    
+    TCLAP::SwitchArg                        geom_is_sem_surfaces("",
+                                              "geom_is_sem_surfaces",
+                                              "geometry of a CityGML object is formed by its semantic surfaces",
+                                              false);    
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
                                               "Tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
@@ -198,6 +202,7 @@ int main(int argc, char* const argv[])
     cmd.add(notranslate);
     cmd.add(verbose);
     cmd.add(primitives);
+    cmd.add(geom_is_sem_surfaces);
     cmd.add(ignore204);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
@@ -267,7 +272,8 @@ int main(int argc, char* const argv[])
           read_file_gml(inputfile.getValue(), 
                         dPrimitives,
                         ioerrs, 
-                        snap_tol.getValue());
+                        snap_tol.getValue(),
+                        geom_is_sem_surfaces.getValue());
           if (ioerrs.has_errors() == true) {
             std::cout << "Errors while reading the input file, aborting." << std::endl;
             std::cout << ioerrs.get_report_text() << std::endl;
@@ -447,6 +453,11 @@ int main(int argc, char* const argv[])
           printProgressBar(100 * (i / double(dPrimitives.size())));
         i++;
         bool bValid = true;
+        COError coerrs;
+        if (co.second.empty() == true) {
+          coerrs.add_error(609, "City Object has no geometry defined.", "");
+          dCOerrors[co.first] = coerrs;
+        }
         for (auto& p : co.second)
         {
           std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
@@ -472,11 +483,9 @@ int main(int argc, char* const argv[])
         //-- if Building then do extra checks  
         if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
         {
-          std::clog << "--extra building validation" << std::endl;
-          COError coerrs;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
-            // std::cout << "ERROR OVERLAPPING BUILDING PARTS" << std::endl;
+            std::clog << "Error: overlapping building parts" << std::endl;
             dCOerrors[co.first] = coerrs;
           }
         }

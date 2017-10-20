@@ -149,6 +149,11 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ----
 
+``--geom_is_sem_surfaces``
+****************
+| The geometry of a CityGML object is formed by its semantic surfaces instead of the geometry (which is missing in the file). Only to be used if :ref:`error_609` occurs. If no semantic surfaces are present, then 609 can still occur even the use of this option.
+
+----
 
 ``--notranslate``
 *****************
