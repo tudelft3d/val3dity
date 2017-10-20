@@ -552,7 +552,7 @@ int main(int argc, char* const argv[])
           }
         }
         // JSON report
-        else {
+        if (report_json.getValue() != ""){
           boost::filesystem::path outpath(report_json.getValue());
           if (boost::filesystem::exists(outpath.parent_path()) == false)
             std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
