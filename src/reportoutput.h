@@ -933,6 +933,12 @@ var errors = {
             "href": "http://val3dity.readthedocs.io/en/v2/errors/#buildingparts-overlap"
         }
     },
+    "609": {
+        "name": "609 – CITYOBJECT_HAS_NO_GEOMETRY",
+        "link": {
+            "href": "https://val3dity.readthedocs.io/en/v2/errors/#cityobject-has-no-geometry"
+        }
+    },
     "901": {
         "name": "901 – INVALID_INPUT_FILE",
         "link": {
