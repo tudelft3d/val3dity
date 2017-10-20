@@ -959,26 +959,34 @@ var errors = {
     }
 }
 
+function error_overview() {
+
+  if ( (report.CityObjects == null) && (report.Primitives == null) ) {
+    // idx_error_table();
+    return;
+  }
+  if (report.overview_errors == null) {
+    var h = document.createElement("H3")           
+    var t = document.createTextNode("No errors!");
+    h.appendChild(t);
+    document.body.appendChild(h);
+    var x = document.createElement("IMG");
+    x.setAttribute("src", "http://geovalidation.bk.tudelft.nl/val3dity/img/welldone.png");
+    x.setAttribute("alt", "The Pulpit Rock");
+    document.body.appendChild(x);
+    return;
+  }
+  else {
+    var h = document.createElement("H3")           
+    var t = document.createTextNode("Overview of errors");
+    h.appendChild(t);
+    document.body.appendChild(h);
+    idx_error_table();
+  }
+}
 
 function idx_error_table(){
-    if (report.overview_errors == null) {
-      var h = document.createElement("H3")           
-      var t = document.createTextNode("No errors!");
-      h.appendChild(t);
-      document.body.appendChild(h);
-      var x = document.createElement("IMG");
-      x.setAttribute("src", "http://geovalidation.bk.tudelft.nl/val3dity/img/welldone.png");
-      x.setAttribute("alt", "The Pulpit Rock");
-      document.body.appendChild(x);
-      return;
-    }
-    else {
-      var h = document.createElement("H3")           
-      var t = document.createTextNode("Overview of errors");
-      h.appendChild(t);
-      document.body.appendChild(h);
-    }
-    
+   
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "errors");
@@ -1115,6 +1123,6 @@ document.getElementById("snap_tol").innerHTML = report.snap_tol;
 document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 
 document.write('<br>');
-idx_error_table();
+error_overview();
 )";
 
