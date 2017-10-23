@@ -307,8 +307,6 @@ To circumvent the issue, we advise you to add a geometry to your objects, this i
 Another option is to use the option ``--geom_is_sem_surfaces`` which gathers all the semantic surfaces of a City Object and validates them.
 We only offer this option as a convenience (and because we are nice people), and we strongly encourage you to define a geometry.
 
-This error cannot occur with CityJSON.
-
 
 .. _error_901:
 
