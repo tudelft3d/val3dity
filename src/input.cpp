@@ -31,6 +31,9 @@ using json = nlohmann::json;
 namespace val3dity
 {
 
+double _minx = 9e10;
+double _miny = 9e10;  
+
 //-- XML namespaces map
 std::map<std::string, std::string> NS; 
 
@@ -869,6 +872,29 @@ void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primiti
     errs.add_error(901, "Input file does not have the GML namespace.");
     return;
   }
+  
+  //-- find (_minx, _miny)
+  std::string s = "//" + NS["gml"] + "posList";
+  pugi::xpath_node_set nall = doc.select_nodes(s.c_str());
+  for (auto& each : nall) 
+  {
+    std::string buf;
+    std::stringstream ss(each.node().child_value());
+    std::vector<std::string> coords;
+    while (ss >> buf)
+      coords.push_back(buf);
+    for (int i = 0; i < coords.size(); i += 3)
+    {
+      if (std::stod(coords[0]) < _minx)
+        _minx = std::stod(coords[0]);
+      if (std::stod(coords[1]) < _miny)
+        _miny = std::stod(coords[1]);
+    }
+  }
+  std::cout << "_minx: " << _minx << std::endl;
+  std::cout << "_miny: " << _miny << std::endl;
+
+
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
