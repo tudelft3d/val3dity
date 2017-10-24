@@ -499,19 +499,18 @@ int main(int argc, char* const argv[])
       if (verbose.getValue() == false)
         printProgressBar(100);
     }
-    std::cout << std::endl;
 
     //-- output shells/surfaces in OFF format
     if (output_off.getValue() != "") 
     {
-      std::cout << "Output OFF" << std::endl;
+      std::cout << std::endl << std::endl;
       boost::filesystem::path outpath(output_off.getValue());
       if (boost::filesystem::exists(outpath.parent_path()) == false)
         std::cout << "Error OFF output: file " << outpath << " impossible to create, wrong path." << std::endl;
       else {
         if (boost::filesystem::exists(outpath) == false)
           boost::filesystem::create_directory(outpath);
-        
+        std::cout << "OFF files saved to: " << outpath << std::endl;
         for (auto& co : dPrimitives)
         {
           std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
@@ -531,6 +530,17 @@ int main(int argc, char* const argv[])
                 o << ts->get_off_representation(1) << std::endl;                                
                 o.close();
               }
+            }
+            else if (p->get_type() == MULTISURFACE)
+            {
+              boost::filesystem::path outfile = outpath / (coid + ".off");
+              std::ofstream o(outfile.string());
+              MultiSurface* ts = dynamic_cast<MultiSurface*>(p);
+              o << ts->get_off_representation() << std::endl;                                
+              o.close();
+            }
+            else {
+              std::cout << "OFF OUTPUT: these primitive types are not supported (yet). Sorry." << std::endl;
             }
           }
         }
