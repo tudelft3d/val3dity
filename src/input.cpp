@@ -920,9 +920,11 @@ void compute_min_xy(pugi::xml_document& doc)
     if (std::stod(tokens[1]) < _miny)
       _miny = std::stod(tokens[1]);
   }
-  std::cout << "_minx: " << _minx << std::endl;
-  std::cout << "_miny: " << _miny << std::endl;
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
 }
+
 
 void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
 {

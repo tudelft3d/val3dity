@@ -170,10 +170,12 @@ int main(int argc, char* const argv[])
                                               "geom_is_sem_surfaces",
                                               "geometry of a CityGML object is formed by its semantic surfaces",
                                               false);
-    TCLAP::SwitchArg                        output_poly("",
-                                              "output_poly",
-                                              "output solids in POLY format",
-                                              false);                                                  
+    TCLAP::ValueArg<std::string>            output_off("",
+                                              "output_off",
+                                              "output each shell/surface in OFF format",
+                                              false,
+                                              "",
+                                              "string");        
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
                                               "Tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
@@ -210,7 +212,7 @@ int main(int argc, char* const argv[])
     cmd.add(ignore204);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
-    cmd.add(output_poly);
+    cmd.add(output_off);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
@@ -254,8 +256,6 @@ int main(int argc, char* const argv[])
     if ( (inputtype == JSON) || (inputtype == GML) )
     {
       prim3d = ALL;
-      if (primitives.getValue() != "")
-        std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
     }
     else {
       if (primitives.getValue() == "Solid")
@@ -401,6 +401,7 @@ int main(int argc, char* const argv[])
         std::cout << "CompositeSurface" << std::endl;
       else
         std::cout << "All" << std::endl;
+        std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
     }
 
     // if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
@@ -484,16 +485,6 @@ int main(int argc, char* const argv[])
           }
           else
             std::clog << "========= VALID =========" << std::endl;
-          if (output_poly.getValue() == true) 
-          {
-            if (p->get_type() == SOLID)
-            {
-              std::cout << "Output POLY" << std::endl;
-              Solid* ts = dynamic_cast<Solid*>(p);
-              std::string poly = ts->get_poly_representation();
-              std::cout << poly << std::endl;
-            }
-          }
         }
         //-- if Building then do extra checks  
         if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
@@ -508,6 +499,44 @@ int main(int argc, char* const argv[])
       if (verbose.getValue() == false)
         printProgressBar(100);
     }
+    std::cout << std::endl;
+
+    //-- output shells/surfaces in OFF format
+    if (output_off.getValue() != "") 
+    {
+      std::cout << "Output OFF" << std::endl;
+      boost::filesystem::path outpath(output_off.getValue());
+      if (boost::filesystem::exists(outpath.parent_path()) == false)
+        std::cout << "Error OFF output: file " << outpath << " impossible to create, wrong path." << std::endl;
+      else {
+        if (boost::filesystem::exists(outpath) == false)
+          boost::filesystem::create_directory(outpath);
+        
+        for (auto& co : dPrimitives)
+        {
+          std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+          for (auto& p : co.second)
+          {
+            if (p->get_type() == SOLID)
+            {
+              boost::filesystem::path outfile = outpath / (coid + ".0.off");
+              std::ofstream o(outfile.string());
+              Solid* ts = dynamic_cast<Solid*>(p);
+              o << ts->get_off_representation(0) << std::endl;                                
+              o.close();
+              for (int i = 1; i <= ts->num_ishells(); i++)
+              {
+                outfile = outpath / (coid + "." + std::to_string(i) + ".off");
+                o.open(outfile.string());
+                o << ts->get_off_representation(1) << std::endl;                                
+                o.close();
+              }
+            }
+          }
+        }
+      }
+    }
+
 
     if (unittests.getValue() == true)
     {

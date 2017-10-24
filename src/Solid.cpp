@@ -167,6 +167,11 @@ std::string Solid::get_poly_representation()
   return ss.str();
 }
 
+std::string Solid::get_off_representation(int shellno)
+{
+  return (_shells[shellno])->get_off_representation();
+}
+
 
 json Solid::get_report_json()
 {
