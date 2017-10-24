@@ -1170,7 +1170,6 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return NULL;
   }
-  Surface* sh = new Surface(shellid);  
   //-- read the points
   int numpt, numf, tmpint;
   std::string s;
@@ -1180,8 +1179,27 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not a valid OFF file.");
     return NULL;
   }
-  std::vector< Point3 >::iterator iPoint3;
-  //-- read first line to decide if 0- or 1-based indexing
+  //-- compute (_minx, _miny)
+  for (int i = 0; i < numpt; i++)
+  {
+    double x, y, z;
+    infile >> x >> y >> z;
+    if (x < _minx)
+      _minx = x;
+    if (y < _miny)
+      _miny = y;
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+  //-- reset the file
+  infile.close();
+  infile.open(ifile.c_str(), std::ifstream::in);
+  infile >> s;
+  infile >> numpt >> numf >> tmpint;
+
+  //-- read the points
+  Surface* sh = new Surface(shellid);  
   for (int i = 0; i < numpt; i++)
   {
     Point3 p;
