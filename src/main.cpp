@@ -539,6 +539,14 @@ int main(int argc, char* const argv[])
               o << ts->get_off_representation() << std::endl;                                
               o.close();
             }
+            else if (p->get_type() == COMPOSITESURFACE)
+            {
+              boost::filesystem::path outfile = outpath / (coid + ".off");
+              std::ofstream o(outfile.string());
+              CompositeSurface* ts = dynamic_cast<CompositeSurface*>(p);
+              o << ts->get_off_representation() << std::endl;                                
+              o.close();
+            }            
             else {
               std::cout << "OFF OUTPUT: these primitive types are not supported (yet). Sorry." << std::endl;
             }
