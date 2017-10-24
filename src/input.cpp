@@ -1236,17 +1236,20 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- read again file and parse everything
-  infile.clear();
+  infile.close();
+  infile.open(ifile.c_str(), std::ifstream::in);
   int primid = 0;
-  std::cout << "Parsing the file..." << std::endl; 
   Surface* sh = new Surface(0, tol_snap);
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
-      Point3 *p = new Point3();
       std::string tmp;
-      iss >> tmp >> *p;
+      double x, y, z;
+      iss >> tmp >> x >> y >> z;
+      x -= _minx;
+      y -= _miny;
+      Point3 *p = new Point3(x, y, z);
       allvertices.push_back(p);
     }
     else if (l.substr(0, 2) == "o ") {
