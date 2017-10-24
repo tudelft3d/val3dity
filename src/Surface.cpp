@@ -245,19 +245,36 @@ int Surface::get_number_parsed_vertices()
 }
 
 
-int Surface::add_point(Point3 p)
+int Surface::add_point(Point3 pi)
 {
   _vertices_added += 1;
-  auto it = _dPts.find(get_coords_key(&p));
-  if (it == _dPts.end()) 
+  if (_tol_snap > 0.0)
   {
-    _lsPts.push_back(p);
-    _dPts[get_coords_key(&p)] = (_lsPts.size() - 1); 
-    return (_lsPts.size() - 1);
+    int i = 0;
+    for (auto& p : _lsPts)
+    {
+      auto d = CGAL::squared_distance(pi, p);
+      if (d <= (_tol_snap*_tol_snap))
+        return i;
+      i++;
+    }
   }
-  return it->second;
+  _lsPts.push_back(pi);
+  return (_lsPts.size() - 1);
 }
 
+// int Surface::add_point(Point3 p)
+// {
+//   _vertices_added += 1;
+//   auto it = _dPts.find(get_coords_key(&p));
+//   if (it == _dPts.end()) 
+//   {
+//     _lsPts.push_back(p);
+//     _dPts[get_coords_key(&p)] = (_lsPts.size() - 1); 
+//     return (_lsPts.size() - 1);
+//   }
+//   return it->second;
+// }
 
 void Surface::add_face(std::vector< std::vector<int> > f, std::string id)
 {
