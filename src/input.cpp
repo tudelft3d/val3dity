@@ -616,6 +616,8 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
         y = (double(j["vertices"][i][1]) * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
         z = (double(j["vertices"][i][2]) * double(j["transform"]["scale"][2])) + double(j["transform"]["translate"][2]);
       }
+      x -= _minx;
+      y -= _miny;
       Point3 p3(x, y, z);
       newr.push_back(sh->add_point(p3));
     }
@@ -874,8 +876,14 @@ void compute_min_xy(json& j)
     if (v[1] < _miny)
       _miny = v[1];
   }
-  std::cout << "_minx: " << _minx << std::endl;
-  std::cout << "_miny: " << _miny << std::endl;
+  if (j.count("transform") != 0)
+  {
+    _minx = (_minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
+    _miny = (_miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
 }
 
 
