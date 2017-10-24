@@ -192,7 +192,11 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
       std::vector<std::string> tokens;
       while (ss >> buf)
         tokens.push_back(buf);
-      Point3 p(std::stod(tokens[0]), std::stod(tokens[1]), std::stod(tokens[2]));
+      long double x = std::stold(tokens[0]);
+      x -= _minx;
+      long double y = std::stold(tokens[1]);
+      y -= _miny;
+      Point3 p(double(x), double(y), std::stod(tokens[2]));
       r.push_back(sh->add_point(p));
     }
   }
@@ -216,7 +220,11 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
     }
     for (int i = 0; i < coords.size(); i += 3)
     {
-      Point3 p(std::stod(coords[i]), std::stod(coords[i+1]), std::stod(coords[i+2]));
+      long double x = std::stold(coords[i]);
+      x -= _minx;
+      long double y = std::stold(coords[i+1]);
+      y -= _miny;
+      Point3 p(double(x), double(y), std::stod(coords[i+2]));
       r.push_back(sh->add_point(p));
     }
   }
@@ -633,6 +641,8 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
   }
   std::cout << "CityJSON input file" << std::endl;
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
+  //-- compute (_minx, _miny)
+  compute_min_xy(j);
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
     // std::cout << "o " << it.key() << std::endl;
@@ -854,6 +864,58 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
   }
 }
 
+
+void compute_min_xy(json& j)
+{
+  for (auto& v : j["vertices"])
+  {
+    if (v[0] < _minx)
+      _minx = v[0];
+    if (v[1] < _miny)
+      _miny = v[1];
+  }
+  std::cout << "_minx: " << _minx << std::endl;
+  std::cout << "_miny: " << _miny << std::endl;
+}
+
+
+void compute_min_xy(pugi::xml_document& doc)
+{
+  std::string s = "//" + NS["gml"] + "posList";
+  pugi::xpath_node_set nall = doc.select_nodes(s.c_str());
+  for (auto& each : nall) 
+  {
+    std::string buf;
+    std::stringstream ss(each.node().child_value());
+    std::vector<std::string> coords;
+    while (ss >> buf)
+      coords.push_back(buf);
+    for (int i = 0; i < coords.size(); i += 3)
+    {
+      if (std::stod(coords[0]) < _minx)
+        _minx = std::stod(coords[0]);
+      if (std::stod(coords[1]) < _miny)
+        _miny = std::stod(coords[1]);
+    }
+  }
+  s = "//" + NS["gml"] + "pos";
+  nall = doc.select_nodes(s.c_str());
+  for (auto& each : nall) 
+  {
+    std::string buf;
+    std::stringstream ss(each.node().child_value());
+    std::vector<std::string> tokens;
+    while (ss >> buf)
+      tokens.push_back(buf);
+    if (std::stod(tokens[0]) < _minx)
+      _minx = std::stod(tokens[0]);
+    if (std::stod(tokens[1]) < _miny)
+      _miny = std::stod(tokens[1]);
+  }
+  std::cout << "_minx: " << _minx << std::endl;
+  std::cout << "_miny: " << _miny << std::endl;
+}
+
 void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
 {
   std::cout << "Reading file: " << ifile << std::endl;
@@ -872,29 +934,8 @@ void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primiti
     errs.add_error(901, "Input file does not have the GML namespace.");
     return;
   }
-  
   //-- find (_minx, _miny)
-  std::string s = "//" + NS["gml"] + "posList";
-  pugi::xpath_node_set nall = doc.select_nodes(s.c_str());
-  for (auto& each : nall) 
-  {
-    std::string buf;
-    std::stringstream ss(each.node().child_value());
-    std::vector<std::string> coords;
-    while (ss >> buf)
-      coords.push_back(buf);
-    for (int i = 0; i < coords.size(); i += 3)
-    {
-      if (std::stod(coords[0]) < _minx)
-        _minx = std::stod(coords[0]);
-      if (std::stod(coords[1]) < _miny)
-        _miny = std::stod(coords[1]);
-    }
-  }
-  std::cout << "_minx: " << _minx << std::endl;
-  std::cout << "_miny: " << _miny << std::endl;
-
-
+  compute_min_xy(doc);
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);

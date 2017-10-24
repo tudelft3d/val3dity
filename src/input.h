@@ -173,6 +173,9 @@ void              printProgressBar(int percent);
 std::string       localise(std::string s);
 std::string       remove_xml_namespace(const char* input);
 
+void              compute_min_xy(pugi::xml_document& doc);
+void              compute_min_xy(json& j);
+
 } // namespace val3dity
 
 #endif
