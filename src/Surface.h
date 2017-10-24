@@ -71,6 +71,7 @@ public:
   void          translate_vertices();
   static void   set_translation_min_values(double minx, double miny);
   std::string   get_poly_representation();
+  std::string   get_off_representation();
 
   bool          were_vertices_merged_during_parsing();
   int           get_number_parsed_vertices();

@@ -169,7 +169,11 @@ int main(int argc, char* const argv[])
     TCLAP::SwitchArg                        geom_is_sem_surfaces("",
                                               "geom_is_sem_surfaces",
                                               "geometry of a CityGML object is formed by its semantic surfaces",
-                                              false);    
+                                              false);
+    TCLAP::SwitchArg                        output_poly("",
+                                              "output_poly",
+                                              "output solids in POLY format",
+                                              false);                                                  
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
                                               "Tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
@@ -206,6 +210,7 @@ int main(int argc, char* const argv[])
     cmd.add(ignore204);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
+    cmd.add(output_poly);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
@@ -479,6 +484,16 @@ int main(int argc, char* const argv[])
           }
           else
             std::clog << "========= VALID =========" << std::endl;
+          if (output_poly.getValue() == true) 
+          {
+            if (p->get_type() == SOLID)
+            {
+              std::cout << "Output POLY" << std::endl;
+              Solid* ts = dynamic_cast<Solid*>(p);
+              std::string poly = ts->get_poly_representation();
+              std::cout << poly << std::endl;
+            }
+          }
         }
         //-- if Building then do extra checks  
         if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )

@@ -191,6 +191,29 @@ std::string Surface::get_poly_representation()
   return s.str();
 }
 
+std::string Surface::get_off_representation()
+{
+  std::stringstream ss;
+  ss << "OFF" << std::endl;
+  int notr = 0;
+  for (auto& f: _lsTr) 
+    for (auto& t: f) 
+      notr++;
+  ss << _lsPts.size() << " " << notr << " 0" << std::endl;
+  //-- points
+  for (auto& p : _lsPts)
+    ss << setprecision(15) << p.x() << " " << p.y() << " " << p.z() << std::endl;
+  //-- triangles
+  for (auto& f: _lsTr)
+  {
+    for (auto& t: f) 
+    {
+      ss << "3 " << t[0] << " " << t[1] << " " << t[2] << std::endl;
+    }
+  }
+  return ss.str();
+}
+
 
 std::string Surface::get_coords_key(Point3* p)
 {
@@ -202,7 +225,7 @@ std::string Surface::get_coords_key(Point3* p)
   else
   {
     int tol = int(1 / _tol_snap);
-    s = std::to_string(int64(p->x() * tol)) + std::to_string(int64(p->y() * tol)) + std::to_string(int64(p->z() * tol));
+    s = std::to_string(int64(p->x() * tol)) + " " + std::to_string(int64(p->y() * tol)) + " " + std::to_string(int64(p->z() * tol));
   }
   return s;
 }
