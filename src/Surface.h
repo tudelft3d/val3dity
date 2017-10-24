@@ -79,7 +79,6 @@ public:
 private:
   int                                     _id;
   std::vector<Point3>                     _lsPts;
-  std::unordered_map< std::string, int >  _dPts;
   std::vector< std::vector< std::vector<int> > >    _lsFaces;
   std::vector<std::string>                _lsFacesID;
   std::vector< std::vector<int*> >        _lsTr;
