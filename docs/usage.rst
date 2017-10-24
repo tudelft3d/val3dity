@@ -155,12 +155,6 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ----
 
-``--notranslate``
-*****************
-|  By default, all coordinates are translated by the (minx, miny) of the input file. This is to avoid precision error with floating-point numbers. This option skips the translation; we advise not to use this though.
-
-----
-
 ``--ignore204``
 ***************
 |  Ignore the error `204 – NON_PLANAR_POLYGON_NORMALS_DEVIATION <http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-normals-deviation>`_.
