@@ -1217,10 +1217,29 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
     errs.add_error(901, "Input file not found.");
     return;
   }
+  //-- find (minx, miny)
+  std::string l;
+  while (std::getline(infile, l)) 
+  {
+    std::istringstream iss(l);
+    if (l.substr(0, 2) == "v ") {
+      std::string tmp;
+      double x, y, z;
+      iss >> tmp >> x >> y >> z;
+      if (x < _minx)
+        _minx = x;
+      if (y < _miny)
+        _miny = y;
+    }
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+  //-- read again file and parse everything
+  infile.clear();
   int primid = 0;
   std::cout << "Parsing the file..." << std::endl; 
   Surface* sh = new Surface(0, tol_snap);
-  std::string l;
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);

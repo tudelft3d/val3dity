@@ -201,7 +201,6 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_n_tol);
     cmd.add(snap_tol);
     cmd.add(overlap_tol);
-    cmd.add(notranslate);
     cmd.add(verbose);
     cmd.add(primitives);
     cmd.add(geom_is_sem_surfaces);
