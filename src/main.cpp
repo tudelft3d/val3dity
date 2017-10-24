@@ -403,30 +403,30 @@ int main(int argc, char* const argv[])
         std::cout << "All" << std::endl;
     }
 
-    if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
-    {
-      //-- translate all vertices to avoid potential problems
-      double tmpx, tmpy;
-      double minx = 9e10;
-      double miny = 9e10;
-      for (auto& co : dPrimitives)
-      {
-        for (auto& p : co.second)
-        {
-          p->get_min_bbox(tmpx, tmpy);
-          if (tmpx < minx)
-            minx = tmpx;
-          if (tmpy < miny)
-            miny = tmpy;
-        }
-      }
-      Primitive::set_translation_min_values(minx, miny);
-      Surface::set_translation_min_values(minx, miny);
-      for (auto& co : dPrimitives)
-        for (auto& p : co.second)
-          p->translate_vertices();
-      std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
-    }
+    // if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
+    // {
+    //   //-- translate all vertices to avoid potential problems
+    //   double tmpx, tmpy;
+    //   double minx = 9e10;
+    //   double miny = 9e10;
+    //   for (auto& co : dPrimitives)
+    //   {
+    //     for (auto& p : co.second)
+    //     {
+    //       p->get_min_bbox(tmpx, tmpy);
+    //       if (tmpx < minx)
+    //         minx = tmpx;
+    //       if (tmpy < miny)
+    //         miny = tmpy;
+    //     }
+    //   }
+    //   Primitive::set_translation_min_values(minx, miny);
+    //   Surface::set_translation_min_values(minx, miny);
+    //   for (auto& co : dPrimitives)
+    //     for (auto& p : co.second)
+    //       p->translate_vertices();
+    //   std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
+    // }
     
     double planarity_n_tol_updated = planarity_n_tol.getValue();
     //-- report on parameters used
