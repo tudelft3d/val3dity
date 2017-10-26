@@ -31,8 +31,8 @@ using json = nlohmann::json;
 namespace val3dity
 {
 
-double _minx = 9e10;
-double _miny = 9e10;  
+double _minx = 9e15;
+double _miny = 9e15;  
 
 //-- XML namespaces map
 std::map<std::string, std::string> NS; 
