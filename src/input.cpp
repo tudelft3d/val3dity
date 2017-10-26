@@ -1196,13 +1196,15 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   infile.open(ifile.c_str(), std::ifstream::in);
   infile >> s;
   infile >> numpt >> numf >> tmpint;
-
   //-- read the points
   Surface* sh = new Surface(shellid);  
   for (int i = 0; i < numpt; i++)
   {
-    Point3 p;
-    infile >> p;
+    double x, y, z;
+    infile >> x >> y >> z;
+    x -= _minx;
+    y -= _miny;
+    Point3 p(x, y, z);
     sh->add_point(p);
   }
   //-- read the facets
