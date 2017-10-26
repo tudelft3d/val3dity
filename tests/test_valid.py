@@ -39,6 +39,7 @@ def data_closed_top(request, dir_valid):
             request.param))
     return(file_path)
 
+
 @pytest.fixture(scope="module",
                 params=["v405.off"])
 def data_v_405(request, dir_valid):
@@ -47,6 +48,18 @@ def data_v_405(request, dir_valid):
             dir_valid,
             request.param))
     return(file_path)
+
+
+
+@pytest.fixture(scope="module",
+                params=["basecube_large_coords.poly"])
+def data_large_coords(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
+
 
 @pytest.fixture(scope="module",
                 params=["inner_shell.poly",
@@ -75,6 +88,11 @@ def data_inner_shell(request, dir_valid, data_basecube):
 
 
 #----------------------------------------------------------------------- Tests
+
+def test_large_coords(validate, data_large_coords):
+    error = validate(data_large_coords)
+    assert(error == [])
+
 def test_v_405(validate, data_v_405):
     error = validate(data_v_405)
     assert(error == [])
