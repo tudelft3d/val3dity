@@ -75,6 +75,7 @@ test_geometry_specific:
   "601": A Building with 2 BuildingParts that overlap by 50 units
 
 test_valid:
+  "v405": the solid that returned 405 before CGAL fixed the bug (v4.10+ it's solved)
   "basecube": Valid unit cube. Used in combination with other shells.
   "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005
   "self_fold": .obj unit cube with a whirl
