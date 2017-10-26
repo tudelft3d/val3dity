@@ -475,7 +475,10 @@ int main(int argc, char* const argv[])
         printProgressBar(100);
     }
 
-    //-- output shells/surfaces in OFF format
+    //-- summary of the validation
+    std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
+
+   //-- output shells/surfaces in OFF format
     if (output_off.getValue() != "") 
     {
       std::cout << std::endl << std::endl;
@@ -489,18 +492,20 @@ int main(int argc, char* const argv[])
         for (auto& co : dPrimitives)
         {
           std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+          int noprim = 0;
           for (auto& p : co.second)
           {
+            std::string theid = coid + "." + std::to_string(noprim);
             if (p->get_type() == SOLID)
             {
-              boost::filesystem::path outfile = outpath / (coid + ".0.off");
+              boost::filesystem::path outfile = outpath / (theid + ".0.off");
               std::ofstream o(outfile.string());
               Solid* ts = dynamic_cast<Solid*>(p);
               o << ts->get_off_representation(0) << std::endl;                                
               o.close();
               for (int i = 1; i <= ts->num_ishells(); i++)
               {
-                outfile = outpath / (coid + "." + std::to_string(i) + ".off");
+                outfile = outpath / (theid + "." + std::to_string(i) + ".off");
                 o.open(outfile.string());
                 o << ts->get_off_representation(1) << std::endl;                                
                 o.close();
@@ -508,7 +513,7 @@ int main(int argc, char* const argv[])
             }
             else if (p->get_type() == MULTISURFACE)
             {
-              boost::filesystem::path outfile = outpath / (coid + ".off");
+              boost::filesystem::path outfile = outpath / (theid + ".off");
               std::ofstream o(outfile.string());
               MultiSurface* ts = dynamic_cast<MultiSurface*>(p);
               o << ts->get_off_representation() << std::endl;                                
@@ -516,7 +521,7 @@ int main(int argc, char* const argv[])
             }
             else if (p->get_type() == COMPOSITESURFACE)
             {
-              boost::filesystem::path outfile = outpath / (coid + ".off");
+              boost::filesystem::path outfile = outpath / (theid + ".off");
               std::ofstream o(outfile.string());
               CompositeSurface* ts = dynamic_cast<CompositeSurface*>(p);
               o << ts->get_off_representation() << std::endl;                                
@@ -525,95 +530,92 @@ int main(int argc, char* const argv[])
             else {
               std::cout << "OFF OUTPUT: these primitive types are not supported (yet). Sorry." << std::endl;
             }
+            noprim++;
           }
         }
       }
+      std::cout << std::endl;
     }
 
-
-    if (unittests.getValue() == true)
+    //-- output report
+    if ( (report.getValue() != "") || (report_json.getValue() != "") )
     {
-      std::cout << "\n" << unit_test(dPrimitives, dCOerrors, ioerrs) << std::endl;
-    }
-    else {
-      //-- print summary of errors
-      std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
-      if ( (report.getValue() != "") || (report_json.getValue() != "") )
-      {
-        json jr;
-        write_report_json(jr, 
-                         inputfile.getValue(),
-                         dPrimitives,
-                         dCOerrors,
-                         snap_tol.getValue(),
-                         overlap_tol.getValue(),
-                         planarity_d2p_tol.getValue(),
-                         planarity_n_tol_updated,
-                         ioerrs,
-                         onlyinvalid.getValue());
-        // HTML report
-        if (report.getValue() != "") {
-          boost::filesystem::path outpath(report.getValue());
-          if (boost::filesystem::exists(outpath.parent_path()) == false)
-            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-          else {
-            if (boost::filesystem::exists(outpath) == false)
-              boost::filesystem::create_directory(outpath);
-            boost::filesystem::path outfile = outpath / "report.html";
-            std::cout << outfile.string() << std::endl;
-            std::ofstream o(outfile.string());
-            o << indexhtml << std::endl;                                
-            std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-            o.close();
+      json jr;
+      write_report_json(jr, 
+                       inputfile.getValue(),
+                       dPrimitives,
+                       dCOerrors,
+                       snap_tol.getValue(),
+                       overlap_tol.getValue(),
+                       planarity_d2p_tol.getValue(),
+                       planarity_n_tol_updated,
+                       ioerrs,
+                       onlyinvalid.getValue());
+      // HTML report
+      if (report.getValue() != "") {
+        boost::filesystem::path outpath(report.getValue());
+        if (boost::filesystem::exists(outpath.parent_path()) == false)
+          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+        else {
+          if (boost::filesystem::exists(outpath) == false)
+            boost::filesystem::create_directory(outpath);
+          boost::filesystem::path outfile = outpath / "report.html";
+          std::ofstream o(outfile.string());
+          o << indexhtml << std::endl;                                
+          std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
+          o.close();
 
-            outfile = outpath / "report.js";
-            o.open(outfile.string());
-            o << "var report =" << jr << std::endl;                                
-            o.close();
+          outfile = outpath / "report.js";
+          o.open(outfile.string());
+          o << "var report =" << jr << std::endl;                                
+          o.close();
 
-            outfile = outpath / "CityObjects.html";
-            o.open(outfile.string());
-            o << cityobjectshtml << std::endl;                                
-            o.close();
+          outfile = outpath / "CityObjects.html";
+          o.open(outfile.string());
+          o << cityobjectshtml << std::endl;                                
+          o.close();
 
-            outfile = outpath / "Primitives.html";
-            o.open(outfile.string());
-            o << primitiveshtml << std::endl;                                
-            o.close();
-            
-            outfile = outpath / "treeview.js";
-            o.open(outfile.string());
-            o << treeviewjs << std::endl;                                
-            o.close();
+          outfile = outpath / "Primitives.html";
+          o.open(outfile.string());
+          o << primitiveshtml << std::endl;                                
+          o.close();
+          
+          outfile = outpath / "treeview.js";
+          o.open(outfile.string());
+          o << treeviewjs << std::endl;                                
+          o.close();
 
-            outfile = outpath / "val3dityconfig.js";
-            o.open(outfile.string());
-            o << val3dityconfigjs << std::endl;                                
-            o.close();
-            
-            outfile = outpath / "index.css";
-            o.open(outfile.string());
-            o << indexcss << std::endl;                                
-            o.close();
-          }
-        }
-        // JSON report
-        if (report_json.getValue() != ""){
-          boost::filesystem::path outpath(report_json.getValue());
-          if (boost::filesystem::exists(outpath.parent_path()) == false)
-            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-          else {
-            if (boost::filesystem::extension(outpath) != ".json")
-              outpath += ".json";
-            std::ofstream o(outpath.string());
-            o << jr.dump(2) << std::endl;                                
-            std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
-          }
+          outfile = outpath / "val3dityconfig.js";
+          o.open(outfile.string());
+          o << val3dityconfigjs << std::endl;                                
+          o.close();
+          
+          outfile = outpath / "index.css";
+          o.open(outfile.string());
+          o << indexcss << std::endl;                                
+          o.close();
         }
       }
-      else
-        std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+      // JSON report
+      if (report_json.getValue() != ""){
+        boost::filesystem::path outpath(report_json.getValue());
+        if (boost::filesystem::exists(outpath.parent_path()) == false)
+          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+        else {
+          if (boost::filesystem::extension(outpath) != ".json")
+            outpath += ".json";
+          std::ofstream o(outpath.string());
+          o << jr.dump(2) << std::endl;                                
+          std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+        }
+      }
     }
+    else
+      std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+
+    //-- unittests 
+    if (unittests.getValue() == true)
+      std::cout << "\n" << unit_test(dPrimitives, dCOerrors, ioerrs) << std::endl;
 
     if (verbose.getValue() == false)
     {
