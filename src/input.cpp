@@ -1064,23 +1064,34 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return NULL;
   }
-  Surface* sh = new Surface(shellid);  
   //-- read the points
   int num, tmpint;
   float tmpfloat;
+  double x, y, z;
   infile >> num >> tmpint >> tmpint >> tmpint;
-  //-- read first line to decide if 0- or 1-based indexing
-  bool zerobased = true;
-  Point3 p;
-  infile >> tmpint >> p;
-  sh->add_point(p);
-  if (tmpint == 1)
-    zerobased = false;
-  //-- process other vertices
-  for (int i = 1; i < num; i++)
+  //-- compute (_minx, _miny)
+  for (int i = 0; i < num; i++)
   {
-    Point3 p;
-    infile >> tmpint >> p;
+    infile >> tmpint >> x >> y >> z;
+    if (x < _minx)
+      _minx = x;
+    if (y < _miny)
+      _miny = y;
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+  infile.close();
+  infile.open(ifile.c_str(), std::ifstream::in);
+  infile >> num >> tmpint >> tmpint >> tmpint;
+  //-- read verticess
+  Surface* sh = new Surface(shellid);  
+  for (int i = 0; i < num; i++)
+  {
+    infile >> tmpint >> x >> y >> z;
+    x -= _minx;
+    y -= _miny;
+    Point3 p(x, y, z);
     sh->add_point(p);
   }
   //-- read the facets
@@ -1108,11 +1119,6 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
     std::vector<int> ids(numpt);
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
-    if (zerobased == false)
-    {
-      for (int k = 0; k < numpt; k++)
-        ids[k] = (ids[k] - 1);      
-    }
     std::vector< std::vector<int> > pgnids;
     pgnids.push_back(ids);
     //-- check for irings
@@ -1126,11 +1132,6 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
       std::vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
         infile >> ids[l];
-      if (zerobased == false)
-      {
-        for (int k = 0; k < numpt; k++)
-          ids[k] = (ids[k] - 1);      
-      }
       pgnids.push_back(ids);
     }
     //-- skip the line about points defining holes (if present)
