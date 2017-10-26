@@ -57,7 +57,7 @@ public:
     std::cout << "OPTIONS" << std::endl;
     std::list<TCLAP::Arg*> args = c.getArgList();
     for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
-      if ((*it)->getName() == "ishell")
+      if ( ((*it)->getName() == "ishell") || ((*it)->getName() == "output_off") )
         continue;
       if ((*it)->getFlag() == "")
         std::cout << "\t--" << (*it)->getName() << std::endl;
@@ -427,6 +427,7 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(dPrimitives.size())));
         i++;
+        std::clog << std::endl << "######### Validating " << co.first << " #########" << std::endl;
         bool bValid = true;
         COError coerrs;
         if (co.second.empty() == true) {
@@ -435,7 +436,7 @@ int main(int argc, char* const argv[])
         }
         for (auto& p : co.second)
         {
-          std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
+          std::clog << "======== Validating Primitive ========" << std::endl;
           switch(p->get_type())
           {
             case 0: std::clog << "Solid"             << std::endl; break;
@@ -456,14 +457,19 @@ int main(int argc, char* const argv[])
             std::clog << "========= VALID =========" << std::endl;
         }
         //-- if Building then do extra checks  
-        if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
+        if ( (bValid == true) && 
+             (co.first.find("Building|") != std::string::npos) &&
+             (co.second.size() > 1)
+           )
         {
+          std::clog << "--- Interactions between BuildingParts ---" << std::endl;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
             std::clog << "Error: overlapping building parts" << std::endl;
             dCOerrors[co.first] = coerrs;
           }
         }
+        std::clog << "#########################################" << std::endl;
       }
       if (verbose.getValue() == false)
         printProgressBar(100);
