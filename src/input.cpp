@@ -1069,7 +1069,6 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
   int num, tmpint;
   float tmpfloat;
   infile >> num >> tmpint >> tmpint >> tmpint;
-  std::vector< Point3 >::iterator iPoint3;
   //-- read first line to decide if 0- or 1-based indexing
   bool zerobased = true;
   Point3 p;
