@@ -57,7 +57,7 @@ public:
     std::cout << "OPTIONS" << std::endl;
     std::list<TCLAP::Arg*> args = c.getArgList();
     for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
-      if ((*it)->getName() == "ishell")
+      if ( ((*it)->getName() == "ishell") || ((*it)->getName() == "output_off") )
         continue;
       if ((*it)->getFlag() == "")
         std::cout << "\t--" << (*it)->getName() << std::endl;
@@ -154,10 +154,6 @@ int main(int argc, char* const argv[])
                                               "unittests",
                                               "Unit tests output",
                                               false);
-    TCLAP::SwitchArg                        notranslate("",
-                                              "notranslate",
-                                              "Do not translate to (minx, miny)",
-                                              false);
     TCLAP::SwitchArg                        onlyinvalid("",
                                               "onlyinvalid",
                                               "Only invalid primitives are reported",
@@ -169,7 +165,13 @@ int main(int argc, char* const argv[])
     TCLAP::SwitchArg                        geom_is_sem_surfaces("",
                                               "geom_is_sem_surfaces",
                                               "geometry of a CityGML object is formed by its semantic surfaces",
-                                              false);    
+                                              false);
+    TCLAP::ValueArg<std::string>            output_off("",
+                                              "output_off",
+                                              "output each shell/surface in OFF format",
+                                              false,
+                                              "",
+                                              "string");        
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
                                               "Tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
@@ -199,13 +201,13 @@ int main(int argc, char* const argv[])
     cmd.add(planarity_n_tol);
     cmd.add(snap_tol);
     cmd.add(overlap_tol);
-    cmd.add(notranslate);
     cmd.add(verbose);
     cmd.add(primitives);
     cmd.add(geom_is_sem_surfaces);
     cmd.add(ignore204);
     cmd.add(unittests);
     cmd.add(onlyinvalid);
+    cmd.add(output_off);
     cmd.add(inputfile);
     cmd.add(ishellfiles);
     cmd.add(report);
@@ -249,8 +251,6 @@ int main(int argc, char* const argv[])
     if ( (inputtype == JSON) || (inputtype == GML) )
     {
       prim3d = ALL;
-      if (primitives.getValue() != "")
-        std::cout << "[--p " << primitives.getValue() << " overwritten] CityGML/CityJSON have all their 3D primitive validated" << std::endl;
     }
     else {
       if (primitives.getValue() == "Solid")
@@ -396,33 +396,8 @@ int main(int argc, char* const argv[])
         std::cout << "CompositeSurface" << std::endl;
       else
         std::cout << "All" << std::endl;
+        std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
     }
-
-    if ( (ioerrs.has_errors() == false) && (notranslate.getValue() == false) )
-    {
-      //-- translate all vertices to avoid potential problems
-      double tmpx, tmpy;
-      double minx = 9e10;
-      double miny = 9e10;
-      for (auto& co : dPrimitives)
-      {
-        for (auto& p : co.second)
-        {
-          p->get_min_bbox(tmpx, tmpy);
-          if (tmpx < minx)
-            minx = tmpx;
-          if (tmpy < miny)
-            miny = tmpy;
-        }
-      }
-      Primitive::set_translation_min_values(minx, miny);
-      Surface::set_translation_min_values(minx, miny);
-      for (auto& co : dPrimitives)
-        for (auto& p : co.second)
-          p->translate_vertices();
-      std::cout << "Translating all coordinates by (-" << minx << ", -" << miny << ")" << std::endl;
-    }
-    
     double planarity_n_tol_updated = planarity_n_tol.getValue();
     //-- report on parameters used
     if (ioerrs.has_errors() == false)
@@ -452,6 +427,7 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(dPrimitives.size())));
         i++;
+        std::clog << std::endl << "######### Validating " << co.first << " #########" << std::endl;
         bool bValid = true;
         COError coerrs;
         if (co.second.empty() == true) {
@@ -460,7 +436,7 @@ int main(int argc, char* const argv[])
         }
         for (auto& p : co.second)
         {
-          std::clog << std::endl << "======== Validating Primitive ========" << std::endl;
+          std::clog << "======== Validating Primitive ========" << std::endl;
           switch(p->get_type())
           {
             case 0: std::clog << "Solid"             << std::endl; break;
@@ -481,102 +457,165 @@ int main(int argc, char* const argv[])
             std::clog << "========= VALID =========" << std::endl;
         }
         //-- if Building then do extra checks  
-        if ( (bValid == true) && (co.first.find("Building|") != std::string::npos) )
+        if ( (bValid == true) && 
+             (co.first.find("Building|") != std::string::npos) &&
+             (co.second.size() > 1)
+           )
         {
+          std::clog << "--- Interactions between BuildingParts ---" << std::endl;
           if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
           {
             std::clog << "Error: overlapping building parts" << std::endl;
             dCOerrors[co.first] = coerrs;
           }
         }
+        std::clog << "#########################################" << std::endl;
       }
       if (verbose.getValue() == false)
         printProgressBar(100);
     }
 
-    if (unittests.getValue() == true)
+    //-- summary of the validation
+    std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
+
+   //-- output shells/surfaces in OFF format
+    if (output_off.getValue() != "") 
     {
-      std::cout << "\n" << unit_test(dPrimitives, dCOerrors, ioerrs) << std::endl;
-    }
-    else {
-      //-- print summary of errors
-      std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
-      if ( (report.getValue() != "") || (report_json.getValue() != "") )
-      {
-        json jr;
-        write_report_json(jr, 
-                         inputfile.getValue(),
-                         dPrimitives,
-                         dCOerrors,
-                         snap_tol.getValue(),
-                         overlap_tol.getValue(),
-                         planarity_d2p_tol.getValue(),
-                         planarity_n_tol_updated,
-                         ioerrs,
-                         onlyinvalid.getValue());
-        // HTML report
-        if (report.getValue() != "") {
-          boost::filesystem::path outpath(report.getValue());
-          if (boost::filesystem::exists(outpath.parent_path()) == false)
-            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-          else {
-            if (boost::filesystem::exists(outpath) == false)
-              boost::filesystem::create_directory(outpath);
-            boost::filesystem::path outfile = outpath / "report.html";
-            std::cout << outfile.string() << std::endl;
-            std::ofstream o(outfile.string());
-            o << indexhtml << std::endl;                                
-            std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-            o.close();
-
-            outfile = outpath / "report.js";
-            o.open(outfile.string());
-            o << "var report =" << jr << std::endl;                                
-            o.close();
-
-            outfile = outpath / "CityObjects.html";
-            o.open(outfile.string());
-            o << cityobjectshtml << std::endl;                                
-            o.close();
-
-            outfile = outpath / "Primitives.html";
-            o.open(outfile.string());
-            o << primitiveshtml << std::endl;                                
-            o.close();
-            
-            outfile = outpath / "treeview.js";
-            o.open(outfile.string());
-            o << treeviewjs << std::endl;                                
-            o.close();
-
-            outfile = outpath / "val3dityconfig.js";
-            o.open(outfile.string());
-            o << val3dityconfigjs << std::endl;                                
-            o.close();
-            
-            outfile = outpath / "index.css";
-            o.open(outfile.string());
-            o << indexcss << std::endl;                                
-            o.close();
-          }
-        }
-        // JSON report
-        if (report_json.getValue() != ""){
-          boost::filesystem::path outpath(report_json.getValue());
-          if (boost::filesystem::exists(outpath.parent_path()) == false)
-            std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-          else {
-            if (boost::filesystem::extension(outpath) != ".json")
-              outpath += ".json";
-            std::ofstream o(outpath.string());
-            o << jr.dump(2) << std::endl;                                
-            std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+      std::cout << std::endl << std::endl;
+      boost::filesystem::path outpath(output_off.getValue());
+      if (boost::filesystem::exists(outpath.parent_path()) == false)
+        std::cout << "Error OFF output: file " << outpath << " impossible to create, wrong path." << std::endl;
+      else {
+        if (boost::filesystem::exists(outpath) == false)
+          boost::filesystem::create_directory(outpath);
+        std::cout << "OFF files saved to: " << outpath << std::endl;
+        for (auto& co : dPrimitives)
+        {
+          std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+          int noprim = 0;
+          for (auto& p : co.second)
+          {
+            std::string theid = coid + "." + std::to_string(noprim);
+            if (p->get_type() == SOLID)
+            {
+              boost::filesystem::path outfile = outpath / (theid + ".0.off");
+              std::ofstream o(outfile.string());
+              Solid* ts = dynamic_cast<Solid*>(p);
+              o << ts->get_off_representation(0) << std::endl;                                
+              o.close();
+              for (int i = 1; i <= ts->num_ishells(); i++)
+              {
+                outfile = outpath / (theid + "." + std::to_string(i) + ".off");
+                o.open(outfile.string());
+                o << ts->get_off_representation(1) << std::endl;                                
+                o.close();
+              }
+            }
+            else if (p->get_type() == MULTISURFACE)
+            {
+              boost::filesystem::path outfile = outpath / (theid + ".off");
+              std::ofstream o(outfile.string());
+              MultiSurface* ts = dynamic_cast<MultiSurface*>(p);
+              o << ts->get_off_representation() << std::endl;                                
+              o.close();
+            }
+            else if (p->get_type() == COMPOSITESURFACE)
+            {
+              boost::filesystem::path outfile = outpath / (theid + ".off");
+              std::ofstream o(outfile.string());
+              CompositeSurface* ts = dynamic_cast<CompositeSurface*>(p);
+              o << ts->get_off_representation() << std::endl;                                
+              o.close();
+            }            
+            else {
+              std::cout << "OFF OUTPUT: these primitive types are not supported (yet). Sorry." << std::endl;
+            }
+            noprim++;
           }
         }
       }
-      else
-        std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+      std::cout << std::endl;
     }
+
+    //-- output report
+    if ( (report.getValue() != "") || (report_json.getValue() != "") )
+    {
+      json jr;
+      write_report_json(jr, 
+                       inputfile.getValue(),
+                       dPrimitives,
+                       dCOerrors,
+                       snap_tol.getValue(),
+                       overlap_tol.getValue(),
+                       planarity_d2p_tol.getValue(),
+                       planarity_n_tol_updated,
+                       ioerrs,
+                       onlyinvalid.getValue());
+      // HTML report
+      if (report.getValue() != "") {
+        boost::filesystem::path outpath(report.getValue());
+        if (boost::filesystem::exists(outpath.parent_path()) == false)
+          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+        else {
+          if (boost::filesystem::exists(outpath) == false)
+            boost::filesystem::create_directory(outpath);
+          boost::filesystem::path outfile = outpath / "report.html";
+          std::ofstream o(outfile.string());
+          o << indexhtml << std::endl;                                
+          std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
+          o.close();
+
+          outfile = outpath / "report.js";
+          o.open(outfile.string());
+          o << "var report =" << jr << std::endl;                                
+          o.close();
+
+          outfile = outpath / "CityObjects.html";
+          o.open(outfile.string());
+          o << cityobjectshtml << std::endl;                                
+          o.close();
+
+          outfile = outpath / "Primitives.html";
+          o.open(outfile.string());
+          o << primitiveshtml << std::endl;                                
+          o.close();
+          
+          outfile = outpath / "treeview.js";
+          o.open(outfile.string());
+          o << treeviewjs << std::endl;                                
+          o.close();
+
+          outfile = outpath / "val3dityconfig.js";
+          o.open(outfile.string());
+          o << val3dityconfigjs << std::endl;                                
+          o.close();
+          
+          outfile = outpath / "index.css";
+          o.open(outfile.string());
+          o << indexcss << std::endl;                                
+          o.close();
+        }
+      }
+      // JSON report
+      if (report_json.getValue() != ""){
+        boost::filesystem::path outpath(report_json.getValue());
+        if (boost::filesystem::exists(outpath.parent_path()) == false)
+          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+        else {
+          if (boost::filesystem::extension(outpath) != ".json")
+            outpath += ".json";
+          std::ofstream o(outpath.string());
+          o << jr.dump(2) << std::endl;                                
+          std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+        }
+      }
+    }
+    else
+      std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+
+    //-- unittests 
+    if (unittests.getValue() == true)
+      std::cout << "\n" << unit_test(dPrimitives, dCOerrors, ioerrs) << std::endl;
 
     if (verbose.getValue() == false)
     {

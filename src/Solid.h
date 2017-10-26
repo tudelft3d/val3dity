@@ -58,6 +58,7 @@ public:
   std::string     get_report_xml();
   json            get_report_json();
   std::string     get_poly_representation();
+  std::string     get_off_representation(int shellno = 0);
   int             is_valid();
   bool            is_empty();
   Primitive3D     get_type();

@@ -50,6 +50,8 @@ public:
   void          get_min_bbox(double& x, double& y);
   void          translate_vertices();
 
+  std::string   get_off_representation();
+
   int           number_faces();
   bool          set_surface(Surface* s);
   Surface*      get_surface();

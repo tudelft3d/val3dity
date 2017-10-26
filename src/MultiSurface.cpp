@@ -73,6 +73,12 @@ int MultiSurface::is_valid() {
 }
 
 
+std::string MultiSurface::get_off_representation()
+{
+  return _surface->get_off_representation();
+}
+
+
 void MultiSurface::get_min_bbox(double& x, double& y)
 {
   _surface->get_min_bbox(x, y);

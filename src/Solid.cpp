@@ -159,12 +159,17 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
 
 std::string Solid::get_poly_representation()
 {
-  std::ostringstream s;
+  std::ostringstream ss;
   for (auto& sh : _shells)
   {
-    s << sh->get_poly_representation() << std::endl;
+    ss << sh->get_off_representation() << std::endl;
   }
-  return s.str();
+  return ss.str();
+}
+
+std::string Solid::get_off_representation(int shellno)
+{
+  return (_shells[shellno])->get_off_representation();
 }
 
 
