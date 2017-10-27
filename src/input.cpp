@@ -1325,7 +1325,7 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
     }
   }
   if (sh->is_empty() == true) {
-    errs.add_error(901, "Some surfaces not defined correctly or are empty");
+    errs.add_error(902, "Some surfaces not defined correctly or are empty");
     return;
   }
   if (prim3d == SOLID)
