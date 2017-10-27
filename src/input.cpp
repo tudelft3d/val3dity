@@ -138,8 +138,7 @@ std::string errorcode2description(int code) {
     case 300: return string("NOT_VALID_2_MANIFOLD"); break;
     case 301: return string("TOO_FEW_POLYGONS"); break;
     case 302: return string("SHELL_NOT_CLOSED"); break;
-    case 303: return string("NON_MANIFOLD_VERTEX"); break;
-    case 304: return string("NON_MANIFOLD_EDGE"); break;
+    case 303: return string("NON_MANIFOLD_CASE"); break;
     case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
     case 306: return string("SHELL_SELF_INTERSECTION"); break;
     case 307: return string("POLYGON_WRONG_ORIENTATION"); break;

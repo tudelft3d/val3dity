@@ -698,7 +698,7 @@ bool Surface::contains_nonmanifold_vertices()
     if (v.second > 2)
     {
       std::stringstream st;
-      st << "Vertex location: (";;
+      st << "Non-manifold vertex at (";;
       st << (v.first->point().x() + _shiftx);
       st << ", ";
       st << (v.first->point().y() + _shifty);
