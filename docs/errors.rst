@@ -192,19 +192,17 @@ The left solid is invalid, while the right one is valid (since the hole is fille
 
 .. _error_303:
 
-303 -- NON_MANIFOLD_VERTEX
---------------------------
-Each shell must be simple, ie it must be a 2-manifold. A vertex is non-manifold when its incident polygons do not form one 'umbrella':
+303 -- NON_MANIFOLD_CASE
+------------------------
+Each shell must be simple, ie it must be a 2-manifold. Two cases are possible:
+
+  1. An edge of a shell is non-manifold when there are more than 2 incident polygons to it.
+  2. A vertex is non-manifold when its incident polygons do not form one 'umbrella'
 
 .. image:: _static/303.png
 
-.. _error_304:
-
-304 -- NON_MANIFOLD_EDGE
-------------------------
-Each edge of a shell should have exactly 2 incident polygons.
-
 .. image:: _static/304.png
+
 
 .. _error_305:
 
