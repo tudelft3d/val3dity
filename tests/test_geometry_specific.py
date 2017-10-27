@@ -58,6 +58,16 @@ def data_601(request, dir_geometry_specific):
             dir_geometry_specific,
             request.param))
     return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=[
+                    ["--unittests", "--overlap_tol 0.01"],
+                    ["--unittests", "--overlap_tol 0.02"]
+                    ])
+def options_overlap(request):
+    return(request.param)
+
 #----------------------------------------------------------------------- Tests
 def test_103(validate, data_103, citymodel):
     error = validate(data_103, options=citymodel)
@@ -66,6 +76,10 @@ def test_103(validate, data_103, citymodel):
 def test_501(validate, data_501, citymodel):
     error = validate(data_501, options=citymodel)
     assert(error == [501])
+
+def test_501_tolerance(validate, data_501, options_overlap):
+    error = validate(data_501, options=options_overlap)
+    assert(error == [])
 
 def test_502(validate, data_502, citymodel):
     error = validate(data_502, options=citymodel)
