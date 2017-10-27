@@ -407,8 +407,8 @@ def test_303(validate, data_303):
     error = validate(data_303)
     assert(error == [303])
 
-def test_303_cs(validate, data_303_cs):
-    error = validate(data_303_cs, option=compositesurface)
+def test_303_cs(validate, data_303_cs, compositesurface):
+    error = validate(data_303_cs, options=compositesurface)
     assert(error == [303])
 
 def test_304(validate, data_304):
