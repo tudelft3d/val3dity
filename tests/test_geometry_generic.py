@@ -188,6 +188,14 @@ def data_303(request, dir_geometry_generic):
             request.param))
     return(file_path)
 
+@pytest.fixture(scope="module",
+                params=["303_cs.poly"])
+def data_303_cs(request, dir_geometry_generic):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_geometry_generic,
+            request.param))
+    return(file_path)
 
 @pytest.fixture(scope="module",
                 params=["304_1.poly",
@@ -397,6 +405,10 @@ def test_302_gml(validate, data_302_gml, citymodel):
 
 def test_303(validate, data_303):
     error = validate(data_303)
+    assert(error == [303])
+
+def test_303_cs(validate, data_303_cs):
+    error = validate(data_303_cs, option=compositesurface)
     assert(error == [303])
 
 def test_304(validate, data_304):
