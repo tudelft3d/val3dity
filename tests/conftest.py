@@ -101,6 +101,11 @@ def solid():
     return(["--unittests", "-p Solid"])
 
 @pytest.fixture(scope="session")
+def compositesurface():
+    """val3dity options for validating a CompositeSurface"""
+    return(["--unittests", "-p CompositeSurface"])
+
+@pytest.fixture(scope="session")
 def multisurface():
     """val3dity options for validating a MultiSurface"""
     return(["--unittests", "-p MultiSurface"])
