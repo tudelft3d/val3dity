@@ -107,3 +107,75 @@ def test_102():
 
 If you add a new marker, make sure to register it in `pytest.ini`.
 
+### How test with multiple input parameters?
+
+For example you want to test a geometry with `--snap_tol` `0.1, 0.01, 0.001`. To do that, create a fixture with these arguments. For example:
+
+```python
+@pytest.fixture(scope="module",
+                params=[
+                    ["--unittests", "--snap_tol 0.1"],
+                    ["--unittests", "--snap_tol 0.01"],
+                    ["--unittests", "--snap_tol 0.001"]
+                    ])
+def options_valid(request):
+    return(request.param)
+
+
+def test_options_valid(validate, data_composite_solid, options_valid):
+    """Valid input options and tolerance arguments"""
+    error = validate(data_composite_solid, options=options_valid)
+    assert(error == [])
+```
+
+### How to add inner shells to a geometry?
+
+For testing errors that are related to inner shells, these need to be passed separately from the exterior in the POLY files. It needs a bit more lines of code, but use test_geometry_generic::401 as an example. You can add multiple inner shells as a list: `[interor1, interor2, ...]`. The normals of the interor have to point "inwards". The fixture `data_401` below uses the `data_basecube` as the exterior shell.
+
+```python
+@pytest.fixture(scope="session")
+def data_basecube():
+    """unit cube that is used in combination with inner-shell testing"""
+    root = os.getcwd()
+    file_path = os.path.abspath(
+        os.path.join(root, "data/test_valid/basecube.poly")
+        )
+    return([file_path])
+
+
+@pytest.fixture(scope="module",
+                params=["401.poly",
+                        "401_1.poly",
+                        ["401_2.poly", "inner_shell.poly"],
+                        ["401_3.poly", "inner_shell.poly"],
+                        "401_4.poly"])
+def data_401(request, dir_geometry_generic, data_basecube):
+    ishell = request.param
+    ishell_path = []
+    if isinstance(ishell, list):
+        for i in ishell:
+            i_path = os.path.abspath(
+                        os.path.join(dir_geometry_generic, i)
+                        )
+            ishell_path = ishell_path + ["--ishell", i_path]
+    else:
+        ishell_path = ["--ishell",
+                       os.path.abspath(
+                           os.path.join(dir_geometry_generic, ishell)
+                           )
+                       ]
+    inner_outer_path = ishell_path + data_basecube
+    return(inner_outer_path)
+
+
+def test_401(validate, data_401):
+    error = validate(data_401)
+    assert(error == [401])
+```
+
+### How to get the whole stdout from val3dity instead of just the error code?
+
+Use the `validate_full()` fixture validation function instead of `validate()`.
+
+
+
