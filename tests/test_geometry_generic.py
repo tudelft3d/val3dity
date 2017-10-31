@@ -159,7 +159,8 @@ def data_301(request, dir_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["302.poly",
-                        "302_1.poly"])
+                        "302_1.poly",
+                        "303_cs.poly"])
 def data_302(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -180,7 +181,9 @@ def data_302_gml(request, dir_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["303.poly",
-                        "303_1.poly"])
+                        "303_1.poly",
+                        "304_1.poly",
+                        "304_2.obj"])
 def data_303(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -188,11 +191,9 @@ def data_303(request, dir_geometry_generic):
             request.param))
     return(file_path)
 
-
 @pytest.fixture(scope="module",
-                params=["304_1.poly",
-                        "304_2.obj"])
-def data_304(request, dir_geometry_generic):
+                params=["303_cs.poly"])
+def data_303_cs(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
             dir_geometry_generic,
@@ -399,9 +400,9 @@ def test_303(validate, data_303):
     error = validate(data_303)
     assert(error == [303])
 
-def test_304(validate, data_304):
-    error = validate(data_304)
-    assert(error == [304])
+def test_303_cs(validate, data_303_cs, compositesurface):
+    error = validate(data_303_cs, options=compositesurface)
+    assert(error == [303])
 
 def test_305(validate, data_305):
     error = validate(data_305)
@@ -414,7 +415,7 @@ def test_306(validate, data_306):
 def test_307(validate, data_307):
     """See #62"""
     error = validate(data_307)
-    assert(error == [304, 307])
+    assert(error == [303, 307])
 
 def test_307_1(validate, data_307_1):
     error = validate(data_307_1)

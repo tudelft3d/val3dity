@@ -41,6 +41,37 @@ def data_closed_top(request, dir_valid):
 
 
 @pytest.fixture(scope="module",
+                params=["v405.off"])
+def data_v_405(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
+
+
+
+@pytest.fixture(scope="module",
+                params=["basecube_large_coords.poly"])
+def data_large_coords(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["multi_solid.json"])
+def data_multi_solid(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
                 params=["inner_shell.poly",
                         "inner_shell_1.poly",
                         ["inner_shell_2.poly", "inner_shell.poly"],
@@ -67,6 +98,15 @@ def data_inner_shell(request, dir_valid, data_basecube):
 
 
 #----------------------------------------------------------------------- Tests
+
+def test_large_coords(validate, data_large_coords):
+    error = validate(data_large_coords)
+    assert(error == [])
+
+def test_v_405(validate, data_v_405):
+    error = validate(data_v_405)
+    assert(error == [])
+
 def test_planar(validate, data_planar):
     error = validate(data_planar)
     assert(error == [])
@@ -84,7 +124,11 @@ def test_inner_shell(validate, data_inner_shell):
     error = validate(data_inner_shell)
     assert(error == [])
 
+def test_multi_solid(validate, data_multi_solid):
+    error = validate(data_multi_solid)
+    assert(error == [])
+
 # data_composite_solid is in conftest.py
-def test_composite_solid(validate, data_composite_solid, citymodel):
-    error = validate(data_composite_solid, options=citymodel)
+def test_composite_solid(validate, data_composite_solid):
+    error = validate(data_composite_solid)
     assert(error == [])

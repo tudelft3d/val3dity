@@ -42,6 +42,7 @@ test_geometry_generic:
   "302_2": A vertex in the top surface does not close the shell (0.00001 discrepancy), GML cube
   "303": Unit cube with one dangling face touching the cube at one point only. The dangling face is the last in the list
   "303_1": 2 unit cubes touching at one vertex
+  "303_cs": one cube with a non-manifold vertex. As a Solid error 302, but CompositeSurface 303. Jeff Coukell's case.
   "304_1": Unit cube with one extra face in the middle, splitting the cube in two parts
   "304_2": Unit cube with one corner as a separate part
   "305": Cube with one extra face floating in the air, not touching
@@ -75,6 +76,8 @@ test_geometry_specific:
   "601": A Building with 2 BuildingParts that overlap by 50 units
 
 test_valid:
+  "basecube_large_coords": the basecube with 999999 added to each xyz, to test translation
+  "v405": the solid that returned 405 before CGAL fixed the bug (v4.10+ it's solved)
   "basecube": Valid unit cube. Used in combination with other shells.
   "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005
   "self_fold": .obj unit cube with a whirl
@@ -85,5 +88,6 @@ test_valid:
   "inner_shell_3": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching along an edge (shared edge)"
   "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
   "composite_solid": Two unit cubes in a CompositeSolid as CityJSON and CityGML
+  "multi_solid": Two unit cubes in a MultiSolid as CityJSON
   "composite_solid_1": "Two unit cubes in a CompositeSolid CityGML, with <CityModel>, <cityObjectMember> part of the 'core' namespace"
   

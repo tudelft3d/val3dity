@@ -39,7 +39,7 @@ def dir_empty_primitive(request, dir_empty):
 #----------------------------------------------------------------------- Tests
 def test_completely_empty(validate, data_completely_empty, citymodel):
     error = validate(data_completely_empty, options=citymodel)
-    assert(error == [901])
+    assert(error == [901] or error == [902])
 
 def test_empty_primitive(validate, dir_empty_primitive, citymodel):
     error = validate(dir_empty_primitive, options=citymodel)

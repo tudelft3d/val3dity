@@ -144,7 +144,14 @@ std::string CompositeSurface::get_report_xml() {
   }
   ss << _surface->get_report_xml();
   ss << "\t</CompositeSurface>" << std::endl;
-  return ss.str();}
+  return ss.str();
+}
+
+
+std::string CompositeSurface::get_off_representation()
+{
+  return _surface->get_off_representation();
+}
 
 
 int CompositeSurface::number_faces() 

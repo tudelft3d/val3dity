@@ -31,6 +31,9 @@ using json = nlohmann::json;
 namespace val3dity
 {
 
+double _minx = 9e15;
+double _miny = 9e15;  
+
 //-- XML namespaces map
 std::map<std::string, std::string> NS; 
 
@@ -135,8 +138,7 @@ std::string errorcode2description(int code) {
     case 300: return string("NOT_VALID_2_MANIFOLD"); break;
     case 301: return string("TOO_FEW_POLYGONS"); break;
     case 302: return string("SHELL_NOT_CLOSED"); break;
-    case 303: return string("NON_MANIFOLD_VERTEX"); break;
-    case 304: return string("NON_MANIFOLD_EDGE"); break;
+    case 303: return string("NON_MANIFOLD_CASE"); break;
     case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
     case 306: return string("SHELL_SELF_INTERSECTION"); break;
     case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
@@ -189,7 +191,11 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
       std::vector<std::string> tokens;
       while (ss >> buf)
         tokens.push_back(buf);
-      Point3 p(std::stod(tokens[0]), std::stod(tokens[1]), std::stod(tokens[2]));
+      long double x = std::stold(tokens[0]);
+      x -= _minx;
+      long double y = std::stold(tokens[1]);
+      y -= _miny;
+      Point3 p(double(x), double(y), std::stod(tokens[2]));
       r.push_back(sh->add_point(p));
     }
   }
@@ -213,7 +219,11 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
     }
     for (int i = 0; i < coords.size(); i += 3)
     {
-      Point3 p(std::stod(coords[i]), std::stod(coords[i+1]), std::stod(coords[i+2]));
+      long double x = std::stold(coords[i]);
+      x -= _minx;
+      long double y = std::stold(coords[i+1]);
+      y -= _miny;
+      Point3 p(double(x), double(y), std::stod(coords[i+2]));
       r.push_back(sh->add_point(p));
     }
   }
@@ -605,6 +615,8 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
         y = (double(j["vertices"][i][1]) * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
         z = (double(j["vertices"][i][2]) * double(j["transform"]["scale"][2])) + double(j["transform"]["translate"][2]);
       }
+      x -= _minx;
+      y -= _miny;
       Point3 p3(x, y, z);
       newr.push_back(sh->add_point(p3));
     }
@@ -630,6 +642,8 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
   }
   std::cout << "CityJSON input file" << std::endl;
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
+  //-- compute (_minx, _miny)
+  compute_min_xy(j);
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
     // std::cout << "o " << it.key() << std::endl;
@@ -851,6 +865,66 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
   }
 }
 
+
+void compute_min_xy(json& j)
+{
+  for (auto& v : j["vertices"])
+  {
+    if (v[0] < _minx)
+      _minx = v[0];
+    if (v[1] < _miny)
+      _miny = v[1];
+  }
+  if (j.count("transform") != 0)
+  {
+    _minx = (_minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
+    _miny = (_miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+}
+
+
+void compute_min_xy(pugi::xml_document& doc)
+{
+  std::string s = "//" + NS["gml"] + "posList";
+  pugi::xpath_node_set nall = doc.select_nodes(s.c_str());
+  for (auto& each : nall) 
+  {
+    std::string buf;
+    std::stringstream ss(each.node().child_value());
+    std::vector<std::string> coords;
+    while (ss >> buf)
+      coords.push_back(buf);
+    for (int i = 0; i < coords.size(); i += 3)
+    {
+      if (std::stod(coords[0]) < _minx)
+        _minx = std::stod(coords[0]);
+      if (std::stod(coords[1]) < _miny)
+        _miny = std::stod(coords[1]);
+    }
+  }
+  s = "//" + NS["gml"] + "pos";
+  nall = doc.select_nodes(s.c_str());
+  for (auto& each : nall) 
+  {
+    std::string buf;
+    std::stringstream ss(each.node().child_value());
+    std::vector<std::string> tokens;
+    while (ss >> buf)
+      tokens.push_back(buf);
+    if (std::stod(tokens[0]) < _minx)
+      _minx = std::stod(tokens[0]);
+    if (std::stod(tokens[1]) < _miny)
+      _miny = std::stod(tokens[1]);
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+}
+
+
 void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
 {
   std::cout << "Reading file: " << ifile << std::endl;
@@ -869,6 +943,8 @@ void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primiti
     errs.add_error(901, "Input file does not have the GML namespace.");
     return;
   }
+  //-- find (_minx, _miny)
+  compute_min_xy(doc);
   //-- build dico of xlinks for <gml:Polygon>
   std::map<std::string, pugi::xpath_node> dallpoly;
   build_dico_xlinks(doc, dallpoly, errs);
@@ -987,24 +1063,34 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return NULL;
   }
-  Surface* sh = new Surface(shellid);  
   //-- read the points
   int num, tmpint;
   float tmpfloat;
+  double x, y, z;
   infile >> num >> tmpint >> tmpint >> tmpint;
-  std::vector< Point3 >::iterator iPoint3;
-  //-- read first line to decide if 0- or 1-based indexing
-  bool zerobased = true;
-  Point3 p;
-  infile >> tmpint >> p;
-  sh->add_point(p);
-  if (tmpint == 1)
-    zerobased = false;
-  //-- process other vertices
-  for (int i = 1; i < num; i++)
+  //-- compute (_minx, _miny)
+  for (int i = 0; i < num; i++)
   {
-    Point3 p;
-    infile >> tmpint >> p;
+    infile >> tmpint >> x >> y >> z;
+    if (x < _minx)
+      _minx = x;
+    if (y < _miny)
+      _miny = y;
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+  infile.close();
+  infile.open(ifile.c_str(), std::ifstream::in);
+  infile >> num >> tmpint >> tmpint >> tmpint;
+  //-- read verticess
+  Surface* sh = new Surface(shellid);  
+  for (int i = 0; i < num; i++)
+  {
+    infile >> tmpint >> x >> y >> z;
+    x -= _minx;
+    y -= _miny;
+    Point3 p(x, y, z);
     sh->add_point(p);
   }
   //-- read the facets
@@ -1032,11 +1118,6 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
     std::vector<int> ids(numpt);
     for (int k = 0; k < numpt; k++)
       infile >> ids[k];
-    if (zerobased == false)
-    {
-      for (int k = 0; k < numpt; k++)
-        ids[k] = (ids[k] - 1);      
-    }
     std::vector< std::vector<int> > pgnids;
     pgnids.push_back(ids);
     //-- check for irings
@@ -1050,11 +1131,6 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
       std::vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
         infile >> ids[l];
-      if (zerobased == false)
-      {
-        for (int k = 0; k < numpt; k++)
-          ids[k] = (ids[k] - 1);      
-      }
       pgnids.push_back(ids);
     }
     //-- skip the line about points defining holes (if present)
@@ -1093,7 +1169,6 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not found.");
     return NULL;
   }
-  Surface* sh = new Surface(shellid);  
   //-- read the points
   int numpt, numf, tmpint;
   std::string s;
@@ -1103,12 +1178,33 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
     errs.add_error(901, "Input file not a valid OFF file.");
     return NULL;
   }
-  std::vector< Point3 >::iterator iPoint3;
-  //-- read first line to decide if 0- or 1-based indexing
+  //-- compute (_minx, _miny)
   for (int i = 0; i < numpt; i++)
   {
-    Point3 p;
-    infile >> p;
+    double x, y, z;
+    infile >> x >> y >> z;
+    if (x < _minx)
+      _minx = x;
+    if (y < _miny)
+      _miny = y;
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+  //-- reset the file
+  infile.close();
+  infile.open(ifile.c_str(), std::ifstream::in);
+  infile >> s;
+  infile >> numpt >> numf >> tmpint;
+  //-- read the points
+  Surface* sh = new Surface(shellid);  
+  for (int i = 0; i < numpt; i++)
+  {
+    double x, y, z;
+    infile >> x >> y >> z;
+    x -= _minx;
+    y -= _miny;
+    Point3 p(x, y, z);
     sh->add_point(p);
   }
   //-- read the facets
@@ -1140,17 +1236,39 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
     errs.add_error(901, "Input file not found.");
     return;
   }
-  int primid = 0;
-  std::cout << "Parsing the file..." << std::endl; 
-  Surface* sh = new Surface(0, tol_snap);
+  //-- find (minx, miny)
   std::string l;
+  while (std::getline(infile, l)) 
+  {
+    std::istringstream iss(l);
+    if (l.substr(0, 2) == "v ") {
+      std::string tmp;
+      double x, y, z;
+      iss >> tmp >> x >> y >> z;
+      if (x < _minx)
+        _minx = x;
+      if (y < _miny)
+        _miny = y;
+    }
+  }
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+  //-- read again file and parse everything
+  infile.close();
+  infile.open(ifile.c_str(), std::ifstream::in);
+  int primid = 0;
+  Surface* sh = new Surface(0, tol_snap);
   std::vector<Point3*> allvertices;
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
-      Point3 *p = new Point3();
       std::string tmp;
-      iss >> tmp >> *p;
+      double x, y, z;
+      iss >> tmp >> x >> y >> z;
+      x -= _minx;
+      y -= _miny;
+      Point3 *p = new Point3(x, y, z);
       allvertices.push_back(p);
     }
     else if (l.substr(0, 2) == "o ") {
@@ -1177,10 +1295,10 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
         primid++;
         sh = new Surface(0, tol_snap);
       }
-      else {
-        errs.add_error(901, "Some surfaces not defined correctly or are empty");
-        return;
-      }
+      // else {
+      //   errs.add_error(901, "Some surfaces not defined correctly or are empty");
+      //   return;
+      // }
     }
     else if (l.substr(0, 2) == "f ") {
       std::vector<int> r;
@@ -1207,7 +1325,7 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
     }
   }
   if (sh->is_empty() == true) {
-    errs.add_error(901, "Some surfaces not defined correctly or are empty");
+    errs.add_error(902, "Some surfaces not defined correctly or are empty");
     return;
   }
   if (prim3d == SOLID)
