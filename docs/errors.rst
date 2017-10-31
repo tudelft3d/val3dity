@@ -267,8 +267,13 @@ Conceptually the same as :ref:`error_205`: the configuration of the interior she
 The polygon/surfaces forming an outer shell should have their normals pointing outwards, and for an interior shell inwards. 
 
 'Outwards' is as follows: if a right-hand system is used, ie when the ordering of the points on the surface follows the direction of rotation of the curled fingers of the right hand, then the thumb points towards the outside. 
+The torus below shows the correct orientation for some rings of some faces.
 
 Conceptually the same as :ref:`error_208`.
+
+.. image:: _static/orientation.png
+   :width: 50%
+
 
 .. _error_501:
 
