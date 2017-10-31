@@ -140,7 +140,7 @@ def validate():
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE,
                                   universal_newlines=True,
-                                  timeout=6)
+                                  timeout=15)
         except subprocess.TimeoutExpired:
             return([" ".join(["Something went really wrong.",
                              "Validate the file separately with val3dity.",

@@ -66,12 +66,13 @@ test_geometry_generic:
   "405": Pyramid with the normals pointing inwards
 
 test_geometry_specific:
-  "103": A unit cube where the bottom surface is not closed
-  "501": CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
-  "501_1": CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
-  "502": CompositeSolid with 3 cubes, where cube 1-2 are identical
-  "503": CompositeSolid with 3 cubes, where cube 1 is not connected to other
-  "601": A Building with 2 BuildingParts that overlap by 50 units
+  "103":    A unit cube where the bottom surface is not closed
+  "501":    CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
+  "501_1":  CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
+  "502":    CompositeSolid with 3 cubes, where cube 1-2 are identical
+  "503":    CompositeSolid with 3 cubes, where cube 1 is not connected to other
+  "601":    A Building with 2 BuildingParts that overlap by 50 units
+  "601_1":  A Building with 6 BuildingParts, part of open dataset Den Haag. Parts overlap by <1cm, with overlap_tol 0.01 it's valid
 
 test_valid:
   "basecube_large_coords": the basecube with 999999 added to each xyz, to test translation
