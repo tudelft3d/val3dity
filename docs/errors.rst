@@ -281,6 +281,9 @@ Conceptually the same as :ref:`error_208`.
 --------------------------
 The interior of 2 ``Solids`` part of a ``CompositeSolid`` intersects.
 
+.. image:: _static/501.png
+   :width: 50%
+
 .. _error_502:
 
 502 -- DUPLICATED_SOLIDS
@@ -292,6 +295,10 @@ Two ``Solids`` in a ``CompositeSolid`` are identical.
 503 -- DISCONNECTED_SOLIDS
 --------------------------
 Two ``Solids`` in a ``CompositeSolid`` are disconnected.
+
+.. image:: _static/503.png
+   :width: 50%
+
 
 .. _error_601:
 
