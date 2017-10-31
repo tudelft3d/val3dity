@@ -267,14 +267,22 @@ Conceptually the same as :ref:`error_205`: the configuration of the interior she
 The polygon/surfaces forming an outer shell should have their normals pointing outwards, and for an interior shell inwards. 
 
 'Outwards' is as follows: if a right-hand system is used, ie when the ordering of the points on the surface follows the direction of rotation of the curled fingers of the right hand, then the thumb points towards the outside. 
+The torus below shows the correct orientation for some rings of some faces.
 
 Conceptually the same as :ref:`error_208`.
+
+.. image:: _static/orientation.png
+   :width: 50%
+
 
 .. _error_501:
 
 501 -- INTERSECTION_SOLIDS
 --------------------------
 The interior of 2 ``Solids`` part of a ``CompositeSolid`` intersects.
+
+.. image:: _static/501.png
+   :width: 50%
 
 .. _error_502:
 
@@ -287,6 +295,10 @@ Two ``Solids`` in a ``CompositeSolid`` are identical.
 503 -- DISCONNECTED_SOLIDS
 --------------------------
 Two ``Solids`` in a ``CompositeSolid`` are disconnected.
+
+.. image:: _static/503.png
+   :width: 50%
+
 
 .. _error_601:
 

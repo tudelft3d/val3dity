@@ -169,15 +169,6 @@ def data_302(request, dir_geometry_generic):
     return(file_path)
 
 
-@pytest.fixture(scope="module",
-                params=["302_2.gml"])
-def data_302_gml(request, dir_geometry_generic):
-    file_path = os.path.abspath(
-        os.path.join(
-            dir_geometry_generic,
-            request.param))
-    return(file_path)
-
 
 @pytest.fixture(scope="module",
                 params=["303.poly",
@@ -313,9 +304,7 @@ def data_403(request, dir_geometry_generic, data_basecube):
 
 
 @pytest.fixture(scope="module",
-                params=["404.poly",
-                        "404_1.poly",
-                        "404_2.poly"])
+                params=["404.poly"])
 def data_404(request, dir_geometry_generic, data_basecube):
     ishell_path = ["--ishell",
                    os.path.abspath(
@@ -390,10 +379,6 @@ def test_301(validate, data_301):
 
 def test_302(validate, data_302):
     error = validate(data_302)
-    assert(error == [302])
-
-def test_302_gml(validate, data_302_gml, citymodel):
-    error = validate(data_302_gml, options=citymodel)
     assert(error == [302])
 
 def test_303(validate, data_303):
