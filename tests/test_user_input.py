@@ -1,4 +1,6 @@
 """Tesing command-line user input.
+
+The goal of this module is to test if val3dity behaves as expected with various in/valid arguments that the user could pass to it. Geometry validation is secondary in this module.
 """
 import pytest
 import subprocess, os
@@ -8,7 +10,7 @@ import re
 @pytest.fixture(scope="module",
                 params=[
                     ["--unittests", "--overlap_tol 1.0"],
-                    ["--unittests", "--snap_tol 1"],
+                    ["--unittests", "--snap_tol 0.01"],
                     ["--unittests", "--planarity_n_tol 18.5"],
                     ["--unittests", "--planarity_d2p_tol 0.5"]
                     ])
@@ -96,6 +98,7 @@ id: id-1(0)
 
 # data_composite_solid is in conftest.py
 def test_options_valid(validate, data_composite_solid, options_valid):
+    """Valid input options and tolerance arguments"""
     error = validate(data_composite_solid, options=options_valid)
     assert(error == [])
 

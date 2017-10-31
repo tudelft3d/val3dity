@@ -39,6 +39,7 @@ test_geometry_generic:
   "301_1": Cube with only 3 surfaces
   "302": Unit cube with one face missing (bottom one)
   "302_1": Unit cube with a hole (inner ring) in the top face
+  "302_2": A vertex in the top surface does not close the shell (0.01 discrepancy), GML cube
   "303": Unit cube with one dangling face touching the cube at one point only. The dangling face is the last in the list
   "303_1": 2 unit cubes touching at one vertex
   "303_cs": one cube with a non-manifold vertex. As a Solid error 302, but CompositeSurface 303. Jeff Coukell's case.
@@ -61,9 +62,7 @@ test_geometry_generic:
   "402_out_1": "A CityJSON with two identical Solids"
   "402_in_1": "+ inner_shell + basecube = Duplicate cavities in basecube"
   "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
-  "404": "+ basecube = A cavity that is disconnected (like the diagram for error 205, but in 3D) in basecube"
-  "404_1": "+ basecube = Like 404 but cavity touches the bottom surface"
-  "404_2": "+ basecube = Like 404 but cavity touches the top and bottom surfaces"
+  "404": "+ basecube = Cavity touches the top and bottom surfaces, dividing the cube into two parts"
   "405": Pyramid with the normals pointing inwards
 
 test_geometry_specific:
@@ -79,7 +78,7 @@ test_valid:
   "basecube_large_coords": the basecube with 999999 added to each xyz, to test translation
   "v405": the solid that returned 405 before CGAL fixed the bug (v4.10+ it's solved)
   "basecube": Valid unit cube. Used in combination with other shells.
-  "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005
+  "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005. Also below the 1 degree normal difference threshold of error 204.
   "self_fold": .obj unit cube with a whirl
   "closed_top": Unit cube with a top surface composed of 2 polygons
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
