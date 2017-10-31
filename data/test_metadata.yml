@@ -39,7 +39,6 @@ test_geometry_generic:
   "301_1": Cube with only 3 surfaces
   "302": Unit cube with one face missing (bottom one)
   "302_1": Unit cube with a hole (inner ring) in the top face
-  "302_2": A vertex in the top surface does not close the shell (0.00001 discrepancy), GML cube
   "303": Unit cube with one dangling face touching the cube at one point only. The dangling face is the last in the list
   "303_1": 2 unit cubes touching at one vertex
   "303_cs": one cube with a non-manifold vertex. As a Solid error 302, but CompositeSurface 303. Jeff Coukell's case.

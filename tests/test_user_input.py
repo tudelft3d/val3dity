@@ -7,7 +7,6 @@ import re
 
 @pytest.fixture(scope="module",
                 params=[
-                    ["--unittests", "--notranslate"],
                     ["--unittests", "--overlap_tol 1.0"],
                     ["--unittests", "--snap_tol 1"],
                     ["--unittests", "--planarity_n_tol 18.5"],
