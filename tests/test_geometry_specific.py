@@ -61,13 +61,25 @@ def data_503(request, dir_geometry_specific):
 
 
 @pytest.fixture(scope="module",
-                params=["601.gml"])
+                params=["601.gml",
+                        "601_1.gml"])
 def data_601(request, dir_geometry_specific):
     file_path = os.path.abspath(
         os.path.join(
             dir_geometry_specific,
             request.param))
     return(file_path)
+
+
+@pytest.fixture(scope="module",
+                params=["601_1.gml"])
+def data_601_overlap(request, dir_geometry_specific):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_geometry_specific,
+            request.param))
+    return(file_path)
+
 
 
 @pytest.fixture(scope="module",
@@ -102,5 +114,9 @@ def test_503(validate, data_503, citymodel):
     assert(error == [503])
 
 def test_601(validate, data_601, citymodel):
-    error = validate(data_601, options=citymodel)
+    error = validate(data_601)
     assert(error == [601])
+
+def test_601_overlap(validate, data_601_overlap, options_overlap):
+    error = validate(data_601_overlap, options=options_overlap)
+    assert(error == [])
