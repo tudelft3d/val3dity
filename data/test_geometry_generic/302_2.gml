@@ -27,7 +27,7 @@
 										<gml:LinearRing>
 											<gml:pos>0.00 0.00 100.00</gml:pos>
 											<gml:pos>100.00 0.00 100.00</gml:pos>
-											<gml:pos>99.99999 100.00 100.00</gml:pos>
+											<gml:pos>99.99 100.00 100.00</gml:pos>
 											<gml:pos>0.00 100.00 100.00</gml:pos>
 											<gml:pos>0.00 0.00 100.00</gml:pos>
 										</gml:LinearRing>
