@@ -31,6 +31,16 @@ def data_501(request, dir_geometry_specific):
 
 
 @pytest.fixture(scope="module",
+                params=["501.gml"])
+def data_501_overlap(request, dir_geometry_specific):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_geometry_specific,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
                 params=["502.gml"])
 def data_502(request, dir_geometry_specific):
     file_path = os.path.abspath(
@@ -63,10 +73,12 @@ def data_601(request, dir_geometry_specific):
 @pytest.fixture(scope="module",
                 params=[
                     ["--unittests", "--overlap_tol 0.01"],
-                    ["--unittests", "--overlap_tol 0.02"]
+                    ["--unittests", "--overlap_tol 0.1"],
+                    ["--unittests", "--overlap_tol 1.0"]
                     ])
 def options_overlap(request):
     return(request.param)
+
 
 #----------------------------------------------------------------------- Tests
 def test_103(validate, data_103, citymodel):
@@ -77,8 +89,8 @@ def test_501(validate, data_501, citymodel):
     error = validate(data_501, options=citymodel)
     assert(error == [501])
 
-def test_501_tolerance(validate, data_501, options_overlap):
-    error = validate(data_501, options=options_overlap)
+def test_501_overlap(validate, data_501_overlap, options_overlap):
+    error = validate(data_501_overlap, options=options_overlap)
     assert(error == [])
 
 def test_502(validate, data_502, citymodel):
