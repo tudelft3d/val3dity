@@ -238,7 +238,9 @@ def data_307_1(request, dir_geometry_generic):
                         "401_1.poly",
                         ["401_2.poly", "inner_shell.poly"],
                         ["401_3.poly", "inner_shell.poly"],
-                        "401_4.poly"])
+                        "401_4.poly",
+                        "401_5.poly",
+                        "401_6.poly"])
 def data_401(request, dir_geometry_generic, data_basecube):
     ishell = request.param
     ishell_path = []
