@@ -124,9 +124,15 @@ That usually means that you have vertices that are very close (say 0.1mm) and th
 Who validates the validator, huh?
 ---------------------------------
 
-We wrote a comprehensive suite of unit tests using the pytest framework.
+We wrote a comprehensive suite of tests using the *pytest* python framework and a custom setup.
 This tests, among many others, the following:
 
+- Empty files and geometries, invalid input file formats. However, val3dity *does not* validate the schema of the input.
+- All the error cases listed in :ref:`errors`.
+- Various valid geometries and boundary conditions.
+- Command-line user input.
+
+You can read more about the `details <https://github.com/tudelft3d/val3dity/blob/v2/tests/README.md>`_, or check the `complete list of tested geometries <https://github.com/tudelft3d/val3dity/blob/v2/data/test_metadata.yml>`_
 
 I don't see all the errors in my solid
 --------------------------------------
