@@ -365,6 +365,17 @@ bool Solid::validate_solid_with_nef()
         this->add_error(401, ss.str(), "");
         isValid = false; 
       }
+      else
+      {
+        nef = nefs[0].boundary() * nefs[i].boundary();
+        if (nef.number_of_facets() > 0)
+        {
+          std::stringstream ss;
+          ss << 0 << "--" << i;
+          this->add_error(401, ss.str(), "");
+          isValid = false;
+        }
+      }
     }
   }
 
