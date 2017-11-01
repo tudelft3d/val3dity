@@ -53,7 +53,7 @@ A good way to think about the organisation is that within a test case, every **t
 
 Most spatial data, or geometry data needs some metadata, because they are too complex to be self-explanatory. Therefore every test data file *needs* a description in `test_metadata.yml`. Note that this is enforced by `test_metadata.py` when running the *full test set*. 
 
-In `test_metadata.yml` the quoting of the nodes is important, particularly if there are no letters in the filename:
+In `test_metadata.yml` the quoting of the nodes is important, particularly if there are no letters in the file name:
 
 ```yaml
 test_geometry_generic:                                  # test case
@@ -130,7 +130,7 @@ def test_options_valid(validate, data_composite_solid, options_valid):
 
 ### How to add inner shells to a geometry?
 
-For testing errors that are related to inner shells, these need to be passed separately from the exterior in the POLY files. It needs a bit more lines of code, but use test_geometry_generic::401 as an example. You can add multiple inner shells as a list: `[interor1, interor2, ...]`. The normals of the interor have to point "inwards". The fixture `data_401` below uses the `data_basecube` as the exterior shell.
+For testing errors that are related to inner shells, these need to be passed separately from the exterior in the POLY files. It needs a bit more lines of code, but use test_geometry_generic::401 as an example. You can add multiple inner shells as a list: `[interor1, interor2, ...]`. The normals of the interior have to point "inwards". The fixture `data_401` below uses the `data_basecube` as the exterior shell.
 
 ```python
 @pytest.fixture(scope="session")
@@ -176,6 +176,24 @@ def test_401(validate, data_401):
 ### How to get the whole stdout from val3dity instead of just the error code?
 
 Use the `validate_full()` fixture validation function instead of `validate()`.
+
+### Do you have a large test file that takes several seconds to validate?
+
+There is a timeout threshold set in `conftest::validate()` so that if some test breaks val3dity, the test suite can still finish. Might happen that the validation of your file takes longer than the `timeout`.
+
+```python
+@pytest.fixture(scope="session")
+def validate():
+        
+        ...
+        
+        try:
+            proc = subprocess.run(command,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE,
+                                  universal_newlines=True,
+                                  timeout=15)
+```
 
 
 

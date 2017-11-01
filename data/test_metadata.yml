@@ -58,8 +58,6 @@ test_geometry_generic:
   "401_2": "+ inner_shell + basecube = Two cavities in basecube that share a face"
   "401_3": "+ inner_shell + basecube = Two cavities in basecube that partly share a face"
   "401_4": "+ basecube = A cavity which bottom face is shared with the bottom face of basecube"
-  "402_out": "A CityJSON with a MultiSolid where the two Solids are the same"
-  "402_out_1": "A CityJSON with two identical Solids"
   "402_in_1": "+ inner_shell + basecube = Duplicate cavities in basecube"
   "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
   "404": "+ basecube = Cavity touches the top and bottom surfaces, dividing the cube into two parts"
