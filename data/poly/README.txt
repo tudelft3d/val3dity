@@ -262,7 +262,7 @@ it explicitly.
   * pyramid encloses the whole cube
   * cube + py11 = invalid
 
-# blocker1
+# blocker1 / 404
   * invalid as outer shell (all normals pointing inwards)
   * kinda pyramid that splits the interior of cube into 2 non-connected parts
   * cube + blocker1 = invalid
