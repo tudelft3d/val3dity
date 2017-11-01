@@ -49,8 +49,7 @@ test_geometry_generic:
   "305_1": 2 unit cubes not touching at all, one above the other separated by 1unit
   "306": House with tip below the ground
   "306_1": House with tip touching the bottom faces
-  "306_2": Unit cube with one extra face inside another face
-  "306_3": Torus where the hole in the top/bottom faces touches the side surfaces
+  "306_2": Torus where the hole in the top/bottom faces touches the side surfaces
   "307": Unit cube with one face (face 0) with opposite orientation
   "307_1": Unit cube with a top surface composed of 2 polygons with opposite orientation
   "401": "+ basecube = An inner-pyramid that pierces through the top of basecube (by 0.00001). Oracle agrees: oracle=54512"
@@ -58,8 +57,6 @@ test_geometry_generic:
   "401_2": "+ inner_shell + basecube = Two cavities in basecube that share a face"
   "401_3": "+ inner_shell + basecube = Two cavities in basecube that partly share a face"
   "401_4": "+ basecube = A cavity which bottom face is shared with the bottom face of basecube"
-  "402_out": "A CityJSON with a MultiSolid where the two Solids are the same"
-  "402_out_1": "A CityJSON with two identical Solids"
   "402_in_1": "+ inner_shell + basecube = Duplicate cavities in basecube"
   "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
   "404": "+ basecube = Cavity touches the top and bottom surfaces, dividing the cube into two parts"

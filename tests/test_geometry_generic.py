@@ -206,8 +206,7 @@ def data_305(request, dir_geometry_generic):
 @pytest.fixture(scope="module",
                 params=["306.poly",
                         "306_1.poly",
-                        "306_2.poly",
-                        "306_3.poly"])
+                        "306_2.poly"])
 def data_306(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -257,17 +256,6 @@ def data_401(request, dir_geometry_generic, data_basecube):
                        ]
     inner_outer_path = ishell_path + data_basecube
     return(inner_outer_path)
-
-
-@pytest.fixture(scope="module",
-                params=["402_out.json",
-                        "402_out_1.json"])
-def data_402(request, dir_geometry_generic):
-    file_path = os.path.abspath(
-        os.path.join(
-            dir_geometry_generic,
-            request.param))
-    return(file_path)
 
 
 @pytest.fixture(scope="module",
@@ -409,10 +397,6 @@ def test_307_1(validate, data_307_1):
 def test_401(validate, data_401):
     error = validate(data_401)
     assert(error == [401])
-
-def test_402_outer(validate, data_402):
-    error = validate(data_402)
-    assert(error == [402])
 
 def test_402_inner(validate, data_402_1):
     error = validate(data_402_1)
