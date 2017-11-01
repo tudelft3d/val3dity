@@ -24,18 +24,25 @@ To validate all the 3D primitives in a CityJSON file and see a summary output:
   $ val3dity my3dcity.json 
 
 
-To validate all the 3D primitives in a CityGML file and get a report (in `JSON <http://json.org/>`_ format):
+To validate all the 3D primitives in a CityGML file and get a HTML report, provide the path to the folder (eg ``/report_dir``) that will contain the report ``report.html``:
 
 .. code-block:: bash
 
-  $ val3dity input.gml -r report.json
+  $ val3dity -r /report_dir input.gml
+
+
+To validate all the 3D primitives in a CityGML file and get a `JSON <http://json.org/>`_ report:
+
+.. code-block:: bash
+
+  $ val3dity --report_json report.json input.gml
 
 
 To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm:
 
 .. code-block:: bash
 
-  $ val3dity input.json --planarity_d2p_tol 0.2
+  $ val3dity --planarity_d2p_tol 0.2 input.json
 
 
 To validate an OBJ file and verify whether the 3D primitives from a Solid (this is the default):
@@ -48,7 +55,7 @@ The same file could be validated as a MultiSurface, ie each of its surface are v
 
 .. code-block:: bash
 
-  $ val3dity input.obj -p MultiSurface
+  $ val3dity -p MultiSurface input.obj
     
 
 Accepted input
@@ -138,7 +145,14 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ``-r, --report``
 ****************
-|  Outputs the validation report to the file given. The report is in JSON file_format.
+|  Outputs the validation report to the file given. The report is an navigable HTML that can be viewed in a web browser. For this option, the path to the report directory (eg ``/report_dir``) is required. This directory will contain ``report.html`` together with the required files to render it.
+
+
+----
+
+``--report_json``
+****************
+|  Outputs the validation report to the file given. The report is in JSON file format.
 
 
 ----

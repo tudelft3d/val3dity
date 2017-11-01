@@ -47,8 +47,6 @@ This ring is for instance invalid:
 
 103 -- NOT_CLOSED 
 -----------------
-|  Default: 0.001unit
-|  Set through ``--snap_tol``
 
 *This applies only to GML rings, in CityJSON/OBJ/OFF it is ignored.* 
 The first and last points have to be identical (at the same location). 
@@ -104,8 +102,6 @@ Two or more rings are identical.
 
 203 -- NON_PLANAR_POLYGON_DISTANCE_PLANE
 ----------------------------------------
-|  Default = 0.01unit
-|  Set through ``--planarity_d2p_tol``
 
 A polygon must be planar, ie all its points (used for both the exterior and interior rings) must lie on a plane. 
 To verify this, we must ensure that the the distance between every point and a plane is less than a given *tolerance* (eg 1cm). 
@@ -117,9 +113,6 @@ The distance to the plane, if larger than the threshold, is also reported in the
 
 204 -- NON_PLANAR_POLYGON_NORMALS_DEVIATION
 -------------------------------------------
-|  Default = 1 degree
-|  Set through ``--planarity_n_tol``
-|  Disable with ``--ignore204``
 
 To ensure that small folds on a surface are detected. Consider the Solid below, the top surface containing 8 vertices (*abcdefgh*) is clearly non-planar since there is a vertical "fold" in the middle. 
 The normal of the sub-surface *abgh* points upwards, while that of *bcfg* points in a different angle. 
