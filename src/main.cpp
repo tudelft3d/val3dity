@@ -66,21 +66,28 @@ public:
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
-    std::cout << "\tval3dity citygmlinput.gml" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in citygmlinput.gml" << std::endl;
+    
+    std::cout << "\tval3dity CityGMLinput.gml" << std::endl;
+    std::cout << "\t\tValidates each 3D primitive in CityGMLinput.gml" << std::endl;
     std::cout << "\t\tand outputs a summary per city object" << std::endl;
+    
     std::cout << "\tval3dity input.json -r /home/elvis/temp/r" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in input.json" << std::endl;
+    std::cout << "\t\tValidates each 3D primitive in input.json (CityJSON file)" << std::endl;
     std::cout << "\t\tand outputs a detailed report '/home/elvis/temp/r/report.html'" << std::endl;
+    
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
     std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts" << std::endl;
+    
     std::cout << "\tval3dity input.json --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
+    
     std::cout << "\tval3dity input.obj" << std::endl;
     std::cout << "\t\tValidates the geometries in input.obj as if they were a Solid (default)" << std::endl;
+    
     std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
     std::cout << "\t\tValidates the geometries in input.off as a MultiSurface" << std::endl;
+    
     std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
   }
