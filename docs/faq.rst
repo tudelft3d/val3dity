@@ -41,18 +41,22 @@ That does mean that you might have to upload your file and get it validated seve
 
 
 .. image:: _static/workflow.svg
-   :width: 100%
+   :width: 60%
 
 
-I'm sure my solid is valid, but the validator says that something is wrong
---------------------------------------------------------------------------
+I'm sure my 3D primitive is valid, but the validator says that something is wrong
+---------------------------------------------------------------------------------
 
 It's possible that there are bugs in `val3dity <https://github.com/tudelft3d/val3dity>`_. 
-Please `report the issue <https://github.com/tudelft3d/val3dity/issues>`_.
+Please `report the issue <https://github.com/tudelft3d/val3dity/issues>`_ and provide the following:
+
+  1. the JSON report (use option ``--report_json``)
+  2. (a link to) the input file you used
+  3. which platform you use, and whether you compiled it yourself or used the web-application
 
 
-The validation report says that there are no solids in my file, but I can see the buildings with my viewer!
------------------------------------------------------------------------------------------------------------
+The validation report says that there are no solids in my CityGML file, but I can see the buildings with my viewer!
+-------------------------------------------------------------------------------------------------------------------
 
 There are many (or more precisely: `too many <http://erouault.blogspot.nl/2014/04/gml-madness.html>`_) ways to model a volume/polyhedron in GML (eg a building in CityGML), but usually practitioners do it with either ``gml:Solid`` or ``gml:MultiSurface``. 
 See `on this page <https://www.citygml.org/samplefiles/building/>`_ the same simple volumetric objects modelled with different primitives.
@@ -62,13 +66,11 @@ If your dataset contains volumes but these are stored as ``gml:MultiSurfaces`` (
 
 Can my GML file contain more than one ``gml:Solid`` or ``gml:MultiSurface``?
 ----------------------------------------------------------------------------
-
 Yes, all the 3D primitives in the file will be validated, one by one.
 
 
 Do you validate the topological relationships between the solids?
 -----------------------------------------------------------------
-
 If these solids are part of a ``gml:CompositeSolid`` then yes, otherwise no.
 We do verify whether two ``BuildingParts`` forming a ``Building`` overlap though.
 
@@ -77,13 +79,12 @@ We however plan to offer in the future this for all primitives/buildings in a fi
 
 The IDs for the shells and surfaces in the report, are they 0-based or 1-based?
 -------------------------------------------------------------------------------
-
 0-based.
 
 
-Where can I get files containing ``gml:Solids``?
-------------------------------------------------
-
+Where can I get files containing ``gml:Solids`` or ``gml:CompositeSolid``?
+--------------------------------------------------------------------------
+In the folder ``/data/`` there are many examples of 
 We maintain a `repository of unit tests <https://github.com/tudelft3d/CityGML-QIE-3Dvalidation>`_ (file containing one solid that has *one* error) for testing our code. 
 Also, on the `official CityGML website <https://www.citygml.org/samplefiles/>`_ there are a few files with 3D buildings, and all the `known publicly available 3D cities are listed too <https://www.citygml.org/3dcities/>`_.
 

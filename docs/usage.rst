@@ -84,6 +84,27 @@ Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option
 If your OBJ contains triangles only (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid. Validation could however catch cases where triangles are collapsed to a line/point.
 Validating it as a solid verifies whether the primitive is a 2-manifold, ie whether it is closed/watertight and whether all normals are pointing outwards.
 
+
+
+How are 3D primitives validated?
+--------------------------------
+
+All primitives are validated hierarchically, for instance:
+
+  1. the lower-dimensionality primitives (the polygons) are validated by projecting them to a 2D plane (obtained with least-square adjustment) and using `GEOS <http://trac.osgeo.org/geos/>`_;
+  2. then these are assembled into shells/surfaces and their validity is analysed, as they must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc;
+  3. then the ``Solids`` are validated
+  4. finally, for ``CompositeSolids`` the interactions between the ``Solids`` are analysed.
+
+This means that if one polygon of a Solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
+
+The formal definitions of the 3D primitives, along with explanations, are given in :doc:`definitions`.
+
+.. image:: _static/workflow.svg
+   :width: 60%
+
+
+
 Options for the validation
 --------------------------
 
@@ -172,7 +193,7 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 ----
 
 ``--report_json``
-****************
+*****************
 |  Outputs the validation report to the file given. The report is in JSON file format.
 
 
@@ -205,19 +226,3 @@ It's setup by default to be 1mm.
 *****************
 |  Display version information and exit.
 
-----
-
-
-How are 3D primitives validated?
---------------------------------
-
-All primitives are validated hierarchically, for instance:
-
-  1. the lower-dimensionality primitives (the polygons) are validated by projecting them to a 2D plane (obtained with least-square adjustment) and using `GEOS <http://trac.osgeo.org/geos/>`_;
-  2. then these are assembled into shells/surfaces and their validity is analysed, as they must be watertight, no self-intersections, orientation of the normals must be consistent and pointing outwards, etc;
-  3. then the ``Solids`` are validated
-  4. finally, for ``CompositeSolids`` the interactions between the ``Solids`` are analysed.
-
-This means that if one polygon of a Solid is not valid, the validator will report that error but will *not* continue the validation (to avoid "cascading" errors). 
-
-The formal definitions of the 3D primitives, along with explanations, are given in 
