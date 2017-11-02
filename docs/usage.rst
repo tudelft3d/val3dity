@@ -108,13 +108,6 @@ The formal definitions of the 3D primitives, along with explanations, are given 
 Options for the validation
 --------------------------
 
-``--geom_is_sem_surfaces``
-**************************
-| The geometry of a CityGML object is formed by its semantic surfaces instead of the geometry (which is missing in the file). Only to be used if :ref:`error_609` occurs. If no semantic surfaces are present, then 609 can still occur even the use of this option.
-
-----
-
-
 ``-h, --help``
 *****************
 |  Display usage information and exit.
@@ -131,6 +124,14 @@ Options for the validation
 ``--onlyinvalid``
 *****************
 |  Only the invalid primitives are reported in the validation report.
+
+
+----
+
+
+``--geom_is_sem_surfaces``
+**************************
+| The geometry of a CityGML object is formed by its semantic surfaces instead of the geometry (which is missing in the file). Only to be used if :ref:`error_609` occurs. If no semantic surfaces are present, then 609 can still occur even the use of this option.
 
 ----
 
@@ -184,17 +185,20 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ----
 
+.. _report:
 
 ``-r, --report``
 ****************
-|  Outputs the validation report to the file given. The report is an navigable HTML that can be viewed in a web browser. For this option, the path to the report directory (eg ``/report_dir``) is required. This directory will contain ``report.html`` together with the required files to render it.
+|  Outputs the validation report to the file given. The report is an navigable HTML that can be viewed in a web browser. For this option, the path to the report directory (eg ``/report_dir``) is required. This directory will contain ``report.html`` together with the required files to render it. Open it in a web browser.
 
 
 ----
 
+.. _report_json:
+
 ``--report_json``
 *****************
-|  Outputs the validation report to the file given. The report is in JSON file format.
+|  Outputs the validation report to the file given. The report is in JSON file format, and can be used to produce nice reports automatically (our HTML reports does exactly this) or to extract statistics.
 
 
 ----

@@ -19,6 +19,29 @@ This tests, among many others, the following:
 You can read more about the `details <https://github.com/tudelft3d/val3dity/blob/v2/tests/README.md>`_, or check the `complete list of tested geometries <https://github.com/tudelft3d/val3dity/blob/v2/data/test_metadata.yml>`_
 
 
+How to interpret the report?
+----------------------------
+
+There are 2 options for a report: HTML and JSON report.
+
+:ref:`report`
+
+Outputs the validation report in a navigable HTML file that can be viewed in a web browser. There is a summary page with an overview, and also a page with all the details of each 3D primitive or City Objects. Some statistics (eg number of faces) for each is also given, as a convenience.
+
+.. image:: _static/report1.png
+   :width: 49%
+.. image:: _static/report2.png
+   :width: 49%
+
+   
+:ref:`report_json`
+
+Outputs a single JSON file with the information shown in the HTML page.
+Use it to produce your own report or extract statistics.
+The structure is self-explanatory.
+
+
+
 I get many errors 203 and 204, but my planes look planar to me. Why is that?
 ----------------------------------------------------------------------------
 
