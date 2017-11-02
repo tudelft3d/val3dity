@@ -84,8 +84,7 @@ The IDs for the shells and surfaces in the report, are they 0-based or 1-based?
 
 Where can I get files containing ``gml:Solids`` or ``gml:CompositeSolid``?
 --------------------------------------------------------------------------
-In the folder ``/data/`` there are many examples of 
-We maintain a `repository of unit tests <https://github.com/tudelft3d/CityGML-QIE-3Dvalidation>`_ (file containing one solid that has *one* error) for testing our code. 
+In the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
 Also, on the `official CityGML website <https://www.citygml.org/samplefiles/>`_ there are a few files with 3D buildings, and all the `known publicly available 3D cities are listed too <https://www.citygml.org/3dcities/>`_.
 
 
