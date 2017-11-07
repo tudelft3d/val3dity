@@ -116,7 +116,7 @@ Options for the validation
 
 ``--ignore204``
 ***************
-|  Ignore the error `204 – NON_PLANAR_POLYGON_NORMALS_DEVIATION <http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-normals-deviation>`_.
+|  Ignore the error :ref:`error_204`.
 
 ----
 
