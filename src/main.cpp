@@ -871,6 +871,12 @@ void write_report_json(json& jr,
     jr["valid_cityobjects"] = dPrimitives.size() - coInvalid;
     jr["invalid_cityobjects"] = coInvalid;
   }
+  else
+  {
+    jr["total_cityobjects"] = 0;
+    jr["valid_cityobjects"] = 0;
+    jr["invalid_cityobjects"] = 0;
+  }
   jr["InputErrors"];
   jr["CityObjects"];
   jr["Primitives"];
