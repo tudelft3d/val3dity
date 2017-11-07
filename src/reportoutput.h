@@ -850,15 +850,9 @@ var errors = {
         }
     },
     "303": {
-        "name": "303 – NON_MANIFOLD_VERTEX",
+        "name": "303 – NON_MANIFOLD_CASE",
         "link": {
-            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-manifold-vertex"
-        }
-    },
-    "304": {
-        "name": "304 – NON_MANIFOLD_EDGE",
-        "link": {
-            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-manifold-edge"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-manifold-case"
         }
     },
     "305": {
