@@ -47,8 +47,8 @@ This ring is for instance invalid:
 
 .. _error_103:
 
-103 -- NOT_CLOSED 
------------------
+103 -- RING_NOT_CLOSED 
+----------------------
 
 *This applies only to GML rings, in CityJSON/OBJ/OFF it is ignored.* 
 The first and last points have to be identical (at the same location). 
@@ -67,8 +67,8 @@ This ring is for instance invalid:
 
 .. _error_104:
 
-104 -- SELF_INTERSECTION 
-------------------------
+104 -- RING_SELF_INTERSECTION 
+-----------------------------
 A ring should be *simple*, ie it should not self-intersect. The self-intersection can be at the location of an explicit point, or not. This case includes rings that are (partly) collapsed to a line for instance.
 
 Observe that self-intersection in 3D and 2D is different, ie a bowtie (the first polygon below) has a self-intersection "in the middle" in 2D, but in 3D if the 4 vertices are not on a plane then there is no intersection.
@@ -134,8 +134,8 @@ Also, 204 usually means that the vertices in the polygon are *very* close to eac
 
 .. _error_205:
 
-205 -- INTERIOR_DISCONNECTED
-----------------------------
+205 -- POLYGON_INTERIOR_DISCONNECTED
+------------------------------------
 The interior of a polygon must be connected. The combination of different valid rings can create such an error, for example:
 
 .. image:: _static/205.png
@@ -177,8 +177,8 @@ A shell should have at least 4 polygons---the simplest volumetric shape in 3D is
 
 .. _error_302:
 
-302 -- NOT_CLOSED
------------------
+302 -- SHELL_NOT_CLOSED
+-----------------------
 The shell must not have 'holes', ie it must be 'watertight'. This refers only to the topology of the shell, not to its geometry (see :ref:`error_306`).
 
 The left solid is invalid, while the right one is valid (since the hole is filled with other polygons):
@@ -209,8 +209,8 @@ Polygons that are not connected to the shell should be reported as an error.
 
 .. _error_306:
 
-306 -- SELF_INTERSECTION
-------------------------
+306 -- SHELL_SELF_INTERSECTION
+------------------------------
 If topology of the shell is correct and the shell is closed (thus no error 301/302/303/304/305), it is possible that the geometry introduces errors, eg intersections. 
 For instance, the topology of both these shells is identical, but the geometry differs. 
 The left shell is valid while the right one is invalid.
@@ -251,8 +251,8 @@ Conceptually the same as :ref:`error_206`.
 
 .. _error_404:
 
-404 -- INTERIOR_DISCONNECTED
-----------------------------
+404 -- SOLID_INTERIOR_DISCONNECTED
+----------------------------------
 Conceptually the same as :ref:`error_205`: the configuration of the interior shells makes the interior of the solid disconnected. 
 
 .. _error_405:
@@ -335,4 +335,4 @@ The parameters used for the validation are not valid.
 
 999 -- UNKNOWN_ERROR
 --------------------
-If none of the above but something went bad. If this happens `please report it <https://github.com/tudelft3d/val3dity/issues>`_.
+If none of the above is suitable, which means something  went (really) bad. If you see this error, `please report it <https://github.com/tudelft3d/val3dity/issues>`_.

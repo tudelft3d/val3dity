@@ -124,7 +124,6 @@ std::string errorcode2description(int code) {
     case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
     case 103: return string("RING_NOT_CLOSED"); break;
     case 104: return string("RING_SELF_INTERSECTION"); break;
-    case 105: return string("RING_COLLAPSED"); break;
     //-- POLYGON
     case 201: return string("INTERSECTION_RINGS"); break;
     case 202: return string("DUPLICATED_RINGS"); break;
@@ -147,7 +146,7 @@ std::string errorcode2description(int code) {
     case 401: return string("INTERSECTION_SHELLS"); break;
     case 402: return string("DUPLICATED_SHELLS"); break;
     case 403: return string("INNER_SHELL_OUTSIDE"); break;
-    case 404: return string("INTERIOR_DISCONNECTED"); break;
+    case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
     case 405: return string("WRONG_ORIENTATION_SHELL"); break;
     //-- COMPOSITESOLID
     case 501: return string("INTERSECTION_SOLIDS"); break;
