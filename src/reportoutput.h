@@ -35,7 +35,7 @@ std::string indexhtml = R"(
         <table id="params">
             <tr>
                 <td>
-                    <a href="http://val3dity.readthedocs.io/en/v2/usage/#planarity-d2p-tol" target="_blank">
+                    <a href="http://geovalidation.bk.tudelft.nl/val3dity/docs/usage/#planarity-d2p-tol" target="_blank">
                         planarity_d2p_tol:
                     </a>
                 </td>
@@ -43,7 +43,7 @@ std::string indexhtml = R"(
             </tr>
             <tr>
                 <td>
-                    <a href="http://val3dity.readthedocs.io/en/v2/usage/#planarity-n-tol" target="_blank">
+                    <a href="http://geovalidation.bk.tudelft.nl/val3dity/docs/usage/#planarity-n-tol" target="_blank">
                         planarity_n_tol:
                     </a>
                 </td>
@@ -51,7 +51,7 @@ std::string indexhtml = R"(
             </tr>
             <tr>
                 <td>
-                    <a href="http://val3dity.readthedocs.io/en/v2/usage/#snap-tol" target="_blank">
+                    <a href="http://geovalidation.bk.tudelft.nl/val3dity/docs/usage/#snap-tol" target="_blank">
                         snap_tol:
                     </a>
                 </td>
@@ -59,7 +59,7 @@ std::string indexhtml = R"(
             </tr>
             <tr>
                 <td>
-                    <a href="http://val3dity.readthedocs.io/en/v2/usage/#overlap-tol" target="_blank">
+                    <a href="http://geovalidation.bk.tudelft.nl/val3dity/docs/usage/#overlap-tol" target="_blank">
                         overlap_tol:
                     </a>
                 </td>
@@ -768,169 +768,169 @@ var errors = {
     "101": {
         "name": "101 – TOO_FEW_POINTS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#too-few-points"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#too-few-points"
         }
     },
     "102": {
         "name": "102 – CONSECUTIVE_POINTS_SAME",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#consecutive-points-same"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#consecutive-points-same"
         }
     },
     "103": {
         "name": "103 – NOT_CLOSED",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#not-closed"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#not-closed"
         }
     },
     "104": {
         "name": "104 – SELF_INTERSECTION",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#self-intersection"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#self-intersection"
         }
     },
     "201": {
         "name": "201 – INTERSECTION_RINGS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#intersection-rings"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#intersection-rings"
         }
     },
     "202": {
         "name": "202 – DUPLICATED_RINGS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#duplicated-rings"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#duplicated-rings"
         }
     },
     "203": {
         "name": "203 – NON_PLANAR_POLYGON_DISTANCE_PLANE",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-distance-plane"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-planar-polygon-distance-plane"
         }
     },
     "204": {
         "name": "204 – NON_PLANAR_POLYGON_NORMALS_DEVIATION",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#non-planar-polygon-normals-deviation"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-planar-polygon-normals-deviation"
         }
     },
     "205": {
         "name": "205 – INTERIOR_DISCONNECTED",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#interior-disconnected"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#interior-disconnected"
         }
     },
     "206": {
         "name": "206 – INNER_RING_OUTSIDE",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#inner-ring-outside"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#inner-ring-outside"
         }
     },
     "207": {
         "name": "207 – INNER_RINGS_NESTED",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#inner-rings-nested"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#inner-rings-nested"
         }
     },
     "208": {
         "name": "208 – ORIENTATION_RINGS_SAME",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#orientation-rings-same"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#orientation-rings-same"
         }
     },
     "301": {
         "name": "301 – TOO_FEW_POLYGONS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#too-few-polygons"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#too-few-polygons"
         }
     },
     "302": {
         "name": "302 – NOT_CLOSED",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#error-302"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#error-302"
         }
     },
     "303": {
         "name": "303 – NON_MANIFOLD_VERTEX",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#non-manifold-vertex"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-manifold-vertex"
         }
     },
     "304": {
         "name": "304 – NON_MANIFOLD_EDGE",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#non-manifold-edge"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#non-manifold-edge"
         }
     },
     "305": {
         "name": "305 – MULTIPLE_CONNECTED_COMPONENTS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#multiple-connected-components"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#multiple-connected-components"
         }
     },
     "306": {
         "name": "306 – SELF_INTERSECTION",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#error-306"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#error-306"
         }
     },
     "307": {
         "name": "307 – POLYGON_WRONG_ORIENTATION",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#polygon-wrong-orientation"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#polygon-wrong-orientation"
         }
     },
     "401": {
         "name": "401 – INTERSECTION_SHELLS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#intersection-shells"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#intersection-shells"
         }
     },
     "402": {
         "name": "402 – DUPLICATED_SHELLS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#duplicated-shells"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#duplicated-shells"
         }
     },
     "403": {
         "name": "403 – INNER_SHELL_OUTSIDE",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#inner-shell-outside"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#inner-shell-outside"
         }
     },
     "404": {
         "name": "404 – INTERIOR_DISCONNECTED",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#error-404"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#error-404"
         }
     },
     "405": {
         "name": "405 – WRONG_ORIENTATION_SHELL",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#wrong-orientation-shell"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#wrong-orientation-shell"
         }
     },
     "501": {
         "name": "501 – INTERSECTION_SOLIDS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#intersection-solids"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#intersection-solids"
         }
     },
     "502": {
         "name": "502 – DUPLICATED_SOLIDS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#duplicated-solids"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#duplicated-solids"
         }
     },
     "503": {
         "name": "503 – DISCONNECTED_SOLIDS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#disconnected-solids"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#disconnected-solids"
         }
     },
     "601": {
         "name": "601 – BUILDINGPARTS_OVERLAP",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#buildingparts-overlap"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#buildingparts-overlap"
         }
     },
     "609": {
@@ -942,25 +942,25 @@ var errors = {
     "901": {
         "name": "901 – INVALID_INPUT_FILE",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#invalid-input-file"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#invalid-input-file"
         }
     },
     "902": {
         "name": "902 – EMPTY_PRIMITIVE",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#empty-primitive"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#empty-primitive"
         }
     },
     "903": {
         "name": "903 – WRONG_INPUT_PARAMETERS",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#wrong-input-parameters"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#wrong-input-parameters"
         }
     },
     "999": {
         "name": "999 – UNKNOWN_ERROR",
         "link": {
-            "href": "http://val3dity.readthedocs.io/en/v2/errors/#unknown-error"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#unknown-error"
         }
     }
 }
