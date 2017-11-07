@@ -967,10 +967,6 @@ var errors = {
 
 function error_overview() {
 
-  if ( (report.CityObjects == null) && (report.Primitives == null) ) {
-    // idx_error_table();
-    return;
-  }
   if (report.overview_errors == null) {
     var h = document.createElement("H3")           
     var t = document.createTextNode("No errors!");
