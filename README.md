@@ -17,10 +17,10 @@ However, as is the case for CityGML, only planar and linear primitives are allow
 
 val3dity accepts as input:
 
-  - [CityGML](https://www.citygml.org)) 
-  - [CityJSON](http://www.cityjson.org))
+  - [CityGML](https://www.citygml.org) 
+  - [CityJSON](http://www.cityjson.org)
   - any [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) 
-  - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file), 
+  - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) 
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
 
