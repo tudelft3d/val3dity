@@ -19,7 +19,7 @@ val3dity accepts as input:
 
   - [CityGML](https://www.citygml.org) 
   - [CityJSON](http://www.cityjson.org)
-  - any [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) 
+  - [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) of any flavour
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) 
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
@@ -66,7 +66,9 @@ However, a file is limited to 50MB.
     
 ## Documentation and help
 
-Read the full documentation at [http://val3dity.rtfd.io](http://val3dity.rtfd.io). 
+Read the full documentation at [http://geovalidation.bk.tudelft.nl/val3dity/docs/](http://geovalidation.bk.tudelft.nl/val3dity/docs/). 
+
 The primary channel to communicate with the developers is the Issues section. 
+
 If you have a question or came across a bug, please submit an issue there. 
 However we ask you check first whether your problem has already been solved by someone else.
