@@ -129,25 +129,25 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "Input file in either GML, CityJSON, OBJ, or OFF",
+                                              "input file in either GML, CityJSON, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
     TCLAP::MultiArg<std::string>            ishellfiles(
                                               "", 
                                               "ishell", 
-                                              "One interior shell (in POLY format only; more than one possible)",
+                                              "one interior shell (in POLY format only; more than one possible)",
                                               false, 
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "Output report in HTML format",
+                                              "output report in HTML format",
                                               false,
                                               "",
                                               "string");    
     TCLAP::ValueArg<std::string>            report_json("",
                                               "report_json",
-                                              "Output report in JSON format",
+                                              "output report in JSON format",
                                               false,
                                               "",
                                               "string");
@@ -159,7 +159,7 @@ int main(int argc, char* const argv[])
                                               &primVals);
     TCLAP::SwitchArg                        verbose("",
                                               "verbose",
-                                              "Verbose output",
+                                              "verbose output",
                                               false);
     TCLAP::SwitchArg                        license("",
                                               "license",
@@ -167,15 +167,15 @@ int main(int argc, char* const argv[])
                                               false);
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
-                                              "Unit tests output",
+                                              "unit tests output",
                                               false);
     TCLAP::SwitchArg                        onlyinvalid("",
                                               "onlyinvalid",
-                                              "Only invalid primitives are reported",
+                                              "only invalid primitives are reported",
                                               false);
     TCLAP::SwitchArg                        ignore204("",
                                               "ignore204",
-                                              "Ignore error 204",
+                                              "ignore error 204",
                                               false);    
     TCLAP::SwitchArg                        geom_is_sem_surfaces("",
                                               "geom_is_sem_surfaces",
@@ -189,25 +189,25 @@ int main(int argc, char* const argv[])
                                               "string");        
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
-                                              "Tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
+                                              "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
                                               false,
                                               0.001,
                                               "double");
     TCLAP::ValueArg<double>                 overlap_tol("",
                                               "overlap_tol",
-                                              "Tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)",
+                                              "tolerance for testing overlap CompositeSolids and BuildingParts (default=0.0)",
                                               false,
                                               -1,
                                               "double");
     TCLAP::ValueArg<double>                 planarity_d2p_tol("",
                                               "planarity_d2p_tol",
-                                              "Tolerance for planarity distance_to_plane (default=0.01)",
+                                              "tolerance for planarity distance_to_plane (default=0.01)",
                                               false,
                                               0.01,
                                               "double");
     TCLAP::ValueArg<double>                 planarity_n_tol("",
                                               "planarity_n_tol",
-                                              "Tolerance for planarity based on normals deviation (default=20.0degree)",
+                                              "tolerance for planarity based on normals deviation (default=20.0degree)",
                                               false,
                                               20.0,
                                               "double");

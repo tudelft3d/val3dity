@@ -16,7 +16,7 @@ This tests, among many others, the following:
 - Various valid geometries and boundary conditions.
 - Command-line user input.
 
-You can read more about the `details <https://github.com/tudelft3d/val3dity/blob/v2/tests/README.md>`_, or check the `complete list of tested geometries <https://github.com/tudelft3d/val3dity/blob/v2/data/test_metadata.yml>`_
+You can read more about the `details <https://github.com/tudelft3d/val3dity/blob/master/tests/README.md>`_, or check the `complete list of tested geometries <https://github.com/tudelft3d/val3dity/blob/master/data/test_metadata.yml>`_
 
 
 How to interpret the report?
