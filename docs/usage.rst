@@ -120,6 +120,7 @@ Options for the validation
 
 ----
 
+.. _option_geom_is_sem_surfaces:
 
 ``--geom_is_sem_surfaces``
 **************************
@@ -140,7 +141,7 @@ Options for the validation
 ``--overlap_tol``
 *****************
 |  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts``
-|  default = 0.0
+|  default = -1 (disabled)
 
 The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid`` or the ``BuildingParts`` of a building.
 The tolerance ``--overlap_tol 0.05`` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating. ``0.0unit`` means that the original boundaries are used.

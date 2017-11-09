@@ -81,15 +81,20 @@ Please `report the issue <https://github.com/tudelft3d/val3dity/issues>`_ and pr
 The validation report says that there are no solids in my CityGML file, but I can see the buildings with my viewer!
 -------------------------------------------------------------------------------------------------------------------
 
-There are many (or more precisely: `too many <http://erouault.blogspot.nl/2014/04/gml-madness.html>`_) ways to model a volume/polyhedron in GML (eg a building in CityGML), but usually practitioners do it with either ``gml:Solid`` or ``gml:MultiSurface``. 
-See `on this page <https://www.citygml.org/samplefiles/building/>`_ the same simple volumetric objects modelled with different primitives.
+There are many (or more precisely: `too many <http://erouault.blogspot.nl/2014/04/gml-madness.html>`_) ways to model geometries in GML, and that applies for buildings in CityGML. 
+See `on this page <https://www.citygml.org/samplefiles/building/>`_ the same simple volumetric objects is modelled with different primitives.
 
-If your dataset contains volumes but these are stored as ``gml:MultiSurfaces`` (eg `the open dataset of Rotterdam <http://www.rotterdamopendata.nl/dataset/rotterdam-3d-bestanden>`_), then you could use our [CityGML Solidifier](https://github.com/tudelft3d/citygml-solidifier).
+If your dataset contains only Semantic Surfaces, then use the option :ref:`option_geom_is_sem_surfaces`.
 
 
 Can my GML file contain more than one ``gml:Solid`` or ``gml:MultiSurface``?
 ----------------------------------------------------------------------------
 Yes, all the 3D primitives in the file will be validated, one by one.
+
+
+The validator says my CityGML file is invalid?
+----------------------------------------------
+You can verify this by validating it against the CityGML schemas (this [online validator](http://geovalidation.bk.tudelft.nl/schemacitygml/) can be used).
 
 
 Do you validate the topological relationships between the solids?
