@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, Hugo Ledoux  
+  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -47,7 +47,8 @@ std::string VAL3DITY_VERSION = "2.0-rc1";
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
-void write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+void        write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+void        print_license();
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -160,6 +161,10 @@ int main(int argc, char* const argv[])
                                               "verbose",
                                               "Verbose output",
                                               false);
+    TCLAP::SwitchArg                        license("",
+                                              "license",
+                                              "see the software license",
+                                              false);
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
                                               "Unit tests output",
@@ -218,7 +223,9 @@ int main(int argc, char* const argv[])
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(output_off);
-    cmd.add(inputfile);
+    // cmd.add(inputfile);
+    // cmd.add(license);
+    cmd.xorAdd( inputfile, license );
     cmd.add(ishellfiles);
     cmd.add(report);
     cmd.add(report_json);
@@ -251,6 +258,17 @@ int main(int argc, char* const argv[])
       mylog.open("val3dity.log");
       std::clog.rdbuf(mylog.rdbuf());
     }
+    if (license.getValue() == true)
+    {
+      print_license();
+      if (verbose.getValue() == false)
+      {
+        clog.rdbuf(savedBufferCLOG);
+        mylog.close();
+      }
+      return(0);
+    }
+    
     if (inputtype == OTHER) {
       std::stringstream ss;
       ss << "Input file (" << inputfile.getValue() << ") not supported.";
@@ -272,6 +290,14 @@ int main(int argc, char* const argv[])
       if ((prim3d == COMPOSITESURFACE) && (ishellfiles.getValue().size() > 0))
         ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
     }
+
+    std::string licensewarning =
+    "---\nval3dity Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  \n"
+    "This program comes with ABSOLUTELY NO WARRANTY.\n"
+    "This is free software, and you are welcome to redistribute it\n"
+    "under certain conditions; for details run val3dity with the '--license' option.\n---";
+    std::cout << licensewarning << std::endl;
+
 
     if (ioerrs.has_errors() == false)
     {
@@ -777,6 +803,30 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
   return ss.str();
 }
 
+
+void print_license() {
+  std::string thelicense =
+    "\nval3dity\n\n"
+    "Copyright (C) 2011-2017  3D geoinformation research group, TU Delft\n\n"
+    "val3dity is free software: you can redistribute it and/or modify\n"
+    "it under the terms of the GNU General Public License as published by\n"
+    "the Free Software Foundation, either version 3 of the License, or\n"
+    "(at your option) any later version.\n\n"
+    "val3dity is distributed in the hope that it will be useful,\n"
+    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+    "GNU General Public License for more details.\n\n"
+    "A copy of the GNU General Public License is available at\n"
+    "<http://www.gnu.org/licenses/> or\n"
+    "<https://github.com/tudelft3d/val3dity/blob/master/LICENSE\n\n"
+    "For any information or further details about the use of val3dity, contact:\n"
+    "Hugo Ledoux \n"
+    "<h.ledoux@tudelft.nl>\n"
+    "Faculty of Architecture & the Built Environment\n"
+    "Delft University of Technology\n"
+    "Julianalaan 134, Delft 2628BL, the Netherlands\n";
+  std::cout << thelicense << std::endl;
+}
 
 void write_report_json(json& jr,
                        std::string ifile, 
