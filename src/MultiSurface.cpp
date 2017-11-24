@@ -107,7 +107,8 @@ json MultiSurface::get_report_json()
     j["id"] = this->_id;
   else
     j["id"] = "none";
-  j["numbersurfaces"] = this->number_faces();
+  j["numberfaces"] = this->num_faces();
+  j["numbervertices"] = this->num_vertices();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -138,7 +139,7 @@ std::string MultiSurface::get_report_xml() {
     ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
   else
     ss << "\t\t<id>none</id>" << std::endl;
-  ss << "\t\t<numbersurfaces>" << this->number_faces() << "</numbersurfaces>" << std::endl;
+  ss << "\t\t<numbersurfaces>" << this->num_faces() << "</numbersurfaces>" << std::endl;
   // ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
   for (auto& err : _errors)
   {
@@ -157,9 +158,14 @@ std::string MultiSurface::get_report_xml() {
   return ss.str();}
 
 
-int MultiSurface::number_faces() 
+int MultiSurface::num_faces() 
 {
   return _surface->number_faces();
+}
+
+int MultiSurface::num_vertices() 
+{
+  return _surface->number_vertices();
 }
 
 

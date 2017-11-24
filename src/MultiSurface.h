@@ -56,7 +56,8 @@ public:
 
   std::string   get_off_representation();
 
-  int           number_faces();
+  int           num_faces();
+  int           num_vertices();
   bool          set_surface(Surface* s);
   Surface*      get_surface();
   std::set<int> get_unique_error_codes();
