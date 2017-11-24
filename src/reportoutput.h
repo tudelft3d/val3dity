@@ -557,7 +557,8 @@ std::string treeviewjs = R"(
                       nrsolids.style.background = colour_invalid;
                   }
               }
-              if(item.numbervertices != undefined) {
+              //-- Solid
+              if(item.numbershells != undefined) {
                   nrshells.setAttribute('class', 'tree-leaf-nrshells');
                   nrshells.textContent = "Shells:" + "\u00A0" + item.numbershells;
                   nrfaces.setAttribute('class', 'tree-leaf-nrfaces');
@@ -572,8 +573,23 @@ std::string treeviewjs = R"(
                   content.appendChild(nrshells);
                   content.appendChild(nrfaces);
                   content.appendChild(nrvertices);
-              } else {
-                //   nothing
+              } 
+              //-- MultiSurface
+              else if(item.numbervertices != undefined) {
+                  nrshells.setAttribute('class', 'tree-leaf-nrshells');
+                  nrfaces.setAttribute('class', 'tree-leaf-nrfaces');
+                  nrfaces.textContent = "Faces:" + "\u00A0" + item.numberfaces;
+                  nrvertices.setAttribute('class', 'tree-leaf-nrvertices');
+                  nrvertices.textContent = "Vertices:" + "\u00A0" + item.numbervertices;
+                  if(!item.validity) {
+                    nrvertices.style.background = colour_invalid;
+                    nrfaces.style.background = colour_invalid;
+                  }
+                  content.appendChild(nrfaces);
+                  content.appendChild(nrvertices);
+              }
+              else {
+                // nothing
               }
           }
 
