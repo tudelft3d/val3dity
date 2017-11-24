@@ -126,43 +126,6 @@ json Surface::get_report_json()
 }
 
 
-std::string Surface::get_report_xml()
-{
-  std::stringstream ss;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      // ss << "\t\t\t<shell_number>" << this->_id << "</shell_number>" << std::endl;
-      ss << "\t\t\t<surface_id>" << std::get<0>(e) << "</surface_id>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  return ss.str();
-}
-
-
-std::string Surface::get_report_text()
-{
-  std::stringstream ss;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t" << std::get<0>(err) << " -- " << errorcode2description(std::get<0>(err)) << std::endl;
-      ss << "\t\tSurface: " << this->_id << std::endl;
-      ss << "\t\tFace: "  << std::get<0>(e) << std::endl;
-      ss << "\t\tInfo: "  << std::get<1>(e) << std::endl;
-    }
-  }
-  return ss.str();
-}
-
-
 std::string Surface::get_poly_representation()
 {
   std::ostringstream s;

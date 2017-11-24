@@ -100,24 +100,6 @@ json IOErrors::get_report_json()
 }
 
 
-std::string IOErrors::get_report_xml()
-{
-  std::stringstream ss;
-  for (auto& err : _errors)
-  {
-    for (auto i : err.second)
-    {
-      ss << "\t<Error>" << std::endl;
-      ss << "\t\t<code>" << err.first << "</code>" << std::endl;
-      ss << "\t\t<type>" << errorcode2description(err.first) << "</type>" << std::endl;
-      ss << "\t\t<info>" << i << "</info>" << std::endl;
-      ss << "\t</Error>" << std::endl;
-    }
-  }
-  return ss.str();
-}
-
-
 std::string errorcode2description(int code) {
   switch(code)
   {
