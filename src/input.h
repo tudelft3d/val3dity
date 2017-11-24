@@ -54,7 +54,6 @@ public:
   bool          has_errors();
   void          add_error(int code, std::string info);
   std::string   get_report_text();
-  std::string   get_report_xml();
   json          get_report_json();
   std::set<int> get_unique_error_codes();
 };

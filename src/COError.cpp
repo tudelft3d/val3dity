@@ -61,24 +61,6 @@ void COError::add_error(int code, std::string info, std::string whichgeoms)
 }
 
 
-std::string COError::get_report_text()
-{
-  std::stringstream ss;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<0>(e) << "</info>" << std::endl;
-      ss << "\t\t\t<primitives>" << std::get<1>(e) << "</primitives>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  return ss.str();
-}
-
 
 json COError::get_report_json()
 {
@@ -99,23 +81,5 @@ json COError::get_report_json()
   return j;
 }
 
-
-std::string COError::get_report_xml()
-{
-  std::stringstream ss;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<0>(e) << "</info>" << std::endl;
-      ss << "\t\t\t<primitives>" << std::get<1>(e) << "</primitives>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  return ss.str();
-}
 
 }

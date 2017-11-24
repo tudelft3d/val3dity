@@ -47,7 +47,6 @@ public:
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   int           is_valid();
   bool          is_empty();
-  std::string   get_report_xml();
   json          get_report_json();
   Primitive3D   get_type();
   std::set<int> get_unique_error_codes();

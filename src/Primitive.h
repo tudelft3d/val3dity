@@ -51,7 +51,6 @@ public:
   virtual bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1) = 0;
   virtual int           is_valid() = 0;
   virtual bool          is_empty() = 0;
-  virtual std::string   get_report_xml() = 0;
   virtual json          get_report_json() = 0;
   virtual Primitive3D   get_type() = 0;
 
