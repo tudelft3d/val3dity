@@ -212,38 +212,6 @@ json Solid::get_report_json()
 }
 
 
-std::string Solid::get_report_xml()
-{
-  std::stringstream ss;
-  ss << "\t<Solid>" << std::endl;
-  if (this->get_id() != "")
-    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
-  else
-    ss << "\t\t<id>none</id>" << std::endl;
-  ss << "\t\t<numbershells>" << (this->num_ishells() + 1) << "</numbershells>" << std::endl;
-  ss << "\t\t<numberfaces>" << this->num_faces() << "</numberfaces>" << std::endl;
-  ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<shell>" << std::get<0>(e) << "</shell>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  for (auto& sh : _shells)
-  {
-    ss << sh->get_report_xml();
-  }
-  ss << "\t</Solid>" << std::endl;
-  return ss.str();
-}
-
-
 Nef_polyhedron* Solid::get_nef_polyhedron()
 {
   if (_nef != NULL)

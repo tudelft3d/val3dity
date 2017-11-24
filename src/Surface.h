@@ -65,9 +65,7 @@ public:
   int    add_point(Point3 p);
   void   add_face(std::vector< std::vector<int> > f, std::string id = "");
 
-  std::string   get_report_xml();
   json          get_report_json();
-  std::string   get_report_text();
   void          add_error(int code, std::string faceid = "", std::string info = "");
   bool          has_errors();
   std::set<int> get_unique_error_codes();

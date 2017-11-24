@@ -132,30 +132,6 @@ json MultiSurface::get_report_json()
 }
 
 
-std::string MultiSurface::get_report_xml() {
-  std::stringstream ss;
-  ss << "\t<MultiSurface>" << std::endl;
-  if (this->get_id() != "")
-    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
-  else
-    ss << "\t\t<id>none</id>" << std::endl;
-  ss << "\t\t<numbersurfaces>" << this->num_faces() << "</numbersurfaces>" << std::endl;
-  // ss << "\t\t<numbervertices>" << this->num_vertices() << "</numbervertices>" << std::endl;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<faces>" << std::get<0>(e) << "</faces>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  ss << _surface->get_report_xml();
-  ss << "\t</MultiSurface>" << std::endl;
-  return ss.str();}
 
 
 int MultiSurface::num_faces() 

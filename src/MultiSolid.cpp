@@ -132,32 +132,6 @@ json MultiSolid::get_report_json()
   return j;
 }
 
-std::string MultiSolid::get_report_xml() 
-{
-    std::stringstream ss;
-  ss << "\t<MultiSolid>" << std::endl;
-  if (this->get_id() != "")
-    ss << "\t\t<id>" << this->_id << "</id>" << std::endl;
-  else
-    ss << "\t\t<id>none</id>" << std::endl;
-  ss << "\t\t<numbersolids>" << this->number_of_solids() << "</numbersolids>" << std::endl;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      ss << "\t\t<Error>" << std::endl;
-      ss << "\t\t\t<code>" << std::get<0>(err) << "</code>" << std::endl;
-      ss << "\t\t\t<type>" << errorcode2description(std::get<0>(err)) << "</type>" << std::endl;
-      ss << "\t\t\t<id>" << std::get<0>(e) << "</id>" << std::endl;
-      ss << "\t\t\t<info>" << std::get<1>(e) << "</info>" << std::endl;
-      ss << "\t\t</Error>" << std::endl;
-    }
-  }
-  for (auto& s : _lsSolids)
-    ss << s->get_report_xml();
-  ss << "\t</MultiSolid>" << std::endl;
-  return ss.str();
-}
 
 
 bool MultiSolid::add_solid(Solid* s) {
