@@ -1,0 +1,91 @@
+# please quote the nodes, particularly if you are using numbers only, eg "101"
+
+# test case
+test_empty:
+  "completely_empty": Completely empty files
+  "empty_primitive": A CompositeSolid where one Solid is empty
+  "empty_primitive_1": "A variation of empty_primitive.json"
+
+test_file_format:
+  "invalid_citygml_1": "A GenericCityObject where the first surfaceMember missing a gml:Polygon tag"
+  "invalid_citygml_2": "CityGML with missing City/GML namespace declarations"
+
+test_geometry_generic:
+  "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
+  "101": Cube top face a line (with only 2 vertices)
+  "102": Cube with one duplicate vertex (repeated in a ring)
+  "104": Unit cube where top face has a bow tie 
+  "104_1": Unit cube with top face having a self-intersecting surface (2D invalid), where 2 out of 3 triangles that are forming a square are bundled as one polygon (which self-intersects)
+  "104_2": One face closing in itself before the last vertex
+  "104_3": Similar to 104_1 but triangles meet in one corner of the square
+  "201": Unit cube with intersecting rings in top face
+  "201_1": A single 3D polygon with an interior ring that instersects its exterior
+  "201_2": Unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point
+  "202": Unit cube with a duplicate inner ring top face
+  "203": Unit cube where the top face has 5 vertices, one of them (8) is not on the plane of the other 4 (+0.05)
+  "203_1": Unit cube with a rectangular hole drilled through it, where one vertex (8) on the inner ring in the top face of the cube is not on the plane of the face (+0.5)
+  "203_2": Same as 203 but non-planar vertex is +0.1
+  "204_valid_1": Unit cube with a hump (+0.00699) in the top face, which results in an 1.00114° normal difference
+  "204_valid_2": Unit cube with a depression (-0.00699) in the top face, which results in an 1.00114° normal difference
+  "204_1": Unit cube with a vertical fold (0.0099) in the top face
+  "204_2": Unit cube with a vertical fold (0.0009) in the top face
+  "205": Unit cube with a polygon with interior disconnected in top face
+  "206": Unit cube with a hole in top face located outside (in 2D the top face is not acc. to SFS)
+  "207": Unit cube with a polygon with nested rings in top face
+  "207_1": Unit cube with a polygon with a nested ring in a nested ring in the top face
+  "207_2": Same as 207_1 but the holes are defined according to the .poly manual
+  "208": Unit cube with a hole (inner ring) in the top face having same orientation as outer ring
+  "301": Flat cube, ie with volume of 0, only 2 surfaces
+  "301_1": Cube with only 3 surfaces
+  "302": Unit cube with one face missing (bottom one)
+  "302_1": Unit cube with a hole (inner ring) in the top face
+  "302_2": A vertex in the top surface does not close the shell (0.01 discrepancy), GML cube
+  "303": Unit cube with one dangling face touching the cube at one point only. The dangling face is the last in the list
+  "303_1": 2 unit cubes touching at one vertex
+  "303_cs": one cube with a non-manifold vertex. As a Solid error 302, but CompositeSurface 303. Jeff Coukell's case.
+  "304_1": Unit cube with one extra face in the middle, splitting the cube in two parts
+  "304_2": Unit cube with one corner as a separate part
+  "305": Cube with one extra face floating in the air, not touching
+  "305_1": 2 unit cubes not touching at all, one above the other separated by 1unit
+  "306": House with tip below the ground
+  "306_1": House with tip touching the bottom faces
+  "306_2": Torus where the hole in the top/bottom faces touches the side surfaces
+  "307": Unit cube with one face (face 0) with opposite orientation
+  "307_1": Unit cube with a top surface composed of 2 polygons with opposite orientation
+  "401": "+ basecube = An inner-pyramid that pierces through the top of basecube (by 0.00001). Oracle agrees: oracle=54512"
+  "401_1": "+ basecube = An inner-pyramid that is outside of the shell of basecube, but pierces inside it (by 0.00001)"
+  "401_2": "+ inner_shell + basecube = Two cavities in basecube that share a face"
+  "401_3": "+ inner_shell + basecube = Two cavities in basecube that partly share a face"
+  "401_4": "+ basecube = A cavity which bottom face is shared with the bottom face of basecube"
+  "401_5": "+ basecube = A cavity which touches bottom and too face of basecube and splits volume"
+  "401_6": "+ basecube = A cavity which touches bottom and too face of basecube"
+  "402_in_1": "+ inner_shell + basecube = Duplicate cavities in basecube"
+  "403": "+ basecube = A pyramid cavity that is completely outside of the outer shell of basecube"
+  "404": "+ basecube = 404 is a blocker that divides the cube into two parts"
+  "405": Pyramid with the normals pointing inwards
+
+test_geometry_specific:
+  "103":    A unit cube where the bottom surface is not closed
+  "501":    CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
+  "501_1":  CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
+  "502":    CompositeSolid with 3 cubes, where cube 1-2 are identical
+  "503":    CompositeSolid with 3 cubes, where cube 1 is not connected to other
+  "601":    A Building with 2 BuildingParts that overlap by 50 units
+  "601_1":  A Building with 6 BuildingParts, part of open dataset Den Haag. Parts overlap by <1cm, with overlap_tol 0.01 it's valid
+
+test_valid:
+  "basecube_large_coords": the basecube with 999999 added to each xyz, to test translation
+  "v405": the solid that returned 405 before CGAL fixed the bug (v4.10+ it's solved)
+  "basecube": Valid unit cube. Used in combination with other shells.
+  "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005. Also below the 1 degree normal difference threshold of error 204.
+  "self_fold": .obj unit cube with a whirl
+  "closed_top": Unit cube with a top surface composed of 2 polygons
+  "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
+  "inner_shell_1": "+ basecube = Unit cube with a cavity where the pyramid touching top face one point. Oracle is wrong on that one: oracle=54513"
+  "inner_shell_2": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching at a single point (duplicate vertex)"
+  "inner_shell_3": "+ inner_shell + basecube = Unit cube with two cavities (pyramids) touching along an edge (shared edge)"
+  "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
+  "composite_solid": Two unit cubes in a CompositeSolid as CityJSON and CityGML
+  "multi_solid": Two unit cubes in a MultiSolid as CityJSON
+  "composite_solid_1": "Two unit cubes in a CompositeSolid CityGML, with <CityModel>, <cityObjectMember> part of the 'core' namespace"
+  
