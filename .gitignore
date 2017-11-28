@@ -1,0 +1,45 @@
+# Metadata
+.DS_Store
+
+# Subversion
+.svn
+
+# OS specific Makefile
+Makefile
+
+# Compiled sources
+*.o
+val3dity
+
+# xcode project
+*.xcodeproj
+
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+
+*.pyc
+*.log
+*.report.txt
+
+# Visual studio files
+vs_build/.vs
+*.VC.opendb
+*.VC.db
+*.exe
+*.ilk
+*.pdb
+*.vcxproj.user
+*.lib
+x64/
+x86/
+/build
+/docs/_build
+
+# Balázs (Visual Studio etc)
+.vscode/
+.cproject
+.project
+.pydevproject
+.settings/
+/.cache
