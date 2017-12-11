@@ -25,6 +25,9 @@ else()
   return()  
 endif()
 
+# Eigen
+find_package(Eigen3)
+include( ${EIGEN3_USE_FILE} )  
 
 # Boost
 find_package( Boost REQUIRED COMPONENTS filesystem)
