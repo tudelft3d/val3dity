@@ -33,7 +33,7 @@ This is relatively easy under Mac and Linux.
 
 To compile val3dity yourself, you first need to install the following free libraries:
 
-  1. [CGAL v4.10+](http://www.cgal.org) (<v4.10 will compile and run, but wrong results for one test (error ))
+  1. [CGAL v4.10+](http://www.cgal.org) (<v4.10 will compile and run, but wrong results for one test (error 405))
   1. (CGAL needs to be compiled with the [Eigen library](http://eigen.tuxfamily.org))
   1. [GEOS](http://trac.osgeo.org/geos/) 
   1. [CMake](http://www.cmake.org)
