@@ -18,6 +18,7 @@ test_geometry_generic:
   "104_1": Unit cube with top face having a self-intersecting surface (2D invalid), where 2 out of 3 triangles that are forming a square are bundled as one polygon (which self-intersects)
   "104_2": One face closing in itself before the last vertex
   "104_3": Similar to 104_1 but triangles meet in one corner of the square
+  "104_4": cube with top face having small fold (Kevin Wiebe's case); vertical shift can't be made (old pfold2.poly)
   "201": Unit cube with intersecting rings in top face
   "201_1": A single 3D polygon with an interior ring that instersects its exterior
   "201_2": Unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point
@@ -27,8 +28,7 @@ test_geometry_generic:
   "203_2": Same as 203 but non-planar vertex is +0.1
   "204_valid_1": Unit cube with a hump (+0.00699) in the top face, which results in an 1.00114° normal difference
   "204_valid_2": Unit cube with a depression (-0.00699) in the top face, which results in an 1.00114° normal difference
-  "204_1": Unit cube with a vertical fold (0.0099) in the top face
-  "204_2": Unit cube with a vertical fold (0.0009) in the top face
+  "204_1": Unit cube with small fold in the top face (old pfold1.poly)
   "205": Unit cube with a polygon with interior disconnected in top face
   "206": Unit cube with a hole in top face located outside (in 2D the top face is not acc. to SFS)
   "207": Unit cube with a polygon with nested rings in top face
@@ -77,7 +77,7 @@ test_valid:
   "basecube_large_coords": the basecube with 999999 added to each xyz, to test translation
   "v405": the solid that returned 405 before CGAL fixed the bug (v4.10+ it's solved)
   "basecube": Valid unit cube. Used in combination with other shells.
-  "planar": Same as 203, but the non-planar vertex on the top face is below the default 0.01 non-planarity threshold with -0.005. Also below the 1 degree normal difference threshold of error 204.
+  "planar": the Polish case of a "long and sloped" planar surface. Triggered the use of Eigenvalue package
   "self_fold": .obj unit cube with a whirl
   "closed_top": Unit cube with a top surface composed of 2 polygons
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
