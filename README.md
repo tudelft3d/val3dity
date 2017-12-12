@@ -27,20 +27,21 @@ val3dity accepts as input:
 ## Installation of the command-line tool
 
 We provide the source code that you need to compile with CMake. 
-This is straightforward under Mac and Linux.
+This is relatively easy under Mac and Linux.
 
 [For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile val3dity yourself.
 
 To compile val3dity yourself, you first need to install the following free libraries:
 
-  1. [CGAL](http://www.cgal.org)
+  1. [CGAL v4.10+](http://www.cgal.org) (<v4.10 will compile and run, but wrong results for one test (error ))
+  1. (CGAL needs to be compiled with the [Eigen library](http://eigen.tuxfamily.org))
   1. [GEOS](http://trac.osgeo.org/geos/) 
   1. [CMake](http://www.cmake.org)
 
-Under Mac we suggest using [Homebrew](http://brew.sh/):
+Under macOS we suggest using [Homebrew](http://brew.sh/):
 
+    $ brew install cgal --with-eigen
     $ brew install cmake 
-    $ brew install cgal
     $ brew install geos
 
 Afterwards navigate to the folder with val3dity and run:
@@ -61,7 +62,7 @@ To see all the options:
 
 If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
 Simply upload your file to our server and get a validation report back.
-We delete the file as soon as it has been validated.
+We delete the file as soon as it has been validated (promised!).
 However, a file is limited to 50MB.
     
 ## Documentation and help
