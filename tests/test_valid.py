@@ -11,7 +11,7 @@ import os.path
 
 #------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
-                params=["planar.poly"])
+                params=["planar.off"])
 def data_planar(request, dir_valid):
     file_path = os.path.abspath(
         os.path.join(
@@ -109,7 +109,7 @@ def test_v_405(validate, data_v_405):
 
 def test_planar(validate, data_planar):
     error = validate(data_planar)
-    assert(error == [])
+    assert(error == [301])
 
 def test_self_fold(validate, data_self_fold):
     error = validate(data_self_fold)
