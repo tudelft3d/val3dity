@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -21,27 +21,28 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EC12993E-689D-496D-BF7E-8D491ED1F413}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -63,9 +64,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>C:\OSGeo4W64\bin;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\bin;C:\dev\CGAL-4.11\build\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\OSGeo4W64\include;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\include;C:\local\boost_1_66_0_b1_rc2;C:\dev\CGAL-4.11\include;C:\dev\CGAL-4.11\auxiliary\gmp\include;C:\dev\eigen3;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OSGeo4W64\lib;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\lib;C:\local\boost_1_66_0_b1_rc2\libs;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\dev\CGAL-4.11\build\lib;C:\dev\CGAL-4.11\auxiliary\gmp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>C:\OSGeo4W64\bin;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\bin;C:\dev\CGAL-4.11\build\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\OSGeo4W64\include;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\include;C:\local\boost_1_66_0_b1_rc2;C:\dev\CGAL-4.11\include;C:\dev\CGAL-4.11\auxiliary\gmp\include;C:\dev\eigen3;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OSGeo4W64\lib;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\lib;C:\local\boost_1_66_0_b1_rc2\libs;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\dev\CGAL-4.11\build\lib;C:\dev\CGAL-4.11\auxiliary\gmp\lib;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ExecutablePath>C:\OSGeo4W64\bin;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\bin;C:\dev\CGAL-4.11\build\bin;$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <IncludePath>C:\OSGeo4W64\include;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\include;C:\local\boost_1_66_0_b1_rc2;C:\dev\CGAL-4.11\include;C:\dev\CGAL-4.11\auxiliary\gmp\include;C:\dev\eigen3;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OSGeo4W64\lib;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\lib;C:\local\boost_1_66_0_b1_rc2\libs;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\dev\CGAL-4.11\build\lib;C:\dev\CGAL-4.11\auxiliary\gmp\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ExecutablePath>C:\OSGeo4W64\bin;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\bin;C:\dev\CGAL-4.11\build\bin;$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <IncludePath>C:\OSGeo4W64\include;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\include;C:\local\boost_1_66_0_b1_rc2;C:\dev\CGAL-4.11\include;C:\dev\CGAL-4.11\auxiliary\gmp\include;C:\dev\eigen3;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\OSGeo4W64\lib;C:\Qt\Qt5.9.3\5.9.3\msvc2017_64\lib;C:\local\boost_1_66_0_b1_rc2\libs;C:\local\boost_1_66_0_b1_rc2\lib64-msvc-14.1;C:\dev\CGAL-4.11\build\lib;C:\dev\CGAL-4.11\auxiliary\gmp\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -80,6 +98,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>C:\OSGeo4W\lib;..\..\CGAL-4.8\bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;geos_c.lib;CGAL_Core-vc140-mt-4.11.lib;CGAL-vc140-mt-4.11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -88,24 +108,28 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\include;..\..\boost_1_60_0;..\..\CGAL-4.8\include;..\..\CGAL-4.8\bin\include;..\..\CGAL-4.8\auxiliary\gmp\include;..\..\assimp-3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\boost\boost_1_66_0_vs2015;D:\CGAL-4.11\include;D:\CGAL-4.11\vs2015\include;D:\CGAL-4.11\auxiliary\gmp\include;C:\OSGeo4W\bin;D:\CGAL-4.11\vs2015\bin</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\OSGeo4W\lib;..\..\CGAL-4.8\bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;geos_c.lib;CGAL_Core-vc140-mt-4.11.lib;CGAL-vc140-mt-4.11.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\include;..\..\boost_1_60_0;..\..\CGAL-4.8\include;..\..\CGAL-4.8\bin\include;..\..\CGAL-4.8\auxiliary\gmp\include;..\..\CGAL-4.8\build\include;..\..\assimp-3.2\include;C:\OSGeo4W64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32</PreprocessorDefinitions>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\CGAL-4.8\bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\OSGeo4W64\lib\geos_c.lib;C:\OSGeo4W64\lib\zlib.lib;..\..\CGAL-4.8\auxiliary\gmp\lib\libgmp-10.lib;..\..\CGAL-4.8\auxiliary\gmp\lib\libmpfr-4.lib;..\..\CGAL-4.8\build\lib\libCGAL-vc140-mt-4.8.lib;..\..\CGAL-4.8\build\lib\libCGAL_Core-vc140-mt-4.8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OSGeo4W\lib;..\..\CGAL-4.8\bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;geos_c.lib;CGAL_Core-vc140-mt-4.11.lib;CGAL-vc140-mt-4.11.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,59 +138,54 @@
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\CGAL-4.8\bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\OSGeo4W64\lib\geos_c.lib;C:\OSGeo4W64\lib\zlib.lib;..\..\CGAL-4.8\auxiliary\gmp\lib\libgmp-10.lib;..\..\CGAL-4.8\auxiliary\gmp\lib\libmpfr-4.lib;..\..\CGAL-4.8\build\lib\libCGAL-vc140-mt-gd-4.8.lib;..\..\CGAL-4.8\build\lib\libCGAL_Core-vc140-mt-gd-4.8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OSGeo4W\lib;..\..\CGAL-4.8\bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;geos_c.lib;CGAL_Core-vc140-mt-4.11.lib;CGAL-vc140-mt-4.11.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\geomtools.cpp" />
-    <ClCompile Include="..\input.cpp" />
-    <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\pugixml.cpp" />
-    <ClCompile Include="..\Shell.cpp" />
-    <ClCompile Include="..\Solid.cpp" />
-    <ClCompile Include="..\validate_shell.cpp" />
-    <ClCompile Include="..\validate_shell_intersection.cpp" />
+    <ClInclude Include="..\thirdparty\nlohmann-json\json.hpp" />
+    <ClInclude Include="..\thirdparty\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="..\thirdparty\pugixml\pugixml.hpp" />
+    <ClInclude Include="..\thirdparty\tclap\Arg.h" />
+    <ClInclude Include="..\thirdparty\tclap\ArgException.h" />
+    <ClInclude Include="..\thirdparty\tclap\ArgTraits.h" />
+    <ClInclude Include="..\thirdparty\tclap\CmdLine.h" />
+    <ClInclude Include="..\thirdparty\tclap\CmdLineInterface.h" />
+    <ClInclude Include="..\thirdparty\tclap\CmdLineOutput.h" />
+    <ClInclude Include="..\thirdparty\tclap\Constraint.h" />
+    <ClInclude Include="..\thirdparty\tclap\DocBookOutput.h" />
+    <ClInclude Include="..\thirdparty\tclap\HelpVisitor.h" />
+    <ClInclude Include="..\thirdparty\tclap\IgnoreRestVisitor.h" />
+    <ClInclude Include="..\thirdparty\tclap\MultiArg.h" />
+    <ClInclude Include="..\thirdparty\tclap\MultiSwitchArg.h" />
+    <ClInclude Include="..\thirdparty\tclap\OptionalUnlabeledTracker.h" />
+    <ClInclude Include="..\thirdparty\tclap\StandardTraits.h" />
+    <ClInclude Include="..\thirdparty\tclap\StdOutput.h" />
+    <ClInclude Include="..\thirdparty\tclap\SwitchArg.h" />
+    <ClInclude Include="..\thirdparty\tclap\UnlabeledMultiArg.h" />
+    <ClInclude Include="..\thirdparty\tclap\UnlabeledValueArg.h" />
+    <ClInclude Include="..\thirdparty\tclap\ValueArg.h" />
+    <ClInclude Include="..\thirdparty\tclap\ValuesConstraint.h" />
+    <ClInclude Include="..\thirdparty\tclap\VersionVisitor.h" />
+    <ClInclude Include="..\thirdparty\tclap\Visitor.h" />
+    <ClInclude Include="..\thirdparty\tclap\XorHandler.h" />
+    <ClInclude Include="..\thirdparty\tclap\ZshCompletionOutput.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\definitions.h" />
-    <ClInclude Include="..\geomtools.h" />
-    <ClInclude Include="..\include\tclap\Arg.h" />
-    <ClInclude Include="..\include\tclap\ArgException.h" />
-    <ClInclude Include="..\include\tclap\ArgTraits.h" />
-    <ClInclude Include="..\include\tclap\CmdLine.h" />
-    <ClInclude Include="..\include\tclap\CmdLineInterface.h" />
-    <ClInclude Include="..\include\tclap\CmdLineOutput.h" />
-    <ClInclude Include="..\include\tclap\Constraint.h" />
-    <ClInclude Include="..\include\tclap\DocBookOutput.h" />
-    <ClInclude Include="..\include\tclap\HelpVisitor.h" />
-    <ClInclude Include="..\include\tclap\IgnoreRestVisitor.h" />
-    <ClInclude Include="..\include\tclap\MultiArg.h" />
-    <ClInclude Include="..\include\tclap\MultiSwitchArg.h" />
-    <ClInclude Include="..\include\tclap\OptionalUnlabeledTracker.h" />
-    <ClInclude Include="..\include\tclap\StandardTraits.h" />
-    <ClInclude Include="..\include\tclap\StdOutput.h" />
-    <ClInclude Include="..\include\tclap\SwitchArg.h" />
-    <ClInclude Include="..\include\tclap\UnlabeledMultiArg.h" />
-    <ClInclude Include="..\include\tclap\UnlabeledValueArg.h" />
-    <ClInclude Include="..\include\tclap\ValueArg.h" />
-    <ClInclude Include="..\include\tclap\ValuesConstraint.h" />
-    <ClInclude Include="..\include\tclap\VersionVisitor.h" />
-    <ClInclude Include="..\include\tclap\Visitor.h" />
-    <ClInclude Include="..\include\tclap\XorHandler.h" />
-    <ClInclude Include="..\include\tclap\ZshCompletionOutput.h" />
-    <ClInclude Include="..\input.h" />
-    <ClInclude Include="..\pugiconfig.hpp" />
-    <ClInclude Include="..\pugixml.hpp" />
-    <ClInclude Include="..\Shell.h" />
-    <ClInclude Include="..\Solid.h" />
-    <ClInclude Include="..\validate_shell.h" />
-    <ClInclude Include="..\validate_shell_intersection.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\assimp-3.2\vs_build\assimp.vcxproj">
-      <Project>{7a042954-9c47-38b3-bdad-e2e0a56616eb}</Project>
-    </ProjectReference>
+    <ClCompile Include="..\src\COError.cpp" />
+    <ClCompile Include="..\src\CompositeSolid.cpp" />
+    <ClCompile Include="..\src\CompositeSurface.cpp" />
+    <ClCompile Include="..\src\geomtools.cpp" />
+    <ClCompile Include="..\src\input.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\MultiSolid.cpp" />
+    <ClCompile Include="..\src\MultiSurface.cpp" />
+    <ClCompile Include="..\src\Primitive.cpp" />
+    <ClCompile Include="..\src\Solid.cpp" />
+    <ClCompile Include="..\src\Surface.cpp" />
+    <ClCompile Include="..\src\validate_prim_toporel.cpp" />
+    <ClCompile Include="..\src\validate_shell.cpp" />
+    <ClCompile Include="..\thirdparty\pugixml\pugixml.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
