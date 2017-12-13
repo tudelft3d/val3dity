@@ -38,13 +38,21 @@ To compile val3dity yourself, you first need to install the following free libra
   1. [GEOS](http://trac.osgeo.org/geos/) 
   1. [CMake](http://www.cmake.org)
 
-Under macOS we suggest using [Homebrew](http://brew.sh/):
+Under macOS, it's super easy, we suggest using [Homebrew](http://brew.sh/):
 
     $ brew install cgal --with-eigen
     $ brew install cmake 
     $ brew install geos
 
-Afterwards navigate to the folder with val3dity and run:
+Under Linux (at least Ubuntu), CGAL has to be compiled because apt-get doesn't give you a version with Eigen.
+Thus, in a nutshell,
+
+  1. download CGAL code
+  1. install Eigen: `$ sudo apt-get install libeigen3-dev`
+  1. compile CGAL by first activating the Eigen option in the CMake: `$ cmake . -DWITH_Eigen3=ON` or use [cmake-gui](https://cmake.org/runningcmake/) and activate it (option is called `WITH_Eigen3`)
+  1. `export CGAL_DIR=/path/to/CGAL-4.1x` which will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build) 
+
+To compile and run val3dity (from the val3dity folder):
 
     $ mkdir build
     $ cd build
