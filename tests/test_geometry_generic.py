@@ -39,7 +39,8 @@ def data_102(request, dir_geometry_generic):
                 params=["104.poly",
                         "104_1.poly",
                         "104_2.poly",
-                        "104_3.poly"])
+                        "104_3.poly",
+                        "104_4.poly"])
 def data_104(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -83,8 +84,7 @@ def data_203(request, dir_geometry_generic):
 
 
 @pytest.fixture(scope="module",
-                params=["204_1.poly",
-                        "204_2.poly"])
+                params=["204_1.poly"])
 def data_204(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
