@@ -48,11 +48,11 @@ typedef std::istrstream istringstream;
 #error "Need a stringstream (sstream or strstream) to compile!"
 #endif
 
-#include <tclap/ArgException.h>
-#include <tclap/Visitor.h>
-#include <tclap/CmdLineInterface.h>
-#include <tclap/ArgTraits.h>
-#include <tclap/StandardTraits.h>
+#include "../tclap/ArgException.h"
+#include "../tclap/Visitor.h"
+#include "../tclap/CmdLineInterface.h"
+#include "../tclap/ArgTraits.h"
+#include "../tclap/StandardTraits.h"
 
 namespace TCLAP {
 

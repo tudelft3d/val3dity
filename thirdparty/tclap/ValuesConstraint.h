@@ -25,7 +25,7 @@
 
 #include <string>
 #include <vector>
-#include <tclap/Constraint.h>
+#include "../tclap/Constraint.h"
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

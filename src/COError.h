@@ -36,7 +36,7 @@
 #include <tuple>
 #include <string>
 #include <fstream>
-#include "nlohmann-json/json.hpp"
+#include "../thirdparty/nlohmann-json/json.hpp"
 
 using json = nlohmann::json;
 

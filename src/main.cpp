@@ -33,9 +33,9 @@
 #include "Surface.h"
 #include "Solid.h"
 #include "COError.h"
-#include <tclap/CmdLine.h>
+#include "../thirdparty/tclap/CmdLine.h"
 #include <time.h>  
-#include "nlohmann-json/json.hpp"
+#include "../thirdparty/nlohmann-json/json.hpp"
 #include <boost/filesystem.hpp>
 
 using namespace std;
