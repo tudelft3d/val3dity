@@ -271,15 +271,15 @@ CgalPolyhedron::Plane_3  get_best_fitted_plane(const std::vector< Point3 > &lsPt
   K::FT b = p.b();
   K::FT c = p.c();
   bool updated = false;
-  if (abs(p.a()) < tol) {
+  if (CGAL::abs(p.a()) < tol) {
     a = 0;
     updated = true;  
   }
-  if (abs(p.b()) < tol) {
+  if (CGAL::abs(p.b()) < tol) {
     b = 0;
     updated = true;  
   }
-  if (abs(p.c()) < tol) {
+  if (CGAL::abs(p.c()) < tol) {
     c = 0;
     updated = true;  
   }
