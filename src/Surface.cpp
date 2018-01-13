@@ -298,8 +298,7 @@ bool Surface::triangulate_shell()
       for ( ; itp2 != ids2.end(); itp2++)
         allpts.push_back(_lsPts[*itp2]);
     }
-    CgalPolyhedron::Plane_3 bestfitplane;
-    get_best_fitted_plane(allpts, bestfitplane);
+    CgalPolyhedron::Plane_3 bestfitplane = get_best_fitted_plane(allpts);
     
     // int proj = projection_plane(_lsPts, idsob);
     // Vector v0 = bestfitplane.orthogonal_vector();
@@ -504,8 +503,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       }
     }
     double value;
-    CgalPolyhedron::Plane_3 bestfitplane;
-    get_best_fitted_plane(allpts, bestfitplane);
+    CgalPolyhedron::Plane_3 bestfitplane = get_best_fitted_plane(allpts);
     if (false == is_face_planar_distance2plane(allpts, bestfitplane, value, tol_planarity_d2p))
     {
       std::stringstream msg;

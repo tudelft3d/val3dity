@@ -262,9 +262,32 @@ Nef_polyhedron* get_aabb(Nef_polyhedron* mynef)
 }
 
 
-void get_best_fitted_plane(const std::vector< Point3 > &lsPts, CgalPolyhedron::Plane_3 &plane)
+CgalPolyhedron::Plane_3  get_best_fitted_plane(const std::vector< Point3 > &lsPts)
 {
-  linear_least_squares_fitting_3(lsPts.begin(), lsPts.end(), plane, CGAL::Dimension_tag<0>());  
+  CgalPolyhedron::Plane_3 p;
+  linear_least_squares_fitting_3(lsPts.begin(), lsPts.end(), p, CGAL::Dimension_tag<0>());  
+  K::FT tol = 1e-12;
+  K::FT a = p.a();
+  K::FT b = p.b();
+  K::FT c = p.c();
+  bool updated = false;
+  if (abs(p.a()) < tol) {
+    a = 0;
+    updated = true;  
+  }
+  if (abs(p.b()) < tol) {
+    b = 0;
+    updated = true;  
+  }
+  if (abs(p.c()) < tol) {
+    c = 0;
+    updated = true;  
+  }
+  if (updated == false)
+    return p;
+  else {
+    return CgalPolyhedron::Plane_3(a, b, c, p.d());
+  }
 }
 
 
