@@ -50,6 +50,16 @@ def data_v_405(request, dir_valid):
     return(file_path)
 
 
+@pytest.fixture(scope="module",
+                params=["v104_1.off",
+                        "v104_2.off"])
+def data_v_104(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
+
 
 @pytest.fixture(scope="module",
                 params=["basecube_large_coords.poly"])
@@ -106,6 +116,10 @@ def test_large_coords(validate, data_large_coords):
 def test_v_405(validate, data_v_405):
     error = validate(data_v_405)
     assert(error == [])
+
+def test_v_104(validate, data_planar):
+    error = validate(data_planar)
+    assert(error == [301])
 
 def test_planar(validate, data_planar):
     error = validate(data_planar)
