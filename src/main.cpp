@@ -29,6 +29,8 @@
 #include "input.h"
 #include "reportoutput.h"
 #include "Primitive.h"
+#include "Feature.h"
+#include "CityObject.h"
 #include "validate_prim_toporel.h"
 #include "Surface.h"
 #include "Solid.h"
