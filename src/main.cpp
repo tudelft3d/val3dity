@@ -50,6 +50,7 @@ std::string VAL3DITY_VERSION = "2.0.2";
 
 
 std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
+std::string print_summary_validation2(std::vector<Feature*>& lsFeatures, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 void        write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
@@ -477,7 +478,8 @@ int main(int argc, char* const argv[])
     }
 
     //-- summary of the validation
-    std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
+    // std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
+    std::cout << "\n" << print_summary_validation2(lsFeatures, dCOerrors, ioerrs) << std::endl;        
 
    //-- output shells/surfaces in OFF format
     if (output_off.getValue() != "") 
@@ -768,6 +770,90 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
   return ss.str();
 }
 
+
+std::string print_summary_validation2(std::vector<Feature*>& lsFeatures, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs)
+{
+  std::stringstream ss;
+  ss << std::endl;
+  int noprim = 0;
+  for (auto& o : lsFeatures)
+    for (auto& p : o->get_primitives())
+      noprim++;
+    
+  ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+
+    int fInvalid = 0;
+    for (auto& f : lsFeatures)
+    {
+      if (f->is_valid() == false)
+        fInvalid++;
+    }
+    ss << "Total # of Features: " << setw(7) << lsFeatures.size() << std::endl;
+    float percentage;
+    if (lsFeatures.size() == 0)
+      percentage = 0;
+    else
+      percentage = 100 * (fInvalid / float(lsFeatures.size()));
+    ss << "# valid: " << setw(22) << lsFeatures.size() - fInvalid;
+    if (lsFeatures.size() == 0)
+      ss << " (" << 0 << "%)" << std::endl;
+    else
+      ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
+    ss << "# invalid: " << setw(20) << fInvalid;
+    ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+    ss << "+++++" << std::endl;
+  ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
+  int bValid = 0;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      if (p->is_valid() == true)
+        bValid++;
+  if (noprim  == 0)
+    percentage = 0;
+  else
+    percentage = 100 * ((noprim - bValid) / float(noprim));
+  ss << "# valid: " << setw(22) << bValid;
+  if (noprim == 0)
+    ss << " (" << 0 << "%)" << std::endl;
+  else
+    ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
+  ss << "# invalid: " << setw(20) << (noprim - bValid);
+  ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  //-- overview of errors
+  std::map<int,int> errors;
+  for (auto& f : lsFeatures) {
+    for (auto& code : f->get_unique_error_codes())
+        errors[code] = 0;
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors[code] = 0;
+  }
+  for (auto& f : lsFeatures) {
+    for (auto& code : f->get_unique_error_codes())
+        errors[code] += 1;
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors[code] += 1;
+  }
+
+  if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
+  {
+    ss << "+++++" << std::endl;
+    ss << "Errors present:" << std::endl;
+    for (auto e : errors)
+    {
+      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
+      ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
+    }
+    for (auto& e : ioerrs.get_unique_error_codes())
+    {
+      ss << "  " << e << " -- " << errorcode2description(e) << std::endl;
+    }
+  }
+
+  ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+  return ss.str();
+}
 
 void print_license() {
   std::string thelicense =
