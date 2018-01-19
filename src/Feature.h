@@ -56,6 +56,10 @@ public:
   void                    set_id(std::string id);
   bool                    is_empty();
   
+  void                    add_primitive(Primitive* p);
+
+  const std::vector<Primitive*>&  get_primitives();
+
   bool                    has_errors();
   void                    add_error(int code, std::string info, std::string whichgeoms);
   json                    get_report_json();
@@ -66,6 +70,7 @@ protected:
   std::string             _type;
   int                     _is_valid; 
   std::vector<Primitive*> _lsPrimitives;
+  bool                    validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);  
   
   std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
 

@@ -85,6 +85,49 @@ json Feature::get_report_json()
 }
 
 
+void Feature::add_primitive(Primitive* p)
+{
+  _lsPrimitives.push_back(p);
+}
+
+const std::vector<Primitive*>& Feature::get_primitives()
+{
+  return _lsPrimitives;
+}
+
+
+bool  Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
+{
+  bool bValid = true;
+  if (this->is_empty() == true) {
+    this->add_error(609, "Feature has no geometry defined.", "");
+    bValid = false;
+  }
+  for (auto& p : _lsPrimitives)
+  {
+    std::clog << "======== Validating Primitive ========" << std::endl;
+    switch(p->get_type())
+    {
+      case 0: std::clog << "Solid"             << std::endl; break;
+      case 1: std::clog << "CompositeSolid"    << std::endl; break;
+      case 2: std::clog << "MultiSolid"        << std::endl; break;
+      case 3: std::clog << "CompositeSurface"  << std::endl; break;
+      case 4: std::clog << "MultiSurface"      << std::endl; break;
+    }
+    std::clog << "id: " << p->get_id() << std::endl;
+    std::clog << "--" << std::endl;
+    if (p->validate(tol_planarity_d2p, tol_planarity_normals, tol_overlap) == false)
+    {
+      std::clog << "======== INVALID ========" << std::endl;
+      bValid = false;
+    }
+    else
+      std::clog << "========= VALID =========" << std::endl;
+  }
+  return bValid;
+}  
+
+
 void Feature::add_error(int code, std::string whichgeoms, std::string info)
 {
   _is_valid = 0;

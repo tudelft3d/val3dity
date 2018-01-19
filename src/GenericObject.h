@@ -39,7 +39,7 @@ namespace val3dity
 class GenericObject : public Feature
 {
 public:
-  GenericObject(std::string theid, std::string thetype);
+  GenericObject(std::string theid);
   ~GenericObject();
   
   bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);

@@ -34,11 +34,11 @@
 namespace val3dity
 {
 
-GenericObject::GenericObject(std::string theid, std::string thetype)
+GenericObject::GenericObject(std::string theid)
 {
   _id = theid;
   _is_valid = -1;
-  _type = thetype; // TODO : validate the type here?
+  _type = "GenericObject"; 
 }
 
 
@@ -47,7 +47,7 @@ GenericObject::~GenericObject()
 
 
 bool GenericObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) {
-  return true;
+  return Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 }
 
 

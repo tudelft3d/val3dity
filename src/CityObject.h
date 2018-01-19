@@ -46,6 +46,9 @@ public:
   int             is_valid();
   std::string     get_type();
 
+protected:
+  bool            validate_building(double tol_overlap);
+
 };
 
 } // namespace val3dity

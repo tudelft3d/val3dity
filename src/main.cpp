@@ -350,6 +350,7 @@ int main(int argc, char* const argv[])
       }
       else if (inputtype == POLY)
       {
+        GenericObject* o = new GenericObject("none");
         Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
         if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
         {
@@ -366,22 +367,23 @@ int main(int argc, char* const argv[])
             }
           }
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(s);
+            o->add_primitive(s);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
         {
           CompositeSurface* cs = new CompositeSurface;
           cs->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(cs);
+            o->add_primitive(cs);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
         {
           MultiSurface* ms = new MultiSurface;
           ms->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(ms);
-        }      
+            o->add_primitive(ms);
+        }
+        lsFeatures.push_back(o);      
       }
       else if (inputtype == OFF)
       {
@@ -427,6 +429,7 @@ int main(int argc, char* const argv[])
       }
     }
 
+    double planarity_n_tol_updated = planarity_n_tol.getValue();
     if (ioerrs.has_errors() == false) 
     {
       std::cout << "Primitive(s) validated: ";
@@ -436,14 +439,11 @@ int main(int argc, char* const argv[])
         std::cout << "MultiSurface" << std::endl;
       else if (prim3d == COMPOSITESURFACE)        
         std::cout << "CompositeSurface" << std::endl;
-      else
+      else {
         std::cout << "All" << std::endl;
         std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
-    }
-    double planarity_n_tol_updated = planarity_n_tol.getValue();
-    //-- report on parameters used
-    if (ioerrs.has_errors() == false)
-    {
+      }
+      //-- report on parameters used
       if (ignore204.getValue() == true)
         planarity_n_tol_updated = 180.0;
       std::cout << "Parameters used for validation:" << std::endl;
@@ -457,6 +457,24 @@ int main(int argc, char* const argv[])
         std::cout << "   overlap_tol" << setw(19)  << "none" << std::endl;
       else
         std::cout << "   overlap_tol" << setw(19)  << overlap_tol.getValue() << std::endl;
+    }
+    
+    //-- now the validation starts
+    if ( (lsFeatures.empty() == false) && (ioerrs.has_errors() == false) )
+    {
+      int i = 1;
+      for (auto& f : lsFeatures)
+      {
+        if ( (i % 10 == 0) && (verbose.getValue() == false) )
+          printProgressBar(100 * (i / double(lsFeatures.size())));
+        i++;
+        std::clog << std::endl << "######### Validating " << f->get_id() << " #########" << std::endl;
+        bool bValid = true;
+        f->validate(planarity_d2p_tol.getValue(), planarity_n_tol_updated, overlap_tol.getValue());
+        std::clog << "#########################################" << std::endl;
+      }
+      if (verbose.getValue() == false)
+        printProgressBar(100);
     }
 
     //-- now the validation starts

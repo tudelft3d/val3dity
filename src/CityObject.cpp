@@ -30,6 +30,7 @@
 #include "CityObject.h"
 #include "definitions.h"
 #include "input.h"
+#include "validate_prim_toporel.h"
 
 namespace val3dity
 {
@@ -45,14 +46,41 @@ CityObject::CityObject(std::string theid, std::string thetype)
 CityObject::~CityObject()
 {}
 
-bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) {
 
-  return true;
+bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
+{
+  bool bValid = true;
+  bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+
+  //-- Building
+  if ( (bValid == true) && (this->_type == "Building") )
+    bValid = validate_building(tol_overlap);
+  
+  return bValid;
+}
+
+
+bool CityObject::validate_building(double tol_overlap)
+{
+  bool bValid = true;
+  if (_lsPrimitives.size() == 0)
+    return bValid;
+  std::clog << "--- Interactions between BuildingParts ---" << std::endl;
+  std::vector<Error> lsErrors;
+  if (do_primitives_overlap2(_lsPrimitives, lsErrors, tol_overlap) == true)
+  {
+    bValid = false;
+    std::clog << "Error: overlapping building parts" << std::endl;
+    for (auto& e : lsErrors)
+      this->add_error(e.errorcode, e.info1, e.info2);
+  }
+  return bValid;
 }
 
 
 int CityObject::is_valid() {
   return _is_valid;
+  // TODO : update this
 }
 
 
