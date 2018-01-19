@@ -27,14 +27,14 @@
 */
 
 
-#include "CityObject.h"
+#include "GenericObject.h"
 #include "definitions.h"
 #include "input.h"
 
 namespace val3dity
 {
 
-CityObject::CityObject(std::string theid, std::string thetype)
+GenericObject::GenericObject(std::string theid, std::string thetype)
 {
   _id = theid;
   _is_valid = -1;
@@ -42,21 +42,21 @@ CityObject::CityObject(std::string theid, std::string thetype)
 }
 
 
-CityObject::~CityObject()
+GenericObject::~GenericObject()
 {}
 
-bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) {
 
+bool GenericObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) {
   return true;
 }
 
 
-int CityObject::is_valid() {
+int GenericObject::is_valid() {
   return _is_valid;
 }
 
 
-std::string CityObject::get_type() {
+std::string GenericObject::get_type() {
   return _type;
 }
 

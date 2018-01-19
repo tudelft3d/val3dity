@@ -31,6 +31,8 @@
 #include "Primitive.h"
 #include "Feature.h"
 #include "CityObject.h"
+#include "GenericObject.h"
+
 #include "validate_prim_toporel.h"
 #include "Surface.h"
 #include "Solid.h"
@@ -239,6 +241,8 @@ int main(int argc, char* const argv[])
     std::map<std::string, std::vector<Primitive*>> dPrimitives;
     //-- if a CO has errors specific to it (6xx), then its key is also in that dico
     std::map<std::string, COError> dCOerrors;
+
+    std::vector<Feature*> lsFeatures;
     
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);

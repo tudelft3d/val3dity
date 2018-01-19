@@ -44,7 +44,6 @@ public:
   
   bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   int             is_valid();
-  json            get_report_json();
   std::string     get_type();
 
 };

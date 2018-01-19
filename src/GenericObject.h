@@ -26,52 +26,28 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#ifndef Feature_h
-#define Feature_h
+#ifndef __val3dity__GenericObject__
+#define __val3dity__GenericObject__
 
-#include "Primitive.h"
+#include "Feature.h"
 #include "definitions.h"
-#include "nlohmann-json/json.hpp"
-#include <vector>
-#include <set>
-#include <string>
-
-using json = nlohmann::json;
 
 
 namespace val3dity
 {
 
-class Feature
+class GenericObject : public Feature
 {
 public:
-  Feature  ();
-  ~Feature ();
-
-  virtual bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1) = 0;
-  virtual int             is_valid() = 0;
-  virtual std::string     get_type() = 0;
-
-  std::string             get_id();
-  void                    set_id(std::string id);
-  bool                    is_empty();
+  GenericObject(std::string theid, std::string thetype);
+  ~GenericObject();
   
-  bool                    has_errors();
-  void                    add_error(int code, std::string info, std::string whichgeoms);
-  json                    get_report_json();
-  std::set<int>           get_unique_error_codes();
-
-protected:
-  std::string             _id;
-  std::string             _type;
-  int                     _is_valid; 
-  std::vector<Primitive*> _lsPrimitives;
-  
-  std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
+  bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
+  int             is_valid();
+  std::string     get_type();
 
 };
 
-
 } // namespace val3dity
 
-#endif /* Feature_h */
+#endif /* defined(__val3dity__GenericObject__) */

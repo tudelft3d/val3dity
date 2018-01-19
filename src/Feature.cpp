@@ -46,6 +46,7 @@ std::string Feature::get_id()
   return _id;
 }
 
+
 void Feature::set_id(std::string id)
 {
   _id = id;
@@ -55,6 +56,32 @@ void Feature::set_id(std::string id)
 bool Feature::is_empty()
 {
   return _lsPrimitives.empty();
+}
+
+
+json Feature::get_report_json() 
+{
+  json j;
+  j["id"] = _id;
+  j["type"] = _type;
+  j["feature_errors"];
+  j["primitives"];
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["type"] = "Error";
+      jj["code"] = std::get<0>(err);
+      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      j["errors"].push_back(jj);
+    }
+  }
+  for (auto& p : _lsPrimitives)
+    j["primitives"].push_back(p->get_report_json()); 
+  return j;
 }
 
 
