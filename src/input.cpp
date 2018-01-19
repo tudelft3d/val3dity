@@ -610,7 +610,7 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
-void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap)
+void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
   std::ifstream input(ifile);
   json j;
@@ -630,10 +630,7 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
   compute_min_xy(j);
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
-    // std::cout << "o " << it.key() << std::endl;
-    std::string coid = it.value()["type"];
-    coid += "|";
-    coid += it.key();
+    CityObject* co = new CityObject(it.key(), it.value()["type"]);
     int idgeom = 0;
     for (auto& g : it.value()["geometry"]) {
       std::string theid = it.key() + "(" + std::to_string(idgeom) + ")";
@@ -658,7 +655,7 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
           else
             s->add_ishell(sh);
         }
-        dPrimitives[coid].push_back(s);
+        co->add_primitive(s);
       }
       else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
       {
@@ -672,13 +669,13 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
         {
           MultiSurface* ms = new MultiSurface(theid);
           ms->set_surface(sh);
-          dPrimitives[coid].push_back(ms);
+          co->add_primitive(ms);
         }
         else
         {
           CompositeSurface* cs = new CompositeSurface(theid);
           cs->set_surface(sh);
-          dPrimitives[coid].push_back(cs);
+          co->add_primitive(cs);
         }
       }
       else if (g["type"] == "MultiSolid") 
@@ -705,7 +702,7 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
           }
           ms->add_solid(s);
         }
-        dPrimitives[coid].push_back(ms);
+        co->add_primitive(ms);
       }
       else if (g["type"] == "CompositeSolid") 
       {
@@ -731,13 +728,13 @@ void read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Pr
           }
           cs->add_solid(s);
         }
-        dPrimitives[coid].push_back(cs);
+        co->add_primitive(cs);
       }      
+      idgeom++;
     }
-    idgeom++;
+    lsFeatures.push_back(co);
   }
 }
-
 
 void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
 {

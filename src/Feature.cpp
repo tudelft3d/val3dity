@@ -59,8 +59,7 @@ json Feature::get_report_json()
   json j;
   j["id"] = _id;
   j["type"] = _type;
-  j["feature_errors"];
-  j["primitives"];
+  j["errors"];
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -74,6 +73,7 @@ json Feature::get_report_json()
       j["errors"].push_back(jj);
     }
   }
+  j["primitives"];
   for (auto& p : _lsPrimitives)
     j["primitives"].push_back(p->get_report_json()); 
   return j;
@@ -91,8 +91,12 @@ const std::vector<Primitive*>& Feature::get_primitives()
 }
 
 
-bool  Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
+bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
+  std::clog << std::endl << "######### Validating Feature #########" << std::endl;
+  std::clog << "id:   " << this->get_id() << std::endl;
+  std::clog << "type: " << this->get_type() << std::endl;
+  std::clog << "--" << std::endl;
   bool bValid = true;
   if (this->is_empty() == true) {
     this->add_error(609, "Feature has no geometry defined.", "");

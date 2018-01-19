@@ -36,57 +36,11 @@
 namespace val3dity
 {
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerrs, double tol_overlap)
-{
-  bool isValid = true;
-  //-- 1. create Nef for all primitives and erode if necessary
-  std::vector<Nef_polyhedron*> lsNefs;
-  for (auto& p : lsPrimitives)
-  {
-    Nef_polyhedron* tmpnef;
-    if (p->get_type() == SOLID)
-      tmpnef = dynamic_cast<Solid*>(p)->get_nef_polyhedron();
-    else if (p->get_type() == COMPOSITESOLID)
-      tmpnef = dynamic_cast<CompositeSolid*>(p)->get_nef_polyhedron();
-    else
-      continue;
-    if (tol_overlap > 0)
-    {
-      lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-      delete tmpnef;
-    }
-    else
-    {
-      lsNefs.push_back(tmpnef);
-    }
-  }
-  //-- 2. check whether pairwise intersection of interiors is empty
-  Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
-  for (int i = 0; i < lsNefs.size(); i++)
-  {
-    Nef_polyhedron* a = lsNefs[i];
-    for (int j = i + 1; j < lsNefs.size(); j++) 
-    {
-      Nef_polyhedron* b = lsNefs[j];
-      if (a->interior() * b->interior() != emptynef)
-      {
-        std::stringstream msg;
-        msg << lsPrimitives[i]->get_id() << " and " << lsPrimitives[j]->get_id();
-        coerrs.add_error(601, msg.str(), "");
-        isValid = false;
-      }
-    }
-  }
-  if (tol_overlap > 0.0)
-  {
-    for (auto each : lsNefs)
-      delete each;
-  }
-  return !isValid;
-}  
 
-
-bool do_primitives_overlap2(std::vector<Primitive*>& lsPrimitives, std::vector<Error> lsErrors, double tol_overlap)
+bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, 
+                           int errorcode_to_assign, 
+                           std::vector<Error> lsErrors, 
+                           double tol_overlap)
 {
   bool isValid = true;
   //-- 1. create Nef for all primitives and erode if necessary
@@ -123,7 +77,7 @@ bool do_primitives_overlap2(std::vector<Primitive*>& lsPrimitives, std::vector<E
         Error e;
         std::stringstream msg;
         msg << lsPrimitives[i]->get_id() << " and " << lsPrimitives[j]->get_id();
-        e.errorcode = 601;
+        e.errorcode = errorcode_to_assign;
         e.info1 = msg.str();
         e.info2 = "";
         lsErrors.push_back(e);

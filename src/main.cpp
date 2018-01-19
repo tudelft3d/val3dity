@@ -335,7 +335,7 @@ int main(int argc, char* const argv[])
       else if (inputtype == JSON)
       {
         read_file_cityjson(inputfile.getValue(), 
-                           dPrimitives,
+                           lsFeatures,
                            ioerrs, 
                            snap_tol.getValue());
         if (ioerrs.has_errors() == true) {
@@ -468,68 +468,7 @@ int main(int argc, char* const argv[])
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
           printProgressBar(100 * (i / double(lsFeatures.size())));
         i++;
-        std::clog << std::endl << "######### Validating " << f->get_id() << " #########" << std::endl;
-        bool bValid = true;
         f->validate(planarity_d2p_tol.getValue(), planarity_n_tol_updated, overlap_tol.getValue());
-        std::clog << "#########################################" << std::endl;
-      }
-      if (verbose.getValue() == false)
-        printProgressBar(100);
-    }
-
-    //-- now the validation starts
-    if ( (dPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
-    {
-      // std::cout << "Validating " << dPrimitives.size();
-      int i = 1;
-      for (auto& co : dPrimitives)
-      {
-        if ( (i % 10 == 0) && (verbose.getValue() == false) )
-          printProgressBar(100 * (i / double(dPrimitives.size())));
-        i++;
-        std::clog << std::endl << "######### Validating " << co.first << " #########" << std::endl;
-        bool bValid = true;
-        COError coerrs;
-        if (co.second.empty() == true) {
-          coerrs.add_error(609, "City Object has no geometry defined.", "");
-          dCOerrors[co.first] = coerrs;
-        }
-        for (auto& p : co.second)
-        {
-          std::clog << "======== Validating Primitive ========" << std::endl;
-          switch(p->get_type())
-          {
-            case 0: std::clog << "Solid"             << std::endl; break;
-            case 1: std::clog << "CompositeSolid"    << std::endl; break;
-            case 2: std::clog << "MultiSolid"        << std::endl; break;
-            case 3: std::clog << "CompositeSurface"  << std::endl; break;
-            case 4: std::clog << "MultiSurface"      << std::endl; break;
-            case 5: std::clog << "All"               << std::endl; break;
-          }
-          std::clog << "id: " << p->get_id() << std::endl;
-          std::clog << "--" << std::endl;
-          if (p->validate(planarity_d2p_tol.getValue(), planarity_n_tol_updated, overlap_tol.getValue()) == false)
-          {
-            std::clog << "======== INVALID ========" << std::endl;
-            bValid = false;
-          }
-          else
-            std::clog << "========= VALID =========" << std::endl;
-        }
-        //-- if Building then do extra checks  
-        if ( (bValid == true) && 
-             (co.first.find("Building|") != std::string::npos) &&
-             (co.second.size() > 1)
-           )
-        {
-          std::clog << "--- Interactions between BuildingParts ---" << std::endl;
-          if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
-          {
-            std::clog << "Error: overlapping building parts" << std::endl;
-            dCOerrors[co.first] = coerrs;
-          }
-        }
-        std::clog << "#########################################" << std::endl;
       }
       if (verbose.getValue() == false)
         printProgressBar(100);

@@ -55,7 +55,7 @@ bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals
   //-- Building
   if ( (bValid == true) && (this->_type == "Building") )
     bValid = validate_building(tol_overlap);
-  
+
   return bValid;
 }
 
@@ -67,7 +67,7 @@ bool CityObject::validate_building(double tol_overlap)
     return bValid;
   std::clog << "--- Interactions between BuildingParts ---" << std::endl;
   std::vector<Error> lsErrors;
-  if (do_primitives_overlap2(_lsPrimitives, lsErrors, tol_overlap) == true)
+  if (do_primitives_overlap(_lsPrimitives, 601, lsErrors, tol_overlap) == true)
   {
     bValid = false;
     std::clog << "Error: overlapping building parts" << std::endl;

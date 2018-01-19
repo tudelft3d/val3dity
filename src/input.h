@@ -31,6 +31,9 @@
 #define VAL3DITY_INPUT_DEFINITIONS_H
 
 #include "Primitive.h"
+#include "Primitive.h"
+#include "Feature.h"
+#include "CityObject.h"
 #include "Surface.h"
 #include "MultiSurface.h"
 #include "CompositeSurface.h"
@@ -149,7 +152,7 @@ struct semantic_surfaces_walker: pugi::xml_tree_walker {
 void              read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
-void              read_file_cityjson(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap);
+void              read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              print_information(std::string &ifile);
 void              report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
