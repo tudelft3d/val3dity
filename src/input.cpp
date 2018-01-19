@@ -1211,7 +1211,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
 }
 
 
-void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap)
+void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
@@ -1244,6 +1244,7 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
   int primid = 0;
   Surface* sh = new Surface(0, tol_snap);
   std::vector<Point3*> allvertices;
+  GenericObject* o = new GenericObject("none");
   while (std::getline(infile, l)) {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
@@ -1262,19 +1263,19 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
         {
           Solid* sol = new Solid(std::to_string(primid));
           sol->set_oshell(sh);
-          dPrimitives["Primitives"].push_back(sol);
+          o->add_primitive(sol);
         }
         else if ( prim3d == COMPOSITESURFACE)
         {
           CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
           cs->set_surface(sh);
-          dPrimitives["Primitives"].push_back(cs);
+          o->add_primitive(cs);
         }
         else if (prim3d == MULTISURFACE)
         {
           MultiSurface* ms = new MultiSurface(std::to_string(primid));
           ms->set_surface(sh);
-          dPrimitives["Primitives"].push_back(ms);
+          o->add_primitive(ms);
         }
         primid++;
         sh = new Surface(0, tol_snap);
@@ -1316,23 +1317,24 @@ void read_file_obj(std::map<std::string, std::vector<Primitive*> >& dPrimitives,
   {
     Solid* sol = new Solid(std::to_string(primid));
     sol->set_oshell(sh);
-    dPrimitives["Primitives"].push_back(sol);
+    o->add_primitive(sol);
   }
   else if ( prim3d == COMPOSITESURFACE)
   {
     CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
     cs->set_surface(sh);
-    dPrimitives["Primitives"].push_back(cs);
+    o->add_primitive(cs);
   }
   else if (prim3d == MULTISURFACE)
   {
     MultiSurface* ms = new MultiSurface(std::to_string(primid));
     ms->set_surface(sh);
-    dPrimitives["Primitives"].push_back(ms);
+    o->add_primitive(ms);
   }
   for (auto& each : allvertices)
     delete each;
   allvertices.clear();
+  lsFeatures.push_back(o);
 } 
 
 } // namespace val3dity

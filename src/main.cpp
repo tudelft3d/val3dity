@@ -387,32 +387,34 @@ int main(int argc, char* const argv[])
       }
       else if (inputtype == OFF)
       {
+        GenericObject* o = new GenericObject("none");
         Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
         if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
         {
           Solid* s = new Solid;
           s->set_oshell(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(s);
+            o->add_primitive(s);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
         {
           CompositeSurface* cs = new CompositeSurface;
           cs->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(cs);
+            o->add_primitive(cs);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
         {
           MultiSurface* ms = new MultiSurface;
           ms->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(ms);
+            o->add_primitive(ms);
         }
+        lsFeatures.push_back(o);
       }    
       else if (inputtype == OBJ)
       {
-        read_file_obj(dPrimitives,
+        read_file_obj(lsFeatures,
                       inputfile.getValue(), 
                       prim3d,
                       ioerrs, 
