@@ -312,7 +312,7 @@ int main(int argc, char* const argv[])
         try
         {
           read_file_gml(inputfile.getValue(), 
-                        dPrimitives,
+                        lsFeatures,
                         ioerrs, 
                         snap_tol.getValue(),
                         geom_is_sem_surfaces.getValue());

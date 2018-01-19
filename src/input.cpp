@@ -736,13 +736,14 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
   }
 }
 
-void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
+void process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
 {
   primitives_walker walker;
   doc.traverse(walker);
   std::cout << "# 3D primitives found: " << walker.lsNodes.size() << std::endl;
   int primid = 0;
   std::string coid = "Primitives";
+  GenericObject* o = new GenericObject("none");
   for (auto& prim : walker.lsNodes)
   {
     if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
@@ -750,42 +751,43 @@ void process_gml_file_primitives(pugi::xml_document& doc, std::map<std::string, 
       Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
         p->set_id(std::to_string(primid));
-      dPrimitives[coid].push_back(p);
+      o->add_primitive(p);
     }
     else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
     {
       MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
         p->set_id(std::to_string(primid));
-      dPrimitives[coid].push_back(p);
+      o->add_primitive(p);
     }      
     else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
     {
       CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
         p->set_id(std::to_string(primid));
-      dPrimitives[coid].push_back(p);
+      o->add_primitive(p);
     }
     else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
     {
       MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
         p->set_id(std::to_string(primid));
-      dPrimitives[coid].push_back(p);
+      o->add_primitive(p);
     } 
     else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
     {
       CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
       if (p->get_id().compare("") == 0)
         p->set_id(std::to_string(primid));
-      dPrimitives[coid].push_back(p);
+      o->add_primitive(p);
     } 
     primid++;
   }  
+  lsFeatures.push_back(o);
 }
 
 
-void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
+void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
 {
   //-- read each CityObject in the file
   citygml_objects_walker walker;
@@ -795,8 +797,8 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
   //-- for each City Object parse its primitives
   for (auto& co : walker.lsNodes)
   {
-    std::string coid = remove_xml_namespace(co.name());
-    coid += "|";
+    std::string cotype = remove_xml_namespace(co.name());
+    std::string coid = "";
     if (co.attribute("gml:id") != 0)
       coid += co.attribute("gml:id").value();
     else
@@ -805,7 +807,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
       coid += std::to_string(cocounter);
       cocounter++;
     }
-    dPrimitives[coid];
+    CityObject* o = new CityObject(coid, cotype);
     primitives_walker walker2;
     co.traverse(walker2);
     int pcounter = 0;
@@ -819,7 +821,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
         p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
         if (p->get_id() == "")
           p->set_id("MISSING_ID_" + std::to_string(pcounter));
-        dPrimitives[coid].push_back(p);
+        o->add_primitive(p);
         pcounter++;
       }
     }
@@ -839,10 +841,11 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::map<std::string
           p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
         if (p->get_id() == "")
           p->set_id("MISSING_ID_" + std::to_string(pcounter));
-        dPrimitives[coid].push_back(p);
+        o->add_primitive(p);
         pcounter++;
       }
     }
+    lsFeatures.push_back(o);
   }
 }
 
@@ -906,7 +909,7 @@ void compute_min_xy(pugi::xml_document& doc)
 }
 
 
-void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
+void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
@@ -932,12 +935,12 @@ void read_file_gml(std::string &ifile, std::map<std::string, std::vector<Primiti
   if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["citygml"] + "CityModel")) )
   {
     std::cout << "CityGML input file" << std::endl;
-    process_gml_file_city_objects(doc, dPrimitives, dallpoly, errs, tol_snap, geom_is_sem_surfaces);
+    process_gml_file_city_objects(doc, lsFeatures, dallpoly, errs, tol_snap, geom_is_sem_surfaces);
   }
   else
   {
     std::cout << "GML input file (ie not CityGML)" << std::endl;
-    process_gml_file_primitives(doc, dPrimitives, dallpoly, errs, tol_snap);
+    process_gml_file_primitives(doc, lsFeatures, dallpoly, errs, tol_snap);
   }
 }
 
