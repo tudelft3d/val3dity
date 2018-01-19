@@ -34,11 +34,6 @@ namespace val3dity
 {
 
 
-Feature::Feature() {
-}
-
-Feature::~Feature() {
-}
 
 
 std::string Feature::get_id()
