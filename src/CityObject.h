@@ -32,8 +32,6 @@
 #include "Feature.h"
 #include "definitions.h"
 
-#include <vector>
-#include <string>
 
 namespace val3dity
 {

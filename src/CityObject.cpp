@@ -45,7 +45,7 @@ CityObject::CityObject(std::string theid, std::string thetype)
 CityObject::~CityObject()
 {}
 
-bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1) {
+bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) {
 
   return true;
 }

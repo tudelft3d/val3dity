@@ -29,9 +29,11 @@
 #ifndef Feature_h
 #define Feature_h
 
+#include "Primitive.h"
 #include "definitions.h"
 #include "nlohmann-json/json.hpp"
 #include <vector>
+#include <set>
 #include <string>
 
 using json = nlohmann::json;
@@ -49,7 +51,7 @@ public:
   virtual bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1) = 0;
   virtual int             is_valid() = 0;
   virtual json            get_report_json() = 0;
-  virtual string          get_type() = 0;
+  virtual std::string     get_type() = 0;
 
   std::string             get_id();
   void                    set_id(std::string id);

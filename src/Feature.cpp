@@ -52,7 +52,7 @@ void Feature::set_id(std::string id)
 }
 
 
-std::string Feature::is_empty()
+bool Feature::is_empty()
 {
   return _lsPrimitives.empty();
 }
