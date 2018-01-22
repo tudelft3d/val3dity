@@ -46,11 +46,11 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
+
 std::string VAL3DITY_VERSION = "2.0.2";
 
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
-std::string print_summary_validation2(std::vector<Feature*>& lsFeatures, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
+std::string print_summary_validation(std::vector<Feature*>& lsFeatures, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
 void        write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
@@ -478,8 +478,7 @@ int main(int argc, char* const argv[])
     }
 
     //-- summary of the validation
-    // std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
-    std::cout << "\n" << print_summary_validation2(lsFeatures, dCOerrors, ioerrs) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsFeatures, dCOerrors, ioerrs) << std::endl;        
 
    //-- output shells/surfaces in OFF format
     if (output_off.getValue() != "") 
@@ -669,109 +668,7 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
 }
 
 
-std::string print_summary_validation(std::map<std::string,std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs)
-{
-  std::stringstream ss;
-  ss << std::endl;
-  int noprim = 0;
-  for (auto& co : dPrimitives)
-    for (auto& p : co.second)
-      noprim++;
-    
-  ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  //-- if a CityGML/CityJSON report also CityObjects
-  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
-  {
-    int coInvalid = 0;
-    for (auto& co : dPrimitives)
-    {
-      if (dCOerrors.find(co.first) != dCOerrors.end())
-      {
-        coInvalid++;
-        continue;
-      }
-      for (auto& p : co.second)
-      {
-        if (p->is_valid() == false)
-        {
-          coInvalid++;
-          break;
-        }
-      }
-    }
-    ss << "Total # of CityObjects: " << setw(7) << dPrimitives.size() << std::endl;
-    float percentage;
-    if (dPrimitives.size()  == 0)
-      percentage = 0;
-    else
-      percentage = 100 * (coInvalid / float(dPrimitives.size()));
-    ss << "# valid: " << setw(22) << dPrimitives.size() - coInvalid;
-    if (dPrimitives.size() == 0)
-      ss << " (" << 0 << "%)" << std::endl;
-    else
-      ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-    ss << "# invalid: " << setw(20) << coInvalid;
-    ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
-    ss << "+++++" << std::endl;
-  }
-  ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
-  int bValid = 0;
-  for (auto& co : dPrimitives)
-    for (auto& p : co.second)
-      if (p->is_valid() == true)
-        bValid++;
-  float percentage;
-  if (noprim  == 0)
-    percentage = 0;
-  else
-    percentage = 100 * ((noprim - bValid) / float(noprim));
-  ss << "# valid: " << setw(22) << bValid;
-  if (noprim == 0)
-    ss << " (" << 0 << "%)" << std::endl;
-  else
-    ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << (noprim - bValid);
-  ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
-  //-- overview of errors
-  std::map<int,int> errors;
-  for (auto& co : dPrimitives) {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
-        errors[code] = 0;
-    for (auto& p : co.second)
-      for (auto& code : p->get_unique_error_codes())
-        errors[code] = 0;
-  }
-  for (auto& co : dPrimitives) {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
-        errors[code] += 1;
-    for (auto& p : co.second)
-      for (auto& code : p->get_unique_error_codes())
-        errors[code] += 1;
-  }
-
-  if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
-  {
-    ss << "+++++" << std::endl;
-    ss << "Errors present:" << std::endl;
-    for (auto e : errors)
-    {
-      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
-      ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
-    }
-    for (auto& e : ioerrs.get_unique_error_codes())
-    {
-      ss << "  " << e << " -- " << errorcode2description(e) << std::endl;
-    }
-  }
-
-  ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-  return ss.str();
-}
-
-
-std::string print_summary_validation2(std::vector<Feature*>& lsFeatures, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs)
+std::string print_summary_validation(std::vector<Feature*>& lsFeatures, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -788,7 +685,7 @@ std::string print_summary_validation2(std::vector<Feature*>& lsFeatures, std::ma
       if (f->is_valid() == false)
         fInvalid++;
     }
-    ss << "Total # of Features: " << setw(7) << lsFeatures.size() << std::endl;
+    ss << "Total # of Features: " << setw(10) << lsFeatures.size() << std::endl;
     float percentage;
     if (lsFeatures.size() == 0)
       percentage = 0;

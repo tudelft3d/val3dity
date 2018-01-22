@@ -47,7 +47,7 @@ class Feature
 public:
 
   virtual bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1) = 0;
-  virtual int             is_valid() = 0;
+  virtual bool            is_valid() = 0;
   virtual std::string     get_type() = 0;
 
   std::string             get_id();
@@ -58,16 +58,16 @@ public:
 
   const std::vector<Primitive*>&  get_primitives();
 
-  bool                    has_errors();
   void                    add_error(int code, std::string info, std::string whichgeoms);
   json                    get_report_json();
   std::set<int>           get_unique_error_codes();
 
 protected:
+  int                     _is_valid; 
   std::string             _id;
   std::string             _type;
-  int                     _is_valid; 
   std::vector<Primitive*> _lsPrimitives;
+  
   bool                    validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);  
   
   std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;

@@ -49,13 +49,13 @@ CityObject::~CityObject()
 
 bool CityObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
-  bool bValid = true;
-  bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
-
+  if (_is_valid != -1)
+    return _is_valid;
+  bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
   //-- Building
   if ( (bValid == true) && (this->_type == "Building") )
     bValid = validate_building(tol_overlap);
-
+  _is_valid = bValid;
   return bValid;
 }
 
@@ -78,9 +78,9 @@ bool CityObject::validate_building(double tol_overlap)
 }
 
 
-int CityObject::is_valid() {
+bool CityObject::is_valid() 
+{
   return _is_valid;
-  // TODO : update this
 }
 
 

@@ -46,12 +46,17 @@ GenericObject::~GenericObject()
 {}
 
 
-bool GenericObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) {
-  return Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+bool GenericObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
+{
+  if (_is_valid != -1)
+    return _is_valid;
+  bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+  _is_valid = bValid;
+  return bValid;
 }
 
 
-int GenericObject::is_valid() {
+bool GenericObject::is_valid() {
   return _is_valid;
 }
 

@@ -123,6 +123,7 @@ bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_no
     else
       std::clog << "========= VALID =========" << std::endl;
   }
+  _is_valid = bValid;
   return bValid;
 }  
 
