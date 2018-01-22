@@ -59,7 +59,8 @@ json Feature::get_report_json()
   json j;
   j["id"] = _id;
   j["type"] = _type;
-  j["errors"];
+  j["validity"] = this->is_valid();
+  j["errors_feature"];
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -70,7 +71,7 @@ json Feature::get_report_json()
       jj["description"] = errorcode2description(std::get<0>(err));
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
-      j["errors"].push_back(jj);
+      j["errors_feature"].push_back(jj);
     }
   }
   j["primitives"];
@@ -112,6 +113,7 @@ bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_no
       case 2: std::clog << "MultiSolid"        << std::endl; break;
       case 3: std::clog << "CompositeSurface"  << std::endl; break;
       case 4: std::clog << "MultiSurface"      << std::endl; break;
+      case 5: std::clog << "ALL"      << std::endl; break;
     }
     std::clog << "id: " << p->get_id() << std::endl;
     std::clog << "--" << std::endl;
@@ -144,10 +146,13 @@ void Feature::add_error(int code, std::string whichgeoms, std::string info)
 std::set<int> Feature::get_unique_error_codes()
 {
   std::set<int> errs;
+  //-- errors related to Features
   for (auto& err : _errors)
-  {
     errs.insert(std::get<0>(err));
-  }
+  //-- errors for each primitive
+  for (auto& p : _lsPrimitives)
+    for (auto& each : p->get_unique_error_codes())
+      errs.insert(each);
   return errs;
 }
 
