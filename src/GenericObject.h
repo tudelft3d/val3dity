@@ -26,20 +26,28 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#ifndef Validate_prim_toporel_h
-#define Validate_prim_toporel_h
+#ifndef __val3dity__GenericObject__
+#define __val3dity__GenericObject__
 
+#include "Feature.h"
 #include "definitions.h"
-#include "Primitive.h"
-#include "COError.h"
+
 
 namespace val3dity
 {
 
+class GenericObject : public Feature
+{
+public:
+  GenericObject(std::string theid);
+  ~GenericObject();
+  
+  bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
+  bool            is_valid();
+  std::string     get_type();
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, int errorcode_to_assign, std::vector<Error> lsErrors, double tol_overlap);
-
+};
 
 } // namespace val3dity
 
-#endif /* Validate_prim_toporel_h */
+#endif /* defined(__val3dity__GenericObject__) */
