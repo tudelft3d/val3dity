@@ -42,6 +42,7 @@ test_geometry_generic:
   "302_2": A vertex in the top surface does not close the shell (0.01 discrepancy), GML cube
   "303": Unit cube with one dangling face touching the cube at one point only. The dangling face is the last in the list
   "303_1": 2 unit cubes touching at one vertex
+  "303_2": Torus where the hole in the top/bottom faces touches the side surfaces
   "303_cs": one cube with a non-manifold vertex. As a Solid error 302, but CompositeSurface 303. Jeff Coukell's case.
   "304_1": Unit cube with one extra face in the middle, splitting the cube in two parts
   "304_2": Unit cube with one corner as a separate part
@@ -49,7 +50,6 @@ test_geometry_generic:
   "305_1": 2 unit cubes not touching at all, one above the other separated by 1unit
   "306": House with tip below the ground
   "306_1": House with tip touching the bottom faces
-  "306_2": Torus where the hole in the top/bottom faces touches the side surfaces
   "307": Unit cube with one face (face 0) with opposite orientation
   "307_1": Unit cube with a top surface composed of 2 polygons with opposite orientation
   "401": "+ basecube = An inner-pyramid that pierces through the top of basecube (by 0.00001). Oracle agrees: oracle=54512"
