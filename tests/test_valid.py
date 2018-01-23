@@ -21,6 +21,15 @@ def data_planar(request, dir_valid):
 
 
 @pytest.fixture(scope="module",
+                params=["nearly-collinear.off"])
+def data_nearly_collinear(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
+
+@pytest.fixture(scope="module",
                 params=["self_fold.obj"])
 def data_self_fold(request, dir_valid):
     file_path = os.path.abspath(
@@ -124,6 +133,10 @@ def test_v_104(validate, data_planar):
 def test_planar(validate, data_planar):
     error = validate(data_planar)
     assert(error == [301])
+
+def test_nearly_collinear(validate, data_nearly_collinear):
+    error = validate(data_nearly_collinear)
+    assert(error == [])
 
 def test_self_fold(validate, data_self_fold):
     error = validate(data_self_fold)

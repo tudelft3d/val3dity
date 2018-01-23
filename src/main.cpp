@@ -45,9 +45,8 @@
 using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
+std::string VAL3DITY_VERSION = "2.0.3";
 
-
-std::string VAL3DITY_VERSION = "2.0.2";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
