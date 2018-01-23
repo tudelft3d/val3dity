@@ -76,7 +76,7 @@ typedef CGAL::Triangulation_face_base_with_info_2<FaceInfo2, K>   Fbb;
 typedef CGAL::Constrained_triangulation_face_base_2<K, Fbb>       Fb;
 typedef CGAL::Triangulation_data_structure_2<Vb,Fb>               TDS;
 typedef CGAL::Exact_intersections_tag                             Itag;
-typedef CGAL::Constrained_triangulation_2<K, TDS, Itag>           CT;
+typedef CGAL::Constrained_Delaunay_triangulation_2<K, TDS, Itag>  CT;
 
 
 //-- Nef requires EPEC (exact-predicates & exact-construction) and thus diff kernels
