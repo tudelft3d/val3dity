@@ -293,7 +293,7 @@ int main(int argc, char* const argv[])
     }
 
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
@@ -686,6 +686,15 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << fInvalid;
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  std::set<std::string> thetypes;
+  for (auto& f : lsFeatures)
+    thetypes.insert(f->get_type());
+  if (thetypes.empty() == false)
+  {
+    ss << "Types:" << std::endl;
+    for (auto& each : thetypes)
+      ss << "  " << each << std::endl;
+  }
   ss << "+++++" << std::endl;
   ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
   int bValid = 0;
@@ -704,6 +713,27 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (noprim - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  std::set<int> theprimitives;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      theprimitives.insert(p->get_type());
+  if (theprimitives.empty() == false)
+  {
+    ss << "Types:" << std::endl;
+    for (auto& each : theprimitives)
+    {
+      ss << "  ";
+      switch(each)
+      {
+        case 0: ss << "Solid"             << std::endl; break;
+        case 1: ss << "CompositeSolid"    << std::endl; break;
+        case 2: ss << "MultiSolid"        << std::endl; break;
+        case 3: ss << "CompositeSurface"  << std::endl; break;
+        case 4: ss << "MultiSurface"      << std::endl; break;
+        case 5: ss << "ALL"               << std::endl; break;
+      }
+    }
+  }
   //-- overview of errors
   std::map<int,int> errors;
   for (auto& f : lsFeatures) 
@@ -784,10 +814,30 @@ void write_report_json(json& jr,
   jr["overlap_tol"] = overlap_tol;
   jr["planarity_d2p_tol"] = planarity_d2p_tol;
   jr["planarity_n_tol"] = planarity_n_tol;
+  
+  std::set<int> theprimitives;
   int noprim = 0;
-  for (auto& o : lsFeatures)
-    for (auto& p : o->get_primitives())
+  for (auto& f : lsFeatures)
+  {
+    for (auto& p : f->get_primitives())
+    {
+      theprimitives.insert(p->get_type());
       noprim++;
+    }
+  }
+  jr["overview_primitives"];    
+  for (auto& each : theprimitives)
+  {
+    switch(each)
+    {
+      case 0: jr["overview_primitives"].push_back("Solid"); break;
+      case 1: jr["overview_primitives"].push_back("CompositeSolid"); break;
+      case 2: jr["overview_primitives"].push_back("MultiSolid"); break;
+      case 3: jr["overview_primitives"].push_back("CompositeSurface"); break;
+      case 4: jr["overview_primitives"].push_back("MultiSurface"); break;
+      case 5: jr["overview_primitives"].push_back("ALL"); break;
+    }
+  }
   jr["total_primitives"] = noprim;
   int bValid = 0;
   for (auto& f : lsFeatures)
@@ -797,11 +847,18 @@ void write_report_json(json& jr,
   jr["valid_primitives"] = bValid;
   jr["invalid_primitives"] = noprim - bValid;
   //-- features
+  std::set<std::string> thefeatures;
   jr["total_features"] = lsFeatures.size();
   bValid = 0;
   for (auto& f : lsFeatures)
+  {
+    thefeatures.insert(f->get_type());
     if (f->is_valid() == true)
       bValid++;
+  }
+  jr["overview_features"];    
+  for (auto& each : thefeatures)
+    jr["overview_features"].push_back(each);
   jr["valid_features"] = bValid;
   jr["invalid_features"] = lsFeatures.size() - bValid;
   //-- overview of errors
