@@ -39,7 +39,7 @@ namespace val3dity
 
 bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, 
                            int errorcode_to_assign, 
-                           std::vector<Error> lsErrors, 
+                           std::vector<Error>& lsErrors, 
                            double tol_overlap)
 {
   bool isValid = true;
