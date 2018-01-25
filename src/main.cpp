@@ -36,7 +36,6 @@
 #include "validate_prim_toporel.h"
 #include "Surface.h"
 #include "Solid.h"
-#include "COError.h"
 #include <tclap/CmdLine.h>
 #include <time.h>  
 #include "nlohmann-json/json.hpp"

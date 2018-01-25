@@ -31,7 +31,6 @@
 
 #include "definitions.h"
 #include "Primitive.h"
-#include "COError.h"
 
 namespace val3dity
 {
