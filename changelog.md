@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [2.0.4] - 2018-01-26
+### Changed
+- fixed bug where inner rings of gml:Polygon wasn't read properly when that polygon is referenced by an XLink.
+
 ## [2.0.3] - 2018-01-23
 ### Changed
 - each surface are now triangulated with a constrained Delaunay triangulation (CDT) instead of a non-Delaunay one. That improves stability, especially when there are nearly collinear vertices in a surfaces: slivers are avoided, which means less errors 204, and less wrong errors caused by numerical stability.
