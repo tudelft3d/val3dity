@@ -309,7 +309,7 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
     oneface.push_back(r);
     //-- interior rings
     s = ".//" + NS["gml"] + "interior";
-    pugi::xpath_node_set nint = it->node().select_nodes(s.c_str());
+    pugi::xpath_node_set nint = p.node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
       std::vector<int> r = process_gml_ring(it->node(), sh, errs);
       if (fliporientation == true) 
