@@ -67,8 +67,8 @@ mkdir $HOME/cgal/CGAL-4.10.2/build && cd $HOME/cgal/CGAL-4.10.2/build
 export CGAL_DIR=$HOME/cgal/CGAL-4.10.2/build
 cmake .. -DWITH_Eigen3=ON
 make
+make install
 
-# Possibly: http://cgal-discuss.949826.n4.nabble.com/Compiling-without-link-to-Boost-Thread-td4656783.html
 
 # pytest -----------------------------------------------------------------------
 echo "Installing pytest..."
@@ -81,7 +81,7 @@ echo "Building val3dity..."
 # source files. Any compilation step, database files, and so on should be done
 # outside the shared folder filesystem inside the guest filesystem itself.
 mkdir $HOME/val3dity_build && cd $HOME/val3dity_build
-cmake $HOME/val3dity -DCGAL_DIR=$CGAL_DIR
+cmake $HOME/val3dity
 make
 make install
 cd $HOME
