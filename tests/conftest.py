@@ -31,7 +31,10 @@ def pytest_collection_modifyitems(config, items):
 def val3dity():
     """path to val3dity executable"""
     root = os.getcwd()
-    p = os.path.join(root, "build/val3dity")
+    if sys.platform.lower() == 'windows':
+        p = os.path.join(root, "build/val3dity.exe")
+    else: #-- darwin && linux
+        p = os.path.join(root, "build/val3dity")
     return(os.path.abspath(p))
 
 #-------------------------------------------------------------- data & folders
