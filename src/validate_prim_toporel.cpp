@@ -27,6 +27,7 @@
 */
 
 #include "validate_prim_toporel.h"
+#include "Primitive.h"
 #include "geomtools.h"
 #include "Solid.h"
 #include "CompositeSolid.h"

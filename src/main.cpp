@@ -29,13 +29,16 @@
 #include "input.h"
 #include "reportoutput.h"
 #include "Primitive.h"
+#include "Surface.h"
+#include "MultiSurface.h"
+#include "CompositeSurface.h"
+#include "Solid.h"
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
 
 #include "validate_prim_toporel.h"
-#include "Surface.h"
-#include "Solid.h"
+
 #include <tclap/CmdLine.h>
 #include <time.h>  
 #include "nlohmann-json/json.hpp"

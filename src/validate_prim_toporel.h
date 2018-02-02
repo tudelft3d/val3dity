@@ -30,11 +30,12 @@
 #define Validate_prim_toporel_h
 
 #include "definitions.h"
-#include "Primitive.h"
 
 namespace val3dity
 {
 
+
+class Primitive;
 
 bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, int errorcode_to_assign, std::vector<Error>& lsErrors, double tol_overlap);
 

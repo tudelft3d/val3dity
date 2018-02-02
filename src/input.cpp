@@ -27,6 +27,17 @@
 */
 
 #include "input.h"
+#include "Primitive.h"
+#include "Feature.h"
+#include "CityObject.h"
+#include "GenericObject.h"
+#include "Surface.h"
+#include "MultiSurface.h"
+#include "CompositeSurface.h"
+#include "Solid.h"
+#include "CompositeSolid.h"
+#include "MultiSolid.h"
+
 
 using namespace std;
 using json = nlohmann::json;

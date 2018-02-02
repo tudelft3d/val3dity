@@ -30,17 +30,7 @@
 #ifndef VAL3DITY_INPUT_DEFINITIONS_H
 #define VAL3DITY_INPUT_DEFINITIONS_H
 
-#include "Primitive.h"
-#include "Primitive.h"
-#include "Feature.h"
-#include "CityObject.h"
-#include "GenericObject.h"
-#include "Surface.h"
-#include "MultiSurface.h"
-#include "CompositeSurface.h"
-#include "Solid.h"
-#include "CompositeSolid.h"
-#include "MultiSolid.h"
+#include "definitions.h"
 #include <fstream>
 #include <string>
 #include "pugixml/pugixml.hpp"
@@ -51,6 +41,18 @@ using json = nlohmann::json;
 
 namespace val3dity
 {
+
+  class Primitive;
+  class Feature;
+  class CityObject;
+  class GenericObject;
+  class Surface;
+  class MultiSurface;
+  class CompositeSurface;
+  class Solid;
+  class CompositeSolid;
+  class MultiSolid;
+
 
 class IOErrors {
   std::map<int, std::vector<std::string> >  _errors;
