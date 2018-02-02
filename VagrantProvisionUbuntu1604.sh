@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Set environment variables
+BUILDS="/opt"
 HOME="/home/vagrant"
 echo HOME: $HOME
 
@@ -28,11 +29,11 @@ apt-get upgrade -y >/dev/null 2>&1
 
 # GEOS -------------------------------------------------------------------------
 echo "Downloading and building GEOS 3.6.2 ..."
-cd $HOME
-wget https://git.osgeo.org/gitea/geos/geos/archive/3.6.2.tar.gz
+cd $BUILDS
+wget https://git.osgeo.org/gitea/geos/geos/archive/3.6.2.tar.gz >/dev/null 2>&1
 tar xf 3.6.2.tar.gz
 rm 3.6.2.tar.gz
-mkdir $HOME/geos/build && cd $HOME/geos/build
+mkdir $BUILDS/geos/build && cd $BUILDS/geos/build
 cmake ..
 make
 geos_test=$(make check | grep -o '100% tests passed')
@@ -45,29 +46,37 @@ else
     exit 1
 fi
 
+
 # CGAL -------------------------------------------------------------------------
+# For some reason CGAL cannot link Eigen3 to boost_thread when the release tarball
+# is used for compilation. However, everything works when CGAL is compiled from
+# the source tarball (copy of GitHub master branch). Only the md5sum is not 
+# correct in the provided md5sum.txt
 echo "Downloading and building CGAL 4.10.2 ..."
-cd $HOME
-mkdir $HOME/cgal && cd $HOME/cgal
-wget https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.10.2/CGAL-4.10.2.tar.xz
-wget https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.10.2/md5sum.txt
+cd $BUILDS
+wget https://github.com/CGAL/cgal/archive/releases/CGAL-4.10.2.tar.gz >/dev/null 2>&1
+#wget https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.10.2/md5sum.txt >/dev/null 2>&1
 
-CGAL_TAR=$(md5sum CGAL-4.10.2.tar.xz)
-CGAL_MD5=$(cat md5sum.txt | grep CGAL-4.10.2.tar.xz)
-if [ "$CGAL_TAR" = "$CGAL_MD5" ]; then
-    tar xf CGAL-4.10.2.tar.xz
-    rm CGAL-4.10.2.tar.xz
-    rm md5sum.txt
-else
-    echo "md5sum of CGAL not matching, exiting provisioning"
-    exit 1
-fi
+#CGAL_TAR=$(md5sum CGAL-4.10.2.tar.xz)
+#CGAL_MD5=$(cat md5sum.txt | grep CGAL-4.10.2.tar.xz)
+#if [ "$CGAL_TAR" = "$CGAL_MD5" ]; then
+#    tar -xf CGAL-4.10.2.tar.xz
+#    rm CGAL-4.10.2.tar.xz
+#    rm md5sum.txt
+#else
+#    echo "md5sum of CGAL not matching, exiting provisioning"
+#    exit 1
+#fi
 
-mkdir $HOME/cgal/CGAL-4.10.2/build && cd $HOME/cgal/CGAL-4.10.2/build
-export CGAL_DIR=$HOME/cgal/CGAL-4.10.2/build
+tar -xf CGAL-4.10.2.tar.gz
+rm CGAL-4.10.2.tar.gz
+
+mkdir $BUILDS/cgal-releases-CGAL-4.10.2/build && cd $BUILDS/cgal-releases-CGAL-4.10.2/build
 cmake .. -DWITH_Eigen3=ON
 make
 make install
+make clean
+ldconfig
 
 
 # pytest -----------------------------------------------------------------------
@@ -85,5 +94,9 @@ cmake $HOME/val3dity
 make
 make install
 cd $HOME
+
+val3dity --version
+
+chown vagrant:vagrant $HOME/val3dity_build
 
 echo "See VAGRANT.md for additional configuration instructions and then run 'vagrant ssh' to log into the val3dity virtual machine."

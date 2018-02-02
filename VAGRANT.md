@@ -59,4 +59,5 @@ Within this login shell, you can build the code, run the server or the tests. Fo
 The val3dity root folder (on host) is mapped to the `/home/vagrant/val3dity` folder on the guest. Note that # Vagrant shared folders (e.g. `/home/vagrant/val3dity`) incur a heavy performance penalty within the virtual machine when there is heavy I/O, so they should only be used for source files. Any compilation step, database files, and so on should be done outside the shared folder filesystem inside the guest filesystem itself.
 
 **Acknowledgement**
+
 The majority of this description was taken from the [Hootenanny project](https://github.com/ngageoint/hootenanny/blob/master/VAGRANT.md)
