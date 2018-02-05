@@ -30,7 +30,7 @@
 #define Surface_h
 
 #include "definitions.h"
-#include "nlohmann-json/json.hpp"
+#include "../thirdparty/nlohmann-json/json.hpp"
 #include <string>
 #include <vector>
 #include <set>
