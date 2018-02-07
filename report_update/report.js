@@ -11237,10 +11237,13 @@ var report={
     307
   ],
   "overview_features": [
-    "Building"
+    "Building",
+    "some-stuff",
+    "some-other-stuff"
   ],
   "overview_primitives": [
-    "Solid"
+    "Solid",
+    "Polygon"
   ],
   "planarity_d2p_tol": 0.01,
   "planarity_n_tol": 20.0,

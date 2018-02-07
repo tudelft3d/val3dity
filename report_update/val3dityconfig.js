@@ -273,21 +273,110 @@ function idx_error_table(){
     body.appendChild(tbl);
 }
 
+
+function parse_valid_amounts(report) {
+    // Get the amount of in/valids per feature and primitive type
+    var feature_list = report.overview_features;
+    var primitive_list = report.overview_primitives;
+    var feat_dict = {};
+    var prim_dict = {};
+    for (var i=0; i<feature_list.length; i++) {
+        feat_dict[feature_list[i]] = {"valid": 0, "total": 0};
+    }
+    for (var i=0; i<primitive_list.length; i++) {
+        prim_dict[primitive_list[i]] = {"valid": 0, "total": 0};
+    }
+
+    for (var f=0; f<report.features.length; f++) {
+        var feature = report.features[f];
+        feat_dict[feature.type]["total"] += 1;
+        if (feature.validity) {
+            feat_dict[feature.type]["valid"] += 1;
+        }
+
+        for (var p=0; p<feature.primitives.length; p++) {
+            var primitive = feature.primitives[p];
+            prim_dict[primitive.type]["total"] += 1;
+            if (primitive.validity) {
+                prim_dict[primitive.type]["valid"] += 1;
+            }
+        }
+    }
+
+    return [feat_dict, prim_dict];
+}
+
+
+function summary_table_cells(tbl, type, dict) {
+    var tr = tbl.insertRow();
+
+    // cell type
+    var td0 = tr.insertCell(0);
+    td0.appendChild(document.createTextNode(type));
+    // var a = document.createElement('a');
+    // var linkText = document.createTextNode('CityObjects (click for more details)');
+    // a.appendChild(linkText);
+    // a.title = "CityObjects";
+    // a.href = "CityObjects.html";
+    // td0.appendChild(a);
+    // cell Total
+    var td_t = tr.insertCell(1);
+    td_t.appendChild(document.createTextNode(dict[type]["total"]));
+    // cell Valid
+    var td_v = tr.insertCell(2);
+    var valid_pc = Math.round(dict[type]["valid"] / dict[type]["total"] * 100);
+    var v = dict[type]["valid"] + ' (' + valid_pc + '%)';
+    td_v.appendChild(document.createTextNode(v));
+    // cell Invalid
+    var td_i = tr.insertCell(3);
+    var invalid = dict[type]["total"] - dict[type]["valid"];
+    var invalid_pc = Math.round(invalid / dict[type]["total"] * 100);
+    var i = invalid + ' (' + invalid_pc + '%)';
+    td_i.appendChild(document.createTextNode(i));
+
+    return tbl;
+}
+
+
 function summary_table(type) {
-    tbl = document.createElement('table');
+    // Validation summary table
+
+    var dicts = parse_valid_amounts(report);
+
+    var tbl = document.createElement('table');
     var tr = tbl.insertRow(0);
     if (type == "features") {
         tbl.setAttribute('id', "summary_features");
         var headers = ["Features", "Total", "Valid", "Invalid"];
+
+        // table header
+        for (var i = 0; i < 4; i++){
+            var h = document.createElement('th');
+            h.appendChild(document.createTextNode(headers[i]));
+            tr.appendChild(h);
+        }
+
+        for (var f=0; f<report.overview_features.length; f++) {
+            var type = report.overview_features[f];
+            tbl = summary_table_cells(tbl, type, dicts[0]);
+        }
+
+
     } else if (type == "primitives") {
         var headers = ["Primitives", "Total", "Valid", "Invalid"];
         tbl.setAttribute('id', "summary_primitives");
-    }
 
-    for (var i = 0; i < 4; i++){
-        var h = document.createElement('th');
-        h.appendChild(document.createTextNode(headers[i]));
-        tr.appendChild(h);
+        // table header
+        for (var i=0; i < 4; i++){
+            var h = document.createElement('th');
+            h.appendChild(document.createTextNode(headers[i]));
+            tr.appendChild(h);
+        }
+
+        for (var p=0; p<report.overview_primitives.length; p++) {
+            var type = report.overview_primitives[p];
+            tbl = summary_table_cells(tbl, type, dicts[1]);
+        }
     }
 
     return tbl;
@@ -306,32 +395,32 @@ function idx_validation_summary(){
         body.appendChild(tbl);
     }
 
-    if (report.CityObjects != null) {
-        var tr = tbl.insertRow();
-
-        // cell CityObjects
-        var td0 = tr.insertCell(0);
-        var a = document.createElement('a');
-        var linkText = document.createTextNode('CityObjects (click for more details)');
-        a.appendChild(linkText);
-        a.title = "CityObjects";
-        a.href = "CityObjects.html";
-        td0.appendChild(a);
-        // cell Total
-        var td_t = tr.insertCell(1);
-        td_t.appendChild(document.createTextNode(report.total_cityobjects));
-        // cell Valid
-        var td_v = tr.insertCell(2);
-        var CO_valid_pc = Math.round(report.valid_cityobjects / report.total_cityobjects * 100);
-        var v = report.valid_cityobjects + ' (' + CO_valid_pc + '%)';
-        td_v.appendChild(document.createTextNode(v));
-        // cell Invalid
-        var td_i = tr.insertCell(3);
-        var CO_invalid_pc = Math.round(report.invalid_cityobjects / report.total_cityobjects * 100);
-        var i = report.invalid_cityobjects + ' (' + CO_invalid_pc + '%)';
-        td_i.appendChild(document.createTextNode(i));
-    }
-
+    // if (report.CityObjects != null) {
+    //     var tr = tbl.insertRow();
+    //
+    //     // cell CityObjects
+    //     var td0 = tr.insertCell(0);
+    //     var a = document.createElement('a');
+    //     var linkText = document.createTextNode('CityObjects (click for more details)');
+    //     a.appendChild(linkText);
+    //     a.title = "CityObjects";
+    //     a.href = "CityObjects.html";
+    //     td0.appendChild(a);
+    //     // cell Total
+    //     var td_t = tr.insertCell(1);
+    //     td_t.appendChild(document.createTextNode(report.total_cityobjects));
+    //     // cell Valid
+    //     var td_v = tr.insertCell(2);
+    //     var CO_valid_pc = Math.round(report.valid_cityobjects / report.total_cityobjects * 100);
+    //     var v = report.valid_cityobjects + ' (' + CO_valid_pc + '%)';
+    //     td_v.appendChild(document.createTextNode(v));
+    //     // cell Invalid
+    //     var td_i = tr.insertCell(3);
+    //     var CO_invalid_pc = Math.round(report.invalid_cityobjects / report.total_cityobjects * 100);
+    //     var i = report.invalid_cityobjects + ' (' + CO_invalid_pc + '%)';
+    //     td_i.appendChild(document.createTextNode(i));
+    // }
+    //
     // if (report.Primitives != null) {
     //     var tr = tbl.insertRow();
     //
