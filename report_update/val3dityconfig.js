@@ -193,98 +193,25 @@ var errors = {
     }
 }
 
-function error_overview() {
-
-  if (report.overview_errors == null) {
-    var h = document.createElement("H3")
-    var t = document.createTextNode("No errors!");
-    h.appendChild(t);
-    document.body.appendChild(h);
-    var x = document.createElement("IMG");
-    x.setAttribute("src", "http://geovalidation.bk.tudelft.nl/val3dity/img/welldone.png");
-    x.setAttribute("alt", "The Pulpit Rock");
-    document.body.appendChild(x);
-    return;
-  }
-  else {
-    var h = document.createElement("H3")
-    var t = document.createTextNode("Overview of errors");
-    h.appendChild(t);
-    document.body.appendChild(h);
-    // idx_error_table();
-  }
-}
-
-function idx_error_table(){
-
-    var body = document.body,
-        tbl  = document.createElement('table');
-    tbl.setAttribute('id', "errors");
-
-
-    var tr = tbl.insertRow(0);
-    var headers = ['Error', '# of primitives'];
-    for (var i = 0; i < 2; i++){
-        var h = document.createElement('th');
-        h.appendChild(document.createTextNode(headers[i]));
-        tr.appendChild(h);
-    }
-
-    var nr_errors = report.overview_errors.length;
-    var l_errors = report.overview_errors;
-    var nr_prims = report.overview_errors_no_primitives;
-
-    for(var i = 0; i < nr_errors; i++){
-        var tr = tbl.insertRow();
-        var td0 = tr.insertCell(0);
-        var td1 = tr.insertCell(1);
-        var err = errors[l_errors[i]];
-        var a = document.createElement('a');
-        var linkText = document.createTextNode(err.name);
-        a.appendChild(linkText);
-        a.title = err.name;
-        a.href = err.link.href;
-        a.target = '_blank';
-        td0.appendChild(a);
-        if (nr_prims[i] < 0) {
-            // this happens on input error
-            td1.appendChild(document.createTextNode("\u2014"));
-        } else {
-            td1.appendChild(document.createTextNode(nr_prims[i]));
-        }
-
-        // set colour
-        if (l_errors[i] < 200) {
-            tr.setAttribute('class', 'linear-ring-level');
-        } else if (100 < l_errors[i] && l_errors[i] < 300) {
-            tr.setAttribute('class', 'polygon-level');
-        } else if(200 < l_errors[i] && l_errors[i] < 400) {
-            tr.setAttribute('class', 'shell-level');
-        } else if (300 < l_errors[i] && l_errors[i] < 500) {
-            tr.setAttribute('class', 'solid-level');
-        } else if (400 < l_errors[i] && l_errors[i] < 600) {
-            tr.setAttribute('class', 'solid-interactions-level');
-        } else if (500 < l_errors[i] && l_errors[i] < 700) {
-            tr.setAttribute('class', 'citygml-building');
-        } else if (800 < l_errors[i] && l_errors[i] < 1000) {
-            tr.setAttribute('class', 'others');
-        }
-    }
-    body.appendChild(tbl);
-}
-
 
 function parse_valid_amounts(report) {
-    // Get the amount of in/valids per feature and primitive type
+    // Get the amount of in/valids per feature and primitive type and
+    // get the amount of objects per error
     var feature_list = report.overview_features;
     var primitive_list = report.overview_primitives;
+    var error_list = report.overview_errors;
     var feat_dict = {};
     var prim_dict = {};
+    var err_dict = {};
+
     for (var i=0; i<feature_list.length; i++) {
         feat_dict[feature_list[i]] = {"valid": 0, "total": 0};
     }
     for (var i=0; i<primitive_list.length; i++) {
         prim_dict[primitive_list[i]] = {"valid": 0, "total": 0};
+    }
+    for (var i=0; i<error_list.length; i++) {
+        err_dict[error_list[i]] = 0;
     }
 
     for (var f=0; f<report.features.length; f++) {
@@ -292,6 +219,12 @@ function parse_valid_amounts(report) {
         feat_dict[feature.type]["total"] += 1;
         if (feature.validity) {
             feat_dict[feature.type]["valid"] += 1;
+        } else {
+            if (feature.errors_feature != null) {
+                for (var e=0; e<feature.errors_feature.length; e++) {
+                    err_dict[feature.errors_feature[e]["code"]] += 1;
+                }
+            }
         }
 
         for (var p=0; p<feature.primitives.length; p++) {
@@ -299,11 +232,15 @@ function parse_valid_amounts(report) {
             prim_dict[primitive.type]["total"] += 1;
             if (primitive.validity) {
                 prim_dict[primitive.type]["valid"] += 1;
+            } else {
+                for (var e=0; e<primitive.errors.length; e++) {
+                    err_dict[primitive.errors[e]["code"]] += 1;
+                }
             }
         }
     }
 
-    return [feat_dict, prim_dict];
+    return [feat_dict, prim_dict, err_dict];
 }
 
 
@@ -338,118 +275,167 @@ function summary_table_cells(tbl, type, dict) {
 }
 
 
-function summary_table(type) {
+function summary_table(type, dict) {
     // Validation summary table
-
-    var dicts = parse_valid_amounts(report);
 
     var tbl = document.createElement('table');
     var tr = tbl.insertRow(0);
     if (type == "features") {
         tbl.setAttribute('id', "summary_features");
         var headers = ["Features", "Total", "Valid", "Invalid"];
+        var overview = report.overview_features;
 
-        // table header
-        for (var i = 0; i < 4; i++){
-            var h = document.createElement('th');
-            h.appendChild(document.createTextNode(headers[i]));
-            tr.appendChild(h);
-        }
-
-        for (var f=0; f<report.overview_features.length; f++) {
-            var type = report.overview_features[f];
-            tbl = summary_table_cells(tbl, type, dicts[0]);
-        }
+        // // table header
+        // for (var i = 0; i < 4; i++){
+        //     var h = document.createElement('th');
+        //     h.appendChild(document.createTextNode(headers[i]));
+        //     tr.appendChild(h);
+        // }
+        //
+        // for (var f=0; f<report.overview_features.length; f++) {
+        //     var type = report.overview_features[f];
+        //     tbl = summary_table_cells(tbl, type, dict);
+        // }
 
 
     } else if (type == "primitives") {
-        var headers = ["Primitives", "Total", "Valid", "Invalid"];
         tbl.setAttribute('id', "summary_primitives");
+        var headers = ["Primitives", "Total", "Valid", "Invalid"];
+        var overview = report.overview_primitives;
 
-        // table header
-        for (var i=0; i < 4; i++){
-            var h = document.createElement('th');
-            h.appendChild(document.createTextNode(headers[i]));
-            tr.appendChild(h);
-        }
+        // // table header
+        // for (var i=0; i < 4; i++){
+        //     var h = document.createElement('th');
+        //     h.appendChild(document.createTextNode(headers[i]));
+        //     tr.appendChild(h);
+        // }
+        //
+        // for (var p=0; p<report.overview_primitives.length; p++) {
+        //     var type = report.overview_primitives[p];
+        //     tbl = summary_table_cells(tbl, type, dict);
+        // }
+    }
 
-        for (var p=0; p<report.overview_primitives.length; p++) {
-            var type = report.overview_primitives[p];
-            tbl = summary_table_cells(tbl, type, dicts[1]);
-        }
+    // table header
+    for (var i = 0; i < 4; i++){
+        var h = document.createElement('th');
+        h.appendChild(document.createTextNode(headers[i]));
+        tr.appendChild(h);
+    }
+
+    for (var f=0; f<overview.length; f++) {
+        var type = overview[f];
+        tbl = summary_table_cells(tbl, type, dict);
     }
 
     return tbl;
 }
 
-function idx_validation_summary(){
+
+function idx_validation_summary(feat_dict, prim_dict){
     var body = document.body;
 
     if (report.overview_features != null) {
-        var tbl = summary_table("features");
+        var tbl = summary_table("features", feat_dict);
         body.appendChild(tbl);
     }
 
     if (report.overview_primitives != null) {
-        var tbl = summary_table("primitives");
+        var tbl = summary_table("primitives", prim_dict);
         body.appendChild(tbl);
     }
-
-    // if (report.CityObjects != null) {
-    //     var tr = tbl.insertRow();
-    //
-    //     // cell CityObjects
-    //     var td0 = tr.insertCell(0);
-    //     var a = document.createElement('a');
-    //     var linkText = document.createTextNode('CityObjects (click for more details)');
-    //     a.appendChild(linkText);
-    //     a.title = "CityObjects";
-    //     a.href = "CityObjects.html";
-    //     td0.appendChild(a);
-    //     // cell Total
-    //     var td_t = tr.insertCell(1);
-    //     td_t.appendChild(document.createTextNode(report.total_cityobjects));
-    //     // cell Valid
-    //     var td_v = tr.insertCell(2);
-    //     var CO_valid_pc = Math.round(report.valid_cityobjects / report.total_cityobjects * 100);
-    //     var v = report.valid_cityobjects + ' (' + CO_valid_pc + '%)';
-    //     td_v.appendChild(document.createTextNode(v));
-    //     // cell Invalid
-    //     var td_i = tr.insertCell(3);
-    //     var CO_invalid_pc = Math.round(report.invalid_cityobjects / report.total_cityobjects * 100);
-    //     var i = report.invalid_cityobjects + ' (' + CO_invalid_pc + '%)';
-    //     td_i.appendChild(document.createTextNode(i));
-    // }
-    //
-    // if (report.Primitives != null) {
-    //     var tr = tbl.insertRow();
-    //
-    //     // cell Primitives
-    //     var td0 = tr.insertCell(0);
-    //     var a = document.createElement('a');
-    //     var linkText = document.createTextNode('Primitives');
-    //     a.appendChild(linkText);
-    //     a.title = "Primitives";
-    //     a.href = "Primitives.html";
-    //     td0.appendChild(a);
-    //     // cell Total
-    //     var td_t = tr.insertCell(1);
-    //     td_t.appendChild(document.createTextNode(report.total_primitives));
-    //     // cell Valid
-    //     var td_v = tr.insertCell(2);
-    //     var p_valid_pc = Math.round(report.valid_primitives / report.total_primitives * 100);
-    //     var v = report.valid_primitives + ' (' + p_valid_pc + '%)';
-    //     td_v.appendChild(document.createTextNode(v));
-    //     // cell Invalid
-    //     var td_i = tr.insertCell(3);
-    //     var p_invalid_pc = Math.round(report.invalid_primitives / report.total_primitives * 100);
-    //     var i = report.invalid_primitives + ' (' + p_invalid_pc + '%)';
-    //     td_i.appendChild(document.createTextNode(i));
-    // }
-
 }
 
-idx_validation_summary();
+
+function error_overview(err_dict) {
+
+  if (report.overview_errors == null) {
+    var h = document.createElement("H3")
+    var t = document.createTextNode("No errors!");
+    h.appendChild(t);
+    document.body.appendChild(h);
+    var x = document.createElement("IMG");
+    x.setAttribute("src", "http://geovalidation.bk.tudelft.nl/val3dity/img/welldone.png");
+    x.setAttribute("alt", "The Pulpit Rock");
+    document.body.appendChild(x);
+    return;
+  }
+  else {
+    var h = document.createElement("H3")
+    var t = document.createTextNode("Overview of errors");
+    h.appendChild(t);
+    document.body.appendChild(h);
+    idx_error_table(err_dict);
+  }
+}
+
+
+
+function idx_error_table(err_dict){
+
+    var body = document.body,
+        tbl  = document.createElement('table');
+    tbl.setAttribute('id', "errors");
+
+
+    var tr = tbl.insertRow(0);
+    var headers = ['Error', '# of objects'];
+    for (var i = 0; i < 2; i++){
+        var h = document.createElement('th');
+        h.appendChild(document.createTextNode(headers[i]));
+        tr.appendChild(h);
+    }
+
+    var nr_errors = report.overview_errors.length;
+    var l_errors = report.overview_errors;
+    // var nr_prims = report.overview_errors_no_primitives;
+
+    for(var i=0; i<nr_errors; i++){
+        var tr = tbl.insertRow();
+        var td0 = tr.insertCell(0);
+        var td1 = tr.insertCell(1);
+        var err = errors[l_errors[i]]; // the error mapping with links and names and such
+        var a = document.createElement('a');
+        var linkText = document.createTextNode(err.name);
+        a.appendChild(linkText);
+        a.title = err.name;
+        a.href = err.link.href;
+        a.target = '_blank';
+        td0.appendChild(a);
+        if (err_dict[l_errors[i]] < 0) {
+            // this happens on input error
+            td1.appendChild(document.createTextNode("\u2014"));
+        } else {
+            td1.appendChild(document.createTextNode(err_dict[l_errors[i]]));
+        }
+
+        // set colour
+        if (l_errors[i] < 200) {
+            tr.setAttribute('class', 'linear-ring-level');
+        } else if (100 < l_errors[i] && l_errors[i] < 300) {
+            tr.setAttribute('class', 'polygon-level');
+        } else if(200 < l_errors[i] && l_errors[i] < 400) {
+            tr.setAttribute('class', 'shell-level');
+        } else if (300 < l_errors[i] && l_errors[i] < 500) {
+            tr.setAttribute('class', 'solid-level');
+        } else if (400 < l_errors[i] && l_errors[i] < 600) {
+            tr.setAttribute('class', 'solid-interactions-level');
+        } else if (500 < l_errors[i] && l_errors[i] < 700) {
+            tr.setAttribute('class', 'citygml-building');
+        } else if (800 < l_errors[i] && l_errors[i] < 1000) {
+            tr.setAttribute('class', 'others');
+        }
+    }
+    body.appendChild(tbl);
+}
+
+
+var dicts = parse_valid_amounts(report);
+var feat_dict = dicts[0];
+var prim_dict = dicts[1];
+var err_dict = dicts[2];
+
+idx_validation_summary(feat_dict, prim_dict);
 
 // Populate index.html with the validation results from the json report
 document.getElementById("in_file").innerHTML = report.input_file.split("/").pop();
@@ -461,4 +447,4 @@ document.getElementById("snap_tol").innerHTML = report.snap_tol;
 document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 
 document.write('<br>');
-error_overview();
+error_overview(err_dict);

@@ -93,6 +93,7 @@ table#summary_features, table#summary_primitives {
 
 table#errors {
     margin-top: 20px;
+    margin-bottom: 2em;
 }
 
 #errors th {
