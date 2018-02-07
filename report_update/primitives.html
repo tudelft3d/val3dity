@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" type="text/css" href="index.css">
+        <title>Primitives</title>
+    </head>
+
+    <body>
+        <div id="header">
+            <div class="content">
+                <h2>Primitives in <b id="infile"></b>
+                </h2>
+                <br/>
+                <button href="#" class="filter_link" data-filter="all">All</button>
+                <button href="#" class="filter_link" data-filter="true">Valid</button>
+                <button id="invalid" href="#" class="filter_link" data-filter="false">Invalid</button>
+            </div>
+        </div>
+
+        <button id="expandAll">Expand All</button>
+        <button id="collapseAll">Collapse All</button>
+        <div id="tree"></div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="treeview.js"></script>
+        <script src="report.js"></script>
+
+        <script>
+            var input = report.input_file;
+            document.getElementById("infile").innerHTML = input.split("/").pop();
+
+            if (report.Primitives != null) {
+                // Grab expand/collapse buttons
+                var expandAll = document.getElementById('expandAll');
+                var collapseAll = document.getElementById('collapseAll');
+
+                // Create tree
+                var t = new TreeView(report.Primitives, 'tree');
+
+                // Attach events
+                expandAll.onclick = function () { t.expandAll(); };
+                collapseAll.onclick = function () { t.collapseAll(); };
+            } else {
+                // do nothing
+            }
+
+            // filter tree
+            var $treeElements = $('.tree-leaf');
+
+            $('.filter_link').click(function(e){
+                e.preventDefault();
+                // get the category from the attribute
+                var filterVal = $(this).data('filter');
+
+                if (filterVal === 'all') {
+                  $treeElements.show();
+                } else {
+                   // hide all then filter the ones to show, but always include the errors
+                   $treeElements.hide().filter("[validity=" + filterVal + "]").show();
+                }
+            });
+
+        </script>
+
+    </body>
+</html>
