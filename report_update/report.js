@@ -32,7 +32,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -49,7 +49,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -66,7 +66,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -83,7 +83,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -100,7 +100,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -117,7 +117,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -134,7 +134,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -151,7 +151,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -168,7 +168,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -185,7 +185,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "CityFurniture",
       "validity": true
     },
     {
@@ -202,7 +202,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -219,7 +219,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -236,7 +236,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -253,7 +253,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -270,7 +270,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -287,7 +287,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -304,7 +304,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -321,7 +321,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -338,7 +338,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -355,7 +355,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -372,7 +372,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -389,7 +389,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -406,7 +406,7 @@ var report={
           "validity": true
         }
       ],
-      "type": "Building",
+      "type": "Vegetation",
       "validity": true
     },
     {
@@ -436,7 +436,7 @@ var report={
           "numberfaces": 17,
           "numbershells": 1,
           "numbervertices": 28,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -453,7 +453,7 @@ var report={
           "numberfaces": 14,
           "numbershells": 1,
           "numbervertices": 25,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -470,7 +470,7 @@ var report={
           "numberfaces": 10,
           "numbershells": 1,
           "numbervertices": 16,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -487,7 +487,7 @@ var report={
           "numberfaces": 12,
           "numbershells": 1,
           "numbervertices": 19,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -504,7 +504,7 @@ var report={
           "numberfaces": 10,
           "numbershells": 1,
           "numbervertices": 16,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -521,7 +521,7 @@ var report={
           "numberfaces": 18,
           "numbershells": 1,
           "numbervertices": 33,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -538,7 +538,7 @@ var report={
           "numberfaces": 8,
           "numbershells": 1,
           "numbervertices": 12,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -555,7 +555,7 @@ var report={
           "numberfaces": 20,
           "numbershells": 1,
           "numbervertices": 40,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -572,7 +572,7 @@ var report={
           "numberfaces": 21,
           "numbershells": 1,
           "numbervertices": 36,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -589,7 +589,7 @@ var report={
           "numberfaces": 72,
           "numbershells": 1,
           "numbervertices": 130,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -606,7 +606,7 @@ var report={
           "numberfaces": 10,
           "numbershells": 1,
           "numbervertices": 16,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -623,7 +623,7 @@ var report={
           "numberfaces": 7,
           "numbershells": 1,
           "numbervertices": 10,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -640,7 +640,7 @@ var report={
           "numberfaces": 14,
           "numbershells": 1,
           "numbervertices": 27,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -657,7 +657,7 @@ var report={
           "numberfaces": 9,
           "numbershells": 1,
           "numbervertices": 14,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -674,7 +674,7 @@ var report={
           "numberfaces": 6,
           "numbershells": 1,
           "numbervertices": 8,
-          "type": "Solid",
+          "type": "Polygon",
           "validity": true
         }
       ],
@@ -11238,8 +11238,8 @@ var report={
   ],
   "overview_features": [
     "Building",
-    "some-stuff",
-    "some-other-stuff"
+    "CityFurniture",
+    "Vegetation"
   ],
   "overview_primitives": [
     "Solid",

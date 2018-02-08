@@ -244,18 +244,24 @@ function parse_valid_amounts(report) {
 }
 
 
-function summary_table_cells(tbl, type, dict) {
+function summary_table_cells(tbl, type, dict, generic_type) {
     var tr = tbl.insertRow();
 
-    // cell type
-    var td0 = tr.insertCell(0);
-    td0.appendChild(document.createTextNode(type));
-    // var a = document.createElement('a');
-    // var linkText = document.createTextNode('CityObjects (click for more details)');
-    // a.appendChild(linkText);
-    // a.title = "CityObjects";
-    // a.href = "CityObjects.html";
-    // td0.appendChild(a);
+    if (generic_type == "features") {
+        // cell type
+        var td0 = tr.insertCell(0);
+        // td0.appendChild(document.createTextNode(type));
+        var a = document.createElement('a');
+        var linkText = document.createTextNode(type + " (click for details)");
+        a.appendChild(linkText);
+        a.title = type;
+        a.href = "tree_template.html?feature_type=" + type;
+        td0.appendChild(a);
+    } else if (generic_type == "primitives") {
+        // cell type
+        var td0 = tr.insertCell(0);
+        td0.appendChild(document.createTextNode(type));
+    }
     // cell Total
     var td_t = tr.insertCell(1);
     td_t.appendChild(document.createTextNode(dict[type]["total"]));
@@ -275,45 +281,19 @@ function summary_table_cells(tbl, type, dict) {
 }
 
 
-function summary_table(type, dict) {
+function summary_table(generic_type, dict) {
     // Validation summary table
 
     var tbl = document.createElement('table');
     var tr = tbl.insertRow(0);
-    if (type == "features") {
+    if (generic_type == "features") {
         tbl.setAttribute('id', "summary_features");
         var headers = ["Features", "Total", "Valid", "Invalid"];
         var overview = report.overview_features;
-
-        // // table header
-        // for (var i = 0; i < 4; i++){
-        //     var h = document.createElement('th');
-        //     h.appendChild(document.createTextNode(headers[i]));
-        //     tr.appendChild(h);
-        // }
-        //
-        // for (var f=0; f<report.overview_features.length; f++) {
-        //     var type = report.overview_features[f];
-        //     tbl = summary_table_cells(tbl, type, dict);
-        // }
-
-
-    } else if (type == "primitives") {
+    } else if (generic_type == "primitives") {
         tbl.setAttribute('id', "summary_primitives");
         var headers = ["Primitives", "Total", "Valid", "Invalid"];
         var overview = report.overview_primitives;
-
-        // // table header
-        // for (var i=0; i < 4; i++){
-        //     var h = document.createElement('th');
-        //     h.appendChild(document.createTextNode(headers[i]));
-        //     tr.appendChild(h);
-        // }
-        //
-        // for (var p=0; p<report.overview_primitives.length; p++) {
-        //     var type = report.overview_primitives[p];
-        //     tbl = summary_table_cells(tbl, type, dict);
-        // }
     }
 
     // table header
@@ -325,7 +305,7 @@ function summary_table(type, dict) {
 
     for (var f=0; f<overview.length; f++) {
         var type = overview[f];
-        tbl = summary_table_cells(tbl, type, dict);
+        tbl = summary_table_cells(tbl, type, dict, generic_type);
     }
 
     return tbl;
