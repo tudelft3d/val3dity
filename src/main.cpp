@@ -53,8 +53,9 @@ std::string VAL3DITY_VERSION = "2.0.4";
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
-void        write_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
+void        write_report_html(json& jr, std::string report);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -537,8 +538,9 @@ int main(int argc, char* const argv[])
     //-- output report
     if ( (report.getValue() != "") || (report_json.getValue() != "") )
     {
+      //-- save the json report in memory first
       json jr;
-      write_report_json(jr, 
+      get_report_json(jr, 
                        inputfile.getValue(),
                        lsFeatures,
                        snap_tol.getValue(),
@@ -549,48 +551,7 @@ int main(int argc, char* const argv[])
                        onlyinvalid.getValue());
       // HTML report
       if (report.getValue() != "") {
-        boost::filesystem::path outpath(report.getValue());
-        if (boost::filesystem::exists(outpath.parent_path()) == false)
-          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-        else {
-          if (boost::filesystem::exists(outpath) == false)
-            boost::filesystem::create_directory(outpath);
-          boost::filesystem::path outfile = outpath / "report.html";
-          std::ofstream o(outfile.string());
-          o << indexhtml << std::endl;                                
-          std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-          o.close();
-
-          outfile = outpath / "report.js";
-          o.open(outfile.string());
-          o << "var report =" << jr << std::endl;                                
-          o.close();
-
-          outfile = outpath / "CityObjects.html";
-          o.open(outfile.string());
-          o << cityobjectshtml << std::endl;                                
-          o.close();
-
-          outfile = outpath / "Primitives.html";
-          o.open(outfile.string());
-          o << primitiveshtml << std::endl;                                
-          o.close();
-          
-          outfile = outpath / "treeview.js";
-          o.open(outfile.string());
-          o << treeviewjs << std::endl;                                
-          o.close();
-
-          outfile = outpath / "val3dityconfig.js";
-          o.open(outfile.string());
-          o << val3dityconfigjs << std::endl;                                
-          o.close();
-          
-          outfile = outpath / "index.css";
-          o.open(outfile.string());
-          o << indexcss << std::endl;                                
-          o.close();
-        }
+        write_report_html(jr, report.getValue());
       }
       // JSON report
       if (report_json.getValue() != ""){
@@ -624,6 +585,48 @@ int main(int argc, char* const argv[])
   {
     std::cout << "ERROR: " << e.error() << " for arg " << e.argId() << std::endl;
     return(0);
+  }
+}
+
+
+void write_report_html(json& jr, std::string report)
+{
+  boost::filesystem::path outpath(report);
+  if (boost::filesystem::exists(outpath.parent_path()) == false)
+    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+  else {
+    if (boost::filesystem::exists(outpath) == false)
+      boost::filesystem::create_directory(outpath);
+    boost::filesystem::path outfile = outpath / "report.html";
+    std::ofstream o(outfile.string());
+    o << report_indexhtml << std::endl;                                
+    std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
+    o.close();
+
+    outfile = outpath / "report.js";
+    o.open(outfile.string());
+    o << "var report =" << jr << std::endl;                                
+    o.close();
+
+    outfile = outpath / "tree_template.html";
+    o.open(outfile.string());
+    o << report_treetemplate << std::endl;                                
+    o.close();
+
+    outfile = outpath / "treeview.js";
+    o.open(outfile.string());
+    o << report_treeviewjs << std::endl;                                
+    o.close();
+
+    outfile = outpath / "val3dityconfig.js";
+    o.open(outfile.string());
+    o << report_val3dityconfigjs << std::endl;                                
+    o.close();
+    
+    outfile = outpath / "index.css";
+    o.open(outfile.string());
+    o << report_indexcss << std::endl;                                
+    o.close();
   }
 }
 
@@ -789,15 +792,15 @@ void print_license() {
 }
 
 
-void write_report_json(json& jr,
-                       std::string ifile, 
-                       std::vector<Feature*>& lsFeatures,
-                       double snap_tol,
-                       double overlap_tol,
-                       double planarity_d2p_tol,
-                       double planarity_n_tol,
-                       IOErrors ioerrs,
-                       bool onlyinvalid)
+void get_report_json(json& jr,
+                     std::string ifile, 
+                     std::vector<Feature*>& lsFeatures,
+                     double snap_tol,
+                     double overlap_tol,
+                     double planarity_d2p_tol,
+                     double planarity_n_tol,
+                     IOErrors ioerrs,
+                     bool onlyinvalid)
 {
   jr["type"] = "val3dity report";
   jr["val3dity_version"] = VAL3DITY_VERSION; 
