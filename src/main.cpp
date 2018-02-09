@@ -56,6 +56,7 @@ std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
 void        write_report_html(json& jr, std::string report);
+void        write_report_json(json& jr, std::string report);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -550,22 +551,11 @@ int main(int argc, char* const argv[])
                        ioerrs,
                        onlyinvalid.getValue());
       // HTML report
-      if (report.getValue() != "") {
+      if (report.getValue() != "") 
         write_report_html(jr, report.getValue());
-      }
       // JSON report
-      if (report_json.getValue() != ""){
-        boost::filesystem::path outpath(report_json.getValue());
-        if (boost::filesystem::exists(outpath.parent_path()) == false)
-          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-        else {
-          if (boost::filesystem::extension(outpath) != ".json")
-            outpath += ".json";
-          std::ofstream o(outpath.string());
-          o << jr.dump(2) << std::endl;                                
-          std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
-        }
-      }
+      if (report_json.getValue() != "")
+        write_report_json(jr, report_json.getValue());
     }
     else
       std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
@@ -587,6 +577,23 @@ int main(int argc, char* const argv[])
     return(0);
   }
 }
+
+
+void write_report_json(json& jr, std::string report)
+{
+  boost::filesystem::path outpath(report);
+  if (boost::filesystem::exists(outpath.parent_path()) == false)
+    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+  else {
+    if (boost::filesystem::extension(outpath) != ".json")
+      outpath += ".json";
+    std::ofstream o(outpath.string());
+    o << jr.dump(2) << std::endl;                                
+    std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+  }
+
+}
+
 
 
 void write_report_html(json& jr, std::string report)
