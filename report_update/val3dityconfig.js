@@ -210,10 +210,11 @@ function parse_valid_amounts(report) {
     for (var i=0; i<primitive_list.length; i++) {
         prim_dict[primitive_list[i]] = {"valid": 0, "total": 0};
     }
-    for (var i=0; i<error_list.length; i++) {
-        err_dict[error_list[i]] = 0;
+    if (error_list != null) {
+        for (var i=0; i<error_list.length; i++) {
+            err_dict[error_list[i]] = 0;
+        }
     }
-
     for (var f=0; f<report.features.length; f++) {
         var feature = report.features[f];
         feat_dict[feature.type]["total"] += 1;
