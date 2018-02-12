@@ -14,8 +14,7 @@ var report = {
                 "numbershells": 1,
                 "numbervertices": 8,
                 "type": "Solid",
-                "validity": true
-            }, {
+                "validity": true}, {
                 "errors": [{
                     "code": 902,
                     "description": "EMPTY_PRIMITIVE",
