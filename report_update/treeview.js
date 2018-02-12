@@ -159,10 +159,21 @@
           leaf.appendChild(content);
 
           if ((item.primitives && item.primitives.length > 0) ||
-                (item.errors && item.errors.length > 0)
+                (item.errors && item.errors.length > 0) ||
+                (item.errors_feature && item.errors_feature)
             ) {
             var children = document.createElement('div');
             children.setAttribute('class', 'tree-child-leaves');
+            if (item.errors_feature) {
+                forEach(item.errors_feature, function (child) {
+                  var childLeaf = renderLeaf(child);
+                  children.appendChild(childLeaf);
+                });
+                if (!item.expanded) {
+                  children.classList.add('hidden');
+                }
+                leaf.appendChild(children);
+            }
             if (item.errors) {
                 forEach(item.errors, function (child) {
                   var childLeaf = renderLeaf(child);
