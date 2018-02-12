@@ -964,42 +964,69 @@ function parse_valid_amounts(report) {
     var prim_dict = {};
     var err_dict = {};
 
-    for (var i=0; i<feature_list.length; i++) {
-        feat_dict[feature_list[i]] = {"valid": 0, "total": 0};
-    }
-    for (var i=0; i<primitive_list.length; i++) {
-        prim_dict[primitive_list[i]] = {"valid": 0, "total": 0};
-    }
-    for (var i=0; i<error_list.length; i++) {
-        err_dict[error_list[i]] = 0;
-    }
-
-    for (var f=0; f<report.features.length; f++) {
-        var feature = report.features[f];
-        feat_dict[feature.type]["total"] += 1;
-        if (feature.validity) {
-            feat_dict[feature.type]["valid"] += 1;
-        } else {
-            if (feature.errors_feature != null) {
-                for (var e=0; e<feature.errors_feature.length; e++) {
-                    err_dict[feature.errors_feature[e]["code"]] += 1;
-                }
-            }
+    if (feature_list != null) {
+        for (var i=0; i<feature_list.length; i++) {
+            feat_dict[feature_list[i]] = {"valid": 0, "total": 0};
         }
-
-        for (var p=0; p<feature.primitives.length; p++) {
-            var primitive = feature.primitives[p];
-            prim_dict[primitive.type]["total"] += 1;
-            if (primitive.validity) {
-                prim_dict[primitive.type]["valid"] += 1;
+    }
+    if (primitive_list != null) {
+        for (var i=0; i<primitive_list.length; i++) {
+            prim_dict[primitive_list[i]] = {"valid": 0, "total": 0};
+        }
+    }
+    if (error_list != null) {
+        for (var i=0; i<error_list.length; i++) {
+            err_dict[error_list[i]] = 0;
+        }
+    }
+    if (report.features != null) {
+        for (var f=0; f<report.features.length; f++) {
+            var feature = report.features[f];
+            feat_dict[feature.type]["total"] += 1;
+            if (feature.validity) {
+                feat_dict[feature.type]["valid"] += 1;
             } else {
-                for (var e=0; e<primitive.errors.length; e++) {
-                    err_dict[primitive.errors[e]["code"]] += 1;
+                if (feature.errors_feature != null) {
+                    for (var e=0; e<feature.errors_feature.length; e++) {
+                        err_dict[feature.errors_feature[e]["code"]] += 1;
+                    }
+                }
+            }
+
+            for (var p=0; p<feature.primitives.length; p++) {
+                var primitive = feature.primitives[p];
+                prim_dict[primitive.type]["total"] += 1;
+                if (primitive.validity) {
+                    prim_dict[primitive.type]["valid"] += 1;
+                } else if (primitive.errors != null) {
+                    for (var e=0; e<primitive.errors.length; e++) {
+                        err_dict[primitive.errors[e]["code"]] += 1;
+                    }
+                }
+                // in case of CompositeSolids
+                if ("primitives" in primitive) {
+                    for (var p=0; p<primitive.primitives.length; p++) {
+                        var pm = primitive.primitives[p];
+                        if (pm.type in prim_dict) {
+                            prim_dict[pm.type]["total"] += 1;
+                        } else {
+                            prim_dict[pm.type] = {"valid": 0, "total": 0};
+                            prim_dict[pm.type]["total"] += 1;
+                        }
+
+                        if (pm.validity) {
+                            prim_dict[pm.type]["valid"] += 1;
+                        } else if (pm.errors != null) {
+                            for (var e=0; e<pm.errors.length; e++) {
+                                err_dict[pm.errors[e]["code"]] += 1;
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
+    console.log(prim_dict)
     return [feat_dict, prim_dict, err_dict];
 }
 
@@ -1012,7 +1039,7 @@ function summary_table_cells(tbl, type, dict, generic_type) {
         var td0 = tr.insertCell(0);
         // td0.appendChild(document.createTextNode(type));
         var a = document.createElement('a');
-        var linkText = document.createTextNode(type + " (click for details) " );
+        var linkText = document.createTextNode(type + ' (click for details)');
         a.appendChild(linkText);
         a.title = type;
         a.href = "tree_template.html?feature_type=" + type;
@@ -1053,7 +1080,8 @@ function summary_table(generic_type, dict) {
     } else if (generic_type == "primitives") {
         tbl.setAttribute('id', "summary_primitives");
         var headers = ["Primitives", "Total", "Valid", "Invalid"];
-        var overview = report.overview_primitives;
+        // var overview = report.overview_primitives;
+        var overview = Object.keys(dict);
     }
 
     // table header
