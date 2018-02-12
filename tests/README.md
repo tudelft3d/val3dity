@@ -9,6 +9,11 @@ Run basic set of tests:
 $ pytest
 ```
 
+By default pytest assumes that the `val3dity` executable is located at `/build/val3dity` or `/build/val3dity.exe` in case of Windows. If you have an out-of-source build, pass the exe to pytest as:
+```
+$ pytest --exe=/path/to/val3dity/exe
+```
+
 Run full set of tests:
 ```
 $ pytest --runfull
