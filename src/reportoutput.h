@@ -540,7 +540,7 @@ std::string report_treeviewjs = R"(
                   content.appendChild(nrshells);
                   content.appendChild(nrfaces);
                   content.appendChild(nrvertices);
-              } 
+              }
               //-- MultiSurface
               else if(item.numbervertices != undefined) {
                   nrshells.setAttribute('class', 'tree-leaf-nrshells');
@@ -563,10 +563,21 @@ std::string report_treeviewjs = R"(
           leaf.appendChild(content);
 
           if ((item.primitives && item.primitives.length > 0) ||
-                (item.errors && item.errors.length > 0)
+                (item.errors && item.errors.length > 0) ||
+                (item.errors_feature && item.errors_feature)
             ) {
             var children = document.createElement('div');
             children.setAttribute('class', 'tree-child-leaves');
+            if (item.errors_feature) {
+                forEach(item.errors_feature, function (child) {
+                  var childLeaf = renderLeaf(child);
+                  children.appendChild(childLeaf);
+                });
+                if (!item.expanded) {
+                  children.classList.add('hidden');
+                }
+                leaf.appendChild(children);
+            }
             if (item.errors) {
                 forEach(item.errors, function (child) {
                   var childLeaf = renderLeaf(child);
@@ -1178,4 +1189,3 @@ document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 document.write('<br>');
 error_overview(err_dict);
 )";
-
