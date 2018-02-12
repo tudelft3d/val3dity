@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [Unreleased]
+### Changed
+- the CityObjects/Primitives subdivision in the report is replaced by Features/Primitives, where Features are the top-level objects, containing one or many Primitives. Primitives can also contain Primitives (e.g. CompositeSolid -> Solids). The Validation Summary table reports the amount of all Features and Primitives, incl. their member Primitives.
+
 ## [2.0.4] - 2018-01-26
 ### Changed
 - fixed bug where inner rings of gml:Polygon wasn't read properly when that polygon is referenced by an XLink.
