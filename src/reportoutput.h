@@ -1,5 +1,5 @@
 
-std::string indexhtml = R"(
+std::string report_indexhtml = R"(
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -73,22 +73,23 @@ std::string indexhtml = R"(
         <script src="val3dityconfig.js"></script>
     </body>
 </html>
+
 )";
 
 
-std::string cityobjectshtml = R"(
+std::string report_treetemplate = R"(
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
         <link rel="stylesheet" type="text/css" href="index.css" />
-        <title>CityObjects</title>
+        <title id="title"></title>
     </head>
 
     <body>
         <div id="header">
             <div class="content">
-                <h2>CityObjects in <b id="infile"></b>
+                <h2><cite id="feature"></cite> in <b id="infile"></b>
                 </h2>
                 <br/>
                 <button href="#" class="filter_link" data-filter="all">All</button>
@@ -106,16 +107,41 @@ std::string cityobjectshtml = R"(
         <script src="report.js"></script>
 
         <script>
+            var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+            };
+
+            var feature_type = getUrlParameter("feature_type");
+            document.getElementById("title").innerHTML = feature_type;
+            document.getElementById("feature").innerHTML = feature_type;
+
+            if (feature_type != null){
+                report.features = $.grep(report.features, function(v) {
+                    return v.type === feature_type;
+                });
+            }
+
             var input = report.input_file;
             document.getElementById("infile").innerHTML = input.split("/").pop();
 
-            if (report.CityObjects != null) {
+            if (report.features != null) {
                 // Grab expand/collapse buttons
                 var expandAll = document.getElementById('expandAll');
                 var collapseAll = document.getElementById('collapseAll');
 
                 // Create tree
-                var t = new TreeView(report.CityObjects, 'tree');
+                var t = new TreeView(report.features, 'tree');
 
                 // Attach events
                 expandAll.onclick = function () { t.expandAll(); };
@@ -146,7 +172,7 @@ std::string cityobjectshtml = R"(
 </html>
 )";
 
-std::string indexcss = R"(
+std::string report_indexcss = R"(
 /* Page-wide styles */
 html, body, h1, h2, h3, p, table, td, th {
     margin: 0;
@@ -178,7 +204,9 @@ p {
 
 table {
     border-collapse: collapse;
+    table-layout: fixed;
     }
+
 td {
     vertical-align: top;
 }
@@ -227,13 +255,20 @@ th {
     font-style: italic;
 }
 
-table#summary tr:hover {
+/*table#summary tr:hover {
     padding-top: .5em;
     background-color: #f5f5f5;
+}*/
+
+table#summary_features, table#summary_primitives {
+    margin-top: .5em;
+    margin-bottom: 1.5em;
+    padding-top: .5em;
 }
 
 table#errors {
     margin-top: 20px;
+    margin-bottom: 2em;
 }
 
 #errors th {
@@ -361,80 +396,12 @@ button#invalid {
 .tree-leaf .tree-leaf-content:after {
     clear: both;
 }
+
 )";
 
 
-std::string primitiveshtml = R"(
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8"/>
-        <link rel="stylesheet" type="text/css" href="index.css">
-        <title>Primitives</title>
-    </head>
 
-    <body>
-        <div id="header">
-            <div class="content">
-                <h2>Primitives in <b id="infile"></b>
-                </h2>
-                <br/>
-                <button href="#" class="filter_link" data-filter="all">All</button>
-                <button href="#" class="filter_link" data-filter="true">Valid</button>
-                <button id="invalid" href="#" class="filter_link" data-filter="false">Invalid</button>
-            </div>
-        </div>
-
-        <button id="expandAll">Expand All</button>
-        <button id="collapseAll">Collapse All</button>
-        <div id="tree"></div>
-
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="treeview.js"></script>
-        <script src="report.js"></script>
-
-        <script>
-            var input = report.input_file;
-            document.getElementById("infile").innerHTML = input.split("/").pop();
-
-            if (report.Primitives != null) {
-                // Grab expand/collapse buttons
-                var expandAll = document.getElementById('expandAll');
-                var collapseAll = document.getElementById('collapseAll');
-
-                // Create tree
-                var t = new TreeView(report.Primitives, 'tree');
-
-                // Attach events
-                expandAll.onclick = function () { t.expandAll(); };
-                collapseAll.onclick = function () { t.collapseAll(); };
-            } else {
-                // do nothing
-            }
-
-            // filter tree
-            var $treeElements = $('.tree-leaf');
-
-            $('.filter_link').click(function(e){
-                e.preventDefault();
-                // get the category from the attribute
-                var filterVal = $(this).data('filter');
-
-                if (filterVal === 'all') {
-                  $treeElements.show();
-                } else {
-                   // hide all then filter the ones to show, but always include the errors
-                   $treeElements.hide().filter("[validity=" + filterVal + "]").show();
-                }
-            });
-
-        </script>
-
-    </body>
-</html>
-)";
-
-std::string treeviewjs = R"(
+std::string report_treeviewjs = R"(
 // Adapted from js-treeview, see: https://github.com/justinchmura/js-treeview
 
 (function (define) {
@@ -779,7 +746,7 @@ std::string treeviewjs = R"(
 }(window.define));
 )";
 
-std::string val3dityconfigjs = R"(
+std::string report_val3dityconfigjs = R"(
 var errors = {
     "101": {
         "name": "101 – TOO_FEW_POINTS",
@@ -975,10 +942,144 @@ var errors = {
     }
 }
 
-function error_overview() {
+
+function parse_valid_amounts(report) {
+    // Get the amount of in/valids per feature and primitive type and
+    // get the amount of objects per error
+    var feature_list = report.overview_features;
+    var primitive_list = report.overview_primitives;
+    var error_list = report.overview_errors;
+    var feat_dict = {};
+    var prim_dict = {};
+    var err_dict = {};
+
+    for (var i=0; i<feature_list.length; i++) {
+        feat_dict[feature_list[i]] = {"valid": 0, "total": 0};
+    }
+    for (var i=0; i<primitive_list.length; i++) {
+        prim_dict[primitive_list[i]] = {"valid": 0, "total": 0};
+    }
+    for (var i=0; i<error_list.length; i++) {
+        err_dict[error_list[i]] = 0;
+    }
+
+    for (var f=0; f<report.features.length; f++) {
+        var feature = report.features[f];
+        feat_dict[feature.type]["total"] += 1;
+        if (feature.validity) {
+            feat_dict[feature.type]["valid"] += 1;
+        } else {
+            if (feature.errors_feature != null) {
+                for (var e=0; e<feature.errors_feature.length; e++) {
+                    err_dict[feature.errors_feature[e]["code"]] += 1;
+                }
+            }
+        }
+
+        for (var p=0; p<feature.primitives.length; p++) {
+            var primitive = feature.primitives[p];
+            prim_dict[primitive.type]["total"] += 1;
+            if (primitive.validity) {
+                prim_dict[primitive.type]["valid"] += 1;
+            } else {
+                for (var e=0; e<primitive.errors.length; e++) {
+                    err_dict[primitive.errors[e]["code"]] += 1;
+                }
+            }
+        }
+    }
+
+    return [feat_dict, prim_dict, err_dict];
+}
+
+
+function summary_table_cells(tbl, type, dict, generic_type) {
+    var tr = tbl.insertRow();
+
+    if (generic_type == "features") {
+        // cell type
+        var td0 = tr.insertCell(0);
+        // td0.appendChild(document.createTextNode(type));
+        var a = document.createElement('a');
+        var linkText = document.createTextNode(type + " (click for details) " );
+        a.appendChild(linkText);
+        a.title = type;
+        a.href = "tree_template.html?feature_type=" + type;
+        td0.appendChild(a);
+    } else if (generic_type == "primitives") {
+        // cell type
+        var td0 = tr.insertCell(0);
+        td0.appendChild(document.createTextNode(type));
+    }
+    // cell Total
+    var td_t = tr.insertCell(1);
+    td_t.appendChild(document.createTextNode(dict[type]["total"]));
+    // cell Valid
+    var td_v = tr.insertCell(2);
+    var valid_pc = Math.round(dict[type]["valid"] / dict[type]["total"] * 100);
+    var v = dict[type]["valid"] + ' (' + valid_pc + '%)';
+    td_v.appendChild(document.createTextNode(v));
+    // cell Invalid
+    var td_i = tr.insertCell(3);
+    var invalid = dict[type]["total"] - dict[type]["valid"];
+    var invalid_pc = Math.round(invalid / dict[type]["total"] * 100);
+    var i = invalid + ' (' + invalid_pc + '%)';
+    td_i.appendChild(document.createTextNode(i));
+
+    return tbl;
+}
+
+
+function summary_table(generic_type, dict) {
+    // Validation summary table
+
+    var tbl = document.createElement('table');
+    var tr = tbl.insertRow(0);
+    if (generic_type == "features") {
+        tbl.setAttribute('id', "summary_features");
+        var headers = ["Features", "Total", "Valid", "Invalid"];
+        var overview = report.overview_features;
+    } else if (generic_type == "primitives") {
+        tbl.setAttribute('id', "summary_primitives");
+        var headers = ["Primitives", "Total", "Valid", "Invalid"];
+        var overview = report.overview_primitives;
+    }
+
+    // table header
+    for (var i = 0; i < 4; i++){
+        var h = document.createElement('th');
+        h.appendChild(document.createTextNode(headers[i]));
+        tr.appendChild(h);
+    }
+
+    for (var f=0; f<overview.length; f++) {
+        var type = overview[f];
+        tbl = summary_table_cells(tbl, type, dict, generic_type);
+    }
+
+    return tbl;
+}
+
+
+function idx_validation_summary(feat_dict, prim_dict){
+    var body = document.body;
+
+    if (report.overview_features != null) {
+        var tbl = summary_table("features", feat_dict);
+        body.appendChild(tbl);
+    }
+
+    if (report.overview_primitives != null) {
+        var tbl = summary_table("primitives", prim_dict);
+        body.appendChild(tbl);
+    }
+}
+
+
+function error_overview(err_dict) {
 
   if (report.overview_errors == null) {
-    var h = document.createElement("H3")           
+    var h = document.createElement("H3")
     var t = document.createTextNode("No errors!");
     h.appendChild(t);
     document.body.appendChild(h);
@@ -989,23 +1090,25 @@ function error_overview() {
     return;
   }
   else {
-    var h = document.createElement("H3")           
+    var h = document.createElement("H3")
     var t = document.createTextNode("Overview of errors");
     h.appendChild(t);
     document.body.appendChild(h);
-    idx_error_table();
+    idx_error_table(err_dict);
   }
 }
 
-function idx_error_table(){
-   
+
+
+function idx_error_table(err_dict){
+
     var body = document.body,
         tbl  = document.createElement('table');
     tbl.setAttribute('id', "errors");
 
 
     var tr = tbl.insertRow(0);
-    var headers = ['Error', '# of primitives'];
+    var headers = ['Error', '# of objects'];
     for (var i = 0; i < 2; i++){
         var h = document.createElement('th');
         h.appendChild(document.createTextNode(headers[i]));
@@ -1014,13 +1117,13 @@ function idx_error_table(){
 
     var nr_errors = report.overview_errors.length;
     var l_errors = report.overview_errors;
-    var nr_prims = report.overview_errors_no_primitives;
+    // var nr_prims = report.overview_errors_no_primitives;
 
-    for(var i = 0; i < nr_errors; i++){
+    for(var i=0; i<nr_errors; i++){
         var tr = tbl.insertRow();
         var td0 = tr.insertCell(0);
         var td1 = tr.insertCell(1);
-        var err = errors[l_errors[i]];
+        var err = errors[l_errors[i]]; // the error mapping with links and names and such
         var a = document.createElement('a');
         var linkText = document.createTextNode(err.name);
         a.appendChild(linkText);
@@ -1028,11 +1131,11 @@ function idx_error_table(){
         a.href = err.link.href;
         a.target = '_blank';
         td0.appendChild(a);
-        if (nr_prims[i] < 0) {
+        if (err_dict[l_errors[i]] < 0) {
             // this happens on input error
             td1.appendChild(document.createTextNode("\u2014"));
         } else {
-            td1.appendChild(document.createTextNode(nr_prims[i]));
+            td1.appendChild(document.createTextNode(err_dict[l_errors[i]]));
         }
 
         // set colour
@@ -1055,75 +1158,13 @@ function idx_error_table(){
     body.appendChild(tbl);
 }
 
-function idx_validation_summary(){
-    var body = document.body,
-        tbl  = document.createElement('table');
-    tbl.setAttribute('id', "summary");
 
-    var tr = tbl.insertRow(0);
-    var headers = [" ", "Total", "Valid", "Invalid"];
-    for (var i = 0; i < 4; i++){
-        var h = document.createElement('th');
-        h.appendChild(document.createTextNode(headers[i]));
-        tr.appendChild(h);
-    }
+var dicts = parse_valid_amounts(report);
+var feat_dict = dicts[0];
+var prim_dict = dicts[1];
+var err_dict = dicts[2];
 
-    if (report.CityObjects != null) {
-        var tr = tbl.insertRow();
-
-        // cell CityObjects
-        var td0 = tr.insertCell(0);
-        var a = document.createElement('a');
-        var linkText = document.createTextNode('CityObjects (click for more details)');
-        a.appendChild(linkText);
-        a.title = "CityObjects";
-        a.href = "CityObjects.html";
-        td0.appendChild(a);
-        // cell Total
-        var td_t = tr.insertCell(1);
-        td_t.appendChild(document.createTextNode(report.total_cityobjects));
-        // cell Valid
-        var td_v = tr.insertCell(2);
-        var CO_valid_pc = Math.round(report.valid_cityobjects / report.total_cityobjects * 100);
-        var v = report.valid_cityobjects + ' (' + CO_valid_pc + '%)';
-        td_v.appendChild(document.createTextNode(v));
-        // cell Invalid
-        var td_i = tr.insertCell(3);
-        var CO_invalid_pc = Math.round(report.invalid_cityobjects / report.total_cityobjects * 100);
-        var i = report.invalid_cityobjects + ' (' + CO_invalid_pc + '%)';
-        td_i.appendChild(document.createTextNode(i));
-    }
-
-    if (report.Primitives != null) {
-        var tr = tbl.insertRow();
-
-        // cell Primitives
-        var td0 = tr.insertCell(0);
-        var a = document.createElement('a');
-        var linkText = document.createTextNode('Primitives');
-        a.appendChild(linkText);
-        a.title = "Primitives";
-        a.href = "Primitives.html";
-        td0.appendChild(a);
-        // cell Total
-        var td_t = tr.insertCell(1);
-        td_t.appendChild(document.createTextNode(report.total_primitives));
-        // cell Valid
-        var td_v = tr.insertCell(2);
-        var p_valid_pc = Math.round(report.valid_primitives / report.total_primitives * 100);
-        var v = report.valid_primitives + ' (' + p_valid_pc + '%)';
-        td_v.appendChild(document.createTextNode(v));
-        // cell Invalid
-        var td_i = tr.insertCell(3);
-        var p_invalid_pc = Math.round(report.invalid_primitives / report.total_primitives * 100);
-        var i = report.invalid_primitives + ' (' + p_invalid_pc + '%)';
-        td_i.appendChild(document.createTextNode(i));
-    }
-
-    body.appendChild(tbl);
-}
-
-idx_validation_summary();
+idx_validation_summary(feat_dict, prim_dict);
 
 // Populate index.html with the validation results from the json report
 document.getElementById("in_file").innerHTML = report.input_file.split("/").pop();
@@ -1135,6 +1176,6 @@ document.getElementById("snap_tol").innerHTML = report.snap_tol;
 document.getElementById("overlap_tol").innerHTML = report.overlap_tol;
 
 document.write('<br>');
-error_overview();
+error_overview(err_dict);
 )";
 
