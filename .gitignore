@@ -36,6 +36,9 @@ x86/
 /build
 /docs/_build
 
+# Vagrant
+.vagrant/
+
 # Balázs (Visual Studio etc)
 .vscode/
 .cproject

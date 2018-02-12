@@ -1,4 +1,4 @@
-# val3dity 
+# val3dity
 
 val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
 Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS only validates 2D primitives).
@@ -7,7 +7,7 @@ In short, it verifies whether a 3D primitive respects the definition as given in
 All the 3D primitives of GML are supported:
 
   - `<gml:MultiSurface>`
-  - `<gml:CompositeSurface>` 
+  - `<gml:CompositeSurface>`
   - `<gml:Solid>`
   - `<gml:MultiSolid>`
   - `<gml:CompositeSolid>`
@@ -17,16 +17,16 @@ However, as is the case for CityGML, only planar and linear primitives are allow
 
 val3dity accepts as input:
 
-  - [CityGML](https://www.citygml.org) 
+  - [CityGML](https://www.citygml.org)
   - [CityJSON](http://www.cityjson.org)
   - [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) of any flavour
-  - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) 
+  - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
 
 ## Installation of the command-line tool
 
-We provide the source code that you need to compile with CMake. 
+We provide the source code that you need to compile with CMake.
 This is relatively easy under Mac and Linux.
 
 [For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile val3dity yourself.
@@ -35,13 +35,13 @@ To compile val3dity yourself, you first need to install the following free libra
 
   1. [CGAL v4.10+](http://www.cgal.org) (<v4.10 will compile and run, but wrong results for one test (error 405))
   1. (CGAL needs to be compiled with the [Eigen library](http://eigen.tuxfamily.org))
-  1. [GEOS](http://trac.osgeo.org/geos/) 
+  1. [GEOS](http://trac.osgeo.org/geos/)
   1. [CMake](http://www.cmake.org)
 
 Under macOS, it's super easy, we suggest using [Homebrew](http://brew.sh/):
 
     $ brew install cgal --with-eigen
-    $ brew install cmake 
+    $ brew install cmake
     $ brew install geos
 
 Under Linux (at least Ubuntu), CGAL has to be compiled because apt-get doesn't give you a version with Eigen.
@@ -72,18 +72,22 @@ Finally, to see all the options possible:
 
     $ ./val3dity --help
 
+## Vagrant development environment
+
+If you are eager to contribute but do not want to fiddle with setting up the required libraries, Vagrant can take care of that. It creates a development environment in a virtual machine, which you can use to compile and run val3dity. For details see VAGRANT.md
+
 ## Web application
 
-If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity). 
+If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity).
 Simply upload your file to our server and get a validation report back.
 We delete the file as soon as it has been validated (promised!).
 However, a file is limited to 50MB.
-    
+
 ## Documentation and help
 
-Read the full documentation at [http://geovalidation.bk.tudelft.nl/val3dity/docs/](http://geovalidation.bk.tudelft.nl/val3dity/docs/). 
+Read the full documentation at [http://geovalidation.bk.tudelft.nl/val3dity/docs/](http://geovalidation.bk.tudelft.nl/val3dity/docs/).
 
-The primary channel to communicate with the developers is the Issues section. 
+The primary channel to communicate with the developers is the Issues section.
 
-If you have a question or came across a bug, please submit an issue there. 
+If you have a question or came across a bug, please submit an issue there.
 However we ask you check first whether your problem has already been solved by someone else.
