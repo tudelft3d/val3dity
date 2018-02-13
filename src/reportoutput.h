@@ -993,32 +993,34 @@ function parse_valid_amounts(report) {
                 }
             }
 
-            for (var p=0; p<feature.primitives.length; p++) {
-                var primitive = feature.primitives[p];
-                prim_dict[primitive.type]["total"] += 1;
-                if (primitive.validity) {
-                    prim_dict[primitive.type]["valid"] += 1;
-                } else if (primitive.errors != null) {
-                    for (var e=0; e<primitive.errors.length; e++) {
-                        err_dict[primitive.errors[e]["code"]] += 1;
-                    }
-                }
-                // in case of CompositeSolids
-                if ("primitives" in primitive) {
-                    for (var p=0; p<primitive.primitives.length; p++) {
-                        var pm = primitive.primitives[p];
-                        if (pm.type in prim_dict) {
-                            prim_dict[pm.type]["total"] += 1;
-                        } else {
-                            prim_dict[pm.type] = {"valid": 0, "total": 0};
-                            prim_dict[pm.type]["total"] += 1;
+            if (feature.primitives != null) {
+                for (var p=0; p<feature.primitives.length; p++) {
+                    var primitive = feature.primitives[p];
+                    prim_dict[primitive.type]["total"] += 1;
+                    if (primitive.validity) {
+                        prim_dict[primitive.type]["valid"] += 1;
+                    } else if (primitive.errors != null) {
+                        for (var e=0; e<primitive.errors.length; e++) {
+                            err_dict[primitive.errors[e]["code"]] += 1;
                         }
+                    }
+                    // in case of CompositeSolids
+                    if ("primitives" in primitive) {
+                        for (var p=0; p<primitive.primitives.length; p++) {
+                            var pm = primitive.primitives[p];
+                            if (pm.type in prim_dict) {
+                                prim_dict[pm.type]["total"] += 1;
+                            } else {
+                                prim_dict[pm.type] = {"valid": 0, "total": 0};
+                                prim_dict[pm.type]["total"] += 1;
+                            }
 
-                        if (pm.validity) {
-                            prim_dict[pm.type]["valid"] += 1;
-                        } else if (pm.errors != null) {
-                            for (var e=0; e<pm.errors.length; e++) {
-                                err_dict[pm.errors[e]["code"]] += 1;
+                            if (pm.validity) {
+                                prim_dict[pm.type]["valid"] += 1;
+                            } else if (pm.errors != null) {
+                                for (var e=0; e<pm.errors.length; e++) {
+                                    err_dict[pm.errors[e]["code"]] += 1;
+                                }
                             }
                         }
                     }
