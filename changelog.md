@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [Unreleased]
+### Added
+- option to pass the val3dity exe to pytest
+
 ## [2.0.4] - 2018-01-26
 ### Changed
 - fixed bug where inner rings of gml:Polygon wasn't read properly when that polygon is referenced by an XLink.
