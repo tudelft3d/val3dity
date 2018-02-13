@@ -1130,7 +1130,7 @@ function error_overview(err_dict) {
     document.body.appendChild(h);
     var x = document.createElement("IMG");
     x.setAttribute("src", "http://geovalidation.bk.tudelft.nl/val3dity/img/welldone.png");
-    x.setAttribute("alt", "The Pulpit Rock");
+    x.setAttribute("alt", "Well done!");
     document.body.appendChild(x);
     return;
   }
