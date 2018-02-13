@@ -275,6 +275,11 @@ table#errors {
     padding-bottom: 10px;
 }
 
+a.clickonme {
+    text-decoration: none;
+    background-color: #CCFF99;
+}
+
 a {
     text-decoration: none;
     color: inherit;
@@ -1039,9 +1044,10 @@ function summary_table_cells(tbl, type, dict, generic_type) {
         var td0 = tr.insertCell(0);
         // td0.appendChild(document.createTextNode(type));
         var a = document.createElement('a');
-        var linkText = document.createTextNode(type + ' (click for details)');
+        var linkText = document.createTextNode(type);
         a.appendChild(linkText);
         a.title = type;
+        a.className = "clickonme";
         a.href = "tree_template.html?feature_type=" + type;
         td0.appendChild(a);
     } else if (generic_type == "primitives") {
