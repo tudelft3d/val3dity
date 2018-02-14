@@ -1013,16 +1013,8 @@ function parse_valid_amounts(report) {
                     if ("primitives" in primitive) {
                         for (var p=0; p<primitive.primitives.length; p++) {
                             var pm = primitive.primitives[p];
-                            if (pm.type in prim_dict) {
-                                prim_dict[pm.type]["total"] += 1;
-                            } else {
-                                prim_dict[pm.type] = {"valid": 0, "total": 0};
-                                prim_dict[pm.type]["total"] += 1;
-                            }
 
-                            if (pm.validity) {
-                                prim_dict[pm.type]["valid"] += 1;
-                            } else if (pm.errors != null) {
+                            if (!pm.validity) {
                                 for (var e=0; e<pm.errors.length; e++) {
                                     err_dict[pm.errors[e]["code"]] += 1;
                                 }
