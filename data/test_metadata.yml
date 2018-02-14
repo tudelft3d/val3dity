@@ -5,6 +5,7 @@ test_empty:
   "completely_empty": Completely empty files
   "empty_primitive": A CompositeSolid where one Solid is empty
   "empty_primitive_1": "A variation of empty_primitive.json"
+  "cityobject_no_geom": "one building in CityGML without any geometry (only Bounding Surfaces)"
 
 test_file_format:
   "invalid_citygml_1": "A GenericCityObject where the first surfaceMember missing a gml:Polygon tag"

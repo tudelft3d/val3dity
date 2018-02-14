@@ -23,6 +23,16 @@ def data_completely_empty(request, dir_empty):
 
 
 @pytest.fixture(scope="module",
+                params=["cityobject_no_geom.gml"])
+def data_cityobject_no_geom(request, dir_empty):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_empty,
+            request.param))
+    return(file_path)
+
+
+@pytest.fixture(scope="module",
                 params=["empty_primitive.gml",
                         "empty_primitive.xml",
                         "empty_primitive.json",
@@ -44,3 +54,7 @@ def test_completely_empty(validate, data_completely_empty, citymodel):
 def test_empty_primitive(validate, dir_empty_primitive, citymodel):
     error = validate(dir_empty_primitive, options=citymodel)
     assert(error == [902])
+
+def test_no_geom(validate, data_cityobject_no_geom, citymodel):
+    error = validate(data_cityobject_no_geom, options=citymodel)
+    assert(error == [609])    
