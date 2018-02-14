@@ -2,8 +2,8 @@
 # Changelog
 
 ## [Unreleased]
-### Added
-- option to pass the val3dity exe to pytest
+### Changed
+- the CityObjects/Primitives subdivision in the report is replaced by Features/Primitives, where Features are the top-level objects, containing one or many Primitives.
 
 ## [2.0.4] - 2018-01-26
 ### Changed
