@@ -6,7 +6,7 @@
 
 ## [2.1.0] - 2018-02-14
 ### Changed
-- the CityObjects/Primitives subdivision in the report is replaced by Features/Primitives, where Features are the top-level objects, containing one or many Primitives.
+- the report is slightly changed: the CityObjects/Primitives subdivision in the report is replaced by Features having Primitives, where Features are the top-level objects, containing one or many Primitives. This is done to allow other data model to be used as input, eg IndoorGML is coming soon!
 ### Added
 - pytest allows to specify the binary to use if not under 'build/'
 
