@@ -612,9 +612,9 @@ void write_report_html(json& jr, std::string report)
     o << "var report =" << jr << std::endl;                                
     o.close();
 
-    outfile = outpath / "tree_template.html";
+    outfile = outpath / "tree.html";
     o.open(outfile.string());
-    o << report_treetemplate << std::endl;                                
+    o << report_tree << std::endl;                                
     o.close();
 
     outfile = outpath / "treeview.js";
