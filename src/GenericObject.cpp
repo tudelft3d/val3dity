@@ -26,33 +26,44 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#ifndef COError_hpp
-#define COError_hpp
 
-
-#include <vector>
-#include <map>
-#include <set>
-#include <tuple>
-#include <string>
-#include <fstream>
-#include "nlohmann-json/json.hpp"
-
-using json = nlohmann::json;
+#include "GenericObject.h"
+#include "definitions.h"
+#include "input.h"
 
 namespace val3dity
 {
 
-//-- City Object Errors
-class COError {
-  std::map<int, std::vector< std::tuple< std::string, std::string > > > _errors;
-public:
-  bool          has_errors();
-  void          add_error(int code, std::string info, std::string whichgeoms);
-  json          get_report_json();
-  std::set<int> get_unique_error_codes();
-};
-
+GenericObject::GenericObject(std::string theid)
+{
+  _id = theid;
+  _is_valid = -1;
+  _type = "GenericObject"; 
 }
 
-#endif /* COError_hpp */
+
+GenericObject::~GenericObject()
+{}
+
+
+bool GenericObject::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
+{
+  if (_is_valid != -1)
+    return _is_valid;
+  bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+  _is_valid = bValid;
+  return bValid;
+}
+
+
+bool GenericObject::is_valid() {
+  return _is_valid;
+}
+
+
+std::string GenericObject::get_type() {
+  return _type;
+}
+
+
+} // namespace val3dity

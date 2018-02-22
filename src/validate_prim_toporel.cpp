@@ -27,6 +27,7 @@
 */
 
 #include "validate_prim_toporel.h"
+#include "Primitive.h"
 #include "geomtools.h"
 #include "Solid.h"
 #include "CompositeSolid.h"
@@ -36,7 +37,11 @@
 namespace val3dity
 {
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerrs, double tol_overlap)
+
+bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, 
+                           int errorcode_to_assign, 
+                           std::vector<Error>& lsErrors, 
+                           double tol_overlap)
 {
   bool isValid = true;
   //-- 1. create Nef for all primitives and erode if necessary
@@ -70,9 +75,13 @@ bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerr
       Nef_polyhedron* b = lsNefs[j];
       if (a->interior() * b->interior() != emptynef)
       {
+        Error e;
         std::stringstream msg;
         msg << lsPrimitives[i]->get_id() << " and " << lsPrimitives[j]->get_id();
-        coerrs.add_error(601, msg.str(), "");
+        e.errorcode = errorcode_to_assign;
+        e.info1 = msg.str();
+        e.info2 = "";
+        lsErrors.push_back(e);
         isValid = false;
       }
     }
@@ -83,7 +92,6 @@ bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, COError& coerr
       delete each;
   }
   return !isValid;
-}  
-
+}
 
 } // namespace val3dity

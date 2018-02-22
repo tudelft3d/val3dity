@@ -45,6 +45,8 @@
 
 #include <CGAL/Aff_transformation_3.h>
 
+#include <string>
+
 namespace val3dity
 {
 
@@ -89,7 +91,6 @@ typedef CGAL::Aff_transformation_3<KE>                      Transformation;
 
 typedef CGAL::Polyhedron_copy_3<CgalPolyhedron, CgalPolyhedronE::HalfedgeDS> Polyhedron_convert; 
 
-
 typedef long long int64;
 
 typedef enum
@@ -111,6 +112,13 @@ typedef enum
   OFF   = 4,
   OTHER = 5,
 } InputTypes;
+
+
+struct Error {
+  int         errorcode;
+  std::string info1;
+  std::string info2;
+};
 
 } // namespace val3dity
 

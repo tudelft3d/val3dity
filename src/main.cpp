@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -29,10 +29,16 @@
 #include "input.h"
 #include "reportoutput.h"
 #include "Primitive.h"
-#include "validate_prim_toporel.h"
 #include "Surface.h"
+#include "MultiSurface.h"
+#include "CompositeSurface.h"
 #include "Solid.h"
-#include "COError.h"
+#include "Feature.h"
+#include "CityObject.h"
+#include "GenericObject.h"
+
+#include "validate_prim_toporel.h"
+
 #include <tclap/CmdLine.h>
 #include <time.h>  
 #include "nlohmann-json/json.hpp"
@@ -42,13 +48,15 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.0.4";
+std::string VAL3DITY_VERSION = "2.1.0";
 
 
-std::string print_summary_validation(std::map<std::string, std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs);
-void        write_report_json(json& jr, std::string ifile, std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
+std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
+std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
+void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
+void        write_report_html(json& jr, std::string report);
+void        write_report_json(json& jr, std::string report);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -231,12 +239,8 @@ int main(int argc, char* const argv[])
     cmd.add(report_json);
     cmd.parse( argc, argv );
 
-    //-- map with Primitives
-    //-- ["Primitives"] --> [] if there are no CityObjects, thus dPrimitives.size() == 1
-    //-- ["Building|id2"] --> [] if there are CityObjects
-    std::map<std::string, std::vector<Primitive*>> dPrimitives;
-    //-- if a CO has errors specific to it (6xx), then its key is also in that dico
-    std::map<std::string, COError> dCOerrors;
+    //-- vector with Features: CityObject, GenericObject, or IndoorObject (or others in the future)
+    std::vector<Feature*> lsFeatures;
     
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
@@ -292,7 +296,7 @@ int main(int argc, char* const argv[])
     }
 
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
@@ -306,7 +310,7 @@ int main(int argc, char* const argv[])
         try
         {
           read_file_gml(inputfile.getValue(), 
-                        dPrimitives,
+                        lsFeatures,
                         ioerrs, 
                         snap_tol.getValue(),
                         geom_is_sem_surfaces.getValue());
@@ -329,7 +333,7 @@ int main(int argc, char* const argv[])
       else if (inputtype == JSON)
       {
         read_file_cityjson(inputfile.getValue(), 
-                           dPrimitives,
+                           lsFeatures,
                            ioerrs, 
                            snap_tol.getValue());
         if (ioerrs.has_errors() == true) {
@@ -344,6 +348,7 @@ int main(int argc, char* const argv[])
       }
       else if (inputtype == POLY)
       {
+        GenericObject* o = new GenericObject("none");
         Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
         if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
         {
@@ -360,51 +365,54 @@ int main(int argc, char* const argv[])
             }
           }
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(s);
+            o->add_primitive(s);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
         {
           CompositeSurface* cs = new CompositeSurface;
           cs->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(cs);
+            o->add_primitive(cs);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
         {
           MultiSurface* ms = new MultiSurface;
           ms->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(ms);
-        }      
+            o->add_primitive(ms);
+        }
+        lsFeatures.push_back(o);      
       }
       else if (inputtype == OFF)
       {
+        GenericObject* o = new GenericObject("none");
         Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
         if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
         {
           Solid* s = new Solid;
           s->set_oshell(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(s);
+            o->add_primitive(s);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
         {
           CompositeSurface* cs = new CompositeSurface;
           cs->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(cs);
+            o->add_primitive(cs);
         }
         else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
         {
           MultiSurface* ms = new MultiSurface;
           ms->set_surface(sh);
           if (ioerrs.has_errors() == false)
-            dPrimitives["Primitives"].push_back(ms);
+            o->add_primitive(ms);
         }
+        lsFeatures.push_back(o);
       }    
       else if (inputtype == OBJ)
       {
-        read_file_obj(dPrimitives,
+        read_file_obj(lsFeatures,
                       inputfile.getValue(), 
                       prim3d,
                       ioerrs, 
@@ -421,6 +429,7 @@ int main(int argc, char* const argv[])
       }
     }
 
+    double planarity_n_tol_updated = planarity_n_tol.getValue();
     if (ioerrs.has_errors() == false) 
     {
       std::cout << "Primitive(s) validated: ";
@@ -430,14 +439,11 @@ int main(int argc, char* const argv[])
         std::cout << "MultiSurface" << std::endl;
       else if (prim3d == COMPOSITESURFACE)        
         std::cout << "CompositeSurface" << std::endl;
-      else
+      else {
         std::cout << "All" << std::endl;
         std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
-    }
-    double planarity_n_tol_updated = planarity_n_tol.getValue();
-    //-- report on parameters used
-    if (ioerrs.has_errors() == false)
-    {
+      }
+      //-- report on parameters used
       if (ignore204.getValue() == true)
         planarity_n_tol_updated = 180.0;
       std::cout << "Parameters used for validation:" << std::endl;
@@ -452,69 +458,26 @@ int main(int argc, char* const argv[])
       else
         std::cout << "   overlap_tol" << setw(19)  << overlap_tol.getValue() << std::endl;
     }
-
+    
     //-- now the validation starts
-    if ( (dPrimitives.empty() == false) && (ioerrs.has_errors() == false) )
+    if ( (lsFeatures.empty() == false) && (ioerrs.has_errors() == false) )
     {
-      // std::cout << "Validating " << dPrimitives.size();
       int i = 1;
-      for (auto& co : dPrimitives)
+      for (auto& f : lsFeatures)
       {
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
-          printProgressBar(100 * (i / double(dPrimitives.size())));
+          printProgressBar(100 * (i / double(lsFeatures.size())));
         i++;
-        std::clog << std::endl << "######### Validating " << co.first << " #########" << std::endl;
-        bool bValid = true;
-        COError coerrs;
-        if (co.second.empty() == true) {
-          coerrs.add_error(609, "City Object has no geometry defined.", "");
-          dCOerrors[co.first] = coerrs;
-        }
-        for (auto& p : co.second)
-        {
-          std::clog << "======== Validating Primitive ========" << std::endl;
-          switch(p->get_type())
-          {
-            case 0: std::clog << "Solid"             << std::endl; break;
-            case 1: std::clog << "CompositeSolid"    << std::endl; break;
-            case 2: std::clog << "MultiSolid"        << std::endl; break;
-            case 3: std::clog << "CompositeSurface"  << std::endl; break;
-            case 4: std::clog << "MultiSurface"      << std::endl; break;
-            case 5: std::clog << "All"               << std::endl; break;
-          }
-          std::clog << "id: " << p->get_id() << std::endl;
-          std::clog << "--" << std::endl;
-          if (p->validate(planarity_d2p_tol.getValue(), planarity_n_tol_updated, overlap_tol.getValue()) == false)
-          {
-            std::clog << "======== INVALID ========" << std::endl;
-            bValid = false;
-          }
-          else
-            std::clog << "========= VALID =========" << std::endl;
-        }
-        //-- if Building then do extra checks  
-        if ( (bValid == true) && 
-             (co.first.find("Building|") != std::string::npos) &&
-             (co.second.size() > 1)
-           )
-        {
-          std::clog << "--- Interactions between BuildingParts ---" << std::endl;
-          if (do_primitives_overlap(co.second, coerrs, overlap_tol.getValue()) == true)
-          {
-            std::clog << "Error: overlapping building parts" << std::endl;
-            dCOerrors[co.first] = coerrs;
-          }
-        }
-        std::clog << "#########################################" << std::endl;
+        f->validate(planarity_d2p_tol.getValue(), planarity_n_tol_updated, overlap_tol.getValue());
       }
       if (verbose.getValue() == false)
         printProgressBar(100);
     }
 
     //-- summary of the validation
-    std::cout << "\n" << print_summary_validation(dPrimitives, dCOerrors, ioerrs) << std::endl;        
+    std::cout << "\n" << print_summary_validation(lsFeatures, ioerrs) << std::endl;        
 
-   //-- output shells/surfaces in OFF format
+    //-- output shells/surfaces in OFF format
     if (output_off.getValue() != "") 
     {
       std::cout << std::endl << std::endl;
@@ -525,13 +488,10 @@ int main(int argc, char* const argv[])
         if (boost::filesystem::exists(outpath) == false)
           boost::filesystem::create_directory(outpath);
         std::cout << "OFF files saved to: " << outpath << std::endl;
-        for (auto& co : dPrimitives)
-        {
-          std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
+        for (auto& f : lsFeatures) {
           int noprim = 0;
-          for (auto& p : co.second)
-          {
-            std::string theid = coid + "." + std::to_string(noprim);
+          for (auto& p : f->get_primitives()) {
+            std::string theid = f->get_id() + "." + std::to_string(noprim);
             if (p->get_type() == SOLID)
             {
               boost::filesystem::path outfile = outpath / (theid + ".0.off");
@@ -576,11 +536,11 @@ int main(int argc, char* const argv[])
     //-- output report
     if ( (report.getValue() != "") || (report_json.getValue() != "") )
     {
+      //-- save the json report in memory first
       json jr;
-      write_report_json(jr, 
+      get_report_json(jr, 
                        inputfile.getValue(),
-                       dPrimitives,
-                       dCOerrors,
+                       lsFeatures,
                        snap_tol.getValue(),
                        overlap_tol.getValue(),
                        planarity_d2p_tol.getValue(),
@@ -588,70 +548,18 @@ int main(int argc, char* const argv[])
                        ioerrs,
                        onlyinvalid.getValue());
       // HTML report
-      if (report.getValue() != "") {
-        boost::filesystem::path outpath(report.getValue());
-        if (boost::filesystem::exists(outpath.parent_path()) == false)
-          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-        else {
-          if (boost::filesystem::exists(outpath) == false)
-            boost::filesystem::create_directory(outpath);
-          boost::filesystem::path outfile = outpath / "report.html";
-          std::ofstream o(outfile.string());
-          o << indexhtml << std::endl;                                
-          std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-          o.close();
-
-          outfile = outpath / "report.js";
-          o.open(outfile.string());
-          o << "var report =" << jr << std::endl;                                
-          o.close();
-
-          outfile = outpath / "CityObjects.html";
-          o.open(outfile.string());
-          o << cityobjectshtml << std::endl;                                
-          o.close();
-
-          outfile = outpath / "Primitives.html";
-          o.open(outfile.string());
-          o << primitiveshtml << std::endl;                                
-          o.close();
-          
-          outfile = outpath / "treeview.js";
-          o.open(outfile.string());
-          o << treeviewjs << std::endl;                                
-          o.close();
-
-          outfile = outpath / "val3dityconfig.js";
-          o.open(outfile.string());
-          o << val3dityconfigjs << std::endl;                                
-          o.close();
-          
-          outfile = outpath / "index.css";
-          o.open(outfile.string());
-          o << indexcss << std::endl;                                
-          o.close();
-        }
-      }
+      if (report.getValue() != "") 
+        write_report_html(jr, report.getValue());
       // JSON report
-      if (report_json.getValue() != ""){
-        boost::filesystem::path outpath(report_json.getValue());
-        if (boost::filesystem::exists(outpath.parent_path()) == false)
-          std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-        else {
-          if (boost::filesystem::extension(outpath) != ".json")
-            outpath += ".json";
-          std::ofstream o(outpath.string());
-          o << jr.dump(2) << std::endl;                                
-          std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
-        }
-      }
+      if (report_json.getValue() != "")
+        write_report_json(jr, report_json.getValue());
     }
     else
       std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
 
     //-- unittests 
     if (unittests.getValue() == true)
-      std::cout << "\n" << unit_test(dPrimitives, dCOerrors, ioerrs) << std::endl;
+      std::cout << "\n" << unit_test(lsFeatures, ioerrs) << std::endl;
 
     if (verbose.getValue() == false)
     {
@@ -668,7 +576,66 @@ int main(int argc, char* const argv[])
 }
 
 
-std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitives, std::map<std::string, COError >& dCOerrors, IOErrors& ioerrs)
+void write_report_json(json& jr, std::string report)
+{
+  boost::filesystem::path outpath(report);
+  if (boost::filesystem::exists(outpath.parent_path()) == false)
+    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+  else {
+    if (boost::filesystem::extension(outpath) != ".json")
+      outpath += ".json";
+    std::ofstream o(outpath.string());
+    o << jr.dump(2) << std::endl;                                
+    std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+  }
+
+}
+
+
+
+void write_report_html(json& jr, std::string report)
+{
+  boost::filesystem::path outpath(report);
+  if (boost::filesystem::exists(outpath.parent_path()) == false)
+    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+  else {
+    if (boost::filesystem::exists(outpath) == false)
+      boost::filesystem::create_directory(outpath);
+    boost::filesystem::path outfile = outpath / "report.html";
+    std::ofstream o(outfile.string());
+    o << report_indexhtml << std::endl;                                
+    std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
+    o.close();
+
+    outfile = outpath / "report.js";
+    o.open(outfile.string());
+    o << "var report =" << jr << std::endl;                                
+    o.close();
+
+    outfile = outpath / "tree.html";
+    o.open(outfile.string());
+    o << report_tree << std::endl;                                
+    o.close();
+
+    outfile = outpath / "treeview.js";
+    o.open(outfile.string());
+    o << report_treeviewjs << std::endl;                                
+    o.close();
+
+    outfile = outpath / "val3dityconfig.js";
+    o.open(outfile.string());
+    o << report_val3dityconfigjs << std::endl;                                
+    o.close();
+    
+    outfile = outpath / "index.css";
+    o.open(outfile.string());
+    o << report_indexcss << std::endl;                                
+    o.close();
+  }
+}
+
+
+std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
@@ -678,15 +645,12 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
     for (auto& each : ioerrs.get_unique_error_codes())
       theerrors.insert(each);
   }
-
-  for (auto& co : dPrimitives)
-  {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& each : dCOerrors[co.first].get_unique_error_codes())
-        theerrors.insert(each);
-    for (auto& p : co.second)
-      for (auto& each : p->get_unique_error_codes())
-        theerrors.insert(each);
+  for (auto& f : lsFeatures) {
+    for (auto& code : f->get_unique_error_codes())
+        theerrors.insert(code);
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        theerrors.insert(code);
   }
   if (theerrors.size() > 0)
   {
@@ -702,58 +666,50 @@ std::string unit_test(std::map<std::string, std::vector<Primitive*> >& dPrimitiv
 }
 
 
-std::string print_summary_validation(std::map<std::string,std::vector<Primitive*>>& dPrimitives, std::map<std::string, COError>& dCOerrors, IOErrors& ioerrs)
+std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs)
 {
   std::stringstream ss;
   ss << std::endl;
   int noprim = 0;
-  for (auto& co : dPrimitives)
-    for (auto& p : co.second)
+  for (auto& o : lsFeatures)
+    for (auto& p : o->get_primitives())
       noprim++;
-    
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
-  //-- if a CityGML/CityJSON report also CityObjects
-  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
+  int fInvalid = 0;
+  for (auto& f : lsFeatures)
   {
-    int coInvalid = 0;
-    for (auto& co : dPrimitives)
-    {
-      if (dCOerrors.find(co.first) != dCOerrors.end())
-      {
-        coInvalid++;
-        continue;
-      }
-      for (auto& p : co.second)
-      {
-        if (p->is_valid() == false)
-        {
-          coInvalid++;
-          break;
-        }
-      }
-    }
-    ss << "Total # of CityObjects: " << setw(7) << dPrimitives.size() << std::endl;
-    float percentage;
-    if (dPrimitives.size()  == 0)
-      percentage = 0;
-    else
-      percentage = 100 * (coInvalid / float(dPrimitives.size()));
-    ss << "# valid: " << setw(22) << dPrimitives.size() - coInvalid;
-    if (dPrimitives.size() == 0)
-      ss << " (" << 0 << "%)" << std::endl;
-    else
-      ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-    ss << "# invalid: " << setw(20) << coInvalid;
-    ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
-    ss << "+++++" << std::endl;
+    if (f->is_valid() == false)
+      fInvalid++;
   }
+  ss << "Total # of Features: " << setw(10) << lsFeatures.size() << std::endl;
+  float percentage;
+  if (lsFeatures.size() == 0)
+    percentage = 0;
+  else
+    percentage = 100 * (fInvalid / float(lsFeatures.size()));
+  ss << "# valid: " << setw(22) << lsFeatures.size() - fInvalid;
+  if (lsFeatures.size() == 0)
+    ss << " (" << 0 << "%)" << std::endl;
+  else
+    ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
+  ss << "# invalid: " << setw(20) << fInvalid;
+  ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  std::set<std::string> thetypes;
+  for (auto& f : lsFeatures)
+    thetypes.insert(f->get_type());
+  if (thetypes.empty() == false)
+  {
+    ss << "Types:" << std::endl;
+    for (auto& each : thetypes)
+      ss << "  " << each << std::endl;
+  }
+  ss << "+++++" << std::endl;
   ss << "Total # of primitives: " << setw(8) << noprim << std::endl;
   int bValid = 0;
-  for (auto& co : dPrimitives)
-    for (auto& p : co.second)
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
       if (p->is_valid() == true)
         bValid++;
-  float percentage;
   if (noprim  == 0)
     percentage = 0;
   else
@@ -765,24 +721,35 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
   ss << "# invalid: " << setw(20) << (noprim - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
+  std::set<int> theprimitives;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      theprimitives.insert(p->get_type());
+  if (theprimitives.empty() == false)
+  {
+    ss << "Types:" << std::endl;
+    for (auto& each : theprimitives)
+    {
+      ss << "  ";
+      switch(each)
+      {
+        case 0: ss << "Solid"             << std::endl; break;
+        case 1: ss << "CompositeSolid"    << std::endl; break;
+        case 2: ss << "MultiSolid"        << std::endl; break;
+        case 3: ss << "CompositeSurface"  << std::endl; break;
+        case 4: ss << "MultiSurface"      << std::endl; break;
+        case 5: ss << "ALL"               << std::endl; break;
+      }
+    }
+  }
   //-- overview of errors
   std::map<int,int> errors;
-  for (auto& co : dPrimitives) {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
+  for (auto& f : lsFeatures) 
+    for (auto& code : f->get_unique_error_codes())
         errors[code] = 0;
-    for (auto& p : co.second)
-      for (auto& code : p->get_unique_error_codes())
-        errors[code] = 0;
-  }
-  for (auto& co : dPrimitives) {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
+  for (auto& f : lsFeatures) 
+    for (auto& code : f->get_unique_error_codes())
         errors[code] += 1;
-    for (auto& p : co.second)
-      for (auto& code : p->get_unique_error_codes())
-        errors[code] += 1;
-  }
 
   if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
   {
@@ -807,7 +774,7 @@ std::string print_summary_validation(std::map<std::string,std::vector<Primitive*
 void print_license() {
   std::string thelicense =
     "\nval3dity\n\n"
-    "Copyright (C) 2011-2017  3D geoinformation research group, TU Delft\n\n"
+    "Copyright (C) 2011-2018  3D geoinformation research group, TU Delft\n\n"
     "val3dity is free software: you can redistribute it and/or modify\n"
     "it under the terms of the GNU General Public License as published by\n"
     "the Free Software Foundation, either version 3 of the License, or\n"
@@ -828,16 +795,16 @@ void print_license() {
   std::cout << thelicense << std::endl;
 }
 
-void write_report_json(json& jr,
-                       std::string ifile, 
-                       std::map<std::string, std::vector<Primitive*> >& dPrimitives,
-                       std::map<std::string, COError >& dCOerrors,
-                       double snap_tol,
-                       double overlap_tol,
-                       double planarity_d2p_tol,
-                       double planarity_n_tol,
-                       IOErrors ioerrs,
-                       bool onlyinvalid)
+
+void get_report_json(json& jr,
+                     std::string ifile, 
+                     std::vector<Feature*>& lsFeatures,
+                     double snap_tol,
+                     double overlap_tol,
+                     double planarity_d2p_tol,
+                     double planarity_n_tol,
+                     IOErrors ioerrs,
+                     bool onlyinvalid)
 {
   jr["type"] = "val3dity report";
   jr["val3dity_version"] = VAL3DITY_VERSION; 
@@ -855,131 +822,74 @@ void write_report_json(json& jr,
   jr["overlap_tol"] = overlap_tol;
   jr["planarity_d2p_tol"] = planarity_d2p_tol;
   jr["planarity_n_tol"] = planarity_n_tol;
+  
+  std::set<int> theprimitives;
   int noprim = 0;
-  for (auto& co : dPrimitives)
-    for (auto& p : co.second)
+  for (auto& f : lsFeatures)
+  {
+    for (auto& p : f->get_primitives())
+    {
+      theprimitives.insert(p->get_type());
       noprim++;
+    }
+  }
+  jr["overview_primitives"];    
+  for (auto& each : theprimitives)
+  {
+    switch(each)
+    {
+      case 0: jr["overview_primitives"].push_back("Solid"); break;
+      case 1: jr["overview_primitives"].push_back("CompositeSolid"); break;
+      case 2: jr["overview_primitives"].push_back("MultiSolid"); break;
+      case 3: jr["overview_primitives"].push_back("CompositeSurface"); break;
+      case 4: jr["overview_primitives"].push_back("MultiSurface"); break;
+      case 5: jr["overview_primitives"].push_back("ALL"); break;
+    }
+  }
   jr["total_primitives"] = noprim;
   int bValid = 0;
-  for (auto& co : dPrimitives)
-    for (auto& p : co.second)
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
       if (p->is_valid() == true)
         bValid++;
   jr["valid_primitives"] = bValid;
   jr["invalid_primitives"] = noprim - bValid;
+  //-- features
+  std::set<std::string> thefeatures;
+  jr["total_features"] = lsFeatures.size();
+  bValid = 0;
+  for (auto& f : lsFeatures)
+  {
+    thefeatures.insert(f->get_type());
+    if (f->is_valid() == true)
+      bValid++;
+  }
+  jr["overview_features"];    
+  for (auto& each : thefeatures)
+    jr["overview_features"].push_back(each);
+  jr["valid_features"] = bValid;
+  jr["invalid_features"] = lsFeatures.size() - bValid;
   //-- overview of errors
   // "overview-errors": [101, 203],
   // "overview-errors-primitives": [5, 1],
   std::map<int,int> errors;
-  for (auto& co : dPrimitives) {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
+  for (auto& f : lsFeatures) 
+    for (auto& code : f->get_unique_error_codes())
         errors[code] = 0;
-    for (auto& p : co.second)
-      for (auto& code : p->get_unique_error_codes())
-        errors[code] = 0;
-  }
-  for (auto& co : dPrimitives) {
-    if (dCOerrors.find(co.first) != dCOerrors.end())
-      for (auto& code : dCOerrors[co.first].get_unique_error_codes())
+  for (auto& f : lsFeatures) 
+    for (auto& code : f->get_unique_error_codes())
         errors[code] += 1;
-    for (auto& p : co.second)
-      for (auto& code : p->get_unique_error_codes())
-        errors[code] += 1;
-  }
   jr["overview_errors"];    
-  jr["overview_errors_no_primitives"];    
   for (auto e : errors)
-  {
     jr["overview_errors"].push_back(e.first);
-    jr["overview_errors_no_primitives"].push_back(e.second);
-  }
   for (auto& e : ioerrs.get_unique_error_codes())
-  {
     jr["overview_errors"].push_back(e);
-    jr["overview_errors_no_primitives"].push_back(-1);
-  }
-  
-  //-- if a CityGML/CityJSON report also CityObjects
-  if (!( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) ))
-  {
-    int coInvalid = 0;
-    for (auto& co : dPrimitives)
-    {
-      if (dCOerrors.find(co.first) != dCOerrors.end())
-      {
-        coInvalid++;
-        continue;
-      }
-      for (auto& p : co.second)
-      {
-        if (p->is_valid() == false)
-        {
-          coInvalid++;
-          break;
-        }
-      }
-    }
-    jr["total_cityobjects"] = dPrimitives.size();
-    jr["valid_cityobjects"] = dPrimitives.size() - coInvalid;
-    jr["invalid_cityobjects"] = coInvalid;
-  }
-  else
-  {
-    jr["total_cityobjects"] = 0;
-    jr["valid_cityobjects"] = 0;
-    jr["invalid_cityobjects"] = 0;
-  }
-  jr["InputErrors"];
-  jr["CityObjects"];
-  jr["Primitives"];
+  jr["errors_dataset"];
+  jr["features"];
   if (ioerrs.has_errors() == true)
-  {
-    jr["InputErrors"] = ioerrs.get_report_json();
-  }
-  else
-  {
-    //-- only primitives (no CityObjects)
-    if ( (dPrimitives.size() == 1) && (dPrimitives.find("Primitives") != dPrimitives.end()) )
-    {
-      for (auto& p : dPrimitives["Primitives"])
-        if ( !((onlyinvalid == true) && (p->is_valid() == true)) ) 
-          jr["Primitives"].push_back(p->get_report_json());
-    }
-    else //-- with CityObjects (CityJSON + CityGML)
-    {
-      for (auto& co : dPrimitives)
-      {
-        json j;
-        std::string cotype = co.first.substr(0, co.first.find_first_of("|"));
-        std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
-        bool isValid = true;
-        j["type"] = cotype;
-        j["errors"];
-        if (dCOerrors.find(co.first) != dCOerrors.end())
-        {
-          for (auto& each: dCOerrors[co.first].get_report_json())
-          {
-            j["errors"].push_back(each);
-            isValid = false;
-          }
-
-        }
-        for (auto& p : co.second)
-        {
-          if ( !((onlyinvalid == true) && (p->is_valid() == true)) )
-          {
-            j["primitives"].push_back(p->get_report_json());
-            if (p->is_valid() == false)
-              isValid = false;
-          }
-        }
-        j["validity"] = isValid;
-        j["id"] = coid;
-        jr["CityObjects"].push_back(j);
-      }
-    }
-  }
+    jr["errors_dataset"] = ioerrs.get_report_json();
+  for (auto& f : lsFeatures) 
+    jr["features"].push_back(f->get_report_json()); 
 }
 
 

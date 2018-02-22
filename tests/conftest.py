@@ -18,6 +18,9 @@ import sys
 def pytest_addoption(parser):
     parser.addoption("--runfull", action="store_true",
                      default=False, help="run full set of tests")
+    parser.addoption("--exe", action="store",
+                 default=None, help=("path to val3dity executable"))
+
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--runfull"):
         # --runslow given in cli: do not skip slow tests
@@ -27,15 +30,19 @@ def pytest_collection_modifyitems(config, items):
         if "full" in item.keywords:
             item.add_marker(skip_full)
 
+
 @pytest.fixture(scope="session")
-def val3dity():
+def val3dity(request):
     """path to val3dity executable"""
-    root = os.getcwd()
-    if sys.platform.lower() == 'windows':
-        p = os.path.join(root, "build/val3dity.exe")
-    else: #-- darwin && linux
-        p = os.path.join(root, "build/val3dity")
-    return(os.path.abspath(p))
+    if request.config.getoption("--exe"):
+        return request.config.getoption("--exe")
+    else:
+        root = os.getcwd()
+        if sys.platform.lower() == 'windows':
+            p = os.path.join(root, "build/val3dity.exe")
+        else: #-- darwin && linux
+            p = os.path.join(root, "build/val3dity")
+        return os.path.abspath(p)
 
 #-------------------------------------------------------------- data & folders
 @pytest.fixture(scope="session")
@@ -120,8 +127,8 @@ def citymodel():
 
 #-------------------------------------------------------- validation functions
 @pytest.fixture(scope="session")
-def validate():
-    def _validate(file_path, options=solid(), val3dity=val3dity()):
+def validate(val3dity):
+    def _validate(file_path, options=solid(), val3dity=val3dity):
         """Validate a file
 
         :return: The error numbers. Empty list if the file is valid.

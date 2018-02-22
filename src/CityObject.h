@@ -26,60 +26,31 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#include "COError.h"
-#include "input.h"
+#ifndef __val3dity__CityObject__
+#define __val3dity__CityObject__
 
-using namespace std;
+#include "Feature.h"
+#include "definitions.h"
+
 
 namespace val3dity
 {
 
-
-bool COError::has_errors()
+class CityObject : public Feature
 {
-  if (_errors.size() == 0)
-    return false;
-  else
-    return true;
-}
+public:
+  CityObject(std::string theid, std::string thetype);
+  ~CityObject();
+  
+  bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
+  bool            is_valid();
+  std::string     get_type();
 
-std::set<int> COError::get_unique_error_codes()
-{
-  std::set<int> errs;
-  for (auto& err : _errors)
-    for (auto i : err.second)
-      errs.insert(std::get<0>(err));
-  return errs;
-}
+protected:
+  bool            validate_building(double tol_overlap);
 
+};
 
-void COError::add_error(int code, std::string info, std::string whichgeoms) 
-{
-  std::tuple<std::string, std::string> a(info, whichgeoms);
-  _errors[code].push_back(a);
-  std::clog << "ERROR " << code << " : " << info << std::endl;
-}
+} // namespace val3dity
 
-
-
-json COError::get_report_json()
-{
-  json j;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      json jj;
-      jj["type"] = "Error";
-      jj["code"] = std::get<0>(err);
-      jj["description"] = errorcode2description(std::get<0>(err));
-      jj["id"] = std::get<0>(e);
-      jj["info"] = std::get<1>(e);
-      j.push_back(jj);
-    }
-  }
-  return j;
-}
-
-
-}
+#endif /* defined(__val3dity__CityObject__) */
