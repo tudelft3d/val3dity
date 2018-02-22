@@ -22,11 +22,13 @@ You can read more about the `details <https://github.com/tudelft3d/val3dity/blob
 How to interpret the report?
 ----------------------------
 
-There are 2 options for a report: HTML and JSON report.
+There are 2 options for a report: HTML and JSON report (the HTML report is just a navigable view of the JSON report).
 
 :ref:`report`
 
-Outputs the validation report in a navigable HTML file that can be viewed in a web browser. There is a summary page with an overview, and also a page with all the details of each 3D primitive or City Objects. Some statistics (eg number of faces) for each is also given, as a convenience.
+Outputs the validation report in a navigable HTML file that can be viewed in a web browser. 
+There is a summary page with an overview, and also a page with all the details of each features present in the file. 
+Some statistics (eg number of faces, IDs, etc) for each feature and primitive is also given, as a convenience.
 
 .. image:: _static/report1.png
    :width: 49%
@@ -38,7 +40,12 @@ Outputs the validation report in a navigable HTML file that can be viewed in a w
 
 Outputs a single JSON file with the information shown in the HTML page.
 Use it to produce your own report or extract statistics.
-The structure is self-explanatory.
+
+The top level objects are called "features", and there are at this moment 2 kinds of features: CityObjects (for CityGML objects, like Building or Bridge) and GenericObject (when the features are not known, eg for an OBJ file).
+Each feature contains a list of 3D primitives.
+The errors are reported as children of either a 3D primitive (errors 1xx to 5xx)  or a feature (errors 6xx).
+The errors 9xx are reported in the ``"errors_dataset"``.
+All the features and primitives contain an entry ``"validity"`` state whether it is valid or not.
 
 
 

@@ -48,7 +48,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.0.4";
+std::string VAL3DITY_VERSION = "2.1.0";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
@@ -477,64 +477,61 @@ int main(int argc, char* const argv[])
     //-- summary of the validation
     std::cout << "\n" << print_summary_validation(lsFeatures, ioerrs) << std::endl;        
 
-    // //-- output shells/surfaces in OFF format
-    // if (output_off.getValue() != "") 
-    // {
-    //   std::cout << std::endl << std::endl;
-    //   boost::filesystem::path outpath(output_off.getValue());
-    //   if (boost::filesystem::exists(outpath.parent_path()) == false)
-    //     std::cout << "Error OFF output: file " << outpath << " impossible to create, wrong path." << std::endl;
-    //   else {
-    //     if (boost::filesystem::exists(outpath) == false)
-    //       boost::filesystem::create_directory(outpath);
-    //     std::cout << "OFF files saved to: " << outpath << std::endl;
-    //     for (auto& co : dPrimitives)
-    //     {
-    //       std::string coid = co.first.substr(co.first.find_first_of("|") + 1);
-    //       int noprim = 0;
-    //       for (auto& p : co.second)
-    //       {
-    //         std::string theid = coid + "." + std::to_string(noprim);
-    //         if (p->get_type() == SOLID)
-    //         {
-    //           boost::filesystem::path outfile = outpath / (theid + ".0.off");
-    //           std::ofstream o(outfile.string());
-    //           Solid* ts = dynamic_cast<Solid*>(p);
-    //           o << ts->get_off_representation(0) << std::endl;                                
-    //           o.close();
-    //           for (int i = 1; i <= ts->num_ishells(); i++)
-    //           {
-    //             outfile = outpath / (theid + "." + std::to_string(i) + ".off");
-    //             o.open(outfile.string());
-    //             o << ts->get_off_representation(1) << std::endl;                                
-    //             o.close();
-    //           }
-    //         }
-    //         else if (p->get_type() == MULTISURFACE)
-    //         {
-    //           boost::filesystem::path outfile = outpath / (theid + ".off");
-    //           std::ofstream o(outfile.string());
-    //           MultiSurface* ts = dynamic_cast<MultiSurface*>(p);
-    //           o << ts->get_off_representation() << std::endl;                                
-    //           o.close();
-    //         }
-    //         else if (p->get_type() == COMPOSITESURFACE)
-    //         {
-    //           boost::filesystem::path outfile = outpath / (theid + ".off");
-    //           std::ofstream o(outfile.string());
-    //           CompositeSurface* ts = dynamic_cast<CompositeSurface*>(p);
-    //           o << ts->get_off_representation() << std::endl;                                
-    //           o.close();
-    //         }            
-    //         else {
-    //           std::cout << "OFF OUTPUT: these primitive types are not supported (yet). Sorry." << std::endl;
-    //         }
-    //         noprim++;
-    //       }
-    //     }
-    //   }
-    //   std::cout << std::endl;
-    // }
+    //-- output shells/surfaces in OFF format
+    if (output_off.getValue() != "") 
+    {
+      std::cout << std::endl << std::endl;
+      boost::filesystem::path outpath(output_off.getValue());
+      if (boost::filesystem::exists(outpath.parent_path()) == false)
+        std::cout << "Error OFF output: file " << outpath << " impossible to create, wrong path." << std::endl;
+      else {
+        if (boost::filesystem::exists(outpath) == false)
+          boost::filesystem::create_directory(outpath);
+        std::cout << "OFF files saved to: " << outpath << std::endl;
+        for (auto& f : lsFeatures) {
+          int noprim = 0;
+          for (auto& p : f->get_primitives()) {
+            std::string theid = f->get_id() + "." + std::to_string(noprim);
+            if (p->get_type() == SOLID)
+            {
+              boost::filesystem::path outfile = outpath / (theid + ".0.off");
+              std::ofstream o(outfile.string());
+              Solid* ts = dynamic_cast<Solid*>(p);
+              o << ts->get_off_representation(0) << std::endl;                                
+              o.close();
+              for (int i = 1; i <= ts->num_ishells(); i++)
+              {
+                outfile = outpath / (theid + "." + std::to_string(i) + ".off");
+                o.open(outfile.string());
+                o << ts->get_off_representation(1) << std::endl;                                
+                o.close();
+              }
+            }
+            else if (p->get_type() == MULTISURFACE)
+            {
+              boost::filesystem::path outfile = outpath / (theid + ".off");
+              std::ofstream o(outfile.string());
+              MultiSurface* ts = dynamic_cast<MultiSurface*>(p);
+              o << ts->get_off_representation() << std::endl;                                
+              o.close();
+            }
+            else if (p->get_type() == COMPOSITESURFACE)
+            {
+              boost::filesystem::path outfile = outpath / (theid + ".off");
+              std::ofstream o(outfile.string());
+              CompositeSurface* ts = dynamic_cast<CompositeSurface*>(p);
+              o << ts->get_off_representation() << std::endl;                                
+              o.close();
+            }            
+            else {
+              std::cout << "OFF OUTPUT: these primitive types are not supported (yet). Sorry." << std::endl;
+            }
+            noprim++;
+          }
+        }
+      }
+      std::cout << std::endl;
+    }
 
     //-- output report
     if ( (report.getValue() != "") || (report_json.getValue() != "") )
@@ -615,9 +612,9 @@ void write_report_html(json& jr, std::string report)
     o << "var report =" << jr << std::endl;                                
     o.close();
 
-    outfile = outpath / "tree_template.html";
+    outfile = outpath / "tree.html";
     o.open(outfile.string());
-    o << report_treetemplate << std::endl;                                
+    o << report_tree << std::endl;                                
     o.close();
 
     outfile = outpath / "treeview.js";

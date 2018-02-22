@@ -77,87 +77,70 @@ std::string report_indexhtml = R"(
 )";
 
 
-std::string report_treetemplate = R"(
+std::string report_tree = R"(
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
         <link rel="stylesheet" type="text/css" href="index.css" />
-        <title id="title"></title>
     </head>
-
     <body>
         <div id="header">
             <div class="content">
-                <h2><cite id="feature"></cite> in <b id="infile"></b>
-                </h2>
+                <h2><b id="infile"></b></h2>
                 <br/>
                 <button href="#" class="filter_link" data-filter="all">All</button>
                 <button href="#" class="filter_link" data-filter="true">Valid</button>
                 <button id="invalid" href="#" class="filter_link" data-filter="false">Invalid</button>
+                &nbsp; &nbsp; | &nbsp; &nbsp; Features to display
+                <select id="features_to_display">
+                </select>
+
             </div>
         </div>
-
         <button id="expandAll">Expand All</button>
         <button id="collapseAll">Collapse All</button>
         <div id="tree"></div>
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="treeview.js"></script>
         <script src="report.js"></script>
+        <script>
+          $('#features_to_display').change(function() {
+            console.log("click");
+            // var sel = $(this).find('option:selected');
+            // feature_type = sel[0].label;
+            updateall();
+          });
+        </script>
 
         <script>
-            var getUrlParameter = function getUrlParameter(sParam) {
-            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-                sURLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
-
-            for (i = 0; i < sURLVariables.length; i++) {
-                sParameterName = sURLVariables[i].split('=');
-
-                if (sParameterName[0] === sParam) {
-                    return sParameterName[1] === undefined ? true : sParameterName[1];
-                }
-            }
-            };
-
-            var feature_type = getUrlParameter("feature_type");
-            document.getElementById("title").innerHTML = feature_type;
-            document.getElementById("feature").innerHTML = feature_type;
-
-            if (feature_type != null){
-                report.features = $.grep(report.features, function(v) {
+          function updateall() {
+            var sel = $(select).find('option:selected');
+            var feature_type = sel[0].label;
+            if (feature_type == "all")
+              ff = report.features;
+            else {
+                ff = $.grep(report.features, function(v) {
                     return v.type === feature_type;
                 });
             }
-
-            var input = report.input_file;
-            document.getElementById("infile").innerHTML = input.split("/").pop();
-
+            // console.log(report.features);
             if (report.features != null) {
                 // Grab expand/collapse buttons
                 var expandAll = document.getElementById('expandAll');
                 var collapseAll = document.getElementById('collapseAll');
-
-                // Create tree
-                var t = new TreeView(report.features, 'tree');
-
-                // Attach events
+                var t = new TreeView(ff, 'tree');
                 expandAll.onclick = function () { t.expandAll(); };
                 collapseAll.onclick = function () { t.collapseAll(); };
-            } else {
-                // do nothing
             }
-
-            // filter tree
             var $treeElements = $('.tree-leaf');
 
             $('.filter_link').click(function(e){
+                console.log("euh...");
                 e.preventDefault();
                 // get the category from the attribute
                 var filterVal = $(this).data('filter');
-
+                console.log(filterVal);
                 if (filterVal === 'all') {
                   $treeElements.show();
                 } else {
@@ -165,7 +148,57 @@ std::string report_treetemplate = R"(
                    $treeElements.hide().filter("[validity=" + filterVal + "]").show();
                 }
             });
+          }
+        </script>
 
+
+        <script>
+          console.log("main");
+            var input = report.input_file;
+            document.getElementById("infile").innerHTML = input.split("/").pop();
+            //-- fill the dropdown with features
+            var select = document.getElementById("features_to_display");
+            const fset = new Set();
+            for (i = 0; i < report.features.length; i++) {
+                fset.add(report.features[i].type);
+            }
+            console.log(fset);
+            const it = fset.entries();
+            var opt = "all";
+            var el = document.createElement("option");
+            el.text = opt;
+            el.value = opt;
+            select.add(el);
+            for (let i of it) {
+                var opt = i[0];
+                var el = document.createElement("option");
+                el.text = opt;
+                el.value = opt;
+                select.add(el);
+            }
+            if (report.features != null) {
+                var expandAll = document.getElementById('expandAll');
+                var collapseAll = document.getElementById('collapseAll');
+                var t = new TreeView(report.features, 'tree');
+                expandAll.onclick = function () { t.expandAll(); };
+                collapseAll.onclick = function () { t.collapseAll(); };
+            }
+
+            var $treeElements = $('.tree-leaf');
+
+            $('.filter_link').click(function(e){
+                console.log("euh...");
+                e.preventDefault();
+                // get the category from the attribute
+                var filterVal = $(this).data('filter');
+                console.log(filterVal);
+                if (filterVal === 'all') {
+                  $treeElements.show();
+                } else {
+                   // hide all then filter the ones to show, but always include the errors
+                   $treeElements.hide().filter("[validity=" + filterVal + "]").show();
+                }
+            });
         </script>
 
     </body>
@@ -763,6 +796,7 @@ std::string report_treeviewjs = R"(
 )";
 
 std::string report_val3dityconfigjs = R"(
+
 var errors = {
     "101": {
         "name": "101 – TOO_FEW_POINTS",
@@ -929,7 +963,7 @@ var errors = {
     "609": {
         "name": "609 – CITYOBJECT_HAS_NO_GEOMETRY",
         "link": {
-            "href": "https://val3dity.readthedocs.io/en/v2/errors/#cityobject-has-no-geometry"
+            "href": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#cityobject-has-no-geometry"
         }
     },
     "901": {
@@ -1032,23 +1066,8 @@ function parse_valid_amounts(report) {
 
 function summary_table_cells(tbl, type, dict, generic_type) {
     var tr = tbl.insertRow();
-
-    if (generic_type == "features") {
-        // cell type
-        var td0 = tr.insertCell(0);
-        // td0.appendChild(document.createTextNode(type));
-        var a = document.createElement('a');
-        var linkText = document.createTextNode(type);
-        a.appendChild(linkText);
-        a.title = type;
-        a.className = "clickonme";
-        a.href = "tree_template.html?feature_type=" + type;
-        td0.appendChild(a);
-    } else if (generic_type == "primitives") {
-        // cell type
-        var td0 = tr.insertCell(0);
-        td0.appendChild(document.createTextNode(type));
-    }
+    var td0 = tr.insertCell(0);
+    td0.appendChild(document.createTextNode(type));
     // cell Total
     var td_t = tr.insertCell(1);
     td_t.appendChild(document.createTextNode(dict[type]["total"]));
@@ -1112,6 +1131,16 @@ function idx_validation_summary(feat_dict, prim_dict){
         var tbl = summary_table("primitives", prim_dict);
         body.appendChild(tbl);
     }
+    //-- validation details
+    var h = document.createElement("H3")
+    var a = document.createElement('a');
+    var linkText = document.createTextNode("Click for validation details");
+    a.appendChild(linkText);
+    a.className = "clickonme";
+    a.href = "tree.html";
+    h.appendChild(a);
+    document.body.appendChild(h);
+    
 }
 
 
