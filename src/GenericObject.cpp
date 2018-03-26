@@ -57,7 +57,10 @@ bool GenericObject::validate(double tol_planarity_d2p, double tol_planarity_norm
 
 
 bool GenericObject::is_valid() {
-  return _is_valid;
+  if (_is_valid == 1) 
+    return true;
+  else
+    return false;
 }
 
 
