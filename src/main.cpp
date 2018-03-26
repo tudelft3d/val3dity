@@ -474,6 +474,13 @@ int main(int argc, char* const argv[])
         printProgressBar(100);
     }
 
+    //-- if error 901 then ignore what was read, it can't be validated
+    //-- and is confusing for users to see a valid/invalid while nothing was done...
+    if (ioerrs.has_specific_error(901) == true) {
+      std::cout << "ERROR 901" << std::endl;
+      lsFeatures.clear();
+    }
+
     //-- summary of the validation
     std::cout << "\n" << print_summary_validation(lsFeatures, ioerrs) << std::endl;        
 
