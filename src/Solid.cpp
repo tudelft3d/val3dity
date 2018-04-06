@@ -204,10 +204,10 @@ json Solid::get_report_json()
   for (auto& sh : _shells)
     for (auto& each: sh->get_report_json())
       j["errors"].push_back(each); 
-  if (j["errors"].is_null() == true)
+  if (this->is_valid() == 1)
     j["validity"] = true;
   else 
-    j["validity"] = false;
+    j["validity"] = false;  
   return j;
 }
 

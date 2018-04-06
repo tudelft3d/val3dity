@@ -48,7 +48,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.1.0";
+std::string VAL3DITY_VERSION = "2.1.1";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
@@ -472,6 +472,13 @@ int main(int argc, char* const argv[])
       }
       if (verbose.getValue() == false)
         printProgressBar(100);
+    }
+
+    //-- if error 901 then ignore what was read, it can't be validated
+    //-- and is confusing for users to see a valid/invalid while nothing was done...
+    if (ioerrs.has_specific_error(901) == true) {
+      std::cout << "ERROR 901" << std::endl;
+      lsFeatures.clear();
     }
 
     //-- summary of the validation

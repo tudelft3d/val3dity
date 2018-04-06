@@ -62,6 +62,7 @@ public:
   std::string   get_report_text();
   json          get_report_json();
   std::set<int> get_unique_error_codes();
+  bool          has_specific_error(int i);
 };
 
   
