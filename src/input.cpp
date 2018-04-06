@@ -829,6 +829,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
     primitives_walker walker2;
     co.traverse(walker2);
     int pcounter = 0;
+    std::cout << "HERE" << std::endl;
     if ( (geom_is_sem_surfaces == true) && (walker2.lsNodes.size() == 0) ) 
     { //-- WARNING: no geom in the CO!
       semantic_surfaces_walker walker3;
@@ -857,6 +858,13 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
           p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
         else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
           p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+        else {
+          std::cout << "OUPS" << std::endl;
+          std::cout << p->get_id() << std::endl;
+        }
+        if (p == NULL)
+          std::cout << "NULL" << std::endl;
+
         if (p->get_id() == "")
           p->set_id("MISSING_ID_" + std::to_string(pcounter));
         o->add_primitive(p);

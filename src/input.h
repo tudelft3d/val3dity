@@ -124,6 +124,7 @@ struct primitives_walker: pugi::xml_tree_walker
            (strcmp(nodeType, "MultiSolid") == 0) ||
            (strcmp(nodeType, "CompositeSolid") == 0) ||
            (strcmp(nodeType, "MultiSurface") == 0) ||
+           (strcmp(nodeType, "Polygon") == 0) ||
            ( (strcmp(nodeType, "boundedBy") == 0) && (gmlboundedBy == false) )||
            (strcmp(nodeType, "CompositeSurface") == 0) ) )
     {
