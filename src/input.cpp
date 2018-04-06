@@ -847,7 +847,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
     else {
       for (auto& prim : walker2.lsNodes)
       {
-        Primitive* p;
+        Primitive* p = NULL;
         if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
           p = process_gml_solid(prim, dallpoly, tol_snap, errs);
         else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
@@ -860,7 +860,7 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
           p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
         else {
           std::cout << "OUPS" << std::endl;
-          std::cout << p->get_id() << std::endl;
+//          std::cout << p->get_id() << std::endl;
         }
         if (p == NULL)
           std::cout << "NULL" << std::endl;
