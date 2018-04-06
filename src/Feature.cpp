@@ -112,8 +112,9 @@ bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_no
       case 1: std::clog << "CompositeSolid"    << std::endl; break;
       case 2: std::clog << "MultiSolid"        << std::endl; break;
       case 3: std::clog << "CompositeSurface"  << std::endl; break;
-      case 4: std::clog << "MultiSurface"      << std::endl; break;
-      case 5: std::clog << "ALL"      << std::endl; break;
+      case 4: std::clog << "MultiSurface"     << std::endl; break;
+      case 5: std::clog << "Polygon"          << std::endl; break;
+      case 6: std::clog << "ALL"             << std::endl; break;
     }
     std::clog << "id: " << p->get_id() << std::endl;
     std::clog << "--" << std::endl;

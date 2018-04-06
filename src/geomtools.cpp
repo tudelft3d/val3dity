@@ -322,7 +322,7 @@ bool cmpPoint3(Point3 &p1, Point3 &p2, double tol)
 }
 
 
-void create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, Polygon &outpgn)
+void create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, CGALPolygon &outpgn)
 {
   // int proj = projection_plane(lsPts, ids);
   std::vector<int>::const_iterator it = ids.begin();

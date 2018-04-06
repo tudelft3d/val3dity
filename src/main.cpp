@@ -30,6 +30,7 @@
 #include "reportoutput.h"
 #include "Primitive.h"
 #include "Surface.h"
+#include "Polygon.h"
 #include "MultiSurface.h"
 #include "CompositeSurface.h"
 #include "Solid.h"
@@ -745,7 +746,8 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
         case 2: ss << "MultiSolid"        << std::endl; break;
         case 3: ss << "CompositeSurface"  << std::endl; break;
         case 4: ss << "MultiSurface"      << std::endl; break;
-        case 5: ss << "ALL"               << std::endl; break;
+        case 5: ss << "Polygon"           << std::endl; break;
+        case 6: ss << "ALL"               << std::endl; break;
       }
     }
   }
@@ -850,7 +852,8 @@ void get_report_json(json& jr,
       case 2: jr["overview_primitives"].push_back("MultiSolid"); break;
       case 3: jr["overview_primitives"].push_back("CompositeSurface"); break;
       case 4: jr["overview_primitives"].push_back("MultiSurface"); break;
-      case 5: jr["overview_primitives"].push_back("ALL"); break;
+      case 5: jr["overview_primitives"].push_back("Polygon"); break;
+      case 6: jr["overview_primitives"].push_back("ALL"); break;
     }
   }
   jr["total_primitives"] = noprim;

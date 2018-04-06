@@ -33,6 +33,7 @@
 #include "GenericObject.h"
 #include "Surface.h"
 #include "MultiSurface.h"
+#include "Polygon.h"
 #include "CompositeSurface.h"
 #include "Solid.h"
 #include "CompositeSolid.h"
@@ -230,6 +231,48 @@ vector<int> process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& err
     }
   }
   return r;
+}
+
+
+Polygon* process_gml_polygon(const pugi::xml_node& n, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs) 
+{
+  Polygon* p = new Polygon();
+  Surface* sh = new Surface(-1, tol_snap);
+  if (n.attribute("gml:id") != 0)
+    p->set_id(std::string(n.attribute("gml:id").value()));
+  std::vector< std::vector<int> > oneface;
+  std::string s = "./" + NS["gml"] + "exterior";
+  pugi::xpath_node ring = n.select_node(s.c_str());
+  std::vector<int> r = process_gml_ring(ring.node(), sh, errs);
+  if (r.front() != r.back())
+  {
+    if (n.attribute("gml:id") == 0)
+      sh->add_error(103, std::to_string(0));
+    else
+      sh->add_error(103, n.attribute("gml:id").value());
+  }
+  else
+    r.pop_back(); 
+  oneface.push_back(r);
+  //-- interior rings
+  s = "./" + NS["gml"] + "interior";
+  pugi::xpath_node_set nint = n.select_nodes(s.c_str());
+  for (pugi::xpath_node_set::const_iterator it = nint.begin(); it != nint.end(); ++it) {
+    std::vector<int> r = process_gml_ring(it->node(), sh, errs);
+    if (r.front() != r.back())
+    {
+      if (n.attribute("gml:id") == 0)
+        sh->add_error(103, std::to_string(0));
+      else
+        sh->add_error(103, n.attribute("gml:id").value());
+    }
+    else
+      r.pop_back(); 
+    oneface.push_back(r);
+  }
+  sh->add_face(oneface, n.attribute("gml:id").value());
+  p->set_surface(sh);
+  return p;
 }
 
 
@@ -858,12 +901,12 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
           p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
         else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
           p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
+        else if (remove_xml_namespace(prim.name()).compare("Polygon") == 0)
+          p = process_gml_polygon(prim, dallpoly, tol_snap, errs);        
         else {
-          std::cout << "OUPS" << std::endl;
+          std::cout << "OUPS GEOMETRIC UNKNOWN" << std::endl;
 //          std::cout << p->get_id() << std::endl;
         }
-        if (p == NULL)
-          std::cout << "NULL" << std::endl;
 
         if (p->get_id() == "")
           p->set_id("MISSING_ID_" + std::to_string(pcounter));

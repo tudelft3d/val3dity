@@ -40,7 +40,7 @@ namespace val3dity
 CgalPolyhedron::Plane_3  get_best_fitted_plane(const std::vector< Point3 > &lsPts);
 
 bool    cmpPoint3(Point3 &p1, Point3 &p2, double tol);
-void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, Polygon &outpgn);
+void    create_cgal_polygon(const std::vector<Point3>& lsPts, const std::vector<int>& ids, const CgalPolyhedron::Plane_3 &plane, CGALPolygon &outpgn);
 bool    is_face_planar_distance2plane(const std::vector<Point3> &pts, const CgalPolyhedron::Plane_3 &plane, double& value, float tolerance);
 bool    is_face_planar_normals(const std::vector<int*> &trs, const std::vector<Point3>& lsPts, double& value, float angleTolerance);
 

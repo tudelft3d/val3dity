@@ -68,7 +68,7 @@ typedef K::Vector_3                 Vector;
 typedef K::Triangle_3               Triangle;
 typedef K::Tetrahedron_3            Tetrahedron;
 typedef K::Plane_3                  Plane;
-typedef CGAL::Polygon_2<K>          Polygon;
+typedef CGAL::Polygon_2<K>          CGALPolygon;
 typedef CGAL::Polyhedron_3<K>       CgalPolyhedron;
 
 
@@ -100,7 +100,8 @@ typedef enum
   MULTISOLID       = 2,
   COMPOSITESURFACE = 3,
   MULTISURFACE     = 4,
-  ALL              = 5,
+  POLYGON          = 5,
+  ALL              = 6,
 } Primitive3D;
 
 typedef enum

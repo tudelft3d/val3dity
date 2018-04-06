@@ -48,6 +48,7 @@ namespace val3dity
   class GenericObject;
   class Surface;
   class MultiSurface;
+  class Polygon;
   class CompositeSurface;
   class Solid;
   class CompositeSolid;
@@ -174,6 +175,7 @@ Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs)
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSurface*     process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
+Polygon*          process_gml_polygon(const pugi::xml_node& n, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 Solid*            process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);

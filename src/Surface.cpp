@@ -303,9 +303,9 @@ bool Surface::triangulate_shell()
     // int proj = projection_plane(_lsPts, idsob);
     // Vector v0 = bestfitplane.orthogonal_vector();
 
-    //-- get projected Polygon
-    Polygon pgn;
-    std::vector<Polygon> lsRings;
+    //-- get projected CGALPolygon
+    CGALPolygon pgn;
+    std::vector<CGALPolygon> lsRings;
     create_cgal_polygon(_lsPts, idsob, bestfitplane, pgn);
     //-- all polygons should be cw for Triangle
     //-- if reversed then re-reversed later
@@ -321,8 +321,8 @@ bool Surface::triangulate_shell()
     for (int j = 1; j < static_cast<int>(numf); j++)
     {
       std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
-      //-- get projected Polygon
-      Polygon pgn;
+      //-- get projected CGALPolygon
+      CGALPolygon pgn;
       create_cgal_polygon(_lsPts, ids2, bestfitplane, pgn);
       if (pgn.is_counterclockwise_oriented() == false) {
         pgn.reverse_orientation();
@@ -356,7 +356,7 @@ bool Surface::triangulate_shell()
 }
 
 
-bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane)
+bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<CGALPolygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane)
 {
   std::vector<int> ids = pgnids[0];
   CT ct;
@@ -513,8 +513,8 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
       continue;
     }
     //-- get projected oring
-    Polygon pgn;
-    std::vector<Polygon> lsRings;
+    CGALPolygon pgn;
+    std::vector<CGALPolygon> lsRings;
     create_cgal_polygon(_lsPts, ids, bestfitplane, pgn);
     if (validate_projected_ring(pgn, _lsFacesID[i]) == false)
     {
@@ -527,7 +527,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     {
       std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
       //-- get projected iring
-      Polygon pgn;
+      CGALPolygon pgn;
       create_cgal_polygon(_lsPts, ids2, bestfitplane, pgn);
       if (validate_projected_ring(pgn, _lsFacesID[i]) == false)
       {
@@ -795,7 +795,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
 }
 
 
-bool Surface::validate_projected_ring(Polygon &pgn, std::string id)
+bool Surface::validate_projected_ring(CGALPolygon &pgn, std::string id)
 {
   if ( (!pgn.is_simple()) || (pgn.orientation() == CGAL::COLLINEAR) )
   {
@@ -806,7 +806,7 @@ bool Surface::validate_projected_ring(Polygon &pgn, std::string id)
 }
 
 
-bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid)
+bool Surface::validate_polygon(std::vector<CGALPolygon> &lsRings, std::string polygonid)
 {
   initGEOS(NULL, NULL);
   //-- check the orientation of the rings: oring != irings
@@ -816,7 +816,7 @@ bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygo
   if (lsRings.size() > 1)
   {
     CGAL::Orientation ooring = lsRings[0].orientation();
-    std::vector<Polygon>::iterator it = lsRings.begin();
+    std::vector<CGALPolygon>::iterator it = lsRings.begin();
     it++;
     for ( ; it != lsRings.end(); it++)
     {
@@ -834,10 +834,10 @@ bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygo
   stringstream wkt;
   wkt << setprecision(15);
   wkt << "POLYGON(";
-  std::vector<Polygon>::iterator it = lsRings.begin();
+  std::vector<CGALPolygon>::iterator it = lsRings.begin();
   //-- oring
   wkt << "(";
-  Polygon::Vertex_iterator vit = it->vertices_begin();
+  CGALPolygon::Vertex_iterator vit = it->vertices_begin();
   for ( ; vit != it->vertices_end(); vit++)
   {
     wkt << vit->x() << " " << vit->y() << ",";
@@ -850,7 +850,7 @@ bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygo
   {
     wkt << ", (";
     it->reverse_orientation();
-    Polygon::Vertex_iterator vit = it->vertices_begin();
+    CGALPolygon::Vertex_iterator vit = it->vertices_begin();
     for ( ; vit != it->vertices_end(); vit++)
     {
       wkt << vit->x() << " " << vit->y() << ",";
