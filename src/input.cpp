@@ -59,6 +59,13 @@ bool IOErrors::has_errors()
     return true;
 }
 
+bool IOErrors::has_specific_error(int i) 
+{
+  if (_errors.count(i) == 0)
+    return false;
+  else
+    return true;
+}
 
 std::set<int> IOErrors::get_unique_error_codes()
 {
