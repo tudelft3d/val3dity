@@ -31,6 +31,7 @@
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
+#include "IndoorCell.h"
 #include "Surface.h"
 #include "MultiSurface.h"
 #include "CompositeSurface.h"
@@ -718,6 +719,57 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
   }
 }
 
+
+void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
+{
+  //-- 1. read each CellSpace in the file (the primal objects)
+  std::string s = ".//" + NS["indoorgml"] + "CellSpace";
+  pugi::xpath_node_set nn = doc.select_nodes(s.c_str());
+  for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
+  {
+    std::cout << "---CellSpace" << std::endl;
+    std::string theid   = "";
+    std::string duality = "";
+    //-- get the ID
+    if (it->node().attribute("gml:id") != 0) {
+      std::cout << "\t" << it->node().attribute("gml:id").value() << std::endl;
+      theid = it->node().attribute("gml:id").value();
+    }
+    //-- get the duality pointer (max one, sweet)
+    s = NS["indoorgml"] + "duality";
+    for (pugi::xml_node child : it->node().children(s.c_str()))
+    {
+      if (child.attribute("xlink:href") != 0) {
+        std::cout << "\t" << child.attribute("xlink:href").value() << std::endl;
+        duality = child.attribute("xlink:href").value();
+      }
+    }
+    IndoorCell* cell = new IndoorCell(theid, duality);
+    //-- get the geometry, either Solid or Surface
+    s = NS["indoorgml"] + "cellSpaceGeometry";
+    for (pugi::xml_node child : it->node().children(s.c_str()))
+    {
+      s = NS["indoorgml"] + "Geometry3D";
+      for (pugi::xml_node child2 : child.children(s.c_str()))
+      {
+        s = NS["gml"] + "Solid";
+        for (pugi::xml_node child3 : child2.children(s.c_str()))
+        {
+          std::cout << "Solid: " << child3.attribute("gml:id").value() << std::endl;
+          Solid* s = process_gml_solid(child3, dallpoly, tol_snap, errs);
+          // if (s->get_id() == "")
+          //   s->set_id(std::to_string(ms->number_of_solids()));
+          cell->add_primitive(s);
+        }
+      }
+    }
+    lsFeatures.push_back(cell);
+  }
+}
+
+
+
+
 void process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
 {
   primitives_walker walker;
@@ -921,7 +973,7 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
   }
   else if ( (NS.count("indoorgml") != 0) && (ncm.name() == (NS["indoorgml"] + "IndoorFeatures")) ) {
     std::cout << "IndoorGML input file" << std::endl;
-    // process_gml_file_city_objects(doc, lsFeatures, dallpoly, errs, tol_snap, geom_is_sem_surfaces);
+    process_gml_file_indoorgml(doc, lsFeatures, dallpoly, errs, tol_snap);
   }
   else
   {
@@ -953,7 +1005,8 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
       }
       else if (value.find("http://www.opengis.net/gml") != std::string::npos)
         sns = "gml";
-      else if (value.find("http://www.opengis.net/indoorgml/1") != std::string::npos) {
+      else if ( (value.find("http://www.opengis.net/indoorgml/1") != std::string::npos) &&
+                (value.find("core") != std::string::npos) ) {
         sns = "indoorgml";
       }
       else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)

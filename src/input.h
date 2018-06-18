@@ -45,6 +45,7 @@ namespace val3dity
   class Primitive;
   class Feature;
   class CityObject;
+  class IndoorCell;
   class GenericObject;
   class Surface;
   class MultiSurface;
@@ -181,6 +182,7 @@ void              process_json_surface(std::vector< std::vector<int> >& pgn, nlo
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 void              process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
+void              process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
 
 void              printProgressBar(int percent);
 std::string       localise(std::string s);
