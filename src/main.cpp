@@ -240,7 +240,8 @@ int main(int argc, char* const argv[])
     cmd.add(report_json);
     cmd.parse( argc, argv );
 
-    //-- vector with Features: CityObject, GenericObject, or IndoorObject (or others in the future)
+    //-- vector with Features: CityObject, GenericObject, 
+    //-- or IndoorCell, or IndoorDualGraph (or others in the future)
     std::vector<Feature*> lsFeatures;
     
     InputTypes inputtype = OTHER;
@@ -442,7 +443,7 @@ int main(int argc, char* const argv[])
         std::cout << "CompositeSurface" << std::endl;
       else {
         std::cout << "All" << std::endl;
-        std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
+        std::cout << "(CityGML/CityJSON/IndoorGML have all their 3D primitives validated)" << std::endl;
       }
       //-- report on parameters used
       if (ignore204.getValue() == true)
