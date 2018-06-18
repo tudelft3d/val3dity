@@ -36,6 +36,7 @@
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
+#include "IndoorCell.h"
 
 #include "validate_prim_toporel.h"
 
