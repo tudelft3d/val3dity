@@ -137,6 +137,12 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
 {
   if (this->is_valid() == 0)
   {
+    std::string s;
+    for (auto& e : this->get_unique_error_codes()) {
+      s += std::to_string(e);
+      s += "; ";
+    }
+    std::clog << "Errors: " << s << std::endl;
     return false;
   }
   bool isValid = true;
