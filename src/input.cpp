@@ -725,22 +725,25 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
   //-- 1. read each CellSpace in the file (the primal objects)
   std::string s = ".//" + NS["indoorgml"] + "CellSpace";
   pugi::xpath_node_set nn = doc.select_nodes(s.c_str());
+  int pcounter = 0;
   for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
   {
-    std::cout << "---CellSpace" << std::endl;
+    // std::cout << "---CellSpace" << std::endl;
     std::string theid   = "";
     std::string duality = "";
     //-- get the ID
     if (it->node().attribute("gml:id") != 0) {
-      std::cout << "\t" << it->node().attribute("gml:id").value() << std::endl;
+      // std::cout << "\t" << it->node().attribute("gml:id").value() << std::endl;
       theid = it->node().attribute("gml:id").value();
     }
+    else 
+      theid = ("MISSING_ID_" + std::to_string(pcounter));
     //-- get the duality pointer (max one, sweet)
     s = NS["indoorgml"] + "duality";
     for (pugi::xml_node child : it->node().children(s.c_str()))
     {
       if (child.attribute("xlink:href") != 0) {
-        std::cout << "\t" << child.attribute("xlink:href").value() << std::endl;
+        // std::cout << "\t" << child.attribute("xlink:href").value() << std::endl;
         duality = child.attribute("xlink:href").value();
       }
     }
@@ -755,14 +758,15 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
         s = NS["gml"] + "Solid";
         for (pugi::xml_node child3 : child2.children(s.c_str()))
         {
-          std::cout << "Solid: " << child3.attribute("gml:id").value() << std::endl;
+          // std::cout << "Solid: " << child3.attribute("gml:id").value() << std::endl;
           Solid* s = process_gml_solid(child3, dallpoly, tol_snap, errs);
-          // if (s->get_id() == "")
-          //   s->set_id(std::to_string(ms->number_of_solids()));
+          if (s->get_id() == "")
+            s->set_id("MISSING_ID");
           cell->add_primitive(s);
         }
       }
     }
+    pcounter++;
     lsFeatures.push_back(cell);
   }
 }
