@@ -49,7 +49,6 @@ IndoorCell::~IndoorCell()
 
 bool IndoorCell::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
-  // return true;
   if (_is_valid != -1)
     return _is_valid;
   bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
