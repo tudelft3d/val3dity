@@ -772,7 +772,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     lsFeatures.push_back(cell);
   }
 
-  //-- 2. read the dual graph 
+  //-- 2. read the dual graphs (yes there can be more than one) 
   s = ".//" + NS["indoorgml"] + "SpaceLayer";
   nn = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
@@ -797,12 +797,13 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
       }
       edges[theid] = std::make_tuple(connects[0], connects[1]);
     }
-
+    //-- fetch all the nodes
     s = ".//" + NS["indoorgml"] + "State";
     pugi::xpath_node_set nstate = doc.select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nstate.begin(); it != nstate.end(); ++it)
     {
-      std::cout << it->node().attribute("gml:id").value() << std::endl;
+      std::cout << "---\n" << it->node().attribute("gml:id").value() << std::endl;
+      std::string vid = it->node().attribute("gml:id").value();
       s = NS["indoorgml"] + "duality";
       pugi::xml_node child = it->node().child(s.c_str());
       if (child.attribute("xlink:href") != 0) {
@@ -818,8 +819,14 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
           std::string s = child.attribute("xlink:href").value();
           if (s[0] == '#')
             s = s.substr(1);
-          std::cout << "dual duality: " << s << std::endl;
-          std::cout << "-- " << std::get<0>(edges[s]) << " --> " << std::get<1>(edges[s]) << std::endl;
+          std::cout << "edge: " << s << std::endl;
+          // std::cout << "-- " << std::get<0>(edges[s]) << " --> " << std::get<1>(edges[s]) << std::endl;
+          std::string vadj;
+          if (std::get<1>(edges[s]) != vid)
+            vadj = std::get<1>(edges[s]);
+//          else
+//            vadj = std::get<1>(edges[s]);
+          std::cout << "vadj: " << vadj << std::endl;
         }
       }
 
