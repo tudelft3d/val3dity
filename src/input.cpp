@@ -743,8 +743,10 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     for (pugi::xml_node child : it->node().children(s.c_str()))
     {
       if (child.attribute("xlink:href") != 0) {
-        // std::cout << "\t" << child.attribute("xlink:href").value() << std::endl;
-        duality = child.attribute("xlink:href").value();
+        std::string s = child.attribute("xlink:href").value();
+        if (s[0] == '#')
+          s = s.substr(1);
+        duality = s;
       }
     }
     IndoorCell* cell = new IndoorCell(theid, duality);
@@ -769,6 +771,61 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     pcounter++;
     lsFeatures.push_back(cell);
   }
+
+  //-- 2. read the dual graph 
+  s = ".//" + NS["indoorgml"] + "SpaceLayer";
+  nn = doc.select_nodes(s.c_str());
+  for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
+  {
+    //-- fetch all the edges
+    std::map<std::string, std::tuple<std::string,std::string>> edges;
+    s = ".//" + NS["indoorgml"] + "Transition";
+    pugi::xpath_node_set ntr = doc.select_nodes(s.c_str());
+    for (pugi::xpath_node_set::const_iterator it = ntr.begin(); it != ntr.end(); ++it)
+    {
+      std::string theid = it->node().attribute("gml:id").value();
+      s = NS["indoorgml"] + "connects";
+      std::vector<std::string> connects;
+      for (pugi::xml_node child : it->node().children(s.c_str()))
+      {
+        if (child.attribute("xlink:href") != 0) {
+          std::string s = child.attribute("xlink:href").value();
+          if (s[0] == '#')
+            s = s.substr(1);
+          connects.push_back(s);
+        }
+      }
+      edges[theid] = std::make_tuple(connects[0], connects[1]);
+    }
+
+    s = ".//" + NS["indoorgml"] + "State";
+    pugi::xpath_node_set nstate = doc.select_nodes(s.c_str());
+    for (pugi::xpath_node_set::const_iterator it = nstate.begin(); it != nstate.end(); ++it)
+    {
+      std::cout << it->node().attribute("gml:id").value() << std::endl;
+      s = NS["indoorgml"] + "duality";
+      pugi::xml_node child = it->node().child(s.c_str());
+      if (child.attribute("xlink:href") != 0) {
+        std::string s = child.attribute("xlink:href").value();
+        if (s[0] == '#')
+          s = s.substr(1);
+        std::cout << "dual node: " << s << std::endl;
+      }
+      s = NS["indoorgml"] + "connects";
+      for (pugi::xml_node child : it->node().children(s.c_str()))
+      {
+        if (child.attribute("xlink:href") != 0) {
+          std::string s = child.attribute("xlink:href").value();
+          if (s[0] == '#')
+            s = s.substr(1);
+          std::cout << "dual duality: " << s << std::endl;
+          std::cout << "-- " << std::get<0>(edges[s]) << " --> " << std::get<1>(edges[s]) << std::endl;
+        }
+      }
+
+    }
+  }
+
 }
 
 
