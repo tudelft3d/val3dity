@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -32,6 +32,7 @@
 #include "CityObject.h"
 #include "GenericObject.h"
 #include "IndoorCell.h"
+#include "IndoorGraph.h"
 #include "Surface.h"
 #include "MultiSurface.h"
 #include "CompositeSurface.h"
@@ -777,6 +778,13 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
   nn = doc.select_nodes(s.c_str());
   for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
   {
+    std::string idg;
+    if (it->node().attribute("gml:id") != 0) {
+      idg = it->node().attribute("gml:id").value();
+    }
+    else 
+      idg = "";
+    IndoorGraph ig(idg);
     //-- fetch all the edges
     std::map<std::string, std::tuple<std::string,std::string>> edges;
     s = ".//" + NS["indoorgml"] + "Transition";
@@ -802,34 +810,49 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     pugi::xpath_node_set nstate = doc.select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nstate.begin(); it != nstate.end(); ++it)
     {
-      std::cout << "---\n" << it->node().attribute("gml:id").value() << std::endl;
+      // std::cout << "---\n" << it->node().attribute("gml:id").value() << std::endl;
       std::string vid = it->node().attribute("gml:id").value();
       s = NS["indoorgml"] + "duality";
+      std::string vdual;
       pugi::xml_node child = it->node().child(s.c_str());
       if (child.attribute("xlink:href") != 0) {
-        std::string s = child.attribute("xlink:href").value();
-        if (s[0] == '#')
-          s = s.substr(1);
-        std::cout << "dual node: " << s << std::endl;
+        vdual = child.attribute("xlink:href").value();
+        if (vdual[0] == '#')
+          vdual = vdual.substr(1);
+        std::cout << "dual node: " << vdual << std::endl;
       }
       s = NS["indoorgml"] + "connects";
+      std::vector<std::string> vadj;
       for (pugi::xml_node child : it->node().children(s.c_str()))
       {
         if (child.attribute("xlink:href") != 0) {
           std::string s = child.attribute("xlink:href").value();
           if (s[0] == '#')
             s = s.substr(1);
-          std::cout << "edge: " << s << std::endl;
-          // std::cout << "-- " << std::get<0>(edges[s]) << " --> " << std::get<1>(edges[s]) << std::endl;
-          std::string vadj;
           if (std::get<1>(edges[s]) != vid)
-            vadj = std::get<1>(edges[s]);
-//          else
-//            vadj = std::get<1>(edges[s]);
-          std::cout << "vadj: " << vadj << std::endl;
+            vadj.push_back(std::get<1>(edges[s]));
         }
       }
-
+      s = ".//" + NS["gml"] + "pos";
+      pugi::xpath_node n = it->node().select_node(s.c_str());
+      // std::cout << n.node().child_value() << std::endl;
+      
+      std::string buf;
+      std::stringstream ss(n.node().child_value());
+      std::vector<std::string> tokens;
+      while (ss >> buf)
+        tokens.push_back(buf);
+      // long double x = std::stold(tokens[0]);
+      // long double y = std::stold(tokens[1]);
+      // long double z = std::stold(tokens[2]);
+      // TODO: use long double?
+      
+      ig.add_vertex(vid, 
+                    std::stold(tokens[0]), 
+                    std::stold(tokens[1]), 
+                    std::stold(tokens[2]),
+                    vdual,
+                    vadj);
     }
   }
 

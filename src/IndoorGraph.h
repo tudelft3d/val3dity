@@ -47,7 +47,7 @@ public:
                              double y, 
                              double z, 
                              std::string dual, 
-                             std::vector<std::string> connects);
+                             std::vector<std::string> vadj);
   
   bool            validate();
   bool            is_valid();
