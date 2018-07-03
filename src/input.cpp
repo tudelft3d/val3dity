@@ -846,7 +846,6 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
       // long double y = std::stold(tokens[1]);
       // long double z = std::stold(tokens[2]);
       // TODO: use long double?
-      
       ig.add_vertex(vid, 
                     std::stold(tokens[0]), 
                     std::stold(tokens[1]), 

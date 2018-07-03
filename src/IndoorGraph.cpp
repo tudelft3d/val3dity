@@ -50,11 +50,11 @@ IndoorGraph::~IndoorGraph()
 
 void IndoorGraph::add_vertex(std::string theid, double x, double y, double z, std::string dual, std::vector<std::string> vadj)
 {
-  // std::map<std::string, std::tuple<Point3,std::string,std::vector<std::string>>> _vertices;
-  std::cout << "ADDING VERTEX" << std::endl;
+  // std::cout << "ADDING VERTEX" << std::endl;
   Point3 v(x, y, z);
   _vertices[theid] = std::make_tuple(v, dual, vadj);
 }
+
 
 bool IndoorGraph::validate() 
 {
