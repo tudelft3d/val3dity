@@ -36,7 +36,7 @@
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
-#include "IndoorCell.h"
+
 
 #include "validate_prim_toporel.h"
 
@@ -241,7 +241,7 @@ int main(int argc, char* const argv[])
     cmd.parse( argc, argv );
 
     //-- vector with Features: CityObject, GenericObject, 
-    //-- or IndoorCell, or IndoorDualGraph (or others in the future)
+    //-- or IndoorModel (or others in the future)
     std::vector<Feature*> lsFeatures;
     
     InputTypes inputtype = OTHER;

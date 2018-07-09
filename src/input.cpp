@@ -31,7 +31,6 @@
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
-#include "IndoorCell.h"
 #include "IndoorModel.h"
 #include "IndoorGraph.h"
 #include "Surface.h"
@@ -760,9 +759,10 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
         duality = s;
       }
     }
-    IndoorCell* cell = new IndoorCell(theid, duality);
+    // IndoorCell* cell = new IndoorCell(theid, duality);
     //-- get the geometry, either Solid or Surface
     s = NS["indoorgml"] + "cellSpaceGeometry";
+    Solid* sol;
     for (pugi::xml_node child : it->node().children(s.c_str()))
     {
       s = NS["indoorgml"] + "Geometry3D";
@@ -772,15 +772,15 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
         for (pugi::xml_node child3 : child2.children(s.c_str()))
         {
           // std::cout << "Solid: " << child3.attribute("gml:id").value() << std::endl;
-          Solid* s = process_gml_solid(child3, dallpoly, tol_snap, errs);
-          if (s->get_id() == "")
-            s->set_id("MISSING_ID");
-          cell->add_primitive(s);
+          sol = process_gml_solid(child3, dallpoly, tol_snap, errs);
+          if (sol->get_id() == "")
+            sol->set_id("MISSING_ID");
+          // cell->add_primitive(sol);
         }
       }
     }
     pcounter++;
-    im->add_cell(cell);
+    im->add_cell(theid, sol, duality);
   }
 
   //-- 2. read the dual graphs (yes there can be more than one) 

@@ -45,7 +45,6 @@ namespace val3dity
   class Primitive;
   class Feature;
   class CityObject;
-  class IndoorCell;
   class GenericObject;
   class Surface;
   class MultiSurface;

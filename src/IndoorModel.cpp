@@ -58,36 +58,36 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 
   if (_is_valid != -1)
     return _is_valid;
-  bool bValid = true;
 
-//-- 1. validate each IndoorCell
-  std::clog << std::endl << "######### Validating IndoorModel #########" << std::endl;
-  std::clog << "id:   " << this->get_id() << std::endl;
-  std::clog << "--" << std::endl;
-  for (auto& key: _cells)
-  {
-    if ((key.second)->validate(tol_planarity_d2p, tol_planarity_normals, tol_overlap) == false)
-      bValid = false;
-  }
+//-- 1. validate each IndoorCell geometry (Solids)
+  bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+
 
 //-- 2. is dual vertex of each cell located inside its Cell?
-
-
-
-  //-- summary of it all
-  if (bValid == false)
-    std::clog << "======== INVALID ========" << std::endl;
-  else
-    std::clog << "========= VALID =========" << std::endl;
-  }
+  if  (bValid == true)
+    bValid = true;
   _is_valid = bValid;
-  return _is_valid;
+  return bValid;
+
+
+
+
+  // //-- summary of it all
+  // if (bValid == false)
+  //   std::clog << "======== INVALID ========" << std::endl;
+  // else
+  //   std::clog << "========= VALID =========" << std::endl;
+  // }
+  // _is_valid = bValid;
+  // return _is_valid;
 }
 
 
-void IndoorModel::add_cell(IndoorCell* c)
+void IndoorModel::add_cell(std::string id, Primitive* p, std::string dual)
 {
-  _cells[c->get_id()] = c;
+  this->add_primitive(p);
+  int pos = (_lsPrimitives.size() - 1);
+  _cells[id] = std::make_tuple(pos, dual);
 }
 
 
@@ -110,8 +110,5 @@ std::string IndoorModel::get_type() {
 }
 
 
-void IndoorModel::add_primitive(Primitive* p) {
-
-}
 
 } // namespace val3dity

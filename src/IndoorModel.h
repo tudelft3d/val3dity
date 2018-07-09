@@ -31,7 +31,6 @@
 
 #include "Feature.h"
 #include "definitions.h"
-#include "IndoorCell.h"
 #include "IndoorGraph.h"
 
 
@@ -48,15 +47,12 @@ public:
   bool            is_valid();
   std::string     get_type();
 
-  //-- this is not used directly by IndoorModel, so overwrite it with empty function
-  void            add_primitive(Primitive* p); 
-
-  void            add_cell(IndoorCell* c);
+  void            add_cell(std::string id, Primitive* p, std::string dual);
   void            add_graph(IndoorGraph* g);
 
 protected:
-  std::map<std::string, IndoorCell*> _cells;
-  std::vector<IndoorGraph*>          _graphs;
+  std::map<std::string, std::tuple<int,std::string>> _cells;  //-- <id, pos_lsPrimitives, dual> 
+  std::vector<IndoorGraph*>                          _graphs;
 
 };
 
