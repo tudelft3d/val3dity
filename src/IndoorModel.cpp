@@ -65,7 +65,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
 //-- 2. is dual vertex of each cell located inside its Cell?
-  std::clog << "======== Validating Dual Vertex ========" << std::endl;
+  std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;
   for (auto& el : _cells)
   {
     std::clog << "Cell ID: " << el.first << std::endl;
