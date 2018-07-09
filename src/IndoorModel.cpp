@@ -53,7 +53,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   // 1. each Cell is valid Solid
   // 2. is dual vertex of each Cell locate inside the Cell
   // 3. is graph valid by itself (faulty xlinks?)
-  // 4. do Cells overlap each others?
+  // 4. do Cells overlap each others? https://doc.cgal.org/latest/Polygon_mesh_processing/group__PMP__predicates__grp.html#ga1ff63ec6e762d45ea5775bf7b49f9270
   // 5. adj in dual == adj in primal
   // 
 
