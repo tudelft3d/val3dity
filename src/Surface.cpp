@@ -32,6 +32,7 @@
 #include "input.h"
 #include "validate_shell.h"
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
+#include <CGAL/Side_of_triangle_mesh.h>
 #include <geos_c.h>
 #include <sstream>
 
@@ -918,6 +919,16 @@ bool Surface::has_face_rings_toofewpoints(const std::vector< std::vector<int> >&
     }
   }
   return bErrors;
+}
+
+int Surface::side_of_triangle_surface(double& x, double& y, double& z)
+{
+  if ( (_polyhedron != NULL) && (CGAL::is_triangle_mesh(*_polyhedron) == true) )
+    std::cout << "TEST POINT IN SURFACE" << std::endl;
+  else
+    std::cout << "---TEST POINT IN SURFACE" << std::endl;
+
+  return 1;
 }
 
 } // namespace val3dity

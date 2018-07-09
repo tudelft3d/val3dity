@@ -243,6 +243,24 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
 }
 
 
+int Solid::is_point_in_solid(double& x, double& y, double& z)
+{
+  if (this->is_valid() == 1)
+  {
+    bool bInside = true;
+    for (auto& s : _shells)
+    {
+      if (s->side_of_triangle_surface(x, y, z) != 2)
+        bInside = false;
+    }
+    return 1;
+  }
+  else
+  {
+    return -2;
+  }
+}
+
 std::set<int> Solid::get_unique_error_codes() {
   std::set<int> errs = Primitive::get_unique_error_codes();
   for (auto& sh : _shells) {

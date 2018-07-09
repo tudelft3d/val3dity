@@ -65,6 +65,8 @@ public:
   bool            is_empty();
   Primitive3D     get_type();
   std::set<int>   get_unique_error_codes();
+
+  int             is_point_in_solid(double& x, double& y, double& z);
   
   const std::vector<Surface*>&  get_shells();
 

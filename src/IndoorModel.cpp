@@ -62,24 +62,17 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 //-- 1. validate each IndoorCell geometry (Solids)
   bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
-
+  
 //-- 2. is dual vertex of each cell located inside its Cell?
   if  (bValid == true)
     bValid = true;
+
+
+//-- bye-bye
   _is_valid = bValid;
   return bValid;
 
 
-
-
-  // //-- summary of it all
-  // if (bValid == false)
-  //   std::clog << "======== INVALID ========" << std::endl;
-  // else
-  //   std::clog << "========= VALID =========" << std::endl;
-  // }
-  // _is_valid = bValid;
-  // return _is_valid;
 }
 
 
