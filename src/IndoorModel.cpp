@@ -30,6 +30,7 @@
 #include "IndoorModel.h"
 #include "definitions.h"
 #include "input.h"
+#include "Solid.h"
 
 namespace val3dity
 {
@@ -59,13 +60,32 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   if (_is_valid != -1)
     return _is_valid;
 
+  bool bValid = true;
 //-- 1. validate each IndoorCell geometry (Solids)
-  bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+  bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
-  
 //-- 2. is dual vertex of each cell located inside its Cell?
-  if  (bValid == true)
-    bValid = true;
+  for (auto& el : _cells)
+  {
+    std::cout << "id: " << el.first << std::endl;
+    std::cout << "dual: " << std::get<1>(el.second) << std::endl;
+    auto v = _graphs[0]->get_vertex(std::get<1>(el.second));
+    Point3 p = std::get<0>(v);
+    std::cout << "Point " << std::get<0>(v) << std::endl;
+      
+    Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
+    int inside = s->is_point_in_solid(p);
+      
+
+  }
+  // std::map<std::string, std::tuple<Point3,std::string,std::vector<std::string>>> _vertices;
+  // for (auto& p : _lsPrimitives)
+  // {
+  //   std::cout << "id: " << p->get_id() << std::endl;
+  //   std::cout << std::get<1>(_cells[p->get_id()]) << std::endl;
+
+  // }
+
 
 
 //-- bye-bye

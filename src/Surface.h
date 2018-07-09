@@ -74,7 +74,7 @@ public:
   std::string   get_poly_representation();
   std::string   get_off_representation();
 
-  int           side_of_triangle_surface(double& x, double& y, double& z);
+  int           side_of_triangle_surface(Point3& p);
 
   bool          were_vertices_merged_during_parsing();
   int           get_number_parsed_vertices();

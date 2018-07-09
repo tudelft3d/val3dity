@@ -243,14 +243,14 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
 }
 
 
-int Solid::is_point_in_solid(double& x, double& y, double& z)
+int Solid::is_point_in_solid(Point3& p)
 {
   if (this->is_valid() == 1)
   {
     bool bInside = true;
     for (auto& s : _shells)
     {
-      if (s->side_of_triangle_surface(x, y, z) != 2)
+      if (s->side_of_triangle_surface(p) != 2)
         bInside = false;
     }
     return 1;

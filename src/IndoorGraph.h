@@ -53,6 +53,8 @@ public:
   bool            is_valid();
   std::string     get_type();
 
+  std::tuple<Point3,std::string,std::vector<std::string>>& get_vertex(std::string id);
+
 protected:
   std::string             _id;
   int                     _is_valid; 

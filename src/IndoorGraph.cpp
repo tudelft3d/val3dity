@@ -81,4 +81,9 @@ std::string IndoorGraph::get_type() {
 }
 
 
+std::tuple<Point3,std::string,std::vector<std::string>>& 
+IndoorGraph::get_vertex(std::string id) {
+  return _vertices[id];
+}
+
 } // namespace val3dity
