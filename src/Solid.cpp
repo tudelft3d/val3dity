@@ -245,20 +245,20 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
 
 int Solid::is_point_in_solid(Point3& p)
 {
+  int re = -2;
   if (this->is_valid() == 1)
   {
-    bool bInside = true;
-    for (auto& s : _shells)
+    auto& s = _shells[0];
+    re = s->side_of_triangle_surface(p);
+    for (int i = 1; i <= this->num_ishells(); i++)
     {
-      if (s->side_of_triangle_surface(p) != 2)
-        bInside = false;
+      s = _shells[i];
+      int re2 = s->side_of_triangle_surface(p);
+      if ( (re2 == 0) || (re2 == 1) )
+        re = -1;
     }
-    return 1;
   }
-  else
-  {
-    return -2;
-  }
+  return re;
 }
 
 std::set<int> Solid::get_unique_error_codes() {

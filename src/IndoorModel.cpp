@@ -65,34 +65,26 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
 //-- 2. is dual vertex of each cell located inside its Cell?
+  std::clog << "======== Validating Dual Vertex ========" << std::endl;
   for (auto& el : _cells)
   {
-    std::cout << "id: " << el.first << std::endl;
-    std::cout << "dual: " << std::get<1>(el.second) << std::endl;
-    auto v = _graphs[0]->get_vertex(std::get<1>(el.second));
-    Point3 p = std::get<0>(v);
-    std::cout << "Point " << std::get<0>(v) << std::endl;
-      
+    std::clog << "Cell ID: " << el.first << std::endl;
+    Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
     Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
     int inside = s->is_point_in_solid(p);
-      
-
+    if (inside == -1)
+    {
+      std::stringstream msg;
+      msg << "CellSpace id=" << el.first;
+      this->add_error(702, msg.str(), "");
+    }
   }
-  // std::map<std::string, std::tuple<Point3,std::string,std::vector<std::string>>> _vertices;
-  // for (auto& p : _lsPrimitives)
-  // {
-  //   std::cout << "id: " << p->get_id() << std::endl;
-  //   std::cout << std::get<1>(_cells[p->get_id()]) << std::endl;
 
-  // }
-
-
-
+//-- 3. is dual graph valid
+      
 //-- bye-bye
   _is_valid = bValid;
   return bValid;
-
-
 }
 
 

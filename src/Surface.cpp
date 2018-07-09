@@ -929,19 +929,15 @@ int Surface::side_of_triangle_surface(Point3& p)
    1 = inside
    */
 {
+  int re = -2;
   if ( (_polyhedron != NULL) && (CGAL::is_triangle_mesh(*_polyhedron) == true) )
   {
-    std::cout << "TEST POINT IN SURFACE" << std::endl;
     CGAL::Side_of_triangle_mesh<CgalPolyhedron, K> inside(*_polyhedron);
     Point3 p_translated(p.x() - Surface::_shiftx, p.y() - Surface::_shifty, p.z());
-    CGAL::Bounded_side res = inside(p_translated);
-    std::cout << res << std::endl;
-
+    re = inside(p_translated);
   }
-  else
-    std::cout << "---SOMETHING WRONG WITH POINT-IN-SURFACE" << std::endl;
-
-  return 1;
+  return re;
 }
+
 
 } // namespace val3dity
