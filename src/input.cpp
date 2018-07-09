@@ -32,6 +32,7 @@
 #include "CityObject.h"
 #include "GenericObject.h"
 #include "IndoorCell.h"
+#include "IndoorModel.h"
 #include "IndoorGraph.h"
 #include "Surface.h"
 #include "MultiSurface.h"
@@ -723,6 +724,15 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
 
 void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
 {
+  //-- 0. read the header of the file and find its gml:name, if any
+  std::string nameim = "";
+  if (doc.first_child().attribute("gml:id") != 0) 
+    nameim = doc.first_child().attribute("gml:id").value();
+  else 
+    nameim = "MyIndoorModel";
+  IndoorModel* im = new IndoorModel(nameim);
+  lsFeatures.push_back(im);
+
   //-- 1. read each CellSpace in the file (the primal objects)
   std::string s = ".//" + NS["indoorgml"] + "CellSpace";
   pugi::xpath_node_set nn = doc.select_nodes(s.c_str());
@@ -770,7 +780,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
       }
     }
     pcounter++;
-    lsFeatures.push_back(cell);
+    im->add_cell(cell);
   }
 
   //-- 2. read the dual graphs (yes there can be more than one) 
@@ -784,7 +794,8 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     }
     else 
       idg = "";
-    IndoorGraph ig(idg);
+    // IndoorGraph ig(idg);
+    IndoorGraph* ig = new IndoorGraph(idg);
     //-- fetch all the edges
     std::map<std::string, std::tuple<std::string,std::string>> edges;
     s = ".//" + NS["indoorgml"] + "Transition";
@@ -846,15 +857,15 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
       // long double y = std::stold(tokens[1]);
       // long double z = std::stold(tokens[2]);
       // TODO: use long double?
-      ig.add_vertex(vid, 
-                    std::stold(tokens[0]), 
-                    std::stold(tokens[1]), 
-                    std::stold(tokens[2]),
-                    vdual,
-                    vadj);
+      ig->add_vertex(vid, 
+                     std::stold(tokens[0]), 
+                     std::stold(tokens[1]), 
+                     std::stold(tokens[2]),
+                     vdual,
+                     vadj);
     }
+    im->add_graph(ig);
   }
-
 }
 
 

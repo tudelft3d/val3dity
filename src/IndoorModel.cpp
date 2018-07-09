@@ -57,6 +57,18 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 }
 
 
+void IndoorModel::add_cell(IndoorCell* c)
+{
+  _cells[c->get_id()] = c;
+}
+
+
+void IndoorModel::add_graph(IndoorGraph* g)
+{
+  _graphs.push_back(g);
+}
+
+
 bool IndoorModel::is_valid() {
   if (_is_valid == 1) 
     return true;
@@ -69,5 +81,9 @@ std::string IndoorModel::get_type() {
   return _type;
 }
 
+
+void IndoorModel::add_primitive(Primitive* p) {
+
+}
 
 } // namespace val3dity

@@ -48,9 +48,15 @@ public:
   bool            is_valid();
   std::string     get_type();
 
+  //-- this is not used directly by IndoorModel, so overwrite it with empty function
+  void            add_primitive(Primitive* p); 
+
+  void            add_cell(IndoorCell* c);
+  void            add_graph(IndoorGraph* g);
+
 protected:
   std::map<std::string, IndoorCell*> _cells;
-  std::vector<IndoorGraph*>_graphs;
+  std::vector<IndoorGraph*>          _graphs;
 
 };
 
