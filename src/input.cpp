@@ -160,6 +160,11 @@ std::string errorcode2description(int code) {
     //-- CityGML objects
     case 601: return string("BUILDINGPARTS_OVERLAP"); break;
     case 609: return string("CITYOBJECT_HAS_NO_GEOMETRY"); break;
+    //-- IndoorGML objects
+    case 701: return string("CELLS_OVERLAP"); break;
+    case 702: return string("DUAL_VERTEX_OUTSIDE_CELL"); break;
+    case 703: return string("NAVIGATION_GRAPH_INVALID"); break;
+    case 704: return string("PRIMAL_DUAL_INCONSISTENT"); break;
     //-- OTHERS
     case 901: return string("INVALID_INPUT_FILE"); break;
     case 902: return string("EMPTY_PRIMITIVE"); break;
