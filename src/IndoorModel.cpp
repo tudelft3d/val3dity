@@ -48,12 +48,40 @@ IndoorModel::~IndoorModel()
 
 bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
-  return true;
-  // if (_is_valid != -1)
-  //   return _is_valid;
-  // bool bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
-  // _is_valid = bValid;
-  // return bValid;
+  // 
+  // 1. each Cell is valid Solid
+  // 2. is dual vertex of each Cell locate inside the Cell
+  // 3. is graph valid by itself (faulty xlinks?)
+  // 4. do Cells overlap each others?
+  // 5. adj in dual == adj in primal
+  // 
+
+  if (_is_valid != -1)
+    return _is_valid;
+  bool bValid = true;
+
+//-- 1. validate each IndoorCell
+  std::clog << std::endl << "######### Validating IndoorModel #########" << std::endl;
+  std::clog << "id:   " << this->get_id() << std::endl;
+  std::clog << "--" << std::endl;
+  for (auto& key: _cells)
+  {
+    if ((key.second)->validate(tol_planarity_d2p, tol_planarity_normals, tol_overlap) == false)
+      bValid = false;
+  }
+
+//-- 2. is dual vertex of each cell located inside its Cell?
+
+
+
+  //-- summary of it all
+  if (bValid == false)
+    std::clog << "======== INVALID ========" << std::endl;
+  else
+    std::clog << "========= VALID =========" << std::endl;
+  }
+  _is_valid = bValid;
+  return _is_valid;
 }
 
 
