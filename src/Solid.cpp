@@ -137,6 +137,12 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
 {
   if (this->is_valid() == 0)
   {
+    std::string s;
+    for (auto& e : this->get_unique_error_codes()) {
+      s += std::to_string(e);
+      s += "; ";
+    }
+    std::clog << "Errors: " << s << std::endl;
     return false;
   }
   bool isValid = true;
@@ -236,6 +242,24 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
   return re;
 }
 
+
+int Solid::is_point_in_solid(Point3& p)
+{
+  int re = -2;
+  if (this->is_valid() == 1)
+  {
+    auto& s = _shells[0];
+    re = s->side_of_triangle_surface(p);
+    for (int i = 1; i <= this->num_ishells(); i++)
+    {
+      s = _shells[i];
+      int re2 = s->side_of_triangle_surface(p);
+      if ( (re2 == 0) || (re2 == 1) )
+        re = -1;
+    }
+  }
+  return re;
+}
 
 std::set<int> Solid::get_unique_error_codes() {
   std::set<int> errs = Primitive::get_unique_error_codes();

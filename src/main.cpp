@@ -37,6 +37,7 @@
 #include "CityObject.h"
 #include "GenericObject.h"
 
+
 #include "validate_prim_toporel.h"
 
 #include <tclap/CmdLine.h>
@@ -239,7 +240,8 @@ int main(int argc, char* const argv[])
     cmd.add(report_json);
     cmd.parse( argc, argv );
 
-    //-- vector with Features: CityObject, GenericObject, or IndoorObject (or others in the future)
+    //-- vector with Features: CityObject, GenericObject, 
+    //-- or IndoorModel (or others in the future)
     std::vector<Feature*> lsFeatures;
     
     InputTypes inputtype = OTHER;
@@ -441,7 +443,7 @@ int main(int argc, char* const argv[])
         std::cout << "CompositeSurface" << std::endl;
       else {
         std::cout << "All" << std::endl;
-        std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
+        std::cout << "(CityGML/CityJSON/IndoorGML have all their 3D primitives validated)" << std::endl;
       }
       //-- report on parameters used
       if (ignore204.getValue() == true)
@@ -765,7 +767,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     for (auto e : errors)
     {
       ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
-      ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
+      ss << setw(11) << e.second;
+      if (e.first < 600)
+       ss << " primitive(s)";
+      else
+       ss << " feature(s)";
+      ss << std::endl;
     }
     for (auto& e : ioerrs.get_unique_error_codes())
     {

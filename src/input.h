@@ -159,10 +159,9 @@ void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 void              read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              print_information(std::string &ifile);
-void              report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
-void              report_building(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
-void              report_building_each_lod(pugi::xml_document& doc, std::map<std::string, std::string>& ns, int lod, int& total_solid, int& total_ms, int& total_sem);
-void              get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml);
+void              report_primitives(pugi::xml_document& doc);
+void              report_building(pugi::xml_document& doc);
+void              report_building_each_lod(pugi::xml_document& doc, int lod, int& total_solid, int& total_ms, int& total_sem);
 void              print_info_aligned(std::string o, size_t number, bool tab = false);
 
 std::string       errorcode2description(int code);
@@ -182,6 +181,7 @@ void              process_json_surface(std::vector< std::vector<int> >& pgn, nlo
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 void              process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
+void              process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
 
 void              printProgressBar(int percent);
 std::string       localise(std::string s);

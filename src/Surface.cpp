@@ -32,6 +32,7 @@
 #include "input.h"
 #include "validate_shell.h"
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
+#include <CGAL/Side_of_triangle_mesh.h>
 #include <geos_c.h>
 #include <sstream>
 
@@ -919,5 +920,24 @@ bool Surface::has_face_rings_toofewpoints(const std::vector< std::vector<int> >&
   }
   return bErrors;
 }
+
+int Surface::side_of_triangle_surface(Point3& p)
+  /*
+   -2 = not valid polyhedron
+   -1 = outside
+   0 = directly on the boundary of polyhedron
+   1 = inside
+   */
+{
+  int re = -2;
+  if ( (_polyhedron != NULL) && (CGAL::is_triangle_mesh(*_polyhedron) == true) )
+  {
+    CGAL::Side_of_triangle_mesh<CgalPolyhedron, K> inside(*_polyhedron);
+    Point3 p_translated(p.x() - Surface::_shiftx, p.y() - Surface::_shifty, p.z());
+    re = inside(p_translated);
+  }
+  return re;
+}
+
 
 } // namespace val3dity
