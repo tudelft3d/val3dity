@@ -39,31 +39,32 @@
 namespace val3dity
 {
 
-typedef std::vector<Solid*>                                             Solids;
-typedef Solids::iterator                                                Iterator;
+typedef std::vector<Nef_polyhedron*>                                    Nefs;
+typedef Nefs::iterator                                                  Iterator;
 typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,Iterator>  AABB;
 
 
 struct Report {
-  Solids* solids;
-  int hola;
+  Nefs* nefs;
+  std::vector<std::string> lsCellIDs;
 
-  Report(Solids& solids, int roger)
-    : solids(&solids)
+  Report(Nefs& nefs, std::vector<std::string>& lsCell)
+    : nefs(&nefs)
   {
-    hola = roger;
+    lsCellIDs = lsCell;
   }
 
   // callback functor that reports all truly intersecting triangles
   void operator()(const AABB& a, const AABB& b) const 
   {
-    std::cout << "Box " << (a.handle() - solids->begin()) << " and "
-              << (b.handle() - solids->begin()) << " intersect";
+    std::cout << "Box " << (a.handle() - nefs->begin()) << " and "
+              << (b.handle() - nefs->begin()) << " intersect";
     std::cout << "-->CHECK IF REAL INTERSECTION" << std::endl;
-    int box1 = (a.handle() - solids->begin());
-    int box2 = (b.handle() - solids->begin());
-    Solid* tmp = solids->at(box1);
-    std::cout << tmp->num_faces() << ":" << hola << std::endl;
+    int box1 = (a.handle() - nefs->begin());
+    int box2 = (b.handle() - nefs->begin());
+    Nef_polyhedron* tmp = nefs->at(box1);
+    std::cout << "id: " << lsCellIDs.at(box1) << std::endl;
+    std::cout << "id: " << lsCellIDs.at(box2) << std::endl;
 //    std::cout << a.handle() << std::endl;
     // if ( ! a.handle()->is_degenerate() && ! b.handle()->is_degenerate()
     //      && CGAL::do_intersect( *(a.handle()), *(b.handle()))) {
@@ -73,21 +74,59 @@ struct Report {
 };
 
 
+bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
+          int errorcode_to_assign, 
+          std::vector<Error>& lsErrors, 
+          double tol_overlap)
+{
+  std::vector<Nef_polyhedron*> lsNefs;
+  std::vector<std::string>     lsCellIDs;
+  for (auto& c : lsCells)
+  {
+    Solid* ts = std::get<1>(c);
+    if (ts->is_valid() != 1)
+      continue;
+    Nef_polyhedron* tmpnef = ts->get_nef_polyhedron();
+    if (tol_overlap > 0)
+    {
+      lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
+      delete tmpnef;
+    }
+    else
+      lsNefs.push_back(tmpnef);
+    lsCellIDs.push_back(std::get<0>(c));
+  }
+  
+  std::vector<AABB> aabbs;
+  
+  int counter = 0;
+  for ( Iterator i = lsNefs.begin(); i != lsNefs.end(); ++i)
+  {
+    Solid* ts = std::get<1>(lsCells[counter]);
+    aabbs.push_back( AABB( ts->get_bbox(), i) );
+    counter++;
+  }
+
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs));
+
+  return true;
+}
+
 
 bool test(std::vector<Primitive*>& lsPrimitives, 
           int errorcode_to_assign, 
           std::vector<Error>& lsErrors, 
           double tol_overlap)
 {
-  std::vector<Solid*> solids;
-  for (auto& p : lsPrimitives)
-    solids.push_back(dynamic_cast<Solid*>(p));
-  std::vector<AABB> aabbs;
+  // std::vector<Solid*> solids;
+  // for (auto& p : lsPrimitives)
+  //   solids.push_back(dynamic_cast<Solid*>(p));
+  // std::vector<AABB> aabbs;
   
-  for ( Iterator i = solids.begin(); i != solids.end(); ++i)
-    aabbs.push_back( AABB( (*i)->get_bbox(), i) );
+  // for ( Iterator i = solids.begin(); i != solids.end(); ++i)
+  //   aabbs.push_back( AABB( (*i)->get_bbox(), i) );
 
-  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(solids, 37));
+  // CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(solids, 37));
 
   return true;
 }

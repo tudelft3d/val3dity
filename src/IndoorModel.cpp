@@ -65,14 +65,22 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 //-- 1. validate each IndoorCell geometry (Solids)
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
-  std::vector<Primitive*> ls;
-  for (auto& s : _lsPrimitives)
-  {
-    if (s->is_valid())
-      ls.push_back(s);
-  }
+//-- OVERLAPPING TESTS
+  std::vector<std::tuple<std::string,Solid*>> lsCells;
+  for (auto& el : _cells)
+    lsCells.push_back(std::make_tuple(el.first, (Solid*)_lsPrimitives[std::get<0>(el.second)]));
   std::vector<Error> lsErrors;  
-  test(ls, 701, lsErrors, 0);
+  std::cout << "?????????????" << std::endl;
+  test2(lsCells, 701, lsErrors, 0);
+
+  // std::vector<Primitive*> ls;
+  // for (auto& s : _lsPrimitives)
+  // {
+  //   if (s->is_valid())
+  //     ls.push_back(s);
+  // }
+  // std::vector<Error> lsErrors;  
+  // test(ls, 701, lsErrors, 0);
   
 
 //-- 2. is dual vertex of each cell located inside its Cell?

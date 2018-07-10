@@ -30,6 +30,7 @@
 #define Validate_prim_toporel_h
 
 #include "definitions.h"
+#include "Solid.h"
 
 namespace val3dity
 {
@@ -38,6 +39,11 @@ namespace val3dity
 class Primitive;
 
 bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives, int errorcode_to_assign, std::vector<Error>& lsErrors, double tol_overlap);
+
+bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
+          int errorcode_to_assign, 
+          std::vector<Error>& lsErrors, 
+          double tol_overlap);
 
 
 bool test(std::vector<Primitive*>& lsPrimitives, 
