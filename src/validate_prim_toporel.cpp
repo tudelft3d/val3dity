@@ -46,16 +46,17 @@ typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,Iterator>  AABB;
 
 struct Report {
   Nefs* nefs;
-  std::vector<std::string> lsCellIDs;
+  std::vector<std::string>* lsCellIDs;
+  std::vector<int>* ll2;
 
-  Report(Nefs& nefs, std::vector<std::string>& lsCell)
-    : nefs(&nefs)
+  Report(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<int>& ll)
+    : nefs(&nefs), lsCellIDs(&lsCell), ll2(&ll)
   {
-    lsCellIDs = lsCell;
+    // lsCellIDs = lsCell;
   }
 
   // callback functor that reports all truly intersecting triangles
-  void operator()(const AABB& a, const AABB& b) const 
+  void operator()(const AABB& a, const AABB& b)  
   {
     std::cout << "Box " << (a.handle() - nefs->begin()) << " and "
               << (b.handle() - nefs->begin()) << " intersect";
@@ -63,8 +64,10 @@ struct Report {
     int box1 = (a.handle() - nefs->begin());
     int box2 = (b.handle() - nefs->begin());
     Nef_polyhedron* tmp = nefs->at(box1);
-    std::cout << "id: " << lsCellIDs.at(box1) << std::endl;
-    std::cout << "id: " << lsCellIDs.at(box2) << std::endl;
+    std::cout << "id: " << lsCellIDs->at(box1) << std::endl;
+    std::cout << "id: " << lsCellIDs->at(box2) << std::endl;
+    std::cout << ll2->size() << std::endl;
+    ll2->push_back(box2);
 //    std::cout << a.handle() << std::endl;
     // if ( ! a.handle()->is_degenerate() && ! b.handle()->is_degenerate()
     //      && CGAL::do_intersect( *(a.handle()), *(b.handle()))) {
@@ -107,8 +110,11 @@ bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
     counter++;
   }
 
-  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs));
+  std::vector<int> ll;
+  ll.push_back(99);
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, ll));
 
+  std::cout << "size: " << ll.size() << std::endl;
   return true;
 }
 
