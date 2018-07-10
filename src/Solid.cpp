@@ -432,4 +432,12 @@ bool Solid::validate_solid_with_nef()
   return isValid;
 }
 
+
+CGAL::Bbox_3 Solid::get_bbox() 
+{
+  CgalPolyhedron* poly = this->get_oshell()->get_cgal_polyhedron();
+  return CGAL::Polygon_mesh_processing::bbox(*poly);
+}
+
+
 } // namespace val3dity
