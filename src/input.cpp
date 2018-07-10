@@ -835,7 +835,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
         vdual = child.attribute("xlink:href").value();
         if (vdual[0] == '#')
           vdual = vdual.substr(1);
-        std::cout << "dual node: " << vdual << std::endl;
+        // std::cout << "dual node: " << vdual << std::endl;
       }
       s = NS["indoorgml"] + "connects";
       std::vector<std::string> vadj;

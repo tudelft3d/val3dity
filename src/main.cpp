@@ -767,7 +767,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     for (auto e : errors)
     {
       ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
-      ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
+      ss << setw(11) << e.second;
+      if (e.first < 600)
+       ss << " primitive(s)";
+      else
+       ss << " feature(s)";
+      ss << std::endl;
     }
     for (auto& e : ioerrs.get_unique_error_codes())
     {
