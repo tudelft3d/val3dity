@@ -37,7 +37,14 @@ namespace val3dity
 
 class Primitive;
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, int errorcode_to_assign, std::vector<Error>& lsErrors, double tol_overlap);
+bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives, int errorcode_to_assign, std::vector<Error>& lsErrors, double tol_overlap);
+
+
+bool test(std::vector<Primitive*>& lsPrimitives, 
+                                   int errorcode_to_assign, 
+                                   std::vector<Error>& lsErrors, 
+                                   double tol_overlap);
+
 
 
 } // namespace val3dity

@@ -31,6 +31,7 @@
 #include "definitions.h"
 #include "input.h"
 #include "Solid.h"
+#include "validate_prim_toporel.h"
 
 namespace val3dity
 {
@@ -63,6 +64,16 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   bool bValid = true;
 //-- 1. validate each IndoorCell geometry (Solids)
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
+
+  std::vector<Primitive*> ls;
+  for (auto& s : _lsPrimitives)
+  {
+    if (s->is_valid())
+      ls.push_back(s);
+  }
+  std::vector<Error> lsErrors;  
+  test(ls, 701, lsErrors, 0);
+  
 
 //-- 2. is dual vertex of each cell located inside its Cell?
   std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;

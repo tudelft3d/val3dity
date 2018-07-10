@@ -34,11 +34,71 @@
 #include <iostream>
 #include <sstream>
 
+#include <CGAL/box_intersection_d.h>
+
 namespace val3dity
 {
 
+typedef std::vector<Solid*>                                             Solids;
+typedef Solids::iterator                                                Iterator;
+typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,Iterator>  AABB;
+// typedef CGAL::Box_intersection_d::Box_d<double,3> AABB;
 
-bool do_primitives_overlap(std::vector<Primitive*>& lsPrimitives, 
+
+// void callback( const AABB& a, const AABB& b ) {
+//     std::cout << "box " << a.id() << " intersects box " << b.id() << std::endl;
+// }
+
+
+struct Report {
+  Solids* solids;
+
+  Report(Solids& solids)
+    : solids(&solids)
+  {}
+
+  // callback functor that reports all truly intersecting triangles
+  void operator()(const AABB& a, const AABB& b) const 
+  {
+    std::cout << "Box " << (a.handle() - solids->begin()) << " and "
+              << (b.handle() - solids->begin()) << " intersect";
+    std::cout << "-->CHECK IF REAL INTERSECTION" << std::endl;
+    int box1 = (a.handle() - solids->begin());
+    int box2 = (b.handle() - solids->begin());
+    Solid* tmp = solids->at(box1);
+    std::cout << tmp->num_faces() << std::endl;
+//    std::cout << a.handle() << std::endl;
+    // if ( ! a.handle()->is_degenerate() && ! b.handle()->is_degenerate()
+    //      && CGAL::do_intersect( *(a.handle()), *(b.handle()))) {
+    // std::cout << ", and the triangles intersect also";
+    // }
+  }
+};
+
+
+
+bool test(std::vector<Primitive*>& lsPrimitives, 
+          int errorcode_to_assign, 
+          std::vector<Error>& lsErrors, 
+          double tol_overlap)
+{
+  std::vector<Solid*> solids;
+  for (auto& p : lsPrimitives)
+    solids.push_back(dynamic_cast<Solid*>(p));
+  std::vector<AABB> aabbs;
+  
+  for ( Iterator i = solids.begin(); i != solids.end(); ++i)
+    aabbs.push_back( AABB( (*i)->get_bbox(), i));
+
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(solids));
+
+  return true;
+}
+
+
+
+
+bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives, 
                            int errorcode_to_assign, 
                            std::vector<Error>& lsErrors, 
                            double tol_overlap)
