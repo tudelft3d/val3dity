@@ -36,8 +36,6 @@
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
-
-
 #include "validate_prim_toporel.h"
 
 #include <tclap/CmdLine.h>
@@ -49,7 +47,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.1.1";
+std::string VAL3DITY_VERSION = "beta 2.2";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
