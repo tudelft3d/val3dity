@@ -47,13 +47,12 @@ typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,Iterator>  AABB;
 struct Report {
   Nefs* nefs;
   std::vector<std::string>* lsCellIDs;
-  std::vector<int>* ll2;
+  std::vector<Error>* lsErrors; 
+  int ecode;
 
-  Report(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<int>& ll)
-    : nefs(&nefs), lsCellIDs(&lsCell), ll2(&ll)
-  {
-    // lsCellIDs = lsCell;
-  }
+  Report(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<Error>& le, int code)
+    : nefs(&nefs), lsCellIDs(&lsCell), lsErrors(&le), ecode(code)
+  {}
 
   // callback functor that reports all truly intersecting triangles
   void operator()(const AABB& a, const AABB& b)  
@@ -66,8 +65,15 @@ struct Report {
     Nef_polyhedron* tmp = nefs->at(box1);
     std::cout << "id: " << lsCellIDs->at(box1) << std::endl;
     std::cout << "id: " << lsCellIDs->at(box2) << std::endl;
-    std::cout << ll2->size() << std::endl;
-    ll2->push_back(box2);
+
+    Error e;
+    std::stringstream msg;
+    msg << lsCellIDs->at(box1) << " and " << lsCellIDs->at(box2);
+    e.errorcode = ecode;
+    e.info1 = msg.str();
+    e.info2 = "";
+    lsErrors->push_back(e);
+
 //    std::cout << a.handle() << std::endl;
     // if ( ! a.handle()->is_degenerate() && ! b.handle()->is_degenerate()
     //      && CGAL::do_intersect( *(a.handle()), *(b.handle()))) {
@@ -99,9 +105,7 @@ bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
       lsNefs.push_back(tmpnef);
     lsCellIDs.push_back(std::get<0>(c));
   }
-  
   std::vector<AABB> aabbs;
-  
   int counter = 0;
   for ( Iterator i = lsNefs.begin(); i != lsNefs.end(); ++i)
   {
@@ -109,12 +113,8 @@ bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
     aabbs.push_back( AABB( ts->get_bbox(), i) );
     counter++;
   }
-
-  std::vector<int> ll;
-  ll.push_back(99);
-  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, ll));
-
-  std::cout << "size: " << ll.size() << std::endl;
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign));
+  std::cout << "#errors: " << lsErrors.size() << std::endl;
   return true;
 }
 
