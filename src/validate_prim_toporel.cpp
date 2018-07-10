@@ -42,20 +42,17 @@ namespace val3dity
 typedef std::vector<Solid*>                                             Solids;
 typedef Solids::iterator                                                Iterator;
 typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,Iterator>  AABB;
-// typedef CGAL::Box_intersection_d::Box_d<double,3> AABB;
-
-
-// void callback( const AABB& a, const AABB& b ) {
-//     std::cout << "box " << a.id() << " intersects box " << b.id() << std::endl;
-// }
 
 
 struct Report {
   Solids* solids;
+  int hola;
 
-  Report(Solids& solids)
+  Report(Solids& solids, int roger)
     : solids(&solids)
-  {}
+  {
+    hola = roger;
+  }
 
   // callback functor that reports all truly intersecting triangles
   void operator()(const AABB& a, const AABB& b) const 
@@ -66,7 +63,7 @@ struct Report {
     int box1 = (a.handle() - solids->begin());
     int box2 = (b.handle() - solids->begin());
     Solid* tmp = solids->at(box1);
-    std::cout << tmp->num_faces() << std::endl;
+    std::cout << tmp->num_faces() << ":" << hola << std::endl;
 //    std::cout << a.handle() << std::endl;
     // if ( ! a.handle()->is_degenerate() && ! b.handle()->is_degenerate()
     //      && CGAL::do_intersect( *(a.handle()), *(b.handle()))) {
@@ -88,9 +85,9 @@ bool test(std::vector<Primitive*>& lsPrimitives,
   std::vector<AABB> aabbs;
   
   for ( Iterator i = solids.begin(); i != solids.end(); ++i)
-    aabbs.push_back( AABB( (*i)->get_bbox(), i));
+    aabbs.push_back( AABB( (*i)->get_bbox(), i) );
 
-  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(solids));
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(solids, 37));
 
   return true;
 }
