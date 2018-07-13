@@ -58,6 +58,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   // 5. is graph valid by itself (faulty xlinks?)
   // 
 
+  std::clog << "--- Validation of IndoorModel ---" << std::endl;
   if (_is_valid != -1)
     return _is_valid;
 
@@ -66,6 +67,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
 //-- 2. overlapping test
+  std::clog << "--- Overlapping tests between Cells ---" << std::endl;
   std::vector<std::tuple<std::string,Solid*>> lsCells;
   for (auto& el : _cells)
     lsCells.push_back(std::make_tuple(el.first, (Solid*)_lsPrimitives[std::get<0>(el.second)]));

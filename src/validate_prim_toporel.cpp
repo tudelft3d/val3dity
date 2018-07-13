@@ -59,7 +59,7 @@ struct Report {
   {
     int id1 = (a.handle() - nefs->begin());
     int id2 = (b.handle() - nefs->begin());
-    // std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
+    std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
     Nef_polyhedron* n1 = nefs->at(id1);
     Nef_polyhedron* n2 = nefs->at(id2);
     Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
@@ -83,8 +83,9 @@ bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>
                                       std::vector<Error>& lsErrors, 
                                       double tol_overlap)
 {
-  std::vector<Nef_polyhedron*> lsNefs;
-  std::vector<std::string>     lsCellIDs;
+  std::clog << "--- Constructing Nef Polyhedra ---" << std::endl;
+  std::vector<Nef_polyhedron*>                lsNefs;
+  std::vector<std::tuple<std::string,Solid*>> subsetCells;
   for (auto& c : lsCells)
   {
     Solid* ts = std::get<1>(c);
@@ -99,16 +100,21 @@ bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>
     }
     else
       lsNefs.push_back(tmpnef);
-    lsCellIDs.push_back(std::get<0>(c));
+    subsetCells.push_back(c);
   }
+  std::clog << "--- Constructing AABB tree ---" << std::endl;
   std::vector<AABB> aabbs;
   int counter = 0;
   for ( Iterator i = lsNefs.begin(); i != lsNefs.end(); ++i)
   {
-    Solid* ts = std::get<1>(lsCells[counter]);
+    Solid* ts = std::get<1>(subsetCells[counter]);
     aabbs.push_back( AABB( ts->get_bbox(), i) );
     counter++;
   }
+  std::vector<std::string> lsCellIDs;
+  for (auto each : subsetCells)
+    lsCellIDs.push_back(std::get<0>(each));
+  std::clog << "--- Checking intersections between Nefs ---" << std::endl;
   int n = lsErrors.size();
   CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign));
   if (lsErrors.size() > n)
