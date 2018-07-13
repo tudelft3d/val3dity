@@ -57,42 +57,38 @@ struct Report {
   // callback functor that reports all truly intersecting triangles
   void operator()(const AABB& a, const AABB& b)  
   {
-    std::cout << "Box " << (a.handle() - nefs->begin()) << " and "
-              << (b.handle() - nefs->begin()) << " intersect";
-    std::cout << "-->CHECK IF REAL INTERSECTION" << std::endl;
-    int box1 = (a.handle() - nefs->begin());
-    int box2 = (b.handle() - nefs->begin());
-    Nef_polyhedron* tmp = nefs->at(box1);
-    std::cout << "id: " << lsCellIDs->at(box1) << std::endl;
-    std::cout << "id: " << lsCellIDs->at(box2) << std::endl;
-
-    Error e;
-    std::stringstream msg;
-    msg << lsCellIDs->at(box1) << " and " << lsCellIDs->at(box2);
-    e.errorcode = ecode;
-    e.info1 = msg.str();
-    e.info2 = "";
-    lsErrors->push_back(e);
-
-//    std::cout << a.handle() << std::endl;
-    // if ( ! a.handle()->is_degenerate() && ! b.handle()->is_degenerate()
-    //      && CGAL::do_intersect( *(a.handle()), *(b.handle()))) {
-    // std::cout << ", and the triangles intersect also";
-    // }
+    int id1 = (a.handle() - nefs->begin());
+    int id2 = (b.handle() - nefs->begin());
+    // std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
+    Nef_polyhedron* n1 = nefs->at(id1);
+    Nef_polyhedron* n2 = nefs->at(id2);
+    Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+    if (n1->interior() * n2->interior() != emptynef)
+    {
+      Error e;
+      std::stringstream msg;
+      msg << lsCellIDs->at(id1) << " and " << lsCellIDs->at(id2);
+      e.errorcode = ecode;
+      e.info1 = msg.str();
+      e.info2 = "";
+      lsErrors->push_back(e);
+    }
   }
 };
 
 
-bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
-          int errorcode_to_assign, 
-          std::vector<Error>& lsErrors, 
-          double tol_overlap)
+
+bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>>& lsCells,
+                                      int errorcode_to_assign, 
+                                      std::vector<Error>& lsErrors, 
+                                      double tol_overlap)
 {
   std::vector<Nef_polyhedron*> lsNefs;
   std::vector<std::string>     lsCellIDs;
   for (auto& c : lsCells)
   {
     Solid* ts = std::get<1>(c);
+    // TODO: only valid Solids are processed: what's the best way here?
     if (ts->is_valid() != 1)
       continue;
     Nef_polyhedron* tmpnef = ts->get_nef_polyhedron();
@@ -113,37 +109,19 @@ bool test2(std::vector<std::tuple<std::string,Solid*>>& lsCells,
     aabbs.push_back( AABB( ts->get_bbox(), i) );
     counter++;
   }
+  int n = lsErrors.size();
   CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign));
-  std::cout << "#errors: " << lsErrors.size() << std::endl;
-  return true;
+  if (lsErrors.size() > n)
+    return false;
+  else
+    return true;
 }
-
-
-bool test(std::vector<Primitive*>& lsPrimitives, 
-          int errorcode_to_assign, 
-          std::vector<Error>& lsErrors, 
-          double tol_overlap)
-{
-  // std::vector<Solid*> solids;
-  // for (auto& p : lsPrimitives)
-  //   solids.push_back(dynamic_cast<Solid*>(p));
-  // std::vector<AABB> aabbs;
-  
-  // for ( Iterator i = solids.begin(); i != solids.end(); ++i)
-  //   aabbs.push_back( AABB( (*i)->get_bbox(), i) );
-
-  // CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(solids, 37));
-
-  return true;
-}
-
-
 
 
 bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives, 
-                           int errorcode_to_assign, 
-                           std::vector<Error>& lsErrors, 
-                           double tol_overlap)
+                                    int errorcode_to_assign, 
+                                    std::vector<Error>& lsErrors, 
+                                    double tol_overlap)
 {
   bool isValid = true;
   //-- 1. create Nef for all primitives and erode if necessary
