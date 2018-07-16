@@ -49,9 +49,10 @@ struct Report {
   std::vector<std::string>* lsCellIDs;
   std::vector<Error>* lsErrors; 
   int ecode;
+  int* thecount;
 
-  Report(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<Error>& le, int code)
-    : nefs(&nefs), lsCellIDs(&lsCell), lsErrors(&le), ecode(code)
+  Report(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<Error>& le, int code, int& count)
+    : nefs(&nefs), lsCellIDs(&lsCell), lsErrors(&le), ecode(code), thecount(&count)
   {}
 
   // callback functor that reports all truly intersecting triangles
@@ -59,7 +60,10 @@ struct Report {
   {
     int id1 = (a.handle() - nefs->begin());
     int id2 = (b.handle() - nefs->begin());
-    std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
+    (*thecount)++;
+    if (*thecount % 1000 == 0)
+      std::cout << "--" << *thecount << std::endl;
+    // std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
     Nef_polyhedron* n1 = nefs->at(id1);
     Nef_polyhedron* n2 = nefs->at(id2);
     Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
@@ -116,7 +120,9 @@ bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>
     lsCellIDs.push_back(std::get<0>(each));
   std::clog << "--- Checking intersections between Nefs ---" << std::endl;
   int n = lsErrors.size();
-  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign));
+  int count = 0; 
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign, count));
+  std::clog << "Total AABB tests: " << count << std::endl;
   if (lsErrors.size() > n)
     return false;
   else
