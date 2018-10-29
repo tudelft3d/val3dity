@@ -457,12 +457,14 @@ int main(int argc, char* const argv[])
         std::cout << "   overlap_tol" << setw(19)  << "none" << std::endl;
       else
         std::cout << "   overlap_tol" << setw(19)  << overlap_tol.getValue() << std::endl;
+      std::cout << std::endl;
     }
     
     //-- now the validation starts
     if ( (lsFeatures.empty() == false) && (ioerrs.has_errors() == false) )
     {
       int i = 1;
+      std::cout << "Validation of " << lsFeatures.size() << " feature(s):" << std::endl;
       for (auto& f : lsFeatures)
       {
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
