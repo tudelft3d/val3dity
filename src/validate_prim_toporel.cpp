@@ -29,6 +29,7 @@
 #include "validate_prim_toporel.h"
 #include "Primitive.h"
 #include "geomtools.h"
+#include "input.h"
 #include "Solid.h"
 #include "CompositeSolid.h"
 #include <iostream>
@@ -61,8 +62,10 @@ struct Report {
     int id1 = (a.handle() - nefs->begin());
     int id2 = (b.handle() - nefs->begin());
     (*thecount)++;
-    if (*thecount % 1000 == 0)
-      std::cout << "--" << *thecount << std::endl;
+    if (*thecount % 100 == 0) {
+      double total = double(*thecount) / double(nefs->size() * nefs->size());
+      printProgressBar(100 * (total));
+    }
     // std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
     Nef_polyhedron* n1 = nefs->at(id1);
     Nef_polyhedron* n2 = nefs->at(id2);
@@ -118,9 +121,12 @@ bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>
   std::vector<std::string> lsCellIDs;
   for (auto each : subsetCells)
     lsCellIDs.push_back(std::get<0>(each));
-  std::clog << "--- Checking intersections between Nefs ---" << std::endl;
+  std::clog << "--- Testing intersections between Nefs ---" << std::endl;
   int n = lsErrors.size();
   int count = 0; 
+  if (lsNefs.size() > 500) {
+    std::cout << "Testing intersections between " << lsNefs.size() << " cells, this could be slow." << std::endl << std::flush;
+  }
   CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign, count));
   std::clog << "Total AABB tests: " << count << std::endl;
   if (lsErrors.size() > n)

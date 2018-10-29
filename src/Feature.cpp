@@ -103,6 +103,9 @@ bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_no
     this->add_error(609, "Feature has no geometry defined.", "");
     bValid = false;
   }
+  if (_lsPrimitives.size() > 500) {
+    std::cout << "Validating " << _lsPrimitives.size() << " geometric primitives, this could be slow." << std::endl << std::flush;
+  }
   for (auto& p : _lsPrimitives)
   {
     std::clog << "======== Validating Primitive ========" << std::endl;
