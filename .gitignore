@@ -34,6 +34,7 @@ vs_build/.vs
 x64/
 x86/
 /build
+/buildx
 /docs/_build
 
 # Vagrant
