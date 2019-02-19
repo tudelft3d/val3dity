@@ -606,12 +606,16 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
   try 
   {
     input >> j;
-    // TODO: other validation for CityJSON and just not JSON stuff?
   }
   catch (nlohmann::detail::parse_error e) 
   {
     errs.add_error(901, "Input file not a valid JSON file.");
     return;
+  }
+  // TODO: other validation for CityJSON or just let it crash?
+  if (j["type"] != "CityJSON") {
+    errs.add_error(901, "Input file not a CityJSON file.");
+    return;  
   }
   std::cout << "CityJSON input file" << std::endl;
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
