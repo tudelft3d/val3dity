@@ -2,7 +2,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -177,6 +177,7 @@ Solid*            process_gml_solid(const pugi::xml_node& nsolid, std::map<std::
 MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
+void              process_json_geometries_of_co(json& jco, CityObject* co, json& j, double tol_snap);
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 void              process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);

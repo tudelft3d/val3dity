@@ -599,6 +599,111 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
+void process_json_geometries_of_co(json& jco, CityObject* co, json& j, double tol_snap)
+{
+  int idgeom = co->number_of_primitives();
+  for (auto& g : jco["geometry"]) {
+    std::string theid = co->get_id() + "(" + std::to_string(idgeom) + ")";
+    if  (g["type"] == "Solid")
+    {
+      Solid* s = new Solid(theid);
+      bool oshell = true;
+      int c = 0;
+      for (auto& shell : g["boundaries"]) 
+      {
+        Surface* sh = new Surface(c, tol_snap);
+        c++;
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, j, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      co->add_primitive(s);
+    }
+    else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
+    {
+      Surface* sh = new Surface(-1, tol_snap);
+      for (auto& p : g["boundaries"]) 
+      { 
+        std::vector< std::vector<int> > pa = p;
+        process_json_surface(pa, j, sh);
+      }
+      if (g["type"] == "MultiSurface")
+      {
+        MultiSurface* ms = new MultiSurface(theid);
+        ms->set_surface(sh);
+        co->add_primitive(ms);
+      }
+      else
+      {
+        CompositeSurface* cs = new CompositeSurface(theid);
+        cs->set_surface(sh);
+        co->add_primitive(cs);
+      }
+    }
+    else if (g["type"] == "MultiSolid") 
+    {
+      MultiSolid* ms = new MultiSolid(theid);
+      for (auto& solid : g["boundaries"]) 
+      {
+        Solid* s = new Solid();
+        bool oshell = true;
+        for (auto& shell : solid) 
+        {
+          Surface* sh = new Surface(-1, tol_snap);
+          for (auto& polygon : shell) { 
+            std::vector< std::vector<int> > pa = polygon;
+            process_json_surface(pa, j, sh);
+          }
+          if (oshell == true)
+          {
+            oshell = false;
+            s->set_oshell(sh);
+          }
+          else
+            s->add_ishell(sh);
+        }
+        ms->add_solid(s);
+      }
+      co->add_primitive(ms);
+    }
+    else if (g["type"] == "CompositeSolid") 
+    {
+      CompositeSolid* cs = new CompositeSolid(theid);
+      for (auto& solid : g["boundaries"]) 
+      {
+        Solid* s = new Solid();
+        bool oshell = true;
+        for (auto& shell : solid) 
+        {
+          Surface* sh = new Surface(-1, tol_snap);
+          for (auto& polygon : shell) { 
+            std::vector< std::vector<int> > pa = polygon;
+            process_json_surface(pa, j, sh);
+          }
+          if (oshell == true)
+          {
+            oshell = false;
+            s->set_oshell(sh);
+          }
+          else
+            s->add_ishell(sh);
+        }
+        cs->add_solid(s);
+      }
+      co->add_primitive(cs);
+    }      
+    idgeom++;
+  }
+}
+
 void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
   std::ifstream input(ifile);
@@ -623,107 +728,18 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
   compute_min_xy(j);
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
+    //-- BuildingParts geometries are put with those of a Building
+    if (it.value()["type"] == "BuildingPart")
+      continue;
     CityObject* co = new CityObject(it.key(), it.value()["type"]);
-    int idgeom = 0;
-    for (auto& g : it.value()["geometry"]) {
-      std::string theid = it.key() + "(" + std::to_string(idgeom) + ")";
-      if  (g["type"] == "Solid")
+    process_json_geometries_of_co(it.value(), co, j, tol_snap);
+    //-- if Building has Parts, put them here in _lsPrimitives
+    if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) ) 
+    {
+      for (std::string bpid : it.value()["children"])
       {
-        Solid* s = new Solid(theid);
-        bool oshell = true;
-        int c = 0;
-        for (auto& shell : g["boundaries"]) 
-        {
-          Surface* sh = new Surface(c, tol_snap);
-          c++;
-          for (auto& polygon : shell) { 
-            std::vector< std::vector<int> > pa = polygon;
-            process_json_surface(pa, j, sh);
-          }
-          if (oshell == true)
-          {
-            oshell = false;
-            s->set_oshell(sh);
-          }
-          else
-            s->add_ishell(sh);
-        }
-        co->add_primitive(s);
+        process_json_geometries_of_co(j["CityObjects"][bpid], co, j, tol_snap);
       }
-      else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
-      {
-        Surface* sh = new Surface(-1, tol_snap);
-        for (auto& p : g["boundaries"]) 
-        { 
-          std::vector< std::vector<int> > pa = p;
-          process_json_surface(pa, j, sh);
-        }
-        if (g["type"] == "MultiSurface")
-        {
-          MultiSurface* ms = new MultiSurface(theid);
-          ms->set_surface(sh);
-          co->add_primitive(ms);
-        }
-        else
-        {
-          CompositeSurface* cs = new CompositeSurface(theid);
-          cs->set_surface(sh);
-          co->add_primitive(cs);
-        }
-      }
-      else if (g["type"] == "MultiSolid") 
-      {
-        MultiSolid* ms = new MultiSolid(theid);
-        for (auto& solid : g["boundaries"]) 
-        {
-          Solid* s = new Solid();
-          bool oshell = true;
-          for (auto& shell : solid) 
-          {
-            Surface* sh = new Surface(-1, tol_snap);
-            for (auto& polygon : shell) { 
-              std::vector< std::vector<int> > pa = polygon;
-              process_json_surface(pa, j, sh);
-            }
-            if (oshell == true)
-            {
-              oshell = false;
-              s->set_oshell(sh);
-            }
-            else
-              s->add_ishell(sh);
-          }
-          ms->add_solid(s);
-        }
-        co->add_primitive(ms);
-      }
-      else if (g["type"] == "CompositeSolid") 
-      {
-        CompositeSolid* cs = new CompositeSolid(theid);
-        for (auto& solid : g["boundaries"]) 
-        {
-          Solid* s = new Solid();
-          bool oshell = true;
-          for (auto& shell : solid) 
-          {
-            Surface* sh = new Surface(-1, tol_snap);
-            for (auto& polygon : shell) { 
-              std::vector< std::vector<int> > pa = polygon;
-              process_json_surface(pa, j, sh);
-            }
-            if (oshell == true)
-            {
-              oshell = false;
-              s->set_oshell(sh);
-            }
-            else
-              s->add_ishell(sh);
-          }
-          cs->add_solid(s);
-        }
-        co->add_primitive(cs);
-      }      
-      idgeom++;
     }
     lsFeatures.push_back(co);
   }

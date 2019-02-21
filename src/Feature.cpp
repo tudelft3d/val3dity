@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -84,6 +84,11 @@ json Feature::get_report_json()
 void Feature::add_primitive(Primitive* p)
 {
   _lsPrimitives.push_back(p);
+}
+
+int Feature::number_of_primitives() 
+{
+  return _lsPrimitives.size();
 }
 
 const std::vector<Primitive*>& Feature::get_primitives()
