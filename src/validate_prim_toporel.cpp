@@ -62,11 +62,18 @@ struct Report {
     int id1 = (a.handle() - nefs->begin());
     int id2 = (b.handle() - nefs->begin());
     (*thecount)++;
-    if (*thecount % 100 == 0) {
-      double total = double(*thecount) / double(nefs->size() * nefs->size());
-      printProgressBar(100 * (total));
+    if (*thecount % 25 == 0) {
+      int r = rand() % 3;
+      if (r == 0)
+        std::cout << "\b|" << std::flush;
+      else if (r == 1)
+        std::cout << "\b/" << std::flush;
+      else if (r == 2)
+        std::cout << "\b-" << std::flush;
+      else
+        std::cout << "\b\\" << std::flush;
     }
-    // std::cout << "Boxes: " << id1 << " + " << id2 << std::endl;
+
     Nef_polyhedron* n1 = nefs->at(id1);
     Nef_polyhedron* n2 = nefs->at(id2);
     Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
