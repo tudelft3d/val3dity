@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -50,10 +50,7 @@ Surface::Surface(int id, double tol_snap)
   _id = id;
   _is_valid_2d = -1;
   _vertices_added = 0;
-  if (tol_snap < 1e-8)
-    _tol_snap = -1;
-  else
-    _tol_snap = tol_snap;
+  _tol_snap = tol_snap;
 }
 
 Surface::~Surface()
@@ -214,16 +211,13 @@ int Surface::get_number_parsed_vertices()
 int Surface::add_point(Point3 pi)
 {
   _vertices_added += 1;
-  if (_tol_snap > 0.0)
+  int i = 0;
+  for (auto& p : _lsPts)
   {
-    int i = 0;
-    for (auto& p : _lsPts)
-    {
-      auto d = CGAL::squared_distance(pi, p);
-      if (d <= (_tol_snap*_tol_snap))
-        return i;
-      i++;
-    }
+    auto d = CGAL::squared_distance(pi, p);
+    if (d <= (_tol_snap*_tol_snap))
+      return i;
+    i++;
   }
   _lsPts.push_back(pi);
   return (_lsPts.size() - 1);

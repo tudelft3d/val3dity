@@ -210,7 +210,6 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 **************
 |  Tolerance for snapping vertices that are close to each others
 |  default = 0.001
-|  to disable snapping = -1 
 
 Geometries modelled in GML store amazingly very little topological relationships. 
 A cube is for instance represented with 6 surfaces, all stored independently. 
