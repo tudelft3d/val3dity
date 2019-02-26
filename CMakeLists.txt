@@ -7,6 +7,8 @@ add_definitions(-std=c++11)
 
 set(CMAKE_CXX_FLAGS "-O2")
 
+set(CMAKE_BUILD_TYPE "Release")
+
 set( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true )
  
 if ( COMMAND cmake_policy )
