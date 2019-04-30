@@ -1,6 +1,6 @@
 {
-  "type": "CityModel",
-  "version": "http://www.cityjson.org/version/0.2",
+  "type": "CityJSON", 
+  "version": "1.0", 
   "CityObjects": {
     "id-1":{
       "type": "GenericCityObject",
