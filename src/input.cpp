@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
