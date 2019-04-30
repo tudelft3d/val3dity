@@ -4,6 +4,12 @@
 ## [Unreleased]
 - validation of IndoorGML features 
 
+## [2.1.0] - 2019-04-30
+### Changed
+- several small bug fixes: wrong handling of some GML namespaces is one of them
+- tol_snap can't be disabled anymore: just too error-prone and means nothing. Give a super small value instead, like 1e-12
+
+
 ## [2.1.0] - 2018-02-14
 ### Changed
 - the report is slightly changed: the CityObjects/Primitives subdivision in the report is replaced by Features having Primitives, where Features are the top-level objects, containing one or many Primitives. This is done to allow other data model to be used as input, eg IndoorGML is coming soon!
