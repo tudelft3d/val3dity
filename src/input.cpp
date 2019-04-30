@@ -549,8 +549,10 @@ void get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns
         sns = "citygml";
         vcitygml = "v2.0";
       }
-      else if (value.find("http://www.opengis.net/gml") != std::string::npos)
-        sns = "gml";
+      else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
+                (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {
+          sns = "gml";
+      }
       else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)
         sns = "building";
       else if (value.find("http://www.w3.org/1999/xlink") != std::string::npos)
@@ -983,8 +985,10 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
         sns = "citygml";
         vcitygml = "v2.0";
       }
-      else if (value.find("http://www.opengis.net/gml") != std::string::npos)
-        sns = "gml";
+      else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
+                (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {
+          sns = "gml";
+      }
       else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)
         sns = "building";
       else if (value.find("http://www.opengis.net/citygml/relief") != std::string::npos)
