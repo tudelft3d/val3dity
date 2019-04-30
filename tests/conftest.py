@@ -128,7 +128,7 @@ def citymodel():
 #-------------------------------------------------------- validation functions
 @pytest.fixture(scope="session")
 def validate(val3dity):
-    def _validate(file_path, options=solid(), val3dity=val3dity):
+    def _validate(file_path, options=solid, val3dity=val3dity):
         """Validate a file
 
         :return: The error numbers. Empty list if the file is valid.
@@ -141,7 +141,7 @@ def validate(val3dity):
             assert isinstance(file_path, list)
         except Exception:
             return(["Something went really wrong. Validate the file separately with val3dity."])
-        assert isinstance(options, list)
+        # assert isinstance(options, list)
 
         command = [val3dity] + options + file_path
         

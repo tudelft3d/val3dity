@@ -118,44 +118,44 @@ def data_inner_shell(request, dir_valid, data_basecube):
 
 #----------------------------------------------------------------------- Tests
 
-def test_large_coords(validate, data_large_coords):
-    error = validate(data_large_coords)
+def test_large_coords(validate, data_large_coords, solid):
+    error = validate(data_large_coords, options=solid)
     assert(error == [])
 
-def test_v_405(validate, data_v_405):
-    error = validate(data_v_405)
+def test_v_405(validate, data_v_405, solid):
+    error = validate(data_v_405, options=solid)
     assert(error == [])
 
-def test_v_104(validate, data_planar):
-    error = validate(data_planar)
+def test_v_104(validate, data_planar, solid):
+    error = validate(data_planar, options=solid)
     assert(error == [301])
 
-def test_planar(validate, data_planar):
-    error = validate(data_planar)
+def test_planar(validate, data_planar, solid):
+    error = validate(data_planar, options=solid)
     assert(error == [301])
 
-def test_nearly_collinear(validate, data_nearly_collinear):
-    error = validate(data_nearly_collinear)
+def test_nearly_collinear(validate, data_nearly_collinear, solid):
+    error = validate(data_nearly_collinear, options=solid)
     assert(error == [])
 
-def test_self_fold(validate, data_self_fold):
-    error = validate(data_self_fold)
+def test_self_fold(validate, data_self_fold, solid):
+    error = validate(data_self_fold, options=solid)
     assert(error == [])
 
-def test_closed_top(validate, data_closed_top):
-    error = validate(data_closed_top)
+def test_closed_top(validate, data_closed_top, solid):
+    error = validate(data_closed_top, options=solid)
     assert(error == [])
 
 @pytest.mark.full
-def test_inner_shell(validate, data_inner_shell):
-    error = validate(data_inner_shell)
+def test_inner_shell(validate, data_inner_shell, solid):
+    error = validate(data_inner_shell, options=solid)
     assert(error == [])
 
-def test_multi_solid(validate, data_multi_solid):
-    error = validate(data_multi_solid)
+def test_multi_solid(validate, data_multi_solid, solid):
+    error = validate(data_multi_solid, options=solid)
     assert(error == [])
 
 # data_composite_solid is in conftest.py
-def test_composite_solid(validate, data_composite_solid):
-    error = validate(data_composite_solid)
+def test_composite_solid(validate, data_composite_solid, solid):
+    error = validate(data_composite_solid, options=solid)
     assert(error == [])
