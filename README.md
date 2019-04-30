@@ -40,7 +40,7 @@ To compile val3dity yourself, you first need to install the following free libra
 
 Under macOS, it's super easy, we suggest using [Homebrew](http://brew.sh/):
 
-    $ brew install cgal --with-eigen
+    $ brew install cgal
     $ brew install cmake
     $ brew install geos
 
