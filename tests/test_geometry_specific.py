@@ -114,7 +114,7 @@ def test_503(validate, data_503, citymodel):
     assert(error == [503])
 
 def test_601(validate, data_601, citymodel):
-    error = validate(data_601)
+    error = validate(data_601, options=citymodel)
     assert(error == [601])
 
 def test_601_overlap(validate, data_601_overlap, options_overlap):

@@ -196,7 +196,7 @@ int main(int argc, char* const argv[])
                                               "string");        
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
-                                              "tolerance for snapping vertices in GML (default=0.001; no-snapping=-1)",
+                                              "tolerance for snapping vertices in GML (default=0.001)",
                                               false,
                                               0.001,
                                               "double");
@@ -272,6 +272,13 @@ int main(int argc, char* const argv[])
       }
       return(0);
     }
+
+    //-- no negative snap_tol value
+    if (snap_tol.getValue() < 0) 
+    {
+      ioerrs.add_error(903, "snap_tol cannot be negative");
+    }
+
     
     if (inputtype == OTHER) {
       std::stringstream ss;
@@ -296,7 +303,7 @@ int main(int argc, char* const argv[])
     }
 
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
@@ -447,8 +454,8 @@ int main(int argc, char* const argv[])
       if (ignore204.getValue() == true)
         planarity_n_tol_updated = 180.0;
       std::cout << "Parameters used for validation:" << std::endl;
-      if (snap_tol.getValue() < 1e-8)
-        std::cout << "   snap_tol"    << setw(22)  << "none" << std::endl;
+      if (snap_tol.getValue() < 0)
+        std::cout << "   snap_tol"    << setw(22)  << "0.001" << std::endl;
       else
         std::cout << "   snap_tol"    << setw(22)  << snap_tol.getValue() << std::endl;
       std::cout << "   planarity_d2p_tol"     << setw(13)  << planarity_d2p_tol.getValue() << std::endl;
