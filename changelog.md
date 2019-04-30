@@ -4,7 +4,7 @@
 ## [Unreleased]
 - validation of IndoorGML features 
 
-## [2.1.0] - 2019-04-30
+## [2.1.1] - 2019-04-30
 ### Changed
 - several small bug fixes: wrong handling of some GML namespaces is one of them
 - tol_snap can't be disabled anymore: just too error-prone and means nothing. Give a super small value instead, like 1e-12
