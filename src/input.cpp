@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -537,6 +537,45 @@ void report_building_each_lod(pugi::xml_document& doc, int lod, int& total_solid
 }
 
 
+void get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml) {
+  vcitygml = "";
+  for (pugi::xml_attribute attr = root.first_attribute(); attr; attr = attr.next_attribute()) {
+    std::string name = attr.name();
+    if (name.find("xmlns") != std::string::npos) {
+      std::string value = attr.value();
+      std::string sns;
+      if (value.find("http://www.opengis.net/citygml/0") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v0.4";
+      }
+      else if (value.find("http://www.opengis.net/citygml/1") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v1.0";
+      }
+      else if (value.find("http://www.opengis.net/citygml/2") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v2.0";
+      }
+      else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
+                (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {
+          sns = "gml";
+      }
+      else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)
+        sns = "building";
+      else if (value.find("http://www.w3.org/1999/xlink") != std::string::npos)
+        sns = "xlink";
+      else
+        sns = "";
+      if (sns != "") {
+        size_t pos = name.find(":");
+        if (pos == std::string::npos) 
+          ns[sns] = "";
+        else 
+          ns[sns] = name.substr(pos + 1) + ":";
+      }    
+    }
+  }
+}
 
 
 
@@ -1129,8 +1168,10 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
         sns = "citygml";
         vcitygml = "v2.0";
       }
-      else if (value.find("http://www.opengis.net/gml") != std::string::npos)
+      else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
+                (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {
         sns = "gml";
+      }
       else if ( (value.find("http://www.opengis.net/indoorgml/1") != std::string::npos) &&
                 (value.find("core") != std::string::npos) ) {
         sns = "indoorgml";

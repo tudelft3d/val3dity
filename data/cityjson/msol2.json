@@ -78,8 +78,8 @@
         }],
         "type": "GenericCityObject"
     }},
-    "version": "http://www.cityjson.org/version/0.1",
-    "type": "CityModel",
+    "type": "CityJSON", 
+    "version": "1.0", 
     "vertices": [
         [
             0,
