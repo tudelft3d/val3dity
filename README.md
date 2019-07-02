@@ -76,6 +76,12 @@ Finally, to see all the options possible:
 
 If you are eager to contribute but do not want to fiddle with setting up the required libraries, Vagrant can take care of that. It creates a development environment in a virtual machine, which you can use to compile and run val3dity. For details see VAGRANT.md
 
+## Usage of Docker
+
+To run val3dity over Docker simply execute:
+
+    $ docker run --rm  -v <local path where your files are>:/data tudelft3d/val3dity:2.1.1 <name of the dedicated file>
+
 ## Web application
 
 If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity).
