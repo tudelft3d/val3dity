@@ -17,6 +17,10 @@ if ( COMMAND cmake_policy )
   cmake_policy( SET CMP0003 NEW )  
 endif()
 
+if (MSVC)
+    add_definitions("/EHsc")
+endif(MSVC)
+
 # CGAL
 find_package( CGAL QUIET COMPONENTS core )
 if ( CGAL_FOUND )
@@ -59,6 +63,6 @@ add_executable(val3dity ${SRC_FILES})
 
 # add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
 
-target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} thirdparty)
+target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} thirdparty)
 
 install(TARGETS val3dity DESTINATION bin)
