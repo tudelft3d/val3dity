@@ -138,7 +138,7 @@ deploy:
   
   #you need add your own github personal token here
   auth_token:    
-    secure: 7bd28250d138737677b987c67e660550e51ff729
+    secure: 9ShYWJn/eiwXjAl+2xazcOxbkgQt6FqfJISw0lq/P9UtS6Ng1j8W66u1a5d4w73y
   artifact: val3dity-windows-x64-v$(appveyor_build_version).zip
   draft: true
   prerelease: false
