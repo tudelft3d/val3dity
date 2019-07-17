@@ -1,0 +1,20 @@
+sudo: required
+
+services:
+- docker
+
+language: python
+
+deploy:
+- provider: script
+  script: travis/deploy-docker.sh
+  skip_cleanup: true
+  on:
+    branch: master
+    repo: cheesecakeman/val3dity
+- provider: script
+  script: travis/deploy-docker.sh
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: cheesecakeman/val3dity
