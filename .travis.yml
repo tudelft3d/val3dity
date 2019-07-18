@@ -23,6 +23,13 @@ deploy:
     branch: master
 - provider: script
   script:
+    - docker tag ${DOCKER_USERNAME}/val3dity:latest ${DOCKER_USERNAME}/val3dity:dev
+    - docker push ${DOCKER_USERNAME}/val3dity:dev
+  skip_cleanup: true
+  on:
+    branch: develop
+- provider: script
+  script:
     - docker tag ${DOCKER_USERNAME}/val3dity:latest ${DOCKER_USERNAME}/val3dity:${TRAVIS_TAG}
     - docker push ${DOCKER_USERNAME}/val3dity:${TRAVIS_TAG}
   skip_cleanup: true
