@@ -9,16 +9,21 @@ install: skip
 
 script:
 - echo "skipping tests"
+- docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
+- docker build . cheesecakeman/val3dity:latest
 
 
 deploy:
 - provider: script
-  script: travis/deploy-docker.sh
+  script:
+    - docker push cheesecakeman/val3dity:latest
   skip_cleanup: true
   on:
     branch: master
 - provider: script
-  script: travis/deploy-docker.sh
+  script:
+    - docker tag cheesecakeman/val3dity:latest cheesecakeman/val3dity:${TRAVIS_TAG}
+    - docker push cheesecakeman/val3dity:${TRAVIS_TAG}
   skip_cleanup: true
   on:
     tags: true
