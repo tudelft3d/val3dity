@@ -17,10 +17,8 @@ deploy:
   skip_cleanup: true
   on:
     branch: master
-    repo: vvmruder/val3dity
 - provider: script
   script: travis/deploy-docker.sh
   skip_cleanup: true
   on:
     tags: true
-    repo: vvmruder/val3dity
