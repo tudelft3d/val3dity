@@ -10,7 +10,8 @@ install: skip
 script:
 - echo "skipping tests"
 - docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
-- docker build . -t ${DOCKER_USERNAME}/val3dity:latest
+- docker pull ${DOCKER_USERNAME}/val3dity:latest || true
+- docker build . --cache-from ${DOCKER_USERNAME}/val3dity:latest -t ${DOCKER_USERNAME}/val3dity:latest
 
 
 deploy:
