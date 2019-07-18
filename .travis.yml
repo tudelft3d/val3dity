@@ -1,9 +1,15 @@
 sudo: required
 
+language: cpp
+
 services:
 - docker
 
-language: python
+install: skip
+
+script:
+- echo "skipping tests"
+
 
 deploy:
 - provider: script
