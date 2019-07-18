@@ -5,6 +5,12 @@ language: cpp
 services:
 - docker
 
+install: skip
+
+script:
+- echo "skipping tests"
+
+
 deploy:
 - provider: script
   script: travis/deploy-docker.sh
