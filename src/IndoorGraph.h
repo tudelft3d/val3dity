@@ -61,6 +61,7 @@ protected:
   std::string     _id;
   int             _is_valid; 
   
+  // _vertices[theid] = std::make_tuple(v, dual, vadj);
   std::map<std::string, std::tuple<Point3,std::string,std::vector<std::string>>> _vertices;
 
 };

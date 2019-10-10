@@ -67,6 +67,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
 //-- 2. overlapping test
+//--    701 - CELLS_OVERLAP
   std::clog << "--- Overlapping tests between Cells ---" << std::endl;
   std::vector<std::tuple<std::string,Solid*>> lsCells;
   for (auto& el : _cells)
@@ -81,10 +82,11 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   }
 
 //-- 3. is dual vertex of each cell located inside its Cell?
+//--    702 - DUAL_VERTEX_OUTSIDE_CELL
   std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;
   for (auto& el : _cells)
   {
-    std::clog << "Cell (" << std::get<2>(el.second) << ") id=" << el.first << std::endl;
+    std::clog << "Cell (" << std::get<2>(el.second) << ") id=" << el.first;
     // TODO : what to do with many graphs here?
     //-- check if there's a dual, something there's not (and it's valid)
     if (std::get<1>(el.second) == "") 
@@ -96,9 +98,10 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       //-- does the dual graph contain that vertex ID?
       if (_graphs[0]->has_vertex(std::get<1>(el.second)) == false) 
       {
-        std::stringstream msg;
-        msg << "Cell (" << std::get<2>(el.second) << ") id=" << el.first;
-        this->add_error(704, msg.str(), "");
+        // std::stringstream msg;
+        // msg << "Cell (" << std::get<2>(el.second) << ") id=" << el.first << " dual doesn't exist";
+        // this->add_error(704, msg.str(), "");
+        std::clog << " ==> dual does not exist" << std::endl;
       } 
       else 
       {
@@ -111,12 +114,37 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           msg << "CellSpace id=" << el.first;
           this->add_error(702, msg.str(), "");
         }
+        else
+          std::clog << " ok" << std::endl;
       }
     }
   }
 
-//-- 4. is dual graph valid
-  // TODO
+//-- 4. is primal-dual graph valid
+//--    703 - PRIMAL_DUAL_WRONGLY_LINKED  
+  std::clog << "======== Validating Primal-Dual links ========" << std::endl;
+  for (auto& el : _cells)
+  {
+    // std::string pid = el.first;
+    std::string pdid = std::get<1>(el.second);
+    std::string dpid = std::get<1>(el.second);
+
+    if (_graphs[0]->has_vertex(pdid) == false)
+    {
+        std::stringstream msg;
+        msg << "Cell id=" << el.first << " dual doesn't exist";
+        this->add_error(703, msg.str(), "");
+    }
+    else
+    {
+      if (std::get<1>(_graphs[0]->get_vertex(pdid)) != el.first)
+      {
+        std::stringstream msg;
+        msg << "Cell id=" << el.first << " and its dual id=" << pdid << " are not reciprocally linked.";
+        this->add_error(703, msg.str(), "");
+      }
+    }
+  }
       
 //-- bye-bye
   _is_valid = bValid;
