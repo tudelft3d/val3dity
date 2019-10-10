@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -47,12 +47,13 @@ public:
   bool            is_valid();
   std::string     get_type();
 
-  void            add_cell(std::string id, Primitive* p, std::string dual);
+  void            add_cell(std::string id, Primitive* p, std::string dual, std::string CellSpaceType);
   void            add_graph(IndoorGraph* g);
 
 protected:
-  std::map<std::string, std::tuple<int,std::string>> _cells;  //-- <id, pos_lsPrimitives, dual> 
-  std::vector<IndoorGraph*>                          _graphs;
+  //-- <id> // <pos_lsPrimitives, dual, CellSpaceType> 
+  std::map<std::string, std::tuple<int,std::string,std::string>> _cells;  
+  std::vector<IndoorGraph*>                                      _graphs;
 
 };
 

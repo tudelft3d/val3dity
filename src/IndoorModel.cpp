@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -84,7 +84,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;
   for (auto& el : _cells)
   {
-    std::clog << "Cell ID: " << el.first << std::endl;
+    std::clog << "Cell (" << std::get<2>(el.second) << ") ID: " << el.first << std::endl;
     Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
     Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
     int inside = s->is_point_in_solid(p);
@@ -104,11 +104,11 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 }
 
 
-void IndoorModel::add_cell(std::string id, Primitive* p, std::string dual)
+void IndoorModel::add_cell(std::string id, Primitive* p, std::string dual, std::string CellSpaceType)
 {
   this->add_primitive(p);
   int pos = (_lsPrimitives.size() - 1);
-  _cells[id] = std::make_tuple(pos, dual);
+  _cells[id] = std::make_tuple(pos, dual, CellSpaceType);
 }
 
 

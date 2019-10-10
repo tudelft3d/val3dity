@@ -795,26 +795,27 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     nameim = "MyIndoorModel";
   IndoorModel* im = new IndoorModel(nameim);
   lsFeatures.push_back(im);
-
-  //-- 1. read each CellSpace in the file (the primal objects)
-  std::string s = ".//" + NS["indoorgml"] + "CellSpace";
+    
+  //-- 1. read each cellSpaceMember in the file (the primal objects)
+  //--    these can have different names, depending on the Extensions/ADEs used
+  std::string s = ".//" + NS["indoorgml"] + "cellSpaceMember";
   pugi::xpath_node_set nn = doc.select_nodes(s.c_str());
   int pcounter = 0;
   for (pugi::xpath_node_set::const_iterator it = nn.begin(); it != nn.end(); ++it)
   {
-    // std::cout << "---CellSpace" << std::endl;
+    pugi::xml_node cs = it->node().first_child();
     std::string theid   = "";
     std::string duality = "";
     //-- get the ID
-    if (it->node().attribute("gml:id") != 0) {
+    if (cs.attribute("gml:id") != 0) {
       // std::cout << "\t" << it->node().attribute("gml:id").value() << std::endl;
-      theid = it->node().attribute("gml:id").value();
+      theid = cs.attribute("gml:id").value();
     }
     else 
       theid = ("MISSING_ID_" + std::to_string(pcounter));
     //-- get the duality pointer (max one, sweet)
     s = NS["indoorgml"] + "duality";
-    for (pugi::xml_node child : it->node().children(s.c_str()))
+    for (pugi::xml_node child : cs.children(s.c_str()))
     {
       if (child.attribute("xlink:href") != 0) {
         std::string s = child.attribute("xlink:href").value();
@@ -827,7 +828,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     //-- get the geometry, either Solid or Surface
     s = NS["indoorgml"] + "cellSpaceGeometry";
     Solid* sol;
-    for (pugi::xml_node child : it->node().children(s.c_str()))
+    for (pugi::xml_node child : cs.children(s.c_str()))
     {
       s = NS["indoorgml"] + "Geometry3D";
       for (pugi::xml_node child2 : child.children(s.c_str()))
@@ -844,7 +845,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
       }
     }
     pcounter++;
-    im->add_cell(theid, sol, duality);
+    im->add_cell(theid, sol, duality, cs.name());
   }
 
   //-- 2. read the dual graphs (yes there can be more than one) 
