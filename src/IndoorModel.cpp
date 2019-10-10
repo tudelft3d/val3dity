@@ -85,14 +85,23 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
   {
     std::clog << "Cell (" << std::get<2>(el.second) << ") ID: " << el.first << std::endl;
-    Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
-    Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
-    int inside = s->is_point_in_solid(p);
-    if (inside == -1)
+    // TODO : what to do with many graphs here?
+    //-- check if there's a dual, something there's not (and it's valid)
+    if (std::get<1>(el.second) == "") 
     {
-      std::stringstream msg;
-      msg << "CellSpace id=" << el.first;
-      this->add_error(702, msg.str(), "");
+      std::clog << "\tNo dual vertex" << std::endl;
+    }
+    else 
+    {
+      Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
+      Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
+      int inside = s->is_point_in_solid(p);
+      if (inside == -1)
+      {
+        std::stringstream msg;
+        msg << "CellSpace id=" << el.first;
+        this->add_error(702, msg.str(), "");
+      }
     }
   }
 
