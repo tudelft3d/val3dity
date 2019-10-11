@@ -125,14 +125,17 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   std::clog << "======== Validating Primal-Dual links ========" << std::endl;
   for (auto& el : _cells)
   {
-    // std::string pid = el.first;
     std::string pdid = std::get<1>(el.second);
-    std::string dpid = std::get<1>(el.second);
-
+    //-- no dual to the cell
+    if (pdid == "") 
+    {
+      std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
+      continue;
+    }
     if (_graphs[0]->has_vertex(pdid) == false)
     {
         std::stringstream msg;
-        msg << "Cell id=" << el.first << " dual doesn't exist";
+        msg << "Cell id=" << el.first << " dual vertex doesn't exist";
         this->add_error(703, msg.str(), "");
     }
     else
@@ -140,7 +143,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       if (std::get<1>(_graphs[0]->get_vertex(pdid)) != el.first)
       {
         std::stringstream msg;
-        msg << "Cell id=" << el.first << " and its dual id=" << pdid << " are not reciprocally linked.";
+        msg << "Cell id=" << el.first << " and its dual vertex id=" << pdid << " are not reciprocally linked";
         this->add_error(703, msg.str(), "");
       }
     }
