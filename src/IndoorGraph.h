@@ -56,6 +56,8 @@ public:
   bool            has_vertex(std::string);
   std::tuple<Point3,std::string,std::vector<std::string>>& 
                   get_vertex(std::string id);
+  std::vector<std::string> 
+                  get_vertices_ids();
 
 protected:
   std::string     _id;

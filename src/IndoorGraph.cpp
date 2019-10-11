@@ -82,6 +82,7 @@ std::string IndoorGraph::get_type()
   return "IndoorGraph";
 }
 
+
 bool IndoorGraph::has_vertex(std::string id) 
 {
   auto it = _vertices.find(id);
@@ -92,9 +93,21 @@ bool IndoorGraph::has_vertex(std::string id)
 }
 
 
+std::vector<std::string> IndoorGraph::get_vertices_ids() 
+{
+  std::vector<std::string> all;
+  for (auto& v: _vertices)
+  {
+    all.push_back(v.first);
+  }
+  return all;
+}
+
+
 std::tuple<Point3,std::string,std::vector<std::string>>& 
 IndoorGraph::get_vertex(std::string id) {
   return _vertices[id];
 }
+
 
 } // namespace val3dity

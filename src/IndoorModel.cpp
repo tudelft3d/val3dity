@@ -148,6 +148,30 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       }
     }
   }
+  //-- test if the neighbours of the dual vertices actually exist
+  auto allids = _graphs[0]->get_vertices_ids();
+  for (auto& vid : allids)
+  {
+    auto vadjs = _graphs[0]->get_vertex(vid);
+    for (auto& vadj: std::get<2>(vadjs))
+    {
+      if (_graphs[0]->has_vertex(vadj) == false)
+      {
+        std::stringstream msg;
+        msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
+        this->add_error(703, msg.str(), "");
+      }
+    }
+  }
+
+
+//-- 5. if 2 cells are adjacent in the primal, are they also in the dual?
+//--    704 - ADJACENCIES_PRIMAL_DUAL_DIFFERENT  
+  std::clog << "======== Validating Primal-Dual links ========" << std::endl;
+  for (auto& el : _cells)
+  {
+    std::string pdid = std::get<1>(el.second);
+  }
       
 //-- bye-bye
   _is_valid = bValid;
