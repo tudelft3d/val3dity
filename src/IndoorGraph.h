@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -53,12 +53,17 @@ public:
   bool            is_valid();
   std::string     get_type();
 
-  std::tuple<Point3,std::string,std::vector<std::string>>& get_vertex(std::string id);
+  bool            has_vertex(std::string);
+  std::tuple<Point3,std::string,std::vector<std::string>>& 
+                  get_vertex(std::string id);
+  std::vector<std::string> 
+                  get_vertices_ids();
 
 protected:
-  std::string             _id;
-  int                     _is_valid; 
+  std::string     _id;
+  int             _is_valid; 
   
+  // _vertices[theid] = std::make_tuple(v, dual, vadj);
   std::map<std::string, std::tuple<Point3,std::string,std::vector<std::string>>> _vertices;
 
 };

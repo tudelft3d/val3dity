@@ -67,6 +67,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   bValid = Feature::validate_generic(tol_planarity_d2p, tol_planarity_normals, tol_overlap);
 
 //-- 2. overlapping test
+//--    701 - CELLS_OVERLAP
   std::clog << "--- Overlapping tests between Cells ---" << std::endl;
   std::vector<std::tuple<std::string,Solid*>> lsCells;
   for (auto& el : _cells)
@@ -81,22 +82,96 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   }
 
 //-- 3. is dual vertex of each cell located inside its Cell?
+//--    702 - DUAL_VERTEX_OUTSIDE_CELL
   std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;
   for (auto& el : _cells)
   {
-    std::clog << "Cell (" << std::get<2>(el.second) << ") ID: " << el.first << std::endl;
-    Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
-    Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
-    int inside = s->is_point_in_solid(p);
-    if (inside == -1)
+    std::clog << "Cell (" << std::get<2>(el.second) << ") id=" << el.first;
+    // TODO : what to do with many graphs here?
+    //-- check if there's a dual, something there's not (and it's valid)
+    if (std::get<1>(el.second) == "") 
     {
-      std::stringstream msg;
-      msg << "CellSpace id=" << el.first;
-      this->add_error(702, msg.str(), "");
+      std::clog << "\tNo dual vertex" << std::endl;
+    }
+    else 
+    {
+      //-- does the dual graph contain that vertex ID?
+      if (_graphs[0]->has_vertex(std::get<1>(el.second)) == false) 
+      {
+        // std::stringstream msg;
+        // msg << "Cell (" << std::get<2>(el.second) << ") id=" << el.first << " dual doesn't exist";
+        // this->add_error(704, msg.str(), "");
+        std::clog << " ==> dual does not exist" << std::endl;
+      } 
+      else 
+      {
+        Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
+        Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
+        int inside = s->is_point_in_solid(p);
+        if (inside == -1)
+        {
+          std::stringstream msg;
+          msg << "CellSpace id=" << el.first;
+          this->add_error(702, msg.str(), "");
+        }
+        else
+          std::clog << " ok" << std::endl;
+      }
     }
   }
 
-//-- 4. is dual graph valid
+//-- 4. is primal-dual graph valid
+//--    703 - PRIMAL_DUAL_WRONGLY_LINKED  
+  std::clog << "======== Validating Primal-Dual links ========" << std::endl;
+  for (auto& el : _cells)
+  {
+    std::string pdid = std::get<1>(el.second);
+    //-- no dual to the cell
+    if (pdid == "") 
+    {
+      std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
+      continue;
+    }
+    if (_graphs[0]->has_vertex(pdid) == false)
+    {
+        std::stringstream msg;
+        msg << "Cell id=" << el.first << " dual vertex doesn't exist";
+        this->add_error(703, msg.str(), "");
+    }
+    else
+    {
+      if (std::get<1>(_graphs[0]->get_vertex(pdid)) != el.first)
+      {
+        std::stringstream msg;
+        msg << "Cell id=" << el.first << " and its dual vertex id=" << pdid << " are not reciprocally linked";
+        this->add_error(703, msg.str(), "");
+      }
+    }
+  }
+  //-- test if the neighbours of the dual vertices actually exist
+  auto allids = _graphs[0]->get_vertices_ids();
+  for (auto& vid : allids)
+  {
+    auto vadjs = _graphs[0]->get_vertex(vid);
+    for (auto& vadj: std::get<2>(vadjs))
+    {
+      if (_graphs[0]->has_vertex(vadj) == false)
+      {
+        std::stringstream msg;
+        msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
+        this->add_error(703, msg.str(), "");
+      }
+    }
+  }
+
+
+//-- 5. if 2 cells are adjacent in the primal, are they also in the dual?
+//--    704 - ADJACENCIES_PRIMAL_DUAL_DIFFERENT  
+  std::clog << "======== Validating Primal-Dual links ========" << std::endl;
+  for (auto& el : _cells)
+  {
+    std::string pdid = std::get<1>(el.second);
+  }
       
 //-- bye-bye
   _is_valid = bValid;

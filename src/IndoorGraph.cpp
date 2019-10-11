@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2018, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -68,7 +68,8 @@ bool IndoorGraph::validate()
 }
 
 
-bool IndoorGraph::is_valid() {
+bool IndoorGraph::is_valid() 
+{
   if (_is_valid == 1) 
     return true;
   else
@@ -76,8 +77,30 @@ bool IndoorGraph::is_valid() {
 }
 
 
-std::string IndoorGraph::get_type() {
+std::string IndoorGraph::get_type() 
+{
   return "IndoorGraph";
+}
+
+
+bool IndoorGraph::has_vertex(std::string id) 
+{
+  auto it = _vertices.find(id);
+  if (it == _vertices.end())
+    return false;
+  else
+    return true;
+}
+
+
+std::vector<std::string> IndoorGraph::get_vertices_ids() 
+{
+  std::vector<std::string> all;
+  for (auto& v: _vertices)
+  {
+    all.push_back(v.first);
+  }
+  return all;
 }
 
 
@@ -85,5 +108,6 @@ std::tuple<Point3,std::string,std::vector<std::string>>&
 IndoorGraph::get_vertex(std::string id) {
   return _vertices[id];
 }
+
 
 } // namespace val3dity
