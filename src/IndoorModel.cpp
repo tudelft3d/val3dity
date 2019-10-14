@@ -73,7 +73,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
     lsCells.push_back(std::make_tuple(el.first, (Solid*)_lsPrimitives[std::get<0>(el.second)]));
   std::vector<Error> lsErrors;  
-  if (are_solids_interior_disconnected(lsCells, 701, lsErrors, tol_overlap) == false)
+  if (are_cells_interior_disconnected_with_aabb(lsCells, 701, lsErrors, tol_overlap) == false)
   {
     bValid = false;
     std::clog << "Error: Cells have overlapping interior" << std::endl;
@@ -115,7 +115,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           this->add_error(702, msg.str(), "");
         }
         else
-          std::clog << " ok" << std::endl;
+          std::clog << " --> ok" << std::endl;
       }
     }
   }
@@ -171,6 +171,31 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
   {
     std::string pdid = std::get<1>(el.second);
+    for (auto& vadj: std::get<2>(_graphs[0]->get_vertex(pdid)))
+    {
+      std::string cadjid = std::get<1>(_graphs[0]->get_vertex(vadj));
+      if (el.first > cadjid)
+        continue;
+      std::clog << "Cells id=" << el.first << " id=" << cadjid;
+      int re = are_primitives_adjacent(_lsPrimitives[std::get<0>(el.second)],
+                                       _lsPrimitives[std::get<0>(_cells[cadjid])],
+                                       tol_overlap);
+      if (re == 0)                                          
+      {
+        std::stringstream msg;
+        msg << "Cells id=" << el.first << " id=" << cadjid;
+        this->add_error(704, msg.str(), "");
+        std::clog << " NOT valid" << std::endl;
+      }
+      else if (re == -1)
+      {
+        std::clog << " are not valid, skipped adjacency test" << std::endl;
+      }
+      else 
+      {
+        std::clog << " --> ok" << std::endl;
+      }
+    }
   }
       
 //-- bye-bye

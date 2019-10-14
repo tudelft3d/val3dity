@@ -45,18 +45,18 @@ typedef Nefs::iterator                                                  Iterator
 typedef CGAL::Box_intersection_d::Box_with_handle_d<double,3,Iterator>  AABB;
 
 
-struct Report {
+struct Report_intersections {
   Nefs* nefs;
   std::vector<std::string>* lsCellIDs;
   std::vector<Error>* lsErrors; 
   int ecode;
   int* thecount;
 
-  Report(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<Error>& le, int code, int& count)
+  Report_intersections(Nefs& nefs, std::vector<std::string>& lsCell, std::vector<Error>& le, int code, int& count)
     : nefs(&nefs), lsCellIDs(&lsCell), lsErrors(&le), ecode(code), thecount(&count)
   {}
 
-  // callback functor that reports all truly intersecting triangles
+  // callback functor that reports when 2 AABBs intersect
   void operator()(const AABB& a, const AABB& b)  
   {
     int id1 = (a.handle() - nefs->begin());
@@ -73,7 +73,8 @@ struct Report {
       else
         std::cout << "\b\\" << std::flush;
     }
-
+    //-- we check here if the 2 (usually eroded) Nefs are intersecting, 
+    //-- if yes then an error is added to the list lsErrors
     Nef_polyhedron* n1 = nefs->at(id1);
     Nef_polyhedron* n2 = nefs->at(id2);
     Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
@@ -92,10 +93,10 @@ struct Report {
 
 
 
-bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>>& lsCells,
-                                      int errorcode_to_assign, 
-                                      std::vector<Error>& lsErrors, 
-                                      double tol_overlap)
+bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::string,Solid*>>& lsCells,
+                                               int errorcode_to_assign, 
+                                               std::vector<Error>& lsErrors, 
+                                               double tol_overlap)
 {
   std::clog << "--- Constructing Nef Polyhedra ---" << std::endl;
   std::vector<Nef_polyhedron*>                lsNefs;
@@ -110,7 +111,7 @@ bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>
     if (tol_overlap > 0)
     {
       lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-      delete tmpnef;
+      // delete tmpnef;
     }
     else
       lsNefs.push_back(tmpnef);
@@ -134,7 +135,7 @@ bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>
   if (lsNefs.size() > 500) {
     std::cout << "Testing intersections between " << lsNefs.size() << " cells, this could be slow." << std::endl << std::flush;
   }
-  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign, count));
+  CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report_intersections(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign, count));
   std::clog << "Total AABB tests: " << count << std::endl;
   if (lsErrors.size() > n)
     return false;
@@ -163,7 +164,7 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
     if (tol_overlap > 0)
     {
       lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-      delete tmpnef;
+      // delete tmpnef;
     }
     else
     {
@@ -198,5 +199,61 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
   }
   return !isValid;
 }
+
+
+//-- adjacent 
+//-- == 
+//-- eroded.interior() not overlapping
+//-- + 
+//-- dilated.interior() overlapping
+//-------------
+// -1: input primitives not valid
+//  0: not adjancent
+//  1: adjacent
+int are_primitives_adjacent(Primitive* p1,
+                             Primitive* p2,
+                             double tol_overlap)
+{
+  //-- only process valid primitives
+  if ( (p1->is_valid() != 1) || (p2->is_valid() != 1) )
+    return -1;
+
+  Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+  Nef_polyhedron* n1;
+  Nef_polyhedron* n2;
+  if (p1->get_type() == SOLID)
+    n1 = dynamic_cast<Solid*>(p1)->get_nef_polyhedron();
+  else if (p1->get_type() == COMPOSITESOLID)
+    n1 = dynamic_cast<CompositeSolid*>(p1)->get_nef_polyhedron();
+  if (p2->get_type() == SOLID)
+    n2 = dynamic_cast<Solid*>(p2)->get_nef_polyhedron();
+  else if (p2->get_type() == COMPOSITESOLID)
+    n2 = dynamic_cast<CompositeSolid*>(p2)->get_nef_polyhedron();
+
+  if (tol_overlap < 0.0)
+  {
+    if (n1->interior() * n2->interior() != emptynef)
+      return 0;
+    if (n1->interior() * n2->interior() == emptynef)
+      return 0;
+    return 1;
+  }
+  else 
+  {
+    //-- 1. erode the nefs
+    Nef_polyhedron* ne1 = erode_nef_polyhedron(n1, tol_overlap);
+    Nef_polyhedron* ne2 = erode_nef_polyhedron(n2, tol_overlap);
+    if (ne1->interior() * ne2->interior() != emptynef)
+      return 0;
+    //-- 2. dilate the Nefs
+    Nef_polyhedron* nd1 = dilate_nef_polyhedron(n1, tol_overlap);
+    Nef_polyhedron* nd2 = dilate_nef_polyhedron(n2, tol_overlap);
+    if (nd1->interior() * nd2->interior() == emptynef)
+      return 0;
+    return 1;
+  }
+}
+
+
 
 } // namespace val3dity

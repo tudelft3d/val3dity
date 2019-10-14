@@ -43,10 +43,12 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
                                     std::vector<Error>& lsErrors, 
                                     double tol_overlap);
 
-bool are_solids_interior_disconnected(std::vector<std::tuple<std::string,Solid*>>& lsCells,
-                                      int errorcode_to_assign, 
-                                      std::vector<Error>& lsErrors, 
-                                      double tol_overlap);
+bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::string,Solid*>>& lsCells,
+                                               int errorcode_to_assign, 
+                                               std::vector<Error>& lsErrors, 
+                                               double tol_overlap);
+
+int are_primitives_adjacent(Primitive* p1, Primitive* p2, double tol_overlap);
 
 
 
