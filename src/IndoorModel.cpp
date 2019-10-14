@@ -171,6 +171,24 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
   {
     std::string pdid = std::get<1>(el.second);
+    std::cout << pdid << std::endl;
+    for (auto& vadj: std::get<2>(_graphs[0]->get_vertex(pdid)))
+    {
+      std::cout << vadj << std::endl;
+      std::string cadjid = std::get<1>(_graphs[0]->get_vertex(vadj));
+      std::cout << cadjid << std::endl;
+      std::cout << std::get<0>(el.second) << std::endl;
+      std::cout << std::get<0>(_cells[cadjid]) << std::endl;
+      bool re = are_primitives_adjacent(_lsPrimitives[std::get<0>(el.second)],
+                                       _lsPrimitives[std::get<0>(_cells[cadjid])],
+                                       tol_overlap);
+      if (re == false)                                          
+      {
+        std::stringstream msg;
+        msg << "Cells id=" << el.first << " id=" << cadjid;
+        this->add_error(704, msg.str(), "");
+      }
+    }
   }
       
 //-- bye-bye

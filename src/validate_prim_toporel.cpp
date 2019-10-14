@@ -200,4 +200,45 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
   return !isValid;
 }
 
+
+//-- adjacent 
+//-- == 
+//-- eroded.interior() not overlapping
+//-- + 
+//-- dilated.interior() overlapping
+bool are_primitives_adjacent(Primitive* p1,
+                             Primitive* p2,
+                             double tol_overlap)
+{
+  Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+
+  //-- 1. erode the Nefs
+  Nef_polyhedron* n1;
+  Nef_polyhedron* n2;
+  if (p1->get_type() == SOLID)
+    n1 = dynamic_cast<Solid*>(p1)->get_nef_polyhedron();
+  else if (p1->get_type() == COMPOSITESOLID)
+    n1 = dynamic_cast<CompositeSolid*>(p1)->get_nef_polyhedron();
+  Nef_polyhedron* ne1 = erode_nef_polyhedron(n1, tol_overlap);
+  if (p2->get_type() == SOLID)
+    n2 = dynamic_cast<Solid*>(p2)->get_nef_polyhedron();
+  else if (p2->get_type() == COMPOSITESOLID)
+    n2 = dynamic_cast<CompositeSolid*>(p2)->get_nef_polyhedron();
+  Nef_polyhedron* ne2 = erode_nef_polyhedron(n2, tol_overlap);
+
+  if (ne1->interior() * ne2->interior() != emptynef)
+    return false;
+
+  //-- 2. dilate the Nefs
+  Nef_polyhedron* nd1 = dilate_nef_polyhedron(n1, tol_overlap);
+  Nef_polyhedron* nd2 = dilate_nef_polyhedron(n2, tol_overlap);
+
+  if (nd1->interior() * nd2->interior() == emptynef)
+    return false;
+
+  return true;
+}
+
+
+
 } // namespace val3dity

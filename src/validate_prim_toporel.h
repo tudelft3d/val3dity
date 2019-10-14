@@ -48,6 +48,8 @@ bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::strin
                                                std::vector<Error>& lsErrors, 
                                                double tol_overlap);
 
+bool are_primitives_adjacent(Primitive* p1, Primitive* p2, double tol_overlap);
+
 
 
 } // namespace val3dity
