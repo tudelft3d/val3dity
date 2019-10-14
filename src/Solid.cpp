@@ -243,6 +243,12 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
 }
 
 
+/*
+ -2 = not valid polyhedron
+ -1 = outside
+  0 = directly on the boundary of polyhedron
+  1 = inside
+ */
 int Solid::is_point_in_solid(Point3& p)
 {
   int re = -2;
@@ -260,6 +266,7 @@ int Solid::is_point_in_solid(Point3& p)
   }
   return re;
 }
+
 
 std::set<int> Solid::get_unique_error_codes() {
   std::set<int> errs = Primitive::get_unique_error_codes();

@@ -111,7 +111,7 @@ bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::strin
     if (tol_overlap > 0)
     {
       lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-      delete tmpnef;
+      // delete tmpnef;
     }
     else
       lsNefs.push_back(tmpnef);
@@ -164,7 +164,7 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
     if (tol_overlap > 0)
     {
       lsNefs.push_back(erode_nef_polyhedron(tmpnef, tol_overlap));
-      delete tmpnef;
+      // delete tmpnef;
     }
     else
     {
@@ -206,37 +206,52 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
 //-- eroded.interior() not overlapping
 //-- + 
 //-- dilated.interior() overlapping
-bool are_primitives_adjacent(Primitive* p1,
+//-------------
+// -1: input primitives not valid
+//  0: not adjancent
+//  1: adjacent
+int are_primitives_adjacent(Primitive* p1,
                              Primitive* p2,
                              double tol_overlap)
 {
-  Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
+  //-- only process valid primitives
+  if ( (p1->is_valid() != 1) || (p2->is_valid() != 1) )
+    return -1;
 
-  //-- 1. erode the Nefs
+  Nef_polyhedron emptynef(Nef_polyhedron::EMPTY);
   Nef_polyhedron* n1;
   Nef_polyhedron* n2;
   if (p1->get_type() == SOLID)
     n1 = dynamic_cast<Solid*>(p1)->get_nef_polyhedron();
   else if (p1->get_type() == COMPOSITESOLID)
     n1 = dynamic_cast<CompositeSolid*>(p1)->get_nef_polyhedron();
-  Nef_polyhedron* ne1 = erode_nef_polyhedron(n1, tol_overlap);
   if (p2->get_type() == SOLID)
     n2 = dynamic_cast<Solid*>(p2)->get_nef_polyhedron();
   else if (p2->get_type() == COMPOSITESOLID)
     n2 = dynamic_cast<CompositeSolid*>(p2)->get_nef_polyhedron();
-  Nef_polyhedron* ne2 = erode_nef_polyhedron(n2, tol_overlap);
 
-  if (ne1->interior() * ne2->interior() != emptynef)
-    return false;
-
-  //-- 2. dilate the Nefs
-  Nef_polyhedron* nd1 = dilate_nef_polyhedron(n1, tol_overlap);
-  Nef_polyhedron* nd2 = dilate_nef_polyhedron(n2, tol_overlap);
-
-  if (nd1->interior() * nd2->interior() == emptynef)
-    return false;
-
-  return true;
+  if (tol_overlap < 0.0)
+  {
+    if (n1->interior() * n2->interior() != emptynef)
+      return 0;
+    if (n1->interior() * n2->interior() == emptynef)
+      return 0;
+    return 1;
+  }
+  else 
+  {
+    //-- 1. erode the nefs
+    Nef_polyhedron* ne1 = erode_nef_polyhedron(n1, tol_overlap);
+    Nef_polyhedron* ne2 = erode_nef_polyhedron(n2, tol_overlap);
+    if (ne1->interior() * ne2->interior() != emptynef)
+      return 0;
+    //-- 2. dilate the Nefs
+    Nef_polyhedron* nd1 = dilate_nef_polyhedron(n1, tol_overlap);
+    Nef_polyhedron* nd2 = dilate_nef_polyhedron(n2, tol_overlap);
+    if (nd1->interior() * nd2->interior() == emptynef)
+      return 0;
+    return 1;
+  }
 }
 
 
