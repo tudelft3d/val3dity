@@ -73,7 +73,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
     lsCells.push_back(std::make_tuple(el.first, (Solid*)_lsPrimitives[std::get<0>(el.second)]));
   std::vector<Error> lsErrors;  
-  if (are_solids_interior_disconnected(lsCells, 701, lsErrors, 0) == false)
+  if (are_solids_interior_disconnected(lsCells, 701, lsErrors, tol_overlap) == false)
   {
     bValid = false;
     std::clog << "Error: Cells have overlapping interior" << std::endl;
