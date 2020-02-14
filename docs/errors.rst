@@ -194,6 +194,9 @@ Each shell must be simple, ie it must be a 2-manifold. Two cases are possible:
   1. An edge of a shell is non-manifold when there are more than 2 incident polygons to it.
   2. A vertex is non-manifold when its incident polygons do not form one 'umbrella'
 
+Notice that this error might be returned for shells having their surfaces that are not consistently oriented (while they are 2-manifold).
+Imagine you have a cube with 6 surfaces, if some surfaces have their normal pointing outwards, and some inwards, then this error might be returned (or :ref:`error_307`, depending on the configuration).
+
 .. image:: _static/303.png
 
 .. image:: _static/304.png
