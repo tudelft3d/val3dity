@@ -1,4 +1,5 @@
 FROM alpine:3.9
+LABEL maintainer.email="b.dukai@tudelft.nl" maintainer.name="Balázs Dukai"
 
 ENV CXX="g++ -std=c++98"
 

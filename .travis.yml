@@ -1,4 +1,4 @@
-sudo: required
+os: linux
 
 language: cpp
 
@@ -10,23 +10,23 @@ install: skip
 script:
   - echo "skipping tests"
   - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-  - docker pull ${DOCKER_USERNAME}/val3dity:latest || true
-  - docker build . --cache-from ${DOCKER_USERNAME}/val3dity:latest -t ${DOCKER_USERNAME}/val3dity:latest
+  - docker pull tudelft3d/val3dity:latest || true
+  - docker build . --cache-from tudelft3d/val3dity:latest -t tudelft3d/val3dity:latest
 
 
 deploy:
   - provider: script
-    script: docker push ${DOCKER_USERNAME}/val3dity:latest
-    skip_cleanup: true
+    script: docker push tudelft3d/val3dity:latest
+    cleanup: false
     on:
       branch: master
   - provider: script
-    script: docker tag ${DOCKER_USERNAME}/val3dity:latest ${DOCKER_USERNAME}/val3dity:dev ; docker push ${DOCKER_USERNAME}/val3dity:dev
-    skip_cleanup: true
+    script: docker tag tudelft3d/val3dity:latest tudelft3d/val3dity:dev ; docker push tudelft3d/val3dity:dev
+    cleanup: false
     on:
       branch: develop
   - provider: script
-    script: docker tag ${DOCKER_USERNAME}/val3dity:latest ${DOCKER_USERNAME}/val3dity:${TRAVIS_TAG} ; docker push ${DOCKER_USERNAME}/val3dity:${TRAVIS_TAG}
-    skip_cleanup: true
+    script: docker tag tudelft3d/val3dity:latest tudelft3d/val3dity:${TRAVIS_TAG} ; docker push tudelft3d/val3dity:${TRAVIS_TAG}
+    cleanup: false
     on:
       tags: true
