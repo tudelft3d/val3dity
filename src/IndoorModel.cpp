@@ -97,6 +97,13 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     else 
     {
       //-- does the dual graph contain that vertex ID?
+      if (this->get_number_graphs() == 0) {
+          std::stringstream msg;
+          msg << "CellSpace id=" << el.first;
+          this->add_error(702, msg.str(), "The dual graph is not in the file.");
+          continue;
+      }
+
       if (_graphs[0]->has_vertex(std::get<1>(el.second)) == false) 
       {
         // std::stringstream msg;
@@ -135,6 +142,12 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
       continue;
     }
+     if (this->get_number_graphs() == 0) {
+        std::stringstream msg;
+        msg << "CellSpace id=" << el.first;
+        this->add_error(703, msg.str(), "The dual graph is not in the file.");
+        continue;
+     }
     if (_graphs[0]->has_vertex(pdid) == false)
     {
         std::stringstream msg;
@@ -154,17 +167,16 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   }
   //-- test if the neighbours of the dual vertices actually exist
   //-- an IndoorGML dual node (a "State") has a 'connects', these should exists
-  auto allids = _graphs[0]->get_vertices_ids();
-  for (auto& vid : allids)
-  {
-    auto vadjs = _graphs[0]->get_vertex(vid);
-    for (auto& vadj: std::get<2>(vadjs))
-    {
-      if (_graphs[0]->has_vertex(vadj) == false)
-      {
-        std::stringstream msg;
-        msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
-        this->add_error(703, msg.str(), "");
+  if (this->get_number_graphs() > 0) {
+    auto allids = _graphs[0]->get_vertices_ids();
+    for (auto &vid : allids) {
+      auto vadjs = _graphs[0]->get_vertex(vid);
+      for (auto &vadj: std::get<2>(vadjs)) {
+        if (_graphs[0]->has_vertex(vadj) == false) {
+          std::stringstream msg;
+          msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
+          this->add_error(703, msg.str(), "");
+        }
       }
     }
   }
@@ -176,6 +188,12 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
   {
     std::string pdid = std::get<1>(el.second);
+    if (this->get_number_graphs() == 0) {
+      std::stringstream msg;
+      msg << "Cell id=" << el.first << " dual vertex doesn't exist";
+      this->add_error(704, msg.str(), "");
+      continue;
+    }
     for (auto& vadj: std::get<2>(_graphs[0]->get_vertex(pdid)))
     {
       std::string cadjid = std::get<1>(_graphs[0]->get_vertex(vadj));
@@ -235,6 +253,10 @@ std::string IndoorModel::get_type() {
   return _type;
 }
 
+
+int IndoorModel::get_number_graphs() {
+    return _graphs.size();
+}
 
 
 } // namespace val3dity

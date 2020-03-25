@@ -931,6 +931,8 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     }
     im->add_graph(ig);
   }
+  if (im->get_number_graphs() == 0)
+    std::cout << "\t!!! No dual graph was found in the input file" << std::endl;
 }
 
 

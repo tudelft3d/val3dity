@@ -50,6 +50,8 @@ public:
   void            add_cell(std::string id, Primitive* p, std::string dual, std::string CellSpaceType);
   void            add_graph(IndoorGraph* g);
 
+  int             get_number_graphs();
+
 protected:
   //-- <id> // <pos_lsPrimitives, dual, CellSpaceType> 
   std::map<std::string, std::tuple<int,std::string,std::string>> _cells;  
