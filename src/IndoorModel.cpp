@@ -104,7 +104,8 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           continue;
       }
 
-      if (_graphs[0]->has_vertex(std::get<1>(el.second)) == false) 
+      int gno = this->get_graph_containing_vertex(std::get<1>(el.second));
+      if (gno == -1)
       {
         // std::stringstream msg;
         // msg << "Cell (" << std::get<2>(el.second) << ") id=" << el.first << " dual doesn't exist";
@@ -113,7 +114,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       } 
       else 
       {
-        Point3 p = std::get<0>(_graphs[0]->get_vertex(std::get<1>(el.second)));
+        Point3 p = std::get<0>(_graphs[gno]->get_vertex(std::get<1>(el.second)));
         Solid* s = (Solid*)_lsPrimitives[std::get<0>(el.second)];
         int inside = s->is_point_in_solid(p);
         if (inside == -1)
@@ -142,14 +143,14 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
       continue;
     }
-     if (this->get_number_graphs() == 0) {
-        std::stringstream msg;
-        msg << "CellSpace id=" << el.first;
-        this->add_error(703, msg.str(), "The dual graph is not in the file.");
-        continue;
-     }
-    if (_graphs[0]->has_vertex(pdid) == false)
-    {
+    if (this->get_number_graphs() == 0) {
+      std::stringstream msg;
+      msg << "CellSpace id=" << el.first;
+      this->add_error(703, msg.str(), "The dual graph is not in the file.");
+      continue;
+    }
+    int gno = this->get_graph_containing_vertex(pdid);
+    if (gno == -1) {
         std::stringstream msg;
         msg << "Cell id=" << el.first << " dual vertex doesn't exist";
         this->add_error(703, msg.str(), "");
@@ -157,7 +158,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     else
     {
       //-- check 'reciprocity' of the XLinks between primal and dual
-      if (std::get<1>(_graphs[0]->get_vertex(pdid)) != el.first)
+      if (std::get<1>(_graphs[gno]->get_vertex(pdid)) != el.first)
       {
         std::stringstream msg;
         msg << "Cell id=" << el.first << " and its dual vertex id=" << pdid << " are not reciprocally linked";
@@ -167,12 +168,12 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   }
   //-- test if the neighbours of the dual vertices actually exist
   //-- an IndoorGML dual node (a "State") has a 'connects', these should exists
-  if (this->get_number_graphs() > 0) {
-    auto allids = _graphs[0]->get_vertices_ids();
+  for (auto& g: _graphs) {
+    auto allids = g->get_vertices_ids();
     for (auto &vid : allids) {
-      auto vadjs = _graphs[0]->get_vertex(vid);
+      auto vadjs = g->get_vertex(vid);
       for (auto &vadj: std::get<2>(vadjs)) {
-        if (_graphs[0]->has_vertex(vadj) == false) {
+        if (g->has_vertex(vadj) == false) {
           std::stringstream msg;
           msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
           this->add_error(703, msg.str(), "");
@@ -194,29 +195,25 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       this->add_error(704, msg.str(), "");
       continue;
     }
-    for (auto& vadj: std::get<2>(_graphs[0]->get_vertex(pdid)))
-    {
-      std::string cadjid = std::get<1>(_graphs[0]->get_vertex(vadj));
-      if (el.first > cadjid)
-        continue;
-      std::clog << "Cells id=" << el.first << " id=" << cadjid;
-      int re = are_primitives_adjacent(_lsPrimitives[std::get<0>(el.second)],
-                                       _lsPrimitives[std::get<0>(_cells[cadjid])],
-                                       tol_overlap);
-      if (re == 0)                                          
-      {
-        std::stringstream msg;
-        msg << "Cells id=" << el.first << " id=" << cadjid;
-        this->add_error(704, msg.str(), "");
-        std::clog << " NOT valid" << std::endl;
-      }
-      else if (re == -1)
-      {
-        std::clog << " are not valid, skipped adjacency test" << std::endl;
-      }
-      else 
-      {
-        std::clog << " --> ok" << std::endl;
+    for (auto& g: _graphs) {
+      for (auto &vadj: std::get<2>(g->get_vertex(pdid))) {
+        std::string cadjid = std::get<1>(g->get_vertex(vadj));
+        if (el.first > cadjid)
+          continue;
+        std::clog << "Cells id=" << el.first << " id=" << cadjid;
+        int re = are_primitives_adjacent(_lsPrimitives[std::get<0>(el.second)],
+                                         _lsPrimitives[std::get<0>(_cells[cadjid])],
+                                         tol_overlap);
+        if (re == 0) {
+          std::stringstream msg;
+          msg << "Cells id=" << el.first << " id=" << cadjid;
+          this->add_error(704, msg.str(), "");
+          std::clog << " NOT valid" << std::endl;
+        } else if (re == -1) {
+          std::clog << " are not valid, skipped adjacency test" << std::endl;
+        } else {
+          std::clog << " --> ok" << std::endl;
+        }
       }
     }
   }
@@ -255,7 +252,24 @@ std::string IndoorModel::get_type() {
 
 
 int IndoorModel::get_number_graphs() {
-    return _graphs.size();
+  return _graphs.size();
+}
+
+bool IndoorModel::graph_has_dual_vertex(std::string theid) {
+  for (auto& g : _graphs)
+    if (g->has_vertex(theid) == true)
+      return true;
+  return false;
+}
+
+
+int IndoorModel::get_graph_containing_vertex(std::string theid) {
+  int i = 0;
+  for (auto& g : _graphs)
+    if (g->has_vertex(theid) == true)
+      return i;
+    i++;
+  return -1;
 }
 
 

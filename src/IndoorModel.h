@@ -51,6 +51,8 @@ public:
   void            add_graph(IndoorGraph* g);
 
   int             get_number_graphs();
+  bool            graph_has_dual_vertex(std::string theid);
+  int             get_graph_containing_vertex(std::string theid);
 
 protected:
   //-- <id> // <pos_lsPrimitives, dual, CellSpaceType> 
