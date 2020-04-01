@@ -864,7 +864,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     //-- fetch all the edges
     std::map<std::string, std::tuple<std::string,std::string>> edges;
     s = ".//" + NS["indoorgml"] + "Transition";
-    pugi::xpath_node_set ntr = doc.select_nodes(s.c_str());
+    pugi::xpath_node_set ntr = it->node().select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = ntr.begin(); it != ntr.end(); ++it)
     {
       std::string theid = it->node().attribute("gml:id").value();
@@ -883,7 +883,8 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     }
     //-- fetch all the nodes
     s = ".//" + NS["indoorgml"] + "State";
-    pugi::xpath_node_set nstate = doc.select_nodes(s.c_str());
+    pugi::xpath_node_set nstate = it->node().select_nodes(s.c_str());
+//    pugi::xpath_node_set nstate = doc.select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nstate.begin(); it != nstate.end(); ++it)
     {
       // std::cout << "---\n" << it->node().attribute("gml:id").value() << std::endl;
