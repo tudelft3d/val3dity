@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -47,7 +47,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "beta 2.2";
+std::string VAL3DITY_VERSION = "2.2.0-beta.1";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
