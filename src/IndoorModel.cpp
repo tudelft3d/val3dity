@@ -173,7 +173,12 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     for (auto &vid : allids) {
       auto vadjs = g->get_vertex(vid);
       for (auto &vadj: std::get<2>(vadjs)) {
-        if (g->has_vertex(vadj) == false) {
+        if (vadj == "") {
+          std::stringstream msg;
+          msg << "Dual vertex id=" << vid << " reference a non-existing edge/Transition";
+          this->add_error(703, msg.str(), "");
+        }
+        else if (g->has_vertex(vadj) == false) {
           std::stringstream msg;
           msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
           this->add_error(703, msg.str(), "");
