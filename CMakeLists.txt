@@ -5,11 +5,9 @@ cmake_minimum_required (VERSION 3.2)
 
 add_definitions(-std=c++11)
 
+
 set( CMAKE_BUILD_TYPE "Release")
-
 set( CMAKE_CXX_FLAGS "-O2" )
-
-set(CMAKE_BUILD_TYPE "Release")
 
 set( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true )
  
