@@ -206,7 +206,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
                                          tol_overlap);
         if (re == 0) {
           std::stringstream msg;
-          msg << "Cells id=" << el.first << " id=" << cadjid;
+          msg << "Cells id=" << el.first << " & id=" << cadjid;
           this->add_error(704, msg.str(), "");
           std::clog << " NOT valid" << std::endl;
         } else if (re == -1) {
