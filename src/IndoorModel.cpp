@@ -265,10 +265,12 @@ bool IndoorModel::graph_has_dual_vertex(std::string theid) {
 
 int IndoorModel::get_graph_containing_vertex(std::string theid) {
   int i = 0;
-  for (auto& g : _graphs)
-    if (g->has_vertex(theid) == true)
+  for (auto& g : _graphs) {
+    if (g->has_vertex(theid) == true) {
       return i;
+    }
     i++;
+  }
   return -1;
 }
 
