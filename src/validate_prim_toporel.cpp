@@ -232,11 +232,10 @@ int are_primitives_adjacent(Primitive* p1,
 
   if (tol_overlap < 0.0)
   {
-    if (n1->interior() * n2->interior() != emptynef)
+    if (n1->boundary() * n2->boundary() != emptynef)
+      return 1;
+    else
       return 0;
-    if (n1->interior() * n2->interior() == emptynef)
-      return 0;
-    return 1;
   }
   else 
   {
