@@ -759,26 +759,41 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     }
   }
   //-- overview of errors
-  std::map<int,int> errors;
-  for (auto& f : lsFeatures) 
+  std::map<int,int> errors_f; //-- features
+  for (auto& f : lsFeatures)
     for (auto& code : f->get_unique_error_codes())
-        errors[code] = 0;
-  for (auto& f : lsFeatures) 
+      if (code > 600)
+        errors_f[code] = 0;
+  for (auto& f : lsFeatures)
     for (auto& code : f->get_unique_error_codes())
-        errors[code] += 1;
-
-  if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
+      if (code > 600)
+        errors_f[code] += 1;
+  std::map<int,int> errors_p; //-- primitives
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors_p[code] = 0;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors_p[code] += 1;
+  if ( (errors_p.size() > 0) || (errors_p.size() > 0) || (ioerrs.has_errors() == true) )
   {
     ss << "+++++" << std::endl;
     ss << "Errors present:" << std::endl;
-    for (auto e : errors)
+    //-- primitives
+    for (auto e : errors_p)
     {
       ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
       ss << setw(11) << e.second;
-      if (e.first < 600)
-       ss << " primitive(s)";
-      else
-       ss << " feature(s)";
+      ss << " primitive(s)";
+      ss << std::endl;
+    }
+    for (auto e : errors_f)
+    {
+      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
+      ss << setw(11) << e.second;
+      ss << " feature(s)";
       ss << std::endl;
     }
     for (auto& e : ioerrs.get_unique_error_codes())
