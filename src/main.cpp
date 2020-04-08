@@ -21,7 +21,7 @@
   For any information or further details about the use of val3dity, contact
   Hugo Ledoux
   <h.ledoux@tudelft.nl>
-  Faculty of Architecture & the Built Environment
+  Faculty of the Built Environment & Architecture
   Delft University of Technology
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
@@ -795,7 +795,7 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
 void print_license() {
   std::string thelicense =
     "\nval3dity\n\n"
-    "Copyright (C) 2011-2018  3D geoinformation research group, TU Delft\n\n"
+    "Copyright (C) 2011-2020  3D geoinformation research group, TU Delft\n\n"
     "val3dity is free software: you can redistribute it and/or modify\n"
     "it under the terms of the GNU General Public License as published by\n"
     "the Free Software Foundation, either version 3 of the License, or\n"
@@ -810,7 +810,7 @@ void print_license() {
     "For any information or further details about the use of val3dity, contact:\n"
     "Hugo Ledoux \n"
     "<h.ledoux@tudelft.nl>\n"
-    "Faculty of Architecture & the Built Environment\n"
+    "Faculty of the Built Environment & Architecture\n"
     "Delft University of Technology\n"
     "Julianalaan 134, Delft 2628BL, the Netherlands\n";
   std::cout << thelicense << std::endl;
