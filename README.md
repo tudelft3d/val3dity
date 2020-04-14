@@ -120,4 +120,4 @@ Ledoux, Hugo (2013). On the validation of solids represented with the internatio
 
 ## Error codes
 
-![](./docs/_static/errorcodes.svg)
+![](./docs/_static/errorcodes.png)
