@@ -282,8 +282,8 @@ int main(int argc, char* const argv[])
     
     if (inputtype == OTHER) {
       std::stringstream ss;
-      ss << "Input file (" << inputfile.getValue() << ") not supported.";
-      ioerrs.add_error(901, ss.str());
+      ss << "Format of file " << inputfile.getValue() << " not supported (based on its extension).";
+      ioerrs.add_error(904, ss.str());
     }
 
     Primitive3D prim3d;
