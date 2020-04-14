@@ -303,7 +303,7 @@ int main(int argc, char* const argv[])
     }
 
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
