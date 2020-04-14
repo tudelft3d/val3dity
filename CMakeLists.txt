@@ -5,7 +5,6 @@ cmake_minimum_required (VERSION 3.2)
 
 add_definitions(-std=c++11)
 
-
 set( CMAKE_BUILD_TYPE "Release")
 set( CMAKE_CXX_FLAGS "-O2" )
 
@@ -20,7 +19,7 @@ if (MSVC)
 endif(MSVC)
 
 # CGAL
-find_package( CGAL QUIET COMPONENTS core )
+find_package( CGAL QUIET COMPONENTS )
 if ( CGAL_FOUND )
   include( ${CGAL_USE_FILE} )
   message(STATUS "CGAL found")
@@ -34,6 +33,7 @@ endif()
 # Eigen
 find_package(Eigen3)
 include( ${EIGEN3_USE_FILE} )  
+
 
 # Boost
 find_package( Boost REQUIRED COMPONENTS filesystem)
