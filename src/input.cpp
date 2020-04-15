@@ -169,6 +169,7 @@ std::string errorcode2description(int code) {
     case 901: return string("INVALID_INPUT_FILE"); break;
     case 902: return string("EMPTY_PRIMITIVE"); break;
     case 903: return string("WRONG_INPUT_PARAMETERS"); break;
+    case 904: return string("FORMAT_NOT_SUPPORTED"); break;
     case 999: return string("UNKNOWN_ERROR"); break;
     default:  return string("UNKNOWN_ERROR"); break;
   }
@@ -1125,6 +1126,13 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
   pugi::xml_node ncm = doc.first_child();
   std::string vcitygml;
   get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
+
+  //-- CityGML v3 is not supported: warning to users
+  if (vcitygml == "v3.0") {
+    errs.add_error(904, "CityGML v3.0 files are not supported, use CityJSON (all versions fully supported) or downgrade to v2.0.");
+    return;
+  }
+
   if (NS.count("gml") == 0)
   {
     errs.add_error(901, "Input file does not have the GML namespace.");
@@ -1171,6 +1179,10 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
       else if (value.find("http://www.opengis.net/citygml/2") != std::string::npos) {
         sns = "citygml";
         vcitygml = "v2.0";
+      }
+      else if (value.find("http://www.opengis.net/citygml/3") != std::string::npos) {
+        sns = "citygml";
+        vcitygml = "v3.0";
       }
       else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
                 (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {

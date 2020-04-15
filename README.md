@@ -117,3 +117,7 @@ However we ask you check first whether your problem has already been solved by s
 Ledoux, Hugo (2019). val3dity: validation of 3D GIS primitives according to the international standards. *Open Geospatial Data, Software and Standards*, 3(1), 2018, pp.1 [[DOI](http://dx.doi.org/10.1186/s40965-018-0043-x)]
 
 Ledoux, Hugo (2013). On the validation of solids represented with the international standards for geographic information. Computer-Aided Civil and Infrastructure Engineering, 28(9):693-706. [PDF] [DOI]
+
+## Error codes
+
+![](./docs/_static/errorcodes.png)
