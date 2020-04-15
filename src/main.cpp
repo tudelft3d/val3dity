@@ -860,7 +860,7 @@ void get_report_json(json& jr,
   jr["parameters"]["planarity_d2p_tol"] = planarity_d2p_tol;
   jr["parameters"]["planarity_n_tol"] = planarity_n_tol;
 
-  //-- primitives
+  //-- primitives overview
   std::map<int, std::tuple<int,int> > prim_o; //-- <primID, total, valid>
   std::set<int> theprimitives;
   for (auto& f : lsFeatures)
@@ -893,7 +893,7 @@ void get_report_json(json& jr,
     jr["primitives_overview"].push_back(j);
   }
 
-  //-- features
+  //-- features overview
   std::map<std::string, std::tuple<int,int> > feat_o; //-- <featureID, total, valid>
   std::set<std::string> thefeatures;
   for (auto& f : lsFeatures)
@@ -914,70 +914,38 @@ void get_report_json(json& jr,
     j["valid"] = std::get<1>(each.second);
     jr["features_overview"].push_back(j);
   }
+
+  //-- each of the features with their primitives listed
+  jr["features"];
+  for (auto& f : lsFeatures)
+    jr["features"].push_back(f->get_report_json());
   
+  //-- dataset errors (9xx)
+  jr["dataset_erors"];
+  if (ioerrs.has_errors() == true)
+    jr["dataset_erors"] = ioerrs.get_report_json();
 
+  //-- overview of errors
+  std::set<int> unique_errors;
+  for (auto& f : lsFeatures)
+    for (auto& code : f->get_unique_error_codes())
+      unique_errors.insert(code);
+  jr["all_errors"];
+  for (auto& e : unique_errors)
+    jr["all_errors"].push_back(e);
+  for (auto& e : ioerrs.get_unique_error_codes())
+    jr["all_errors"].push_back(e);
 
-
-
-//  jr["overview_primitives"];
-//  for (auto& each : theprimitives)
-//  {
-//    switch(each)
-//    {
-//      case 0: jr["overview_primitives"].push_back("Solid"); break;
-//      case 1: jr["overview_primitives"].push_back("CompositeSolid"); break;
-//      case 2: jr["overview_primitives"].push_back("MultiSolid"); break;
-//      case 3: jr["overview_primitives"].push_back("CompositeSurface"); break;
-//      case 4: jr["overview_primitives"].push_back("MultiSurface"); break;
-//      case 5: jr["overview_primitives"].push_back("ALL"); break;
-//    }
-//  }
-//  jr["total_primitives"] = noprim;
-//  int bValid = 0;
-//  for (auto& f : lsFeatures)
-//    for (auto& p : f->get_primitives())
-//      if (p->is_valid() == true)
-//        bValid++;
-//  jr["valid_primitives"] = bValid;
-//  jr["invalid_primitives"] = noprim - bValid;
-//
-//  //-- features
-//  std::set<std::string> thefeatures;
-//  jr["total_features"] = lsFeatures.size();
-//  bValid = 0;
-//  for (auto& f : lsFeatures)
-//  {
-//    thefeatures.insert(f->get_type());
-//    if (f->is_valid() == true)
-//      bValid++;
-//  }
-//  jr["overview_features"];
-//  for (auto& each : thefeatures)
-//    jr["overview_features"].push_back(each);
-//  jr["valid_features"] = bValid;
-//  jr["invalid_features"] = lsFeatures.size() - bValid;
-//
-//  //-- overview of errors
-//  // "overview-errors": [101, 203],
-//  // "overview-errors-primitives": [5, 1],
-//  std::map<int,int> errors;
-//  for (auto& f : lsFeatures)
-//    for (auto& code : f->get_unique_error_codes())
-//        errors[code] = 0;
-//  for (auto& f : lsFeatures)
-//    for (auto& code : f->get_unique_error_codes())
-//        errors[code] += 1;
-//  jr["overview_errors"];
-//  for (auto e : errors)
-//    jr["overview_errors"].push_back(e.first);
-//  for (auto& e : ioerrs.get_unique_error_codes())
-//    jr["overview_errors"].push_back(e);
-//  jr["errors_dataset"];
-//  jr["features"];
-//  if (ioerrs.has_errors() == true)
-//    jr["errors_dataset"] = ioerrs.get_report_json();
-//  for (auto& f : lsFeatures)
-//    jr["features"].push_back(f->get_report_json());
+  bool bValid = true;
+  for (auto& f : lsFeatures) {
+    if (f->is_valid() == false) {
+      bValid = false;
+      break;
+    }
+  }
+  if (ioerrs.has_errors() == true)
+    bValid = false;
+  jr["validity"] = bValid;
 }
 
 
