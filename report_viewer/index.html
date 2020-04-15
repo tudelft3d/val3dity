@@ -57,7 +57,7 @@
                   <tbody>
                     <tr v-for="e in report.all_errors">
                       <th scope="row">{{ e }}</th>
-                      <td>POINT_NOT_CLOSED</td>
+                      <td><a v-bind:href="errors[e].link">{{ errors[e].name }}</a></td>
                     </tr>
                   </tbody>
                 </table>
