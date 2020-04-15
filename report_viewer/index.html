@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/bc945c94ff.js" crossorigin="anonymous"></script>
+
+    <title>val3dity report explorer</title>
+  </head>
+  <body>
+    <div id="app">
+      <nav class="navbar navbar-dark bg-dark">
+          <a class="navbar-brand" href="#">val3dity report</a>
+      </nav>
+      <div v-if="file_loaded">
+        <div class="container">
+          <div class="row">
+            <main class="col-12 py-md-3">
+              
+              <h3>Overview</h3>
+              <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row">input file</th>
+                  <td>{{ report.input_file }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">val3dity version</th>
+                  <td>{{ report.val3dity_version }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">validation time</th>
+                  <td>{{ report.time }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>
+              Validation summary 
+              <span v-if="report.validity" class="badge badge-success">all valid</span>
+              <span v-else class="badge badge-danger">invalid</span>
+            </h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">features</th>
+                  <th scope="col">total</th>
+                  <th scope="col">valid</th>
+                  <th scope="col">invalid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="f in report.features">
+                  <th scope="row">{{ f.type }}</th>
+                  <td>{{ report.input_file }}</td>
+                </tr>
+              </tbody>
+            </table>
+            
+
+
+            </main>
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <div class="container">
+          <div class="row">
+            <main class="col-12 py-md-3 pl-md-5">
+              <h2>File upload</h2>
+              <p>Drag'n'drop your val3dity report here</p>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Upload</span>
+                </div>
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="inputGroupFile01" ref="reportFile" @change="selectedFile">
+                  <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue2-filters/dist/vue2-filters.min.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>
