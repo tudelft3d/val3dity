@@ -27,7 +27,6 @@
 */
 
 #include "input.h"
-#include "reportoutput.h"
 #include "Primitive.h"
 #include "Surface.h"
 #include "MultiSurface.h"
@@ -54,7 +53,6 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
-void        write_report_html(json& jr, std::string report);
 void        write_report_json(json& jr, std::string report);
 
 
@@ -78,13 +76,13 @@ public:
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
     
-    std::cout << "\tval3dity CityGMLinput.gml" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in CityGMLinput.gml" << std::endl;
+    std::cout << "\tval3dity CityJSON_input.json" << std::endl;
+    std::cout << "\t\tValidates each 3D primitive in CityJSON_input.json" << std::endl;
     std::cout << "\t\tand outputs a summary per city object" << std::endl;
     
-    std::cout << "\tval3dity input.json -r /home/elvis/temp/r" << std::endl;
+    std::cout << "\tval3dity input.json -r /home/elvis/temp/myreport.json" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.json (CityJSON file)" << std::endl;
-    std::cout << "\t\tand outputs a detailed report '/home/elvis/temp/r/report.html'" << std::endl;
+    std::cout << "\t\tand outputs a detailed JSON report '/home/elvis/temp/myreport.json'" << std::endl;
     
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
@@ -148,16 +146,10 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "output report in HTML format",
-                                              false,
-                                              "",
-                                              "string");    
-    TCLAP::ValueArg<std::string>            report_json("",
-                                              "report_json",
                                               "output report in JSON format",
                                               false,
                                               "",
-                                              "string");
+                                              "string");    
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
                                               "which geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
@@ -235,7 +227,6 @@ int main(int argc, char* const argv[])
     cmd.xorAdd( inputfile, license );
     cmd.add(ishellfiles);
     cmd.add(report);
-    cmd.add(report_json);
     cmd.parse( argc, argv );
 
     //-- vector with Features: CityObject, GenericObject, 
@@ -549,8 +540,8 @@ int main(int argc, char* const argv[])
       std::cout << std::endl;
     }
 
-    //-- output report
-    if ( (report.getValue() != "") || (report_json.getValue() != "") )
+    //-- output report in JSON 
+    if (report.getValue() != "") 
     {
       //-- save the json report in memory first
       json jr;
@@ -563,15 +554,11 @@ int main(int argc, char* const argv[])
                        planarity_n_tol_updated,
                        ioerrs,
                        onlyinvalid.getValue());
-      // HTML report
-      if (report.getValue() != "") 
-        write_report_html(jr, report.getValue());
-      // JSON report
-      if (report_json.getValue() != "")
-        write_report_json(jr, report_json.getValue());
+      if (report.getValue() != "")
+        write_report_json(jr, report.getValue());
     }
     else
-      std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
 
     //-- unittests 
     if (unittests.getValue() == true)
@@ -605,49 +592,6 @@ void write_report_json(json& jr, std::string report)
     std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
   }
 
-}
-
-
-
-void write_report_html(json& jr, std::string report)
-{
-  boost::filesystem::path outpath(report);
-  if (boost::filesystem::exists(outpath.parent_path()) == false)
-    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-  else {
-    if (boost::filesystem::exists(outpath) == false)
-      boost::filesystem::create_directory(outpath);
-    boost::filesystem::path outfile = outpath / "report.html";
-    std::ofstream o(outfile.string());
-    o << report_indexhtml << std::endl;                                
-    std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-    o.close();
-
-    outfile = outpath / "report.js";
-    o.open(outfile.string());
-    o << "var report =" << jr << std::endl;                                
-    o.close();
-
-    outfile = outpath / "tree.html";
-    o.open(outfile.string());
-    o << report_tree << std::endl;                                
-    o.close();
-
-    outfile = outpath / "treeview.js";
-    o.open(outfile.string());
-    o << report_treeviewjs << std::endl;                                
-    o.close();
-
-    outfile = outpath / "val3dityconfig.js";
-    o.open(outfile.string());
-    o << report_val3dityconfigjs << std::endl;                                
-    o.close();
-    
-    outfile = outpath / "index.css";
-    o.open(outfile.string());
-    o << report_indexcss << std::endl;                                
-    o.close();
-  }
 }
 
 
