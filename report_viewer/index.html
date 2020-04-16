@@ -18,11 +18,14 @@
         <div class="container">
           <div class="row">
             <main class="col-12 py-md-3">
-            
+              <div class="page-header text-center">
+                <h2><img src="./img/val3dity2.png" width=250 alt=""/></h2>
+              </div>
+              <br>
               <!-- OVERVIEW -->
               <div class="card">
                 <div class="card-header text-center bg-primary text-white">
-                  val3dity report
+                  overview input
                 </div>
                 <div class="card-body">
                   <table class="table table-sm">
@@ -31,12 +34,6 @@
                         <th scope="row">input file</th>
                         <td>{{ report.input_file }}</td>
                       </tr>
-                      <tr>
-                        <th scope="row">validity</th>
-                        <td>
-                          <span v-if="report.validity" class="badge badge-success">100% valid</span>
-                          <span v-else class="badge badge-danger">invalid</span>
-                        </td>
                       </tr>
                       <tr>
                         <th scope="row">val3dity version</th>
@@ -56,13 +53,19 @@
               </div>
 
               <div class="card my-3">
-                <div class="card-header text-center bg-secondary text-white">
+                <div class="card-header text-center bg-info text-white">
                   Overview
                 </div>
                 <div class="card-body">
                   <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
-                      <a class="nav-link active" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="true">
+                      <a class="nav-link active" id="isitvalid-tab" data-toggle="tab" href="#isitvalid" role="tab" aria-controls="isitvalid" aria-selected="true">
+                        <span v-if="report.validity == true" class="badge badge-success">valid</span>
+                        <span v-else class="badge badge-danger">invalid</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">
                         Errors in the file
                         <span v-if="report.all_errors.length == 0" class="badge badge-success">0</span>
                         <span v-else class="badge badge-danger">{{ report.all_errors.length }}</span>
@@ -91,8 +94,18 @@
                     </li>
                   </ul>
                   <div class="tab-content" id="myTabContent">
+                    <!-- ISITVALID -->
+                    <div class="tab-pane fade show active" id="isitvalid" role="tabpanel" aria-labelledby="isitvalid-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <tbody>
+                          <img v-if="report.validity == true" src="./img/welldone.png" width=100 alt=""/>
+                          <p   v-if="report.validity == false">TODO STATISTICS GLOBAL</p>
+                        </tbody>
+                      </table>
+                    </div>                    
                     <!-- ERRORS -->
-                    <div class="tab-pane fade show active" id="errors" role="tabpanel" aria-labelledby="errors-tab">
+                    <div class="tab-pane fade" id="errors" role="tabpanel" aria-labelledby="errors-tab">
                       <br>
                       <table class="table table-sm table-striped">
                         <tbody>
@@ -172,7 +185,7 @@
                 </div>
               </div>
               <div class="card">
-                <div class="card-header text-center bg-info text-white">
+                <div class="card-header text-center bg-secondary text-white">
                   All features with details
                 </div>
                 <ul class="list-unstyled">
