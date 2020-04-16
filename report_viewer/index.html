@@ -73,13 +73,15 @@
                     <li class="nav-item">
                       <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">
                         Features
-                        <span class="badge badge-info">{{ report.features_overview.length }}</span>
+                        <span v-if="report.features_overview !== null" class="badge badge-info">{{ report.features_overview.length }}</span>
+                        <span v-else class="badge badge-info">0</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="primitives-tab" data-toggle="tab" href="#primitives" role="tab" aria-controls="primitives" aria-selected="false">
                         Primitives
-                        <span class="badge badge-info">{{ report.primitives_overview.length }}</span>
+                        <span v-if="report.primitives_overview !== null" class="badge badge-info">{{ report.primitives_overview.length }}</span>
+                        <span v-else class="badge badge-info">0</span>
                       </a>
                     </li>
                   </ul>
@@ -120,6 +122,7 @@
                     </div>
                     <!-- PRIMITIVES -->
                     <div class="tab-pane fade" id="primitives" role="tabpanel" aria-labelledby="primitives-tab">
+                      <br>
                       <table class="table table-sm table-striped">
                         <thead>
                           <tr>
