@@ -160,6 +160,10 @@ var errors = {
         "name": "WRONG_INPUT_PARAMETERS",
         "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#wrong-input-parameters"
     },
+    "904": {
+        "name": "FORMAT_NOT_SUPPORTED",
+        "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#wrong-input-parameters"
+    },    
     "999": {
         "name": "UNKNOWN_ERROR",
         "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#unknown-error"
