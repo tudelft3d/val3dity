@@ -21,7 +21,7 @@
             
               <!-- OVERVIEW -->
               <div class="card">
-                <div class="card-header text-center">
+                <div class="card-header text-center bg-secondary text-white">
                   val3dity report
                 </div>
                 <div class="card-body">
@@ -55,10 +55,8 @@
                 </div>
               </div>
 
-              <br>
-
-              <div class="card">
-                <div class="card-header text-center">
+              <div class="card my-3">
+                <div class="card-header text-center bg-dark text-white">
                   Overview
                 </div>
                 <div class="card-body">
@@ -173,6 +171,14 @@
                   </div>
                 </div>
               </div>
+              <div class="card">
+                <div class="card-header text-center bg-info text-white">
+                  Features
+                </div>
+                <ul class="list-unstyled">
+                  <feature-item :feature="feature" v-for="feature in report.features"></feature-item>
+                </ul>
+              </div>
               <br>
               <div class="text-center">
                 <button type="button" class="btn btn-outline-danger" v-on:click="reset"><i class="fas fa-redo"></i> Start over</button>
@@ -212,6 +218,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
     <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue2-filters/dist/vue2-filters.min.js"></script>
+    <script src="js/data.js"></script>
     <script src="js/index.js"></script>
   </body>
 </html>
