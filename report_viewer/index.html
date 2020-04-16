@@ -14,128 +14,134 @@
   </head>
   <body>
     <div id="app">
-      <nav class="navbar navbar-dark bg-dark">
-          <a class="navbar-brand" href="#">val3dity report</a>
-      </nav>
       <div v-if="file_loaded">
         <div class="container">
           <div class="row">
             <main class="col-12 py-md-3">
-              
-              <h3>Overview</h3>
-              <table class="table">
-              <tbody>
-                <tr>
-                  <th scope="row">input file</th>
-                  <td>{{ report.input_file }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">val3dity version</th>
-                  <td>{{ report.val3dity_version }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">validation time</th>
-                  <td>{{ report.time }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">validity</th>
-                  <td>
-                    <span v-if="report.validity" class="badge badge-success">100% valid</span>
-                    <span v-else class="badge badge-danger">invalid</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            
 
-            <!-- ALL ERRORS -->
-            <p>
-              <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseErrorOverview" aria-expanded="false" aria-controls="collapseErrorOverview">Error Overview <span class="badge badge-light">{{ report.all_errors.length }}</span> <i class="fa fa-caret-down" aria-hidden="true"></i></button>
-            </p>  
-            <div class="collapse" id="collapseErrorOverview"> 
-              <div class="card card-body">  
-                <table class="table">
-                  <tbody>
-                    <tr v-for="e in report.all_errors">
-                      <th scope="row">{{ e }}</th>
-                      <td><a v-bind:href="errors[e].link">{{ errors[e].name }}</a></td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="card">
+                <div class="card-header text-center">
+                  val3dity report
+                </div>
+                <div class="card-body">
+                  <table class="table table-sm">
+                    <tbody>
+                      <tr>
+                        <th scope="row">input file</th>
+                        <td>{{ report.input_file }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">validity</th>
+                        <td>
+                          <span v-if="report.validity" class="badge badge-success">100% valid</span>
+                          <span v-else class="badge badge-danger">invalid</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">val3dity version</th>
+                        <td>{{ report.val3dity_version }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">validation time</th>
+                        <td>{{ report.time }}</td>
+                      </tr>
+                      <tr v-for="(value, name) in report.parameters">
+                        <th scope="row">{{ name }}</th>
+                        <td>{{ value }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
 
-            <!-- PARAMS -->
-            <p>
-              <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseParamOverview" aria-expanded="false" aria-controls="collapseParamOverview">Validation parameters used <i class="fa fa-caret-down" aria-hidden="true"></i></button>
-            </p>  
-            <div class="collapse" id="collapseParamOverview"> 
-              <div class="card card-body">  
-                <table class="table">
-                  <tbody>
-                    <tr v-for="(value, name) in report.parameters">
-                      <th scope="row">{{ name }}</th>
-                      <td>{{ value }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <br>
+
+              <div class="card">
+                <div class="card-header text-center">
+                  Overview
+                </div>
+                <div class="card-body">
+                  <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="true">
+                        Errors in the file
+                        <span v-if="report.all_errors.length == 0" class="badge badge-success">0</span>
+                        <span v-else class="badge badge-danger">{{ report.all_errors.length }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">
+                        Features
+                        <span class="badge badge-info">{{ report.features_overview.length }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="primitives-tab" data-toggle="tab" href="#primitives" role="tab" aria-controls="primitives" aria-selected="false">
+                        Primitives
+                        <span class="badge badge-info">{{ report.primitives_overview.length }}</span>
+                      </a>
+                    </li>
+                  </ul>
+                  <div class="tab-content" id="myTabContent">
+                    <!-- ERRORS -->
+                    <div class="tab-pane fade show active" id="errors" role="tabpanel" aria-labelledby="errors-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <tbody>
+                          <tr v-for="e in report.all_errors">
+                            <th scope="row">{{ e }}</th>
+                            <td><a v-bind:href="errors[e].link">{{ errors[e].name }}</a></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- FEATURES -->
+                    <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">total</th>
+                            <th class="text-success" scope="col">valid</th>
+                            <th class="text-danger" scope="col">invalid</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="f in report.features_overview">
+                            <th scope="row">{{ f.type }}</th>
+                            <td>{{ f.total }}</td>
+                            <td>{{ f.valid }}</td>
+                            <td>{{ f.total - f.valid }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- PRIMITIVES -->
+                    <div class="tab-pane fade" id="primitives" role="tabpanel" aria-labelledby="primitives-tab">
+                      <table class="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">total</th>
+                            <th class="text-success" scope="col">valid</th>
+                            <th class="text-danger" scope="col">invalid</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="f in report.primitives_overview">
+                            <th scope="row">{{ f.type }}</th>
+                            <td>{{ f.total }}</td>
+                            <td>{{ f.valid }}</td>
+                            <td>{{ f.total - f.valid }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-
-
-            <!-- FEATURES -->
-            <p>
-              <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFeaturesOverview" aria-expanded="false" aria-controls="collapseFeaturesOverview">Summary Features <span class="badge badge-light">{{ report.features_overview.length }}</span> <i class="fa fa-caret-down" aria-hidden="true"></i></button>
-            </p>  
-            <div class="collapse" id="collapseFeaturesOverview">
-            <div class="card card-body">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">total</th>
-                    <th scope="col">valid</th>
-                    <th scope="col">invalid</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="f in report.features_overview">
-                    <th scope="row">{{ f.type }}</th>
-                    <td>{{ f.total }}</td>
-                    <td>{{ f.valid }}</td>
-                    <td>{{ f.total - f.valid }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>  
-            </div>  
-
-            <!-- PRIMITIVES -->
-            <p>
-              <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsePrimitivesOverview" aria-expanded="false" aria-controls="collapsePrimitivesOverview">Summary Primitives <span class="badge badge-light">{{ report.primitives_overview.length }}</span> <i class="fa fa-caret-down" aria-hidden="true"></i></button>
-            </p>  
-            <div class="collapse" id="collapsePrimitivesOverview"> 
-            <div class="card card-body">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">total</th>
-                    <th scope="col">valid</th>
-                    <th scope="col">invalid</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="f in report.primitives_overview">
-                    <th scope="row">{{ f.type }}</th>
-                    <td>{{ f.total }}</td>
-                    <td>{{ f.valid }}</td>
-                    <td>{{ f.total - f.valid }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            </div>            
-
 
             </main>
           </div>
