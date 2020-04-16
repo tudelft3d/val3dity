@@ -150,16 +150,15 @@
       <div v-else>
         <div class="container">
           <div class="row">
-            <main class="col-12 py-md-3 pl-md-5">
-              <h2>File upload</h2>
-              <p>Drag'n'drop your val3dity report here</p>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Upload</span>
-                </div>
-                <div class="custom-file">
-                  <input type="file" class="custom-file-input" id="inputGroupFile01" ref="reportFile" @change="selectedFile">
-                  <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+            <main class="col-12 py-md-3">
+              <div class="jumbotron jumbotron-fluid">
+                <div class="container text-center">
+                  <h2 class="display-4">val3dity report browser</h2>
+                  <br>  
+                  <div class="custom-file col-6">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01" ref="reportFile" @change="selectedFile">
+                    <label class="custom-file-label" for="inputGroupFile01">drag your val3dity report here</label>
+                  </div>
                 </div>
               </div>
             </main>
@@ -168,7 +167,6 @@
       </div>
     </div>
 
-    
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
