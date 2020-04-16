@@ -41,10 +41,10 @@ RUN apk --update add --virtual .cgal-deps \
         mpfr-dev \
         zlib-dev && \
     cd /tmp && \
-    wget https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.13.1/CGAL-4.13.1.tar.xz && \
-    tar xf CGAL-4.13.1.tar.xz && \
-    rm -f CGAL-4.13.1.tar.xz && \
-    cd CGAL-4.13.1 && \
+    wget https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-5.0.2/CGAL-5.0.2.tar.xz && \
+    tar xf CGAL-5.0.2.tar.xz && \
+    rm -f CGAL-5.0.2.tar.xz && \
+    cd CGAL-5.0.2.tar.xz && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DWITH_Eigen3=ON .. && \
@@ -57,6 +57,7 @@ RUN apk --update add --virtual .cgal-deps \
     rm -rf /user/local/man
 
 # install val3dity
+COPY . /tmp
 RUN apk --update add --virtual .val3dity-deps \
         make \
         cmake \
@@ -71,11 +72,7 @@ RUN apk --update add --virtual .val3dity-deps \
         py-yaml \
         py-lxml \
         py3-setuptools && \
-    cd /tmp && \
-    wget https://github.com/tudelft3d/val3dity/archive/2.1.1.tar.gz && \
-    tar xzf 2.1.1.tar.gz && \
-    rm -f 2.1.1.tar.gz && \
-    cd val3dity-2.1.1 && \
+    cd /tmp/val3dity && \
     mkdir build && \
     cd build && \
     cmake .. && \
