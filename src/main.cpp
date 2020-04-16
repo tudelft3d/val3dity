@@ -865,9 +865,9 @@ void get_report_json(json& jr,
     jr["features"].push_back(f->get_report_json());
   
   //-- dataset errors (9xx)
-  jr["dataset_erors"];
+  jr["dataset_errors"];
   if (ioerrs.has_errors() == true)
-    jr["dataset_erors"] = ioerrs.get_report_json();
+    jr["dataset_errors"] = ioerrs.get_report_json();
 
   //-- overview of errors
   std::set<int> unique_errors;
