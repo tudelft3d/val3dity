@@ -84,6 +84,13 @@
                         <span v-else class="badge badge-info">0</span>
                       </a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="dataseterrors-tab" data-toggle="tab" href="#dataseterrors" role="tab" aria-controls="dataseterrors" aria-selected="false">
+                        File errors
+                        <span v-if="report.dataset_errors !== null" class="badge badge-danger">{{ report.dataset_errors.length }}</span>
+                        <span v-else class="badge badge-success">0</span>
+                      </a>
+                    </li>
                   </ul>
                   <div class="tab-content" id="myTabContent">
                     <!-- ERRORS -->
@@ -142,6 +149,27 @@
                         </tbody>
                       </table>
                     </div>
+                    <!-- FILE LEVEL -->
+                    <div class="tab-pane fade" id="dataseterrors" role="tabpanel" aria-labelledby="dataseterrors-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col">error</th>
+                            <th scope="col">description</th>
+                            <th scope="col">information</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="e in report.dataset_errors">
+                            <th scope="row">{{ e.code }}</th>
+                            <td>{{ e.description }}</td>
+                            <td>{{ e.info }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
                   </div>
                 </div>
               </div>
