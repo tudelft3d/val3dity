@@ -82,11 +82,6 @@ To verify that everything went fine during the compilation, run the unit tests (
 You shouldn't get any errors.
 
 
-## Vagrant development environment
-
-If you are eager to contribute but do not want to fiddle with setting up the required libraries, Vagrant can take care of that. It creates a development environment in a virtual machine, which you can use to compile and run val3dity. For details see VAGRANT.md
-
-
 ## Usage of Docker
 
 To run val3dity over Docker simply execute:
