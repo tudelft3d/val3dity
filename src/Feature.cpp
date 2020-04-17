@@ -60,7 +60,7 @@ json Feature::get_report_json()
   j["id"] = _id;
   j["type"] = _type;
   j["validity"] = this->is_valid();
-  j["errors"];
+  j["errors"] = json::array();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
