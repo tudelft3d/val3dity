@@ -77,9 +77,6 @@ var app = new Vue({
         }
       },
       getOverviewPercentage(report_list) {
-        if (report_list == null) {
-            return 0;
-        }
         var total = report_list.reduce((acc, item) => acc + item.total, 0);
         var valid = report_list.reduce((acc, item) => acc + item.valid, 0);
         if (total == 0){
@@ -118,8 +115,7 @@ var app = new Vue({
             else {
                 filter = f => {return true; }
             }
-            if (this.report.features !== null)
-                return this.report.features.filter(filter);
+            return this.report.features.filter(filter);
         }
     }
 })

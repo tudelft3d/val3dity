@@ -67,15 +67,14 @@
                     <li class="nav-item">
                       <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">
                         Errors in the file
-                        <span v-if="report.all_errors == null" class="badge badge-success">0</span>
+                        <span v-if="report.all_errors.length == 0" class="badge badge-success">0</span>
                         <span v-else class="badge badge-danger">{{ report.all_errors.length }}</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">
                         Features
-                        <span v-if="report.features_overview !== null" class="badge badge-info">{{ report.features_overview.length }}</span>
-                        <span v-else class="badge badge-info">0</span>
+                        <span class="badge badge-info">{{ report.features_overview.length }}</span>
                       </a>
                     </li>
                     <li class="nav-item">
