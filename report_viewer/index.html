@@ -188,8 +188,14 @@
                 <div class="card-header text-center bg-secondary text-white">
                   All features with details
                 </div>
+                <div class="input-group m-2">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Search</span>
+                  </div>
+                  <input type="text" placeholder="Type an id..." v-model="search_term"/>
+                </div>
                 <ul class="list-unstyled">
-                  <feature-item :feature="feature" v-for="feature in report.features"></feature-item>
+                  <feature-item :feature="feature" v-for="feature in report.features" :key="feature.id" v-show="search_term == null || search_term == '' || feature.id.includes(search_term)"></feature-item>
                 </ul>
               </div>
               <br>

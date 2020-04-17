@@ -55,6 +55,7 @@ var app = new Vue({
         return {
             file_loaded: false,
             report: {},
+            search_term: null
         }
     },
     methods: {
