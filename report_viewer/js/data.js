@@ -111,6 +111,22 @@ var errors = {
         "name": "CITYOBJECT_HAS_NO_GEOMETRY",
         "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#cityobject-has-no-geometry"
     },
+    "701": {
+        "name": "CELLS_OVERLAP",
+        "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/"
+    },
+    "702": {
+        "name": "DUAL_VERTEX_OUTSIDE_CELL",
+        "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/"
+    },
+    "703": {
+        "name": "PRIMAL_DUAL_XLINKS_ERROR",
+        "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/"
+    },
+    "704": {
+        "name": "PRIMAL_DUAL_ADJACENCIES_INCONSISTENT",
+        "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/"
+    },
     "901": {
         "name": "INVALID_INPUT_FILE",
         "link": "http://geovalidation.bk.tudelft.nl/val3dity/docs/errors/#invalid-input-file"
