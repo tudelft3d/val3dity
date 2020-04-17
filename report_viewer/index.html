@@ -67,7 +67,7 @@
                     <li class="nav-item">
                       <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">
                         Errors in the file
-                        <span v-if="report.all_errors.length == 0" class="badge badge-success">0</span>
+                        <span v-if="report.all_errors == null" class="badge badge-success">0</span>
                         <span v-else class="badge badge-danger">{{ report.all_errors.length }}</span>
                       </a>
                     </li>
@@ -112,7 +112,7 @@
                       <br>
                       <table class="table table-sm table-striped">
                         <tbody>
-                          <tr v-for="e in report.all_errors">
+                          <tr v-if="report.all_errors !== null" v-for="e in report.all_errors">
                             <th scope="row">{{ e }}</th>
                             <td><a v-bind:href="errors[e].link">{{ errors[e].name }}</a></td>
                           </tr>

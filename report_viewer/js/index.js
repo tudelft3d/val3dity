@@ -63,6 +63,7 @@ var app = new Vue({
       reset() {
         this.report = {};
         this.filter_value = false;
+        this.file_loaded = false;
       },
       getAlertClass(percentage) {
         if( percentage > 80) {
@@ -117,7 +118,8 @@ var app = new Vue({
             else {
                 filter = f => {return true; }
             }
-            return this.report.features.filter(filter);
+            if (this.report.features !== null)
+                return this.report.features.filter(filter);
         }
     }
 })
