@@ -60,36 +60,32 @@
                   <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
                       <a class="nav-link active" id="isitvalid-tab" data-toggle="tab" href="#isitvalid" role="tab" aria-controls="isitvalid" aria-selected="true">
-                        Summary 
-                        <span v-if="report.validity == true" class="badge badge-success">valid</span>
-                        <span v-else class="badge badge-danger">invalid</span>
+                        Summary
+                        <span class="badge badge-success" :class="[ report.validity ? 'badge-success' : 'badge-danger' ]">{{ report.validity ? 'valid' : 'invalid' }}</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">
                         Errors in the file
-                        <span v-if="report.all_errors.length == 0" class="badge badge-success">0</span>
-                        <span v-else class="badge badge-danger">{{ report.all_errors.length }}</span>
+                        <span class="badge badge-pill" :class="[ report.all_errors.length == 0 ? 'badge-success' : 'badge-danger' ]">{{ report.all_errors.length }}</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">
                         Features
-                        <span class="badge badge-info">{{ report.features_overview.length }}</span>
+                        <span class="badge badge-info badge-pill">{{ report.features_overview.length }}</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="primitives-tab" data-toggle="tab" href="#primitives" role="tab" aria-controls="primitives" aria-selected="false">
                         Primitives
-                        <span v-if="report.primitives_overview !== null" class="badge badge-info">{{ report.primitives_overview.length }}</span>
-                        <span v-else class="badge badge-info">0</span>
+                        <span class="badge badge-info badge-pill">{{ report.primitives_overview == null ? 0 : report.primitives_overview.length}}</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="dataseterrors-tab" data-toggle="tab" href="#dataseterrors" role="tab" aria-controls="dataseterrors" aria-selected="false">
                         File errors
-                        <span v-if="report.dataset_errors.length == 0"  class="badge badge-success">{{ report.dataset_errors.length }}</span>
-                        <span v-else class="badge badge-danger">{{ report.dataset_errors.length }}</span>
+                        <span class="badge badge-pill" :class="[ report.dataset_errors.length == 0 ? 'badge-success' : 'badge-danger' ]">{{ report.dataset_errors == 0 ? 0 : report.dataset_errors.length }}</span>
                       </a>
                     </li>
                   </ul>
@@ -99,12 +95,24 @@
                       <br>
                       <img v-if="report.validity == true" src="./img/welldone.png" width=100 alt=""/>
                       <div v-if="report.validity == false">
-                        <div class="alert" :class="getAlertClass(getOverviewPercentage(report.primitives_overview))" role="alert">
-                          <b>Primitives:</b> {{ getOverviewPercentage(report.primitives_overview) }}% are valid
-                        </div>
-                        <div class="alert" :class="getAlertClass(getOverviewPercentage(report.features_overview))" role="alert">
-                          <b>Features:</b> {{ getOverviewPercentage(report.features_overview) }}% are valid
-                        </div>
+                        <ul class="list-unstyled">
+                          <li class="mb-3">
+                            <b>Primitives</b>
+                            <div class="progress">
+                              <!-- <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div> -->
+                              <div class="progress-bar bg-success" role="progressbar" :style="{ width: getOverviewPercentage(report.primitives_overview) + '%' }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">{{ getOverviewPercentage(report.primitives_overview) }}%</div>
+                              <div class="progress-bar bg-danger" role="progressbar" :style="{ width: (100 - getOverviewPercentage(report.primitives_overview)) + '%' }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{ (100 - getOverviewPercentage(report.primitives_overview)) }}%</div>
+                            </div>
+                          </li>
+                          <li>
+                            <b>Features</b>
+                            <div class="progress">
+                              <!-- <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div> -->
+                              <div class="progress-bar bg-success" role="progressbar" :style="{ width: getOverviewPercentage(report.features_overview) + '%' }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">{{ getOverviewPercentage(report.features_overview) + '%' }}</div>
+                              <div class="progress-bar bg-danger" role="progressbar" :style="{ width: (100 - getOverviewPercentage(report.features_overview)) + '%' }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{ (100 - getOverviewPercentage(report.features_overview)) + '%' }}</div>
+                            </div>
+                          </li>
+                        </ul>
                       </div>
                     </div>                    
                     <!-- ERRORS -->
