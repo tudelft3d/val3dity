@@ -92,6 +92,7 @@ var app = new Vue({
         if (!file || file.type != "application/json")
         {
           console.log("This is not a val3dity report JSON file. Abort.");
+          alert("This is not a val3dity report JSON file (must be v2.2+).");
           return;
         }
 
