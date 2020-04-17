@@ -7,7 +7,7 @@ Vue.component('primitive-item', {
         <span v-else class="badge badge-danger">{{ primitive.type }}</span> 
         {{ primitive.id }}
         <ul v-show="isOpen">
-            <li :primitive="e" v-for="e in primitive.errors">{{ e.code }}-{{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
+            <li :primitive="e" v-for="e in primitive.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
         </ul>
     </li>
     `,
@@ -32,6 +32,7 @@ Vue.component('feature-item', {
         <span v-else class="badge badge-danger">{{ feature.type }}</span> 
         {{ feature.id }}
         <ul class="list-unstyled ml-5" v-show="isOpen">
+            <li :error="e" v-for="e in feature.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
             <primitive-item :primitive="p" v-for="p in feature.primitives"></primitive-item>
         </ul>
     </li>
