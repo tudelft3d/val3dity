@@ -44,7 +44,7 @@ RUN apk --update add --virtual .cgal-deps \
     wget https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-5.0.2/CGAL-5.0.2.tar.xz && \
     tar xf CGAL-5.0.2.tar.xz && \
     rm -f CGAL-5.0.2.tar.xz && \
-    cd CGAL-5.0.2.tar.xz && \
+    cd CGAL-5.0.2 && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DWITH_Eigen3=ON .. && \
