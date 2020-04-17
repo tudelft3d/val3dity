@@ -820,7 +820,7 @@ void get_report_json(json& jr,
       }
     }
   }
-  jr["primitives_overview"];
+  jr["primitives_overview"] = json::array();
   for (auto& each : prim_o) {
     json j;
     switch(each.first)
@@ -850,7 +850,7 @@ void get_report_json(json& jr,
       std::get<1>(feat_o[f->get_type()]) += 1;
     }
   }
-  jr["features_overview"];
+  jr["features_overview"] = json::array();
   for (auto& each : feat_o) {
     json j;
     j["type"] = each.first; 
@@ -860,12 +860,12 @@ void get_report_json(json& jr,
   }
 
   //-- each of the features with their primitives listed
-  jr["features"];
+  jr["features"] = json::array();
   for (auto& f : lsFeatures)
     jr["features"].push_back(f->get_report_json());
   
   //-- dataset errors (9xx)
-  jr["dataset_errors"];
+  jr["dataset_errors"] = json::array();
   if (ioerrs.has_errors() == true)
     jr["dataset_errors"] = ioerrs.get_report_json();
 
@@ -874,7 +874,7 @@ void get_report_json(json& jr,
   for (auto& f : lsFeatures)
     for (auto& code : f->get_unique_error_codes())
       unique_errors.insert(code);
-  jr["all_errors"];
+  jr["all_errors"] = json::array();
   for (auto& e : unique_errors)
     jr["all_errors"].push_back(e);
   for (auto& e : ioerrs.get_unique_error_codes())
