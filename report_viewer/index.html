@@ -87,8 +87,8 @@
                     <li class="nav-item">
                       <a class="nav-link" id="dataseterrors-tab" data-toggle="tab" href="#dataseterrors" role="tab" aria-controls="dataseterrors" aria-selected="false">
                         File errors
-                        <span v-if="report.dataset_errors !== null" class="badge badge-danger">{{ report.dataset_errors.length }}</span>
-                        <span v-else class="badge badge-success">0</span>
+                        <span v-if="report.dataset_errors.length == 0"  class="badge badge-success">{{ report.dataset_errors.length }}</span>
+                        <span v-else class="badge badge-danger">{{ report.dataset_errors.length }}</span>
                       </a>
                     </li>
                   </ul>
