@@ -79,13 +79,13 @@
                     <li class="nav-item">
                       <a class="nav-link" id="primitives-tab" data-toggle="tab" href="#primitives" role="tab" aria-controls="primitives" aria-selected="false">
                         Primitives
-                        <span class="badge badge-info badge-pill">{{ report.primitives_overview == null ? 0 : report.primitives_overview.length}}</span>
+                        <span class="badge badge-info badge-pill">{{ report.primitives_overview.length }}</span>
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="dataseterrors-tab" data-toggle="tab" href="#dataseterrors" role="tab" aria-controls="dataseterrors" aria-selected="false">
                         File errors
-                        <span class="badge badge-pill" :class="[ report.dataset_errors.length == 0 ? 'badge-success' : 'badge-danger' ]">{{ report.dataset_errors == 0 ? 0 : report.dataset_errors.length }}</span>
+                        <span class="badge badge-pill" :class="[ report.dataset_errors.length == 0 ? 'badge-success' : 'badge-danger' ]">{{ report.dataset_errors.length }}</span>
                       </a>
                     </li>
                   </ul>
