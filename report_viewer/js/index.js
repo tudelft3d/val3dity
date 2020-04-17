@@ -3,7 +3,8 @@ Vue.component('primitive-item', {
     template: `
     <li>
         <i class="fas" :class="[ isOpen ? 'fa-minus' : 'fa-plus', primitive.validity ? 'text-white' : '' ]" @click="toggle()"></i> 
-        <span class="badge" :class="[ primitive.validity ? 'badge-success' : 'badge-danger' ]">{{ primitive.type }}</span>
+        <span class="badge badge-secondary">{{ primitive.type }}</span>
+        <span class="badge" :class="[ primitive.validity ? 'badge-success' : 'badge-danger' ]">{{ primitive.validity ? 'valid' : 'invalid' }}</span>
         {{ primitive.id }}
         <ul v-show="isOpen">
             <li :primitive="e" v-for="e in primitive.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
@@ -27,7 +28,8 @@ Vue.component('feature-item', {
     template: `
     <li class="m-2">
         <i class="fas" :class="[ isOpen ? 'fa-minus' : 'fa-plus' ]" @click="toggle()"></i> 
-        <span class="badge" :class="[ feature.validity ? 'badge-success' : 'badge-danger' ]">{{ feature.type }}</span>
+        <span class="badge badge-primary">{{ feature.type }}</span>
+        <span class="badge" :class="[ feature.validity ? 'badge-success' : 'badge-danger' ]">{{ feature.validity ? 'valid' : 'invalid' }}</span>
         {{ feature.id }}
         <ul class="list-unstyled ml-5" v-show="isOpen">
             <li :error="e" v-for="e in feature.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
