@@ -50,7 +50,6 @@ RUN apk --update add --virtual .cgal-deps \
     cmake -DCMAKE_BUILD_TYPE=Release -DWITH_Eigen3=ON .. && \
     make && \
     make install && \
-    cp lib/* /usr/local/lib && \
     cd / && \
     apk del .cgal-deps && \
     rm -rf /tmp/* && \
