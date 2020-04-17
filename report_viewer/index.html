@@ -97,12 +97,27 @@
                     <!-- ISITVALID -->
                     <div class="tab-pane fade show active" id="isitvalid" role="tabpanel" aria-labelledby="isitvalid-tab">
                       <br>
-                      <table class="table table-sm table-striped">
-                        <tbody>
-                          <img v-if="report.validity == true" src="./img/welldone.png" width=100 alt=""/>
-                          <p   v-if="report.validity == false">TODO STATISTICS GLOBAL</p>
-                        </tbody>
-                      </table>
+                      <img v-if="report.validity == true" src="./img/welldone.png" width=100 alt=""/>
+                      <div v-if="report.validity == false">
+                        <div v-if="get_percent_primitives() > 80" class="alert alert-success" role="alert">
+                          <b>Primitives:</b> {{ get_percent_primitives() }}% are valid
+                        </div>
+                        <div v-else-if="(get_percent_primitives() > 50) && (get_percent_primitives() <= 80)" class="alert alert-warning" role="alert">
+                          <b>Primitives:</b> {{ get_percent_primitives() }}% are valid
+                        </div>
+                        <div v-else class="alert alert-danger" role="alert">
+                          <b>Primitives:</b> {{ get_percent_primitives() }}% are valid
+                        </div>
+                        <div v-if="get_percent_features() > 80" class="alert alert-success" role="alert">
+                          <b>Features:</b> {{ get_percent_features() }}% are valid
+                        </div>
+                        <div v-else-if="(get_percent_features() > 50) && (get_percent_features() <= 80)" class="alert alert-warning" role="alert">
+                          <b>Features:</b> {{ get_percent_features() }}% are valid
+                        </div>
+                        <div v-else class="alert alert-danger" role="alert">
+                          <b>Features:</b> {{ get_percent_features() }}% are valid
+                        </div>
+                      </div>
                     </div>                    
                     <!-- ERRORS -->
                     <div class="tab-pane fade" id="errors" role="tabpanel" aria-labelledby="errors-tab">
