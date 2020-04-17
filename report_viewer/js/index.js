@@ -56,18 +56,13 @@ var app = new Vue({
             file_loaded: false,
             report: {},
             search_term: null,
-            feature_filter: function(value) {
-                return true;
-            }
+            feature_filter: "all",
         }
     },
     methods: {
       reset() {
         this.report = {};
         this.filter_value = false;
-      },
-      setFeatureFilter(predicate) {
-          this.feature_filter = predicate;
       },
       getAlertClass(percentage) {
         if( percentage > 80) {
@@ -113,7 +108,16 @@ var app = new Vue({
     },
     computed: {
         filteredFeatures: function () {
-            return this.report.features.filter(this.feature_filter);
+            if (this.feature_filter == "valid") {
+                filter = f => { return f.validity; }
+            }
+            else if (this.feature_filter == "invalid") {
+                filter = f => { return !f.validity; }
+            }
+            else {
+                filter = f => {return true; }
+            }
+            return this.report.features.filter(filter);
         }
     }
 })
