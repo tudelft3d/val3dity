@@ -55,13 +55,19 @@ var app = new Vue({
         return {
             file_loaded: false,
             report: {},
-            search_term: null
+            search_term: null,
+            feature_filter: function(value) {
+                return true;
+            }
         }
     },
     methods: {
       reset() {
         this.report = {};
-        this.file_loaded = false;
+        this.filter_value = false;
+      },
+      setFeatureFilter(predicate) {
+          this.feature_filter = predicate;
       },
       getAlertClass(percentage) {
         if( percentage > 80) {
@@ -104,6 +110,11 @@ var app = new Vue({
           this.file_loaded = true;
         }
       }
+    },
+    computed: {
+        filteredFeatures: function () {
+            return this.report.features.filter(this.feature_filter);
+        }
     }
 })
 
