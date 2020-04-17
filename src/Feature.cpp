@@ -60,7 +60,7 @@ json Feature::get_report_json()
   j["id"] = _id;
   j["type"] = _type;
   j["validity"] = this->is_valid();
-  j["errors_feature"];
+  j["errors"];
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -71,7 +71,7 @@ json Feature::get_report_json()
       jj["description"] = errorcode2description(std::get<0>(err));
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
-      j["errors_feature"].push_back(jj);
+      j["errors"].push_back(jj);
     }
   }
   j["primitives"];
