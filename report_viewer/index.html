@@ -99,23 +99,11 @@
                       <br>
                       <img v-if="report.validity == true" src="./img/welldone.png" width=100 alt=""/>
                       <div v-if="report.validity == false">
-                        <div v-if="get_percent_primitives() > 80" class="alert alert-success" role="alert">
-                          <b>Primitives:</b> {{ get_percent_primitives() }}% are valid
+                        <div class="alert" :class="getAlertClass(getOverviewPercentage(report.primitives_overview))" role="alert">
+                          <b>Primitives:</b> {{ getOverviewPercentage(report.primitives_overview) }}% are valid
                         </div>
-                        <div v-else-if="(get_percent_primitives() > 50) && (get_percent_primitives() <= 80)" class="alert alert-warning" role="alert">
-                          <b>Primitives:</b> {{ get_percent_primitives() }}% are valid
-                        </div>
-                        <div v-else class="alert alert-danger" role="alert">
-                          <b>Primitives:</b> {{ get_percent_primitives() }}% are valid
-                        </div>
-                        <div v-if="get_percent_features() > 80" class="alert alert-success" role="alert">
-                          <b>Features:</b> {{ get_percent_features() }}% are valid
-                        </div>
-                        <div v-else-if="(get_percent_features() > 50) && (get_percent_features() <= 80)" class="alert alert-warning" role="alert">
-                          <b>Features:</b> {{ get_percent_features() }}% are valid
-                        </div>
-                        <div v-else class="alert alert-danger" role="alert">
-                          <b>Features:</b> {{ get_percent_features() }}% are valid
+                        <div class="alert" :class="getAlertClass(getOverviewPercentage(report.features_overview))" role="alert">
+                          <b>Features:</b> {{ getOverviewPercentage(report.features_overview) }}% are valid
                         </div>
                       </div>
                     </div>                    

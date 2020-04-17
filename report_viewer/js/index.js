@@ -63,28 +63,28 @@ var app = new Vue({
         this.report = {};
         this.file_loaded = false;
       },
-      get_percent_primitives() {
-        if (this.report.primitives_overview == null) {
-            return 0;
+      getAlertClass(percentage) {
+        if( percentage > 80) {
+            return ['alert-success'];
         }
-        var total = this.report.primitives_overview.reduce((acc, item) => acc + item.total, 0);
-        var valid = this.report.primitives_overview.reduce((acc, item) => acc + item.valid, 0);
-        if (total == 0){
-            return 0;
+        else if (percentage > 50) {
+            return ['alert-warning'];
         }
-        return Math.floor((valid / total) * 100);;
+        else {
+            return ['alert-danger'];
+        }
       },
-      get_percent_features() {
-        if (this.report.features_overview == null) {
+      getOverviewPercentage(report_list) {
+        if (report_list == null) {
             return 0;
         }
-        var total = this.report.features_overview.reduce((acc, item) => acc + item.total, 0);
-        var valid = this.report.features_overview.reduce((acc, item) => acc + item.valid, 0);
+        var total = report_list.reduce((acc, item) => acc + item.total, 0);
+        var valid = report_list.reduce((acc, item) => acc + item.valid, 0);
         if (total == 0){
             return 0;
         }
         return Math.floor((valid / total) * 100);;
-      },      
+      },  
       selectedFile() {
         console.log("Selected a val3dity report JSON file...");
         console.log(this.$refs.reportFile.files[0]);
