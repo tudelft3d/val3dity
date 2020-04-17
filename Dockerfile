@@ -71,7 +71,7 @@ RUN apk --update add --virtual .val3dity-deps \
         py-yaml \
         py-lxml \
         py3-setuptools && \
-    cd /tmp/val3dity && \
+    cd /tmp && \
     mkdir build && \
     cd build && \
     cmake .. && \
