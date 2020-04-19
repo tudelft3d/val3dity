@@ -235,16 +235,26 @@ int main(int argc, char* const argv[])
     
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
-    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
+    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
       inputtype = GML;
-    else if ( (extension == "poly") || (extension == "POLY") ) 
+      ioerrs.set_input_file_type("GML");
+    }
+    else if ( (extension == "poly") || (extension == "POLY") ) {
       inputtype = POLY;    
-    else if ( (extension == "json") || (extension == "JSON") ) 
+      ioerrs.set_input_file_type("POLY");
+    }
+    else if ( (extension == "json") || (extension == "JSON") ) {
       inputtype = JSON;
-    else if ( (extension == "obj") || (extension == "OBJ") ) 
+      ioerrs.set_input_file_type("CityJSON");
+    }
+    else if ( (extension == "obj") || (extension == "OBJ") ) {
       inputtype = OBJ;
-    else if ( (extension == "off") || (extension == "OFF") ) 
+      ioerrs.set_input_file_type("OBJ");
+    }
+    else if ( (extension == "off") || (extension == "OFF") ) {
       inputtype = OFF;
+      ioerrs.set_input_file_type("OFF");
+    }
 
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
@@ -275,6 +285,7 @@ int main(int argc, char* const argv[])
       std::stringstream ss;
       ss << "Format of file " << inputfile.getValue() << " not supported (based on its extension).";
       ioerrs.add_error(904, ss.str());
+      ioerrs.set_input_file_type("UNKNOWN");
     }
 
     Primitive3D prim3d;
@@ -789,6 +800,7 @@ void get_report_json(json& jr,
   jr["type"] = "val3dity_report";
   jr["val3dity_version"] = VAL3DITY_VERSION; 
   jr["input_file"] = ifile;
+  jr["input_file_type"] = ioerrs.get_input_file_type();
   //-- time
   std::time_t rawtime;
   struct tm * timeinfo;

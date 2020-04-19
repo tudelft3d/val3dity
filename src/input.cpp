@@ -120,6 +120,16 @@ json IOErrors::get_report_json()
 }
 
 
+std::string IOErrors::get_input_file_type() {
+  return _inputfiletype;
+}
+
+
+void IOErrors::set_input_file_type(std::string s) {
+  _inputfiletype = s;
+}
+
+
 std::string errorcode2description(int code) {
   switch(code)
   {
@@ -1146,10 +1156,12 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
   if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["citygml"] + "CityModel")) )
   {
     std::cout << "CityGML input file" << std::endl;
+    errs.set_input_file_type("CityGML");
     process_gml_file_city_objects(doc, lsFeatures, dallpoly, errs, tol_snap, geom_is_sem_surfaces);
   }
   else if ( (NS.count("indoorgml") != 0) && (ncm.name() == (NS["indoorgml"] + "IndoorFeatures")) ) {
     std::cout << "IndoorGML input file" << std::endl;
+    errs.set_input_file_type("IndoorGML");
     process_gml_file_indoorgml(doc, lsFeatures, dallpoly, errs, tol_snap);
   }
   else
