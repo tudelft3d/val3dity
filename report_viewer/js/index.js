@@ -1,3 +1,5 @@
+
+
 Vue.component('primitive-item', {
     props: ['primitive'],
     template: `
@@ -52,14 +54,40 @@ Vue.component('feature-item', {
 var app = new Vue({
     el: '#app',
     data: function() {
+        var fre = this.getUrlVars()["f"];
+        if (fre != null) {
+          console.log("URL params for the report to load.");
+          this.load_report_from_url(fre);
+        }
         return {
-            file_loaded: false,
-            report: {},
-            search_term: null,
-            feature_filter: "all",
+          file_loaded: false,
+          report: {},
+          search_term: null,
+          feature_filter: "all",
         }
     },
     methods: {
+      getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+      },
+      load_report_from_url(fre) {
+        // var dataURL = 'http://homepage.tudelft.nl/23t4p/temp/r2.json';
+        console.log("fetching the report from a URL");
+        var hackcors = 'https://cors-anywhere.herokuapp.com/';
+        var theurl = hackcors + fre;
+        var self = this;
+        $.getJSON(theurl, 
+          function(data) {
+            // console.log(data);
+            self.report = data;
+            self.file_loaded = true;
+        });
+        console.log("fetched.");
+      },
       reset() {
         this.report = {};
         this.filter_value = false;
@@ -92,7 +120,7 @@ var app = new Vue({
         if (!file || file.type != "application/json")
         {
           console.log("This is not a val3dity report JSON file. Abort.");
-          alert("This is not a val3dity report JSON file (must be v2.2+).");
+          alert("This is not a val3dity report file (must be JSON & v2.2+).");
           return;
         }
 
@@ -122,3 +150,5 @@ var app = new Vue({
 })
 
 Vue.config.devtools = true
+
+
