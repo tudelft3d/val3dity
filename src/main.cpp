@@ -27,7 +27,6 @@
 */
 
 #include "input.h"
-#include "reportoutput.h"
 #include "Primitive.h"
 #include "Surface.h"
 #include "MultiSurface.h"
@@ -54,7 +53,6 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        print_license();
-void        write_report_html(json& jr, std::string report);
 void        write_report_json(json& jr, std::string report);
 
 
@@ -78,13 +76,13 @@ public:
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
     
-    std::cout << "\tval3dity CityGMLinput.gml" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in CityGMLinput.gml" << std::endl;
+    std::cout << "\tval3dity CityJSON_input.json" << std::endl;
+    std::cout << "\t\tValidates each 3D primitive in CityJSON_input.json" << std::endl;
     std::cout << "\t\tand outputs a summary per city object" << std::endl;
     
-    std::cout << "\tval3dity input.json -r /home/elvis/temp/r" << std::endl;
+    std::cout << "\tval3dity input.json -r /home/elvis/temp/myreport.json" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.json (CityJSON file)" << std::endl;
-    std::cout << "\t\tand outputs a detailed report '/home/elvis/temp/r/report.html'" << std::endl;
+    std::cout << "\t\tand outputs a detailed JSON report '/home/elvis/temp/myreport.json'" << std::endl;
     
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
     std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
@@ -148,16 +146,10 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "output report in HTML format",
-                                              false,
-                                              "",
-                                              "string");    
-    TCLAP::ValueArg<std::string>            report_json("",
-                                              "report_json",
                                               "output report in JSON format",
                                               false,
                                               "",
-                                              "string");
+                                              "string");    
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
                                               "which geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
@@ -235,7 +227,6 @@ int main(int argc, char* const argv[])
     cmd.xorAdd( inputfile, license );
     cmd.add(ishellfiles);
     cmd.add(report);
-    cmd.add(report_json);
     cmd.parse( argc, argv );
 
     //-- vector with Features: CityObject, GenericObject, 
@@ -244,16 +235,26 @@ int main(int argc, char* const argv[])
     
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
-    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
+    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
       inputtype = GML;
-    else if ( (extension == "poly") || (extension == "POLY") ) 
+      ioerrs.set_input_file_type("GML");
+    }
+    else if ( (extension == "poly") || (extension == "POLY") ) {
       inputtype = POLY;    
-    else if ( (extension == "json") || (extension == "JSON") ) 
+      ioerrs.set_input_file_type("POLY");
+    }
+    else if ( (extension == "json") || (extension == "JSON") ) {
       inputtype = JSON;
-    else if ( (extension == "obj") || (extension == "OBJ") ) 
+      ioerrs.set_input_file_type("CityJSON");
+    }
+    else if ( (extension == "obj") || (extension == "OBJ") ) {
       inputtype = OBJ;
-    else if ( (extension == "off") || (extension == "OFF") ) 
+      ioerrs.set_input_file_type("OBJ");
+    }
+    else if ( (extension == "off") || (extension == "OFF") ) {
       inputtype = OFF;
+      ioerrs.set_input_file_type("OFF");
+    }
 
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
@@ -284,6 +285,7 @@ int main(int argc, char* const argv[])
       std::stringstream ss;
       ss << "Format of file " << inputfile.getValue() << " not supported (based on its extension).";
       ioerrs.add_error(904, ss.str());
+      ioerrs.set_input_file_type("UNKNOWN");
     }
 
     Primitive3D prim3d;
@@ -549,8 +551,8 @@ int main(int argc, char* const argv[])
       std::cout << std::endl;
     }
 
-    //-- output report
-    if ( (report.getValue() != "") || (report_json.getValue() != "") )
+    //-- output report in JSON 
+    if (report.getValue() != "") 
     {
       //-- save the json report in memory first
       json jr;
@@ -563,15 +565,11 @@ int main(int argc, char* const argv[])
                        planarity_n_tol_updated,
                        ioerrs,
                        onlyinvalid.getValue());
-      // HTML report
-      if (report.getValue() != "") 
-        write_report_html(jr, report.getValue());
-      // JSON report
-      if (report_json.getValue() != "")
-        write_report_json(jr, report_json.getValue());
+      if (report.getValue() != "")
+        write_report_json(jr, report.getValue());
     }
     else
-      std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
 
     //-- unittests 
     if (unittests.getValue() == true)
@@ -605,49 +603,6 @@ void write_report_json(json& jr, std::string report)
     std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
   }
 
-}
-
-
-
-void write_report_html(json& jr, std::string report)
-{
-  boost::filesystem::path outpath(report);
-  if (boost::filesystem::exists(outpath.parent_path()) == false)
-    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-  else {
-    if (boost::filesystem::exists(outpath) == false)
-      boost::filesystem::create_directory(outpath);
-    boost::filesystem::path outfile = outpath / "report.html";
-    std::ofstream o(outfile.string());
-    o << report_indexhtml << std::endl;                                
-    std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-    o.close();
-
-    outfile = outpath / "report.js";
-    o.open(outfile.string());
-    o << "var report =" << jr << std::endl;                                
-    o.close();
-
-    outfile = outpath / "tree.html";
-    o.open(outfile.string());
-    o << report_tree << std::endl;                                
-    o.close();
-
-    outfile = outpath / "treeview.js";
-    o.open(outfile.string());
-    o << report_treeviewjs << std::endl;                                
-    o.close();
-
-    outfile = outpath / "val3dityconfig.js";
-    o.open(outfile.string());
-    o << report_val3dityconfigjs << std::endl;                                
-    o.close();
-    
-    outfile = outpath / "index.css";
-    o.open(outfile.string());
-    o << report_indexcss << std::endl;                                
-    o.close();
-  }
 }
 
 
@@ -842,9 +797,10 @@ void get_report_json(json& jr,
                      IOErrors ioerrs,
                      bool onlyinvalid)
 {
-  jr["type"] = "val3dity report";
+  jr["type"] = "val3dity_report";
   jr["val3dity_version"] = VAL3DITY_VERSION; 
   jr["input_file"] = ifile;
+  jr["input_file_type"] = ioerrs.get_input_file_type();
   //-- time
   std::time_t rawtime;
   struct tm * timeinfo;
@@ -854,78 +810,98 @@ void get_report_json(json& jr,
   std::strftime(buffer, 80, "%c %Z", timeinfo);
   jr["time"] = buffer;
   //-- user-defined param
-  jr["snap_tol"] = snap_tol;
-  jr["overlap_tol"] = overlap_tol;
-  jr["planarity_d2p_tol"] = planarity_d2p_tol;
-  jr["planarity_n_tol"] = planarity_n_tol;
-  
+  jr["parameters"];
+  jr["parameters"]["snap_tol"] = snap_tol;
+  jr["parameters"]["overlap_tol"] = overlap_tol;
+  jr["parameters"]["planarity_d2p_tol"] = planarity_d2p_tol;
+  jr["parameters"]["planarity_n_tol"] = planarity_n_tol;
+
+  //-- primitives overview
+  std::map<int, std::tuple<int,int> > prim_o; //-- <primID, total, valid>
   std::set<int> theprimitives;
-  int noprim = 0;
   for (auto& f : lsFeatures)
-  {
     for (auto& p : f->get_primitives())
-    {
       theprimitives.insert(p->get_type());
-      noprim++;
-    }
-  }
-  jr["overview_primitives"];    
   for (auto& each : theprimitives)
-  {
-    switch(each)
-    {
-      case 0: jr["overview_primitives"].push_back("Solid"); break;
-      case 1: jr["overview_primitives"].push_back("CompositeSolid"); break;
-      case 2: jr["overview_primitives"].push_back("MultiSolid"); break;
-      case 3: jr["overview_primitives"].push_back("CompositeSurface"); break;
-      case 4: jr["overview_primitives"].push_back("MultiSurface"); break;
-      case 5: jr["overview_primitives"].push_back("ALL"); break;
+    prim_o[each] = std::make_tuple(0, 0);
+  for (auto& f : lsFeatures) {
+    for (auto& p : f->get_primitives()) {
+      std::get<0>(prim_o[p->get_type()]) += 1;
+      if (p->is_valid() == true) {
+        std::get<1>(prim_o[p->get_type()]) += 1;
+      }
     }
   }
-  jr["total_primitives"] = noprim;
-  int bValid = 0;
-  for (auto& f : lsFeatures)
-    for (auto& p : f->get_primitives())
-      if (p->is_valid() == true)
-        bValid++;
-  jr["valid_primitives"] = bValid;
-  jr["invalid_primitives"] = noprim - bValid;
-  //-- features
-  std::set<std::string> thefeatures;
-  jr["total_features"] = lsFeatures.size();
-  bValid = 0;
-  for (auto& f : lsFeatures)
-  {
-    thefeatures.insert(f->get_type());
-    if (f->is_valid() == true)
-      bValid++;
+  jr["primitives_overview"] = json::array();
+  for (auto& each : prim_o) {
+    json j;
+    switch(each.first)
+    {
+      case 0: j["type"] = "Solid"; break;
+      case 1: j["type"] = "CompositeSolid"; break;
+      case 2: j["type"] = "MultiSolid"; break;
+      case 3: j["type"] = "CompositeSurface"; break;
+      case 4: j["type"] = "MultiSurface"; break;
+      case 5: j["type"] = "ALL"; break;
+    }
+    j["total"] = std::get<0>(each.second);
+    j["valid"] = std::get<1>(each.second);
+    jr["primitives_overview"].push_back(j);
   }
-  jr["overview_features"];    
+
+  //-- features overview
+  std::map<std::string, std::tuple<int,int> > feat_o; //-- <featureID, total, valid>
+  std::set<std::string> thefeatures;
+  for (auto& f : lsFeatures)
+    thefeatures.insert(f->get_type());
   for (auto& each : thefeatures)
-    jr["overview_features"].push_back(each);
-  jr["valid_features"] = bValid;
-  jr["invalid_features"] = lsFeatures.size() - bValid;
-  //-- overview of errors
-  // "overview-errors": [101, 203],
-  // "overview-errors-primitives": [5, 1],
-  std::map<int,int> errors;
-  for (auto& f : lsFeatures) 
-    for (auto& code : f->get_unique_error_codes())
-        errors[code] = 0;
-  for (auto& f : lsFeatures) 
-    for (auto& code : f->get_unique_error_codes())
-        errors[code] += 1;
-  jr["overview_errors"];    
-  for (auto e : errors)
-    jr["overview_errors"].push_back(e.first);
-  for (auto& e : ioerrs.get_unique_error_codes())
-    jr["overview_errors"].push_back(e);
-  jr["errors_dataset"];
-  jr["features"];
+    feat_o[each] = std::make_tuple(0, 0);
+  for (auto& f : lsFeatures) {
+    std::get<0>(feat_o[f->get_type()]) += 1;
+    if (f->is_valid() == true) {
+      std::get<1>(feat_o[f->get_type()]) += 1;
+    }
+  }
+  jr["features_overview"] = json::array();
+  for (auto& each : feat_o) {
+    json j;
+    j["type"] = each.first; 
+    j["total"] = std::get<0>(each.second);
+    j["valid"] = std::get<1>(each.second);
+    jr["features_overview"].push_back(j);
+  }
+
+  //-- each of the features with their primitives listed
+  jr["features"] = json::array();
+  for (auto& f : lsFeatures)
+    jr["features"].push_back(f->get_report_json());
+  
+  //-- dataset errors (9xx)
+  jr["dataset_errors"] = json::array();
   if (ioerrs.has_errors() == true)
-    jr["errors_dataset"] = ioerrs.get_report_json();
-  for (auto& f : lsFeatures) 
-    jr["features"].push_back(f->get_report_json()); 
+    jr["dataset_errors"] = ioerrs.get_report_json();
+
+  //-- overview of errors
+  std::set<int> unique_errors;
+  for (auto& f : lsFeatures)
+    for (auto& code : f->get_unique_error_codes())
+      unique_errors.insert(code);
+  jr["all_errors"] = json::array();
+  for (auto& e : unique_errors)
+    jr["all_errors"].push_back(e);
+  for (auto& e : ioerrs.get_unique_error_codes())
+    jr["all_errors"].push_back(e);
+
+  bool bValid = true;
+  for (auto& f : lsFeatures) {
+    if (f->is_valid() == false) {
+      bValid = false;
+      break;
+    }
+  }
+  if (ioerrs.has_errors() == true)
+    bValid = false;
+  jr["validity"] = bValid;
 }
 
 

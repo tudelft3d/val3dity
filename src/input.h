@@ -56,6 +56,7 @@ namespace val3dity
 
 class IOErrors {
   std::map<int, std::vector<std::string> >  _errors;
+  std::string                               _inputfiletype;
 public:
   bool          has_errors();
   void          add_error(int code, std::string info);
@@ -63,6 +64,8 @@ public:
   json          get_report_json();
   std::set<int> get_unique_error_codes();
   bool          has_specific_error(int i);
+  std::string   get_input_file_type();
+  void          set_input_file_type(std::string s);
 };
 
   
