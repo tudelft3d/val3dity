@@ -18,19 +18,25 @@ The validation of the following 3D primitives is fully supported:
   - ``MultiSolid``
   - ``CompositeSolid``
 
-Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported, and so are cavities in solids (also called voids or inner shells).
-However, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported (and there is no plan to do so!).
+Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported and so are cavities in solids (also called voids or inner shells).
+However, as is the case for many formats used in practice, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported. 
+There is no plan to support these geometries.
 
 val3dity accepts as input:
 
-  - `CityJSON <http://www.cityjson.org>`_
-  - `CityGML <https://www.citygml.org>`_ 
   - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
+  - `CityJSON <http://www.cityjson.org>`_
+  - `CityGML (v1 & v2 only, v3 will not be supported) <https://www.citygml.org>`_ 
+  - `IndoorGML <http://indoorgml.net/>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
 
+For the City/JSON/GML and IndoorGML formats, extra validations (specific to the format) are performed, eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
+
 .. note::  
-  Most of the details are available in this scientific article, if you use val3dity for scientific purposes please cite this article:
+  If you use val3dity in a scientific context, please cite these articles:
+
+  Ledoux, Hugo (2019). val3dity: validation of 3D GIS primitives according to the international standards. *Open Geospatial Data, Software and Standards*, 3(1), 2018, pp.1 `[DOI] <http://dx.doi.org/10.1186/s40965-018-0043-x>`_
 
   Ledoux, Hugo (2013). On the validation of solids represented with the international standards for geographic information. *Computer-Aided Civil and Infrastructure Engineering*, 28(9):693-706. `[PDF] <https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf>`_ `[DOI] <http://dx.doi.org/10.1111/mice.12043>`_
 

@@ -4,14 +4,14 @@ val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives acc
 Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS only validates 2D primitives).
 
 In short, it verifies whether a 3D primitive respects the definition as given in [ISO 19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language).
-All the 3D primitives of GML are supported:
 
-  - `<gml:Polygon>`
-  - `<gml:MultiSurface>`
-  - `<gml:CompositeSurface>`
-  - `<gml:Solid>`
-  - `<gml:MultiSolid>`
-  - `<gml:CompositeSolid>`
+The validation of the following 3D primitives is fully supported:
+
+  - ``MultiSurface``
+  - ``CompositeSurface>`` 
+  - ``Solid``
+  - ``MultiSolid``
+  - ``CompositeSolid``
 
 Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported and so are cavities in solids (also called voids or inner shells).
 However, as is the case for many formats used in practice, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported. 
@@ -26,7 +26,7 @@ val3dity accepts as input:
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
-For CityJSON and IndoorGML formats, extra validations (specific to the format) are performed.
+For the City/JSON/GML and IndoorGML formats, extra validations (specific to the format) are performed, eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
 
 ## Installation of the command-line tool
@@ -107,7 +107,7 @@ If you have a question or came across a bug, please submit an issue there.
 However we ask you check first whether your problem has already been solved by someone else.
 
 
-## If you use val3dity in a scientific context, please cite this article:
+## If you use val3dity in a scientific context, please cite these articles:
 
 Ledoux, Hugo (2019). val3dity: validation of 3D GIS primitives according to the international standards. *Open Geospatial Data, Software and Standards*, 3(1), 2018, pp.1 [[DOI](http://dx.doi.org/10.1186/s40965-018-0043-x)]
 

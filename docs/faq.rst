@@ -22,30 +22,23 @@ You can read more about the `details <https://github.com/tudelft3d/val3dity/blob
 How to interpret the report?
 ----------------------------
 
-There are 2 options for a report: HTML and JSON report (the HTML report is just a navigable view of the JSON report).
+With the option ``--report`` a JSON report is output.
 
-:ref:`report`
+The report is rather simple, and lists errors at 3 levels:
 
-Outputs the validation report in a navigable HTML file that can be viewed in a web browser. 
-There is a summary page with an overview, and also a page with all the details of each features present in the file. 
-Some statistics (eg number of faces, IDs, etc) for each feature and primitive is also given, as a convenience.
+  1. errors with the input files (errors 9xx)
+  2. errors with the features, eg Buildings in CityJSON (errors 6xx and 7xx)
+  3. errors with the geometries (errors 1xx -- 5xx)
+
+
+You can navigate this report with a JSON browser (eg drag it in Firefox) or by loading it to the `val3dity report browser <http://geovalidation.bk.tudelft.nl/val3dity/browse/>`_:
 
 .. image:: _static/report1.png
    :width: 49%
 .. image:: _static/report2.png
    :width: 49%
 
-   
-:ref:`report_json`
-
-Outputs a single JSON file with the information shown in the HTML page.
-Use it to produce your own report or extract statistics.
-
-The top level objects are called "features", and there are at this moment 2 kinds of features: CityObjects (for CityGML objects, like Building or Bridge) and GenericObject (when the features are not known, eg for an OBJ file).
-Each feature contains a list of 3D primitives.
-The errors are reported as children of either a 3D primitive (errors 1xx to 5xx)  or a feature (errors 6xx).
-The errors 9xx are reported in the ``"errors_dataset"``.
-All the features and primitives contain an entry ``"validity"`` state whether it is valid or not.
+There you get an overview of the statistics per features and primitives, and each feature has its primitives and errors as children.   
 
 
 
@@ -120,6 +113,5 @@ The IDs for the shells and surfaces in the report, are they 0-based or 1-based?
 Where can I get files containing ``gml:Solids`` or ``gml:CompositeSolid``?
 --------------------------------------------------------------------------
 In the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
-Also, on the `official CityGML website <https://www.citygml.org/samplefiles/>`_ there are a few files with 3D buildings, and all the `known publicly available 3D cities are listed too <https://www.citygml.org/3dcities/>`_.
 
 

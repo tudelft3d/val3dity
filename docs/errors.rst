@@ -4,7 +4,7 @@
 Errors
 ======
 
-.. image:: _static/errorcodes.svg
+.. image:: _static/errorcodes.png
    :width: 100%
 
 .. contents:: :local:
@@ -169,6 +169,14 @@ When the polygon is used as a bounding surface of a shell, then the rings have t
 .. image:: _static/208.png
    :width: 25%
 
+
+.. _error_300:
+
+300 -- NOT_VALID_2_MANIFOLD
+---------------------------
+The shell is not valid, but the exact error (errors 3xx) is not known. This error happens when the construction of the shell failed for unknown reason. Hopefully you don't get that error.
+
+
 .. _error_301:
 
 301 -- TOO_FEW_POLYGONS
@@ -316,6 +324,34 @@ Another option is to use the option ``--geom_is_sem_surfaces`` which gathers all
 We only offer this option as a convenience (and because we are nice people), and we strongly encourage you to define a geometry.
 
 
+.. _error_701: 
+
+701 -- CELLS_OVERLAP
+--------------------
+Two IndoorGML cells overlap with each other. Similar to :ref:`error_601`: but for IndoorGML.
+The overlap allowed can be controlled with the validation option :ref:`option_overlap_tol`:.
+
+
+.. _error_702: 
+
+702 -- DUAL_VERTEX_OUTSIDE_CELL
+-------------------------------
+The dual vertex of an IndoorGML cell is located outside the cell.
+
+
+.. _error_703: 
+
+703 -- PRIMAL_DUAL_XLINKS_ERROR
+-------------------------------
+The XLinks in an IndoorGML file are wrong, the primal and the dual are not correctly linked. The schema validation (.xsd) of IndoorGML does not validate this.
+
+.. _error_704: 
+
+704 -- PRIMAL_DUAL_ADJACENCIES_INCONSISTENT
+-------------------------------------------
+The adjacency of IndoorGML cells in the primal and the dual are no consistent. Basically, if two 3-cells are adjacent in the primal, are they also in the dual (do they have a dual edge)? The :ref:`option_overlap_tol`: influences this.
+
+
 .. _error_901:
 
 901 -- INVALID_INPUT_FILE
@@ -333,6 +369,13 @@ The input file contains empty primitives, eg an OBJ where to surfaces are define
 903 -- WRONG_INPUT_PARAMETERS
 -----------------------------
 The parameters used for the validation are not valid.
+
+
+.. _error_904:
+
+904 -- FORMAT_NOT_SUPPORTED
+---------------------------
+It can be that certain versions of a supported format are not supported, eg v3.0 of CityGML is not.
 
 .. _error_999:
 
