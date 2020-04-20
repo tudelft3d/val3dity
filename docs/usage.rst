@@ -24,21 +24,14 @@ To validate all the 3D primitives in a CityJSON file and see a summary output:
   $ val3dity my3dcity.json 
 
 
-To validate all the 3D primitives in a CityGML file and get a HTML report, provide the path to the folder (eg ``/report_dir``) that will contain the report ``report.html``:
+To validate all the 3D primitives in a CityGML file and get a JSON report ``myreport.json``:
 
 .. code-block:: bash
 
-  $ val3dity -r /report_dir input.gml
+  $ val3dity input.gml --report ./myreport.json
 
 
-To validate all the 3D primitives in a CityGML file and get a `JSON <http://json.org/>`_ report:
-
-.. code-block:: bash
-
-  $ val3dity --report_json report.json input.gml
-
-
-To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm:
+To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm (0.2):
 
 .. code-block:: bash
 
