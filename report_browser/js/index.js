@@ -128,8 +128,15 @@ var app = new Vue({
         reader.readAsText(file, "UTF-8");
         reader.onload = evt => {
           jre = JSON.parse(evt.target.result);
-          this.report = jre;
-          this.file_loaded = true;
+          if (jre.type == "val3dity_report") {
+            this.report = jre;
+            this.file_loaded = true;
+          }
+          else {
+            console.log("This is not a val3dity report JSON file. Abort.");
+            alert("This is not a val3dity report file (must be JSON & v2.2+).");
+            return;
+          }
         }
       }
     },
