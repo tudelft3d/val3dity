@@ -593,16 +593,22 @@ int main(int argc, char* const argv[])
 void write_report_json(json& jr, std::string report)
 {
   boost::filesystem::path outpath(report);
-  if (boost::filesystem::exists(outpath.parent_path()) == false)
-    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-  else {
-    if (boost::filesystem::extension(outpath) != ".json")
-      outpath += ".json";
-    std::ofstream o(outpath.string());
-    o << jr.dump(2) << std::endl;                                
-    std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+  if (boost::filesystem::exists(outpath.parent_path()) == false) {
+    boost::filesystem::path fullpath(boost::filesystem::current_path() / report);
+    if (boost::filesystem::exists(fullpath.parent_path()) == false) {
+      std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+      return;
+    }
+    else
+      outpath = fullpath;
   }
-
+  if (boost::filesystem::extension(outpath) != ".json")
+    outpath += ".json";
+  std::ofstream o(outpath.string());
+  o << jr.dump(2) << std::endl;                                
+  std::cout << "Validation report saved to " << boost::filesystem::canonical(outpath) << std::endl;
+  std::cout << "Browse its content:" << std::endl;
+  std::cout << "==>http://geovalidation.bk.tudelft.nl/val3dity/browser/\n" << std::endl;
 }
 
 
