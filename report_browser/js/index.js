@@ -64,6 +64,7 @@ var app = new Vue({
           report: {},
           search_term: null,
           feature_filter: "all",
+          error_filters: [],
         }
     },
     methods: {
@@ -92,6 +93,7 @@ var app = new Vue({
         this.report = {};
         this.filter_value = false;
         this.file_loaded = false;
+        this.error_filters = [];
       },
       getAlertClass(percentage) {
         if( percentage > 80) {
@@ -131,6 +133,7 @@ var app = new Vue({
           if (jre.type == "val3dity_report") {
             this.report = jre;
             this.file_loaded = true;
+            this.error_filters = this.report.all_errors;
           }
           else {
             console.log("This is not a val3dity report JSON file. Abort.");
@@ -146,9 +149,19 @@ var app = new Vue({
                 filter = f => { return f.validity; }
             }
             else if (this.feature_filter == "invalid") {
-                filter = f => { return !f.validity; }
+                // filter = f => { return !f.validity; }
+                let error_code = this.feature_filter;
+                filter = f => {
+                  if (f.errors.some(e => this.error_filters.includes(e.code))) {
+                    return true;
+                  }
+
+                  return f.primitives.some(p => {
+                    return 'errors' in p && p.errors.some(e => this.error_filters.includes(e.code));
+                  });
+                }
             }
-            else {
+            else if (this.feature_filter == "all") {
                 filter = f => {return true; }
             }
             return this.report.features.filter(filter);

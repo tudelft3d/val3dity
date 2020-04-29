@@ -227,6 +227,13 @@
                       <input class="form-check-input" type="radio" name="featureFilter" id="show_invalid" value="invalid" v-model="feature_filter">
                       <label class="form-check-label" for="show_invalid">invalid</label>
                     </div>
+                    <span class="ml-3">Error types:</span>
+                    <div
+                      class="form-check form-check-inline"
+                      v-for="error_type in report.all_errors">
+                      <input class="form-check-input" type="checkbox" name="featureFilter" :id="error_type" :value="error_type" v-model="error_filters" :disabled="feature_filter != 'invalid'">
+                      <label class="form-check-label" for="error_type">{{ error_type }}</label>
+                    </div>
                   </div>
                 </div>
                 <ul class="list-unstyled">
