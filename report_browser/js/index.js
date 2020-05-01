@@ -147,6 +147,8 @@ var app = new Vue({
         filteredFeatures: function () {
             if (this.feature_filter == "valid") {
                 filter = f => { return f.validity; }
+
+                return this.report.features.filter(filter);
             }
             else if (this.feature_filter == "invalid") {
                 // filter = f => { return !f.validity; }
@@ -157,14 +159,22 @@ var app = new Vue({
                   }
 
                   return f.primitives.some(p => {
-                    return 'errors' in p && p.errors.some(e => this.error_filters.includes(e.code));
+                    return 'errors' in p && p.errors != null && p.errors.some(e => this.error_filters.includes(e.code));
                   });
                 }
+
+                return this.report.features.filter(filter)
+                                           .map(f => {
+                                              var new_f = $.extend(true, {}, f);
+                                              new_f.primitives = f.primitives.filter(p => {
+                                                return 'errors' in p && p.errors != null && p.errors.some(e => this.error_filters.includes(e.code));
+                                              })
+                                              return new_f;
+                                            });
             }
             else if (this.feature_filter == "all") {
-                filter = f => {return true; }
+              return this.report.features;
             }
-            return this.report.features.filter(filter);
         }
     }
 })
