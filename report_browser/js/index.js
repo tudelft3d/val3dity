@@ -82,8 +82,7 @@ var app = new Vue({
         $.getJSON(theurl, 
           function(data) {
             // console.log(data);
-            self.report = data;
-            self.file_loaded = true;
+            self.set_report_data(data);
         });
         console.log("fetched.");
       },
@@ -129,9 +128,7 @@ var app = new Vue({
         reader.onload = evt => {
           jre = JSON.parse(evt.target.result);
           if (jre.type == "val3dity_report") {
-            this.report = jre;
-            this.file_loaded = true;
-            this.error_filters = this.report.all_errors;
+            this.set_report_data(jre);
           }
           else {
             console.log("This is not a val3dity report JSON file. Abort.");
@@ -139,6 +136,11 @@ var app = new Vue({
             return;
           }
         }
+      },
+      set_report_data(data) {
+        this.report = data;
+        this.file_loaded = true;
+        this.error_filters = this.report.all_errors;
       }
     },
     computed: {
