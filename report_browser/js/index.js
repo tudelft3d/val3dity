@@ -76,10 +76,8 @@ var app = new Vue({
         return vars;
       },
       load_report_from_url(fre) {
-        // var dataURL = 'http://homepage.tudelft.nl/23t4p/temp/r2.json';
         console.log("fetching the report from a URL");
-        var hackcors = 'https://cors-anywhere.herokuapp.com/';
-        var theurl = hackcors + fre;
+        var theurl = fre;
         var self = this;
         $.getJSON(theurl, 
           function(data) {
