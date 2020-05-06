@@ -99,7 +99,7 @@ However, a file is limited to 50MB.
 
 ## Documentation and help
 
-Read the full documentation at [http://geovalidation.bk.tudelft.nl/val3dity/docs/](http://geovalidation.bk.tudelft.nl/val3dity/docs/).
+Read the full documentation at [https://val3dity.rtfd.io](https://val3dity.rtfd.io).
 
 The primary channel to communicate with the developers is the Issues section.
 
