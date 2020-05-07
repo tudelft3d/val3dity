@@ -46,7 +46,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.2.0-beta.1";
+std::string VAL3DITY_VERSION = "2.2.0-beta.2";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
@@ -222,9 +222,9 @@ int main(int argc, char* const argv[])
     cmd.add(unittests);
     cmd.add(onlyinvalid);
     cmd.add(output_off);
-    // cmd.add(inputfile);
-    // cmd.add(license);
-    cmd.xorAdd( inputfile, license );
+    cmd.add(inputfile);
+    cmd.add(license);
+    // cmd.xorAdd( inputfile, license );
     cmd.add(ishellfiles);
     cmd.add(report);
     cmd.parse( argc, argv );
