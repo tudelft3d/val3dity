@@ -95,12 +95,13 @@ typedef long long int64;
 
 typedef enum
 {
-  SOLID            = 0,
-  COMPOSITESOLID   = 1,
-  MULTISOLID       = 2,
-  COMPOSITESURFACE = 3,
-  MULTISURFACE     = 4,
-  ALL              = 5,
+  SOLID             = 0,
+  COMPOSITESOLID    = 1,
+  MULTISOLID        = 2,
+  COMPOSITESURFACE  = 3,
+  MULTISURFACE      = 4,
+  GEOMETRYTEMPLATE  = 5,
+  ALL               = 9,
 } Primitive3D;
 
 typedef enum

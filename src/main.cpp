@@ -715,7 +715,8 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
         case 2: ss << "MultiSolid"        << std::endl; break;
         case 3: ss << "CompositeSurface"  << std::endl; break;
         case 4: ss << "MultiSurface"      << std::endl; break;
-        case 5: ss << "ALL"               << std::endl; break;
+        case 5: ss << "GeometryTemplate"  << std::endl; break;
+        case 9: ss << "ALL"               << std::endl; break;
       }
     }
   }
@@ -848,7 +849,8 @@ void get_report_json(json& jr,
       case 2: j["type"] = "MultiSolid"; break;
       case 3: j["type"] = "CompositeSurface"; break;
       case 4: j["type"] = "MultiSurface"; break;
-      case 5: j["type"] = "ALL"; break;
+      case 5: j["type"] = "GeometryTemplate"; break;
+      case 9: j["type"] = "ALL"; break;
     }
     j["total"] = std::get<0>(each.second);
     j["valid"] = std::get<1>(each.second);
