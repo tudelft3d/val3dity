@@ -754,7 +754,6 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     else if (g["type"] == "GeometryInstance") 
     {
       int gti = g["template"];
-      std::cout << "==>HEY A GT: " << gti << std::endl;
       GeometryTemplate* g2 = lsGTs[gti];
       co->add_primitive(g2);
     }
@@ -784,15 +783,13 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
   //-- compute (_minx, _miny)
   compute_min_xy(j);
-  
   //-- read and store the GeometryTemplates
   std::vector<GeometryTemplate*> lsGTs;
   if (j.count("geometry-templates") == 1)
   {
     process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
-    std::cout << "==>SIZE OF lsGTs: " << lsGTs.size() << std::endl;
   }
-
+  //-- process each CO
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
     //-- BuildingParts geometries are put with those of a Building
