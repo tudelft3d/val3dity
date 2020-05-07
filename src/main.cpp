@@ -52,7 +52,6 @@ std::string VAL3DITY_VERSION = "2.2.0-beta.2";
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
-void        print_license();
 void        write_report_json(json& jr, std::string report);
 
 
@@ -114,6 +113,39 @@ public:
 
 };
 
+class LicensePrint : public TCLAP::Visitor
+{
+  public:
+  
+    LicensePrint() : Visitor() {};
+    void visit() 
+    {
+      std::string thelicense =
+      "\nval3dity\n\n"
+      "Copyright (C) 2011-2020  3D geoinformation research group, TU Delft\n\n"
+      "val3dity is free software: you can redistribute it and/or modify\n"
+      "it under the terms of the GNU General Public License as published by\n"
+      "the Free Software Foundation, either version 3 of the License, or\n"
+      "(at your option) any later version.\n\n"
+      "val3dity is distributed in the hope that it will be useful,\n"
+      "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+      "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+      "GNU General Public License for more details.\n\n"
+      "A copy of the GNU General Public License is available at\n"
+      "<http://www.gnu.org/licenses/> or\n"
+      "<https://github.com/tudelft3d/val3dity/blob/master/LICENSE\n\n"
+      "For any information or further details about the use of val3dity, contact:\n"
+      "Hugo Ledoux \n"
+      "<h.ledoux@tudelft.nl>\n"
+      "Faculty of the Built Environment & Architecture\n"
+      "Delft University of Technology\n"
+      "Julianalaan 134, Delft 2628BL, the Netherlands\n";
+ 
+      std::cout << thelicense << std::endl;  
+      exit(0); 
+    };
+};
+
 
 int main(int argc, char* const argv[])
 {
@@ -160,10 +192,11 @@ int main(int argc, char* const argv[])
                                               "verbose",
                                               "verbose output",
                                               false);
-    TCLAP::SwitchArg                        license("",
+    TCLAP::SwitchArg                        license("l",
                                               "license",
                                               "see the software license",
-                                              false);
+                                              false,
+                                              new LicensePrint() );
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
                                               "unit tests output",
@@ -224,7 +257,6 @@ int main(int argc, char* const argv[])
     cmd.add(output_off);
     cmd.add(inputfile);
     cmd.add(license);
-    // cmd.xorAdd( inputfile, license );
     cmd.add(ishellfiles);
     cmd.add(report);
     cmd.parse( argc, argv );
@@ -262,16 +294,6 @@ int main(int argc, char* const argv[])
       savedBufferCLOG = clog.rdbuf();
       mylog.open("val3dity.log");
       std::clog.rdbuf(mylog.rdbuf());
-    }
-    if (license.getValue() == true)
-    {
-      print_license();
-      if (verbose.getValue() == false)
-      {
-        clog.rdbuf(savedBufferCLOG);
-        mylog.close();
-      }
-      return(0);
     }
 
     //-- no negative snap_tol value
@@ -569,7 +591,7 @@ int main(int argc, char* const argv[])
         write_report_json(jr, report.getValue());
     }
     else
-      std::cout << "-->The validation report wasn't saved, use option '--report'." << std::endl;
+      std::cout << "==> The validation report wasn't saved, use option '--report'." << std::endl;
 
     //-- unittests 
     if (unittests.getValue() == true)
@@ -767,32 +789,6 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
 }
-
-
-void print_license() {
-  std::string thelicense =
-    "\nval3dity\n\n"
-    "Copyright (C) 2011-2020  3D geoinformation research group, TU Delft\n\n"
-    "val3dity is free software: you can redistribute it and/or modify\n"
-    "it under the terms of the GNU General Public License as published by\n"
-    "the Free Software Foundation, either version 3 of the License, or\n"
-    "(at your option) any later version.\n\n"
-    "val3dity is distributed in the hope that it will be useful,\n"
-    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-    "GNU General Public License for more details.\n\n"
-    "A copy of the GNU General Public License is available at\n"
-    "<http://www.gnu.org/licenses/> or\n"
-    "<https://github.com/tudelft3d/val3dity/blob/master/LICENSE\n\n"
-    "For any information or further details about the use of val3dity, contact:\n"
-    "Hugo Ledoux \n"
-    "<h.ledoux@tudelft.nl>\n"
-    "Faculty of the Built Environment & Architecture\n"
-    "Delft University of Technology\n"
-    "Julianalaan 134, Delft 2628BL, the Netherlands\n";
-  std::cout << thelicense << std::endl;
-}
-
 
 void get_report_json(json& jr,
                      std::string ifile, 
