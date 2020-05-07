@@ -8,8 +8,9 @@ Vue.component('primitive-item', {
         <span class="badge badge-secondary">{{ primitive.type }}</span>
         <span class="badge" :class="[ primitive.validity ? 'badge-success' : 'badge-danger' ]">{{ primitive.validity ? 'valid' : 'invalid' }}</span>
         {{ primitive.id }}
-        <ul v-show="isOpen">
+        <ul class="list-unstyled ml-5" v-show="isOpen">
             <li :primitive="e" v-for="e in primitive.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
+            <primitive-item :primitive="p" v-if="'primitives' in primitive" v-for="p in primitive.primitives"></primitive-item>
         </ul>
     </li>
     `,
@@ -141,6 +142,20 @@ var app = new Vue({
         this.report = data;
         this.file_loaded = true;
         this.error_filters = this.report.all_errors;
+      },
+      primitive_has_error(p) {
+        if ('errors' in p && p.errors != null && p.errors.some(e => this.error_filters.includes(e.code))) {
+          return true;
+        }
+
+        if ('primitives' in p) {
+          return p.primitives.some(childp => this.primitive_has_error(childp));
+        }
+
+        return false;
+      },
+      filter_primitives(p) {
+        
       }
     },
     computed: {
@@ -158,16 +173,23 @@ var app = new Vue({
                     return true;
                   }
 
-                  return f.primitives.some(p => {
-                    return 'errors' in p && p.errors != null && p.errors.some(e => this.error_filters.includes(e.code));
-                  });
+                  return f.primitives.some(p => this.primitive_has_error(p));
                 }
+
+                let self = this;
 
                 return this.report.features.filter(filter)
                                            .map(f => {
                                               var new_f = $.extend(true, {}, f);
-                                              new_f.primitives = f.primitives.filter(p => {
-                                                return 'errors' in p && p.errors != null && p.errors.some(e => this.error_filters.includes(e.code));
+                                              new_f.primitives = new_f.primitives.filter(function f(p) {
+                                                console.log(p.code);
+                                                if (self.error_filters.includes(p.code)) {
+                                                  return true;
+                                                }
+
+                                                if ('primitives' in p) {
+                                                  return (p.primitives = p.primitives.filter(f)).length;
+                                                }
                                               })
                                               return new_f;
                                             });
