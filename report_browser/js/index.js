@@ -142,57 +142,41 @@ var app = new Vue({
         this.report = data;
         this.file_loaded = true;
         this.error_filters = this.report.all_errors;
-      },
-      primitive_has_error(p) {
-        if ('errors' in p && p.errors != null && p.errors.some(e => this.error_filters.includes(e.code))) {
-          return true;
-        }
-
-        if ('primitives' in p) {
-          return p.primitives.some(childp => this.primitive_has_error(childp));
-        }
-
-        return false;
-      },
-      filter_primitives(p) {
-        
       }
     },
     computed: {
         filteredFeatures: function () {
             if (this.feature_filter == "valid") {
-                filter = f => { return f.validity; }
+              var new_features = $.extend(true, [], this.report.features);
 
-                return this.report.features.filter(filter);
-            }
-            else if (this.feature_filter == "invalid") {
-                // filter = f => { return !f.validity; }
-                let error_code = this.feature_filter;
-                filter = f => {
-                  if (f.errors.some(e => this.error_filters.includes(e.code))) {
-                    return true;
-                  }
-
-                  return f.primitives.some(p => this.primitive_has_error(p));
+              return new_features.filter(function f(p) {
+                if (p.validity == true) {
+                  return true;
                 }
 
-                let self = this;
+                if (p.primitives) {
+                  return (p.primitives = p.primitives.filter(f)).length
+                }
+              });
+            }
+            else if (this.feature_filter == "invalid") {
+              var new_features = $.extend(true, [], this.report.features);
 
-                return this.report.features.filter(filter)
-                                           .map(f => {
-                                              var new_f = $.extend(true, {}, f);
-                                              new_f.primitives = new_f.primitives.filter(function f(p) {
-                                                console.log(p.code);
-                                                if (self.error_filters.includes(p.code)) {
-                                                  return true;
-                                                }
+              let error_filters = this.error_filters;
 
-                                                if ('primitives' in p) {
-                                                  return (p.primitives = p.primitives.filter(f)).length;
-                                                }
-                                              })
-                                              return new_f;
-                                            });
+              return new_features.filter(function f(p) {
+                var show = false;
+
+                if (p.errors && p.errors.some(e => error_filters.includes(e.code))) {
+                  show = true;
+                }
+
+                if (p.primitives) {
+                  show = show | (p.primitives = p.primitives.filter(f)).length;
+                }
+
+                return show;
+              });
             }
             else if (this.feature_filter == "all") {
               return this.report.features;
