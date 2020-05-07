@@ -193,7 +193,7 @@ json Solid::get_report_json()
   j["numbershells"] = (this->num_ishells() + 1);
   j["numberfaces"] = this->num_faces();
   j["numbervertices"] = this->num_vertices();
-  j["errors"];
+  j["errors"] = json::array();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
