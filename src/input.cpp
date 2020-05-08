@@ -39,6 +39,7 @@
 #include "Solid.h"
 #include "CompositeSolid.h"
 #include "MultiSolid.h"
+#include "GeometryTemplate.h"
 
 
 using namespace std;
@@ -649,7 +650,7 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
-void process_json_geometries_of_co(json& jco, CityObject* co, json& j, double tol_snap)
+void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap)
 {
   int idgeom = co->number_of_primitives();
   for (auto& g : jco["geometry"]) {
@@ -749,7 +750,13 @@ void process_json_geometries_of_co(json& jco, CityObject* co, json& j, double to
         cs->add_solid(s);
       }
       co->add_primitive(cs);
-    }      
+    }
+    else if (g["type"] == "GeometryInstance") 
+    {
+      int gti = g["template"];
+      GeometryTemplate* g2 = lsGTs[gti];
+      co->add_primitive(g2);
+    }
     idgeom++;
   }
 }
@@ -776,23 +783,109 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
   //-- compute (_minx, _miny)
   compute_min_xy(j);
+  //-- read and store the GeometryTemplates
+  std::vector<GeometryTemplate*> lsGTs;
+  if (j.count("geometry-templates") == 1)
+  {
+    process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
+  }
+  //-- process each CO
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
     //-- BuildingParts geometries are put with those of a Building
     if (it.value()["type"] == "BuildingPart")
       continue;
     CityObject* co = new CityObject(it.key(), it.value()["type"]);
-    process_json_geometries_of_co(it.value(), co, j, tol_snap);
+    process_json_geometries_of_co(it.value(), co, lsGTs, j, tol_snap);
     //-- if Building has Parts, put them here in _lsPrimitives
     if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) ) 
     {
       for (std::string bpid : it.value()["children"])
       {
-        process_json_geometries_of_co(j["CityObjects"][bpid], co, j, tol_snap);
+        process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, tol_snap);
       }
     }
     lsFeatures.push_back(co);
   }
+}
+
+
+void process_cityjson_geometrytemplates(json& j, std::vector<GeometryTemplate*>& lsGTs, double tol_snap)
+{
+  int count = 0;
+  for (auto& jt : j["templates"])
+  {
+    GeometryTemplate* gt = new GeometryTemplate(std::to_string(count));
+    if  (jt["type"] == "Solid")
+    {
+      Solid* s = new Solid("0");
+      bool oshell = true;
+      int c = 0;
+      for (auto& shell : jt["boundaries"]) 
+      {
+        Surface* sh = new Surface(c, tol_snap);
+        c++;
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface_geometrytemplate(pa, j, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      gt->add_primitive(s);
+    }
+    else if ( (jt["type"] == "MultiSurface") || (jt["type"] == "CompositeSurface") ) 
+    {
+      Surface* sh = new Surface(-1, tol_snap);
+      for (auto& p : jt["boundaries"]) 
+      { 
+        std::vector< std::vector<int> > pa = p;
+        process_json_surface_geometrytemplate(pa, j, sh);
+      }
+      if (jt["type"] == "MultiSurface")
+      {
+        MultiSurface* ms = new MultiSurface("0");
+        ms->set_surface(sh);
+        gt->add_primitive(ms);
+      }
+      else
+      {
+        CompositeSurface* cs = new CompositeSurface("0");
+        cs->set_surface(sh);
+        gt->add_primitive(cs);
+      }
+    }
+    lsGTs.push_back(gt);
+    count++;
+  }
+}
+
+
+void process_json_surface_geometrytemplate(std::vector< std::vector<int> >& pgn, json& j, Surface* sh)
+{
+  std::vector< std::vector<int> > pgnids;
+  for (auto& r : pgn)
+  {
+    std::vector<int> newr;
+    for (auto& i : r)
+    {
+      double x;
+      double y;
+      double z;
+      x = double(j["vertices-templates"][i][0]);
+      y = double(j["vertices-templates"][i][1]);
+      z = double(j["vertices-templates"][i][2]);
+      Point3 p3(x, y, z);
+      newr.push_back(sh->add_point(p3));
+    }
+    pgnids.push_back(newr);
+  }
+  sh->add_face(pgnids);
 }
 
 

@@ -219,7 +219,7 @@ json CompositeSolid::get_report_json()
   else
     j["id"] = "none";
   j["numbersolids"] = this->number_of_solids();
-  j["errors"];
+  j["errors"]  = json::array();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
