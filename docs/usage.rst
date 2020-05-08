@@ -123,14 +123,6 @@ Options for the validation
 
 ----
 
-
-``--onlyinvalid``
-*****************
-|  Only the invalid primitives are reported in the validation report.
-
-
-----
-
 .. _option_overlap_tol:
 
 ``--overlap_tol``

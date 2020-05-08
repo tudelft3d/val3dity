@@ -51,8 +51,15 @@ std::string VAL3DITY_VERSION = "2.2.0-beta.2";
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
-void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
 void        write_report_json(json& jr, std::string report);
+void        get_report_json(json& jr, 
+                            std::string ifile, 
+                            std::vector<Feature*>& lsFeatures, 
+                            double snap_tol, 
+                            double overlap_tol, 
+                            double planarity_d2p_tol, 
+                            double planarity_n_tol, 
+                            IOErrors ioerrs);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -201,10 +208,6 @@ int main(int argc, char* const argv[])
                                               "unittests",
                                               "unit tests output",
                                               false);
-    TCLAP::SwitchArg                        onlyinvalid("",
-                                              "onlyinvalid",
-                                              "only invalid primitives are reported",
-                                              false);
     TCLAP::SwitchArg                        ignore204("",
                                               "ignore204",
                                               "ignore error 204",
@@ -253,7 +256,6 @@ int main(int argc, char* const argv[])
     cmd.add(geom_is_sem_surfaces);
     cmd.add(ignore204);
     cmd.add(unittests);
-    cmd.add(onlyinvalid);
     cmd.add(output_off);
     cmd.add(inputfile);
     cmd.add(license);
@@ -585,8 +587,7 @@ int main(int argc, char* const argv[])
                        overlap_tol.getValue(),
                        planarity_d2p_tol.getValue(),
                        planarity_n_tol_updated,
-                       ioerrs,
-                       onlyinvalid.getValue());
+                       ioerrs);
       if (report.getValue() != "")
         write_report_json(jr, report.getValue());
     }
@@ -797,8 +798,7 @@ void get_report_json(json& jr,
                      double overlap_tol,
                      double planarity_d2p_tol,
                      double planarity_n_tol,
-                     IOErrors ioerrs,
-                     bool onlyinvalid)
+                     IOErrors ioerrs)
 {
   jr["type"] = "val3dity_report";
   jr["val3dity_version"] = VAL3DITY_VERSION; 
