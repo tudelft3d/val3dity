@@ -2,7 +2,21 @@
 # Changelog
 
 ## [Unreleased]
-- validation of IndoorGML features 
+- validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
+- phasing out CityGML support
+
+## [2.2.0] - 2020-05-08
+### Added
+- support for IndoorGML datasets, not just the geometries but specific validation tests for the primal-dual consistency were added
+- support for GeometryTemplates in CityJSON (https://www.cityjson.org/specs/#geometry-templates)
+
+### Changed
+- completely revamped the JSON error report, it's better and clearer
+- no more HTML output for the report (output of report is now with option "--report" be careful), but you can just drag your JSON report to the HTML page (in folder '/report_browser/index.html') or at http://geovalidation.bk.tudelft.nl/val3dity/browser/
+- improved the error codes a bit: new errors for IndoorGML + for handy faulty inputs
+- code is now using CGAL5, easier to install and compile for everyone
+- observe that this is the last version that will support CityGML, I will remove it from v2.3+. Most errors/issues reported have to do with a faulty parser of CityGML, and not with val3dity itself. I cannot justify spending 100s of hours fixing the parser, I tried hard but this not possible anymore. If someone wants to do it then great I am willing to help them, but I will not invest time on this anymore. Just convert your files to CityJSON (https://www.cityjson.org/help/users/conversion/), I'll always maintain a full CityJSON parser!
+
 
 ## [2.1.1] - 2019-04-30
 ### Changed
