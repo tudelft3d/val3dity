@@ -65,7 +65,7 @@ void Primitive::add_error(int code, std::string whichgeoms, std::string info)
   _is_valid = 0;
   std::tuple<std::string, std::string> a(whichgeoms, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
   if (whichgeoms.empty() == false)
     std::clog << " (id: " << whichgeoms << ")";
   std::clog << std::endl;

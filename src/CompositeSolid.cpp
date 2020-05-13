@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -227,7 +227,7 @@ json CompositeSolid::get_report_json()
       json jj;
       jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
-      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
       j["errors"].push_back(jj);
