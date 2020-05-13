@@ -86,8 +86,11 @@ You shouldn't get any errors.
 
 To run val3dity over Docker simply execute:
 
-    $ docker run --rm  -v <local path where your files are>:/data tudelft3d/val3dity:2.1.1 <name of the dedicated file>
+    $ docker run --rm  -v <local path where your files are>:/data tudelft3d/val3dity:<tag> <name of the dedicated file>
+    
+Where `<tag>` is docker image tag from [https://hub.docker.com/r/tudelft3d/val3dity/tags](https://hub.docker.com/r/tudelft3d/val3dity/tags)
 
+If you are using the `--report` option, then **keep in mind that `<local path where your files are>` need to be writable by any user, otherwise your output won't be saved.**
 
 ## Web application
 
