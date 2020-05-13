@@ -85,7 +85,7 @@ void Surface::add_error(int code, std::string faceid, std::string info)
 {
   std::tuple<std::string, std::string> a(faceid, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << errorcode2description(code);
+  std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
   if (faceid.empty() == false)
     std::clog << " (face " << faceid << ")";
   std::clog << std::endl;
@@ -114,7 +114,7 @@ json Surface::get_report_json()
       json jj;
       jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
-      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
       j.push_back(jj);

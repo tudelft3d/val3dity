@@ -101,7 +101,7 @@ json GeometryTemplate::get_report_json()
       json jj;
       jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
-      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
       j["errors"].push_back(jj);

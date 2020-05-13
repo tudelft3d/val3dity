@@ -154,6 +154,23 @@ class LicensePrint : public TCLAP::Visitor
 };
 
 
+class ListErrorsPrint : public TCLAP::Visitor
+{
+  public:
+  
+    ListErrorsPrint() : Visitor() {};
+    void visit() 
+    {
+      for (auto& e: ALL_ERRORS) {
+        std::cout << e.first << " -- " << e.second << std::endl;
+      }
+      std::cout << std::endl;
+      std::string url = "https://val3dity.readthedocs.io/en/" + VAL3DITY_VERSION + "/errors/";
+      std::cout << "Explanations and examples of each error at " << url << std::endl;
+      exit(0); 
+    };
+};
+
 int main(int argc, char* const argv[])
 {
   IOErrors ioerrs;
@@ -204,6 +221,11 @@ int main(int argc, char* const argv[])
                                               "see the software license",
                                               false,
                                               new LicensePrint() );
+    TCLAP::SwitchArg                        listerrors("",
+                                              "listerrors",
+                                              "list all the possible errors",
+                                              false,
+                                              new ListErrorsPrint() );
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
                                               "unit tests output",
@@ -258,6 +280,7 @@ int main(int argc, char* const argv[])
     cmd.add(unittests);
     cmd.add(output_off);
     cmd.add(inputfile);
+    cmd.add(listerrors);
     cmd.add(license);
     cmd.add(ishellfiles);
     cmd.add(report);
@@ -675,6 +698,15 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     for (auto& p : o->get_primitives())
       noprim++;
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  ss << "Input file type:" << std::endl;
+  std::string ft = ioerrs.get_input_file_type();
+  if (ft == "CityGML") {
+    ft += "\n  [watchout: CityGML support is deprecated]";
+    ft += "\n  [future version will not support it]";
+    ft += "\n  [upgrade to CityJSON]";
+  }
+  ss << "  " << ft << std::endl;
+  ss << "+++++" << std::endl;
   int fInvalid = 0;
   for (auto& f : lsFeatures)
   {
@@ -687,12 +719,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     percentage = 0;
   else
     percentage = 100 * (fInvalid / float(lsFeatures.size()));
-  ss << "# valid: " << setw(22) << lsFeatures.size() - fInvalid;
+  ss << "  # valid: " << setw(20) << lsFeatures.size() - fInvalid;
   if (lsFeatures.size() == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << fInvalid;
+  ss << "  # invalid: " << setw(18) << fInvalid;
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   std::set<std::string> thetypes;
   for (auto& f : lsFeatures)
@@ -714,12 +746,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     percentage = 0;
   else
     percentage = 100 * ((noprim - bValid) / float(noprim));
-  ss << "# valid: " << setw(22) << bValid;
+  ss << "  # valid: " << setw(20) << bValid;
   if (noprim == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << (noprim - bValid);
+  ss << "  # invalid: " << setw(18) << (noprim - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   std::set<int> theprimitives;
   for (auto& f : lsFeatures)
@@ -769,21 +801,21 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     //-- primitives
     for (auto e : errors_p)
     {
-      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
+      ss << "  " << e.first << " -- " << ALL_ERRORS[e.first] << std::endl;
       ss << setw(11) << e.second;
       ss << " primitive(s)";
       ss << std::endl;
     }
     for (auto e : errors_f)
     {
-      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
+      ss << "  " << e.first << " -- " << ALL_ERRORS[e.first] << std::endl;
       ss << setw(11) << e.second;
       ss << " feature(s)";
       ss << std::endl;
     }
     for (auto& e : ioerrs.get_unique_error_codes())
     {
-      ss << "  " << e << " -- " << errorcode2description(e) << std::endl;
+      ss << "  " << e << " -- " << ALL_ERRORS[e] << std::endl;
     }
   }
 
