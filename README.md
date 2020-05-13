@@ -36,7 +36,8 @@ For the City/JSON/GML and IndoorGML formats, extra validations (specific to the 
 
 val3dity is a command-line interface (CLI) programme only, with [several options](https://val3dity.readthedocs.io/en/latest/usage/#options-for-the-validation).
 
-![](./misc/cli.svg)
+[![val3dity cli demo](./misc/cli.svg)](https://asciinema.org/a/329835)  
+_No demo visible here? View it on [asciinema](https://asciinema.org/a/329835)._
 
 
 ## Web application
