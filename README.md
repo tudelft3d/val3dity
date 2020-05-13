@@ -1,10 +1,6 @@
 
 [![GitHub license](https://img.shields.io/github/license/tudelft3d/val3dity)](https://github.com/tudelft3d/val3dity/blob/master/LICENSE) [![webapp](https://img.shields.io/badge/webapp-geovalidation.bk.tudelft.nl%2Fval3dity%2F-fea93b)](http://geovalidation.bk.tudelft.nl/val3dity/) [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs40965--018--0043--x-blueviolet)](http://dx.doi.org/10.1186/s40965-018-0043-x)
 
-
-
-
-
 # val3dity
 
 val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
@@ -77,8 +73,9 @@ Thus, in a nutshell,
 
   1. install Eigen library: `$ sudo apt install libeigen3-dev`
   1. install GEOS library: `$ sudo apt install libgeos++-dev`
-  1. download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
-  1. set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.0.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
+  1. install CGAL: `$ sudo apt-get install libcgal-dev`
+    - if it's not CGAL5 that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
+    - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.0.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
 
 To compile and run val3dity (from the val3dity folder):
 
