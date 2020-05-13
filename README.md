@@ -38,9 +38,10 @@ For the City/JSON/GML and IndoorGML formats, extra validations (specific to the 
 
 ## Usage
 
-val3dity is a command-line interface (CLI) programme only.
+val3dity is a command-line interface (CLI) programme only, with [several options](https://val3dity.readthedocs.io/en/latest/usage/#options-for-the-validation).
 
-[![asciicast](https://asciinema.org/a/23SoX3R1eZz2fDhe6LObSGFUL.svg)](https://asciinema.org/a/23SoX3R1eZz2fDhe6LObSGFUL)
+![](./misc/cli.svg)
+
 
 ## Web application
 
