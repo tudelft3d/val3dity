@@ -1,5 +1,5 @@
 
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/tudelft3d/val3dity?include_prereleases&sort=semver) [![GitHub license](https://img.shields.io/github/license/tudelft3d/val3dity)](https://github.com/tudelft3d/val3dity/blob/master/LICENSE) [![webapp](https://img.shields.io/badge/webapp-geovalidation.bk.tudelft.nl%2Fval3dity%2F-fea93b)](http://geovalidation.bk.tudelft.nl/val3dity/) [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs40965--018--0043--x-blueviolet)](http://dx.doi.org/10.1186/s40965-018-0043-x)
+[![GitHub license](https://img.shields.io/github/license/tudelft3d/val3dity)](https://github.com/tudelft3d/val3dity/blob/master/LICENSE) [![webapp](https://img.shields.io/badge/webapp-geovalidation.bk.tudelft.nl%2Fval3dity%2F-fea93b)](http://geovalidation.bk.tudelft.nl/val3dity/) [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs40965--018--0043--x-blueviolet)](http://dx.doi.org/10.1186/s40965-018-0043-x)
 
 
 
