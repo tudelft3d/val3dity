@@ -1,3 +1,10 @@
+
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/tudelft3d/val3dity?include_prereleases&sort=semver) [![GitHub license](https://img.shields.io/github/license/tudelft3d/val3dity)](https://github.com/tudelft3d/val3dity/blob/master/LICENSE) [![webapp](https://img.shields.io/badge/webapp-geovalidation.bk.tudelft.nl%2Fval3dity%2F-fea93b)](http://geovalidation.bk.tudelft.nl/val3dity/) [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs40965--018--0043--x-blueviolet)](http://dx.doi.org/10.1186/s40965-018-0043-x)
+
+
+
+
+
 # val3dity
 
 val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
@@ -8,7 +15,7 @@ In short, it verifies whether a 3D primitive respects the definition as given in
 The validation of the following 3D primitives is fully supported:
 
   - ``MultiSurface``
-  - ``CompositeSurface>`` 
+  - ``CompositeSurface`` 
   - ``Solid``
   - ``MultiSolid``
   - ``CompositeSolid``
@@ -21,12 +28,26 @@ val3dity accepts as input:
 
   - [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) of any flavour
   - [CityJSON](http://www.cityjson.org)
-  - [CityGML (v1 & v2 only, v3 will not be supported)](https://www.citygml.org)
+  - [CityGML (v1 & v2 only; v3 will not be supported)](https://www.citygml.org)
   - [IndoorGML](http://indoorgml.net/)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
 For the City/JSON/GML and IndoorGML formats, extra validations (specific to the format) are performed, eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
+
+
+## Usage
+
+val3dity is a command-line interface (CLI) programme only.
+
+[![asciicast](https://asciinema.org/a/23SoX3R1eZz2fDhe6LObSGFUL.svg)](https://asciinema.org/a/23SoX3R1eZz2fDhe6LObSGFUL)
+
+## Web application
+
+If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity).
+Simply upload your file to our server and get a validation report back.
+We delete the file as soon as it has been validated (promised!).
+However, a file is limited to 50MB.
 
 
 ## Installation of the command-line tool
@@ -91,13 +112,6 @@ To run val3dity over Docker simply execute:
 Where `<tag>` is docker image tag from [https://hub.docker.com/r/tudelft3d/val3dity/tags](https://hub.docker.com/r/tudelft3d/val3dity/tags)
 
 If you are using the `--report` option, then **keep in mind that `<local path where your files are>` need to be writable by any user, otherwise your output won't be saved.**
-
-## Web application
-
-If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity).
-Simply upload your file to our server and get a validation report back.
-We delete the file as soon as it has been validated (promised!).
-However, a file is limited to 50MB.
 
 
 ## Documentation and help
