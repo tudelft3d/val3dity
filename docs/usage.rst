@@ -181,6 +181,14 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ----
 
+.. _listerrors:
+
+``--listerrors``
+****************
+|  Outputs a list of the val3dity errors.
+
+----
+
 .. _snap_tol:
 
 ``--snap_tol``

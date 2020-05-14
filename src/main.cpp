@@ -46,7 +46,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.2.0-beta.2";
+std::string VAL3DITY_VERSION = "2.2.0";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
@@ -82,26 +82,27 @@ public:
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
     
-    std::cout << "\tval3dity CityJSON_input.json" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in CityJSON_input.json" << std::endl;
-    std::cout << "\t\tand outputs a summary per city object" << std::endl;
+    std::cout << "\tval3dity input.json" << std::endl;
+    std::cout << "\t\tValidate each City Object and each 3D primitive in input.json (CityJSON file)" << std::endl;
+    std::cout << "\t\tand print a summary" << std::endl;
     
-    std::cout << "\tval3dity input.json -r /home/elvis/temp/myreport.json" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in input.json (CityJSON file)" << std::endl;
-    std::cout << "\t\tand outputs a detailed JSON report '/home/elvis/temp/myreport.json'" << std::endl;
+    std::cout << "\tval3dity input.json --report /home/elvis/temp/myreport.json" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.json (CityJSON file)" << std::endl;
+    std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
+    std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
     
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
-    std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.gml (a GML file)," << std::endl;
+    std::cout << "\t\ta tolerance of 0.05 unit is used for the 3D adjacency between Solids." << std::endl;
     
     std::cout << "\tval3dity input.json --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
     
     std::cout << "\tval3dity input.obj" << std::endl;
-    std::cout << "\t\tValidates the geometries in input.obj as if they were a Solid (default)" << std::endl;
+    std::cout << "\t\tValidate the geometries in input.obj as if they were an ISO19107 Solid (default)" << std::endl;
     
     std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
-    std::cout << "\t\tValidates the geometries in input.off as a MultiSurface" << std::endl;
+    std::cout << "\t\tValidate the geometries in input.off as an ISO19107 MultiSurface" << std::endl;
     
     std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
@@ -154,6 +155,23 @@ class LicensePrint : public TCLAP::Visitor
 };
 
 
+class ListErrorsPrint : public TCLAP::Visitor
+{
+  public:
+  
+    ListErrorsPrint() : Visitor() {};
+    void visit() 
+    {
+      for (auto& e: ALL_ERRORS) {
+        std::cout << e.first << " -- " << e.second << std::endl;
+      }
+      std::cout << std::endl;
+      std::string url = "https://val3dity.readthedocs.io/en/" + VAL3DITY_VERSION + "/errors/";
+      std::cout << "Explanations and examples of each error at " << url << std::endl;
+      exit(0); 
+    };
+};
+
 int main(int argc, char* const argv[])
 {
   IOErrors ioerrs;
@@ -204,6 +222,11 @@ int main(int argc, char* const argv[])
                                               "see the software license",
                                               false,
                                               new LicensePrint() );
+    TCLAP::SwitchArg                        listerrors("",
+                                              "listerrors",
+                                              "list all the possible errors",
+                                              false,
+                                              new ListErrorsPrint() );
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
                                               "unit tests output",
@@ -258,6 +281,7 @@ int main(int argc, char* const argv[])
     cmd.add(unittests);
     cmd.add(output_off);
     cmd.add(inputfile);
+    cmd.add(listerrors);
     cmd.add(license);
     cmd.add(ishellfiles);
     cmd.add(report);
@@ -675,6 +699,15 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     for (auto& p : o->get_primitives())
       noprim++;
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  ss << "Input file type:" << std::endl;
+  std::string ft = ioerrs.get_input_file_type();
+  if (ft == "CityGML") {
+    ft += "\n  [watchout: CityGML support is deprecated]";
+    ft += "\n  [future version will not support it]";
+    ft += "\n  [upgrade to CityJSON]";
+  }
+  ss << "  " << ft << std::endl;
+  ss << "+++++" << std::endl;
   int fInvalid = 0;
   for (auto& f : lsFeatures)
   {
@@ -687,12 +720,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     percentage = 0;
   else
     percentage = 100 * (fInvalid / float(lsFeatures.size()));
-  ss << "# valid: " << setw(22) << lsFeatures.size() - fInvalid;
+  ss << "  # valid: " << setw(20) << lsFeatures.size() - fInvalid;
   if (lsFeatures.size() == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << fInvalid;
+  ss << "  # invalid: " << setw(18) << fInvalid;
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   std::set<std::string> thetypes;
   for (auto& f : lsFeatures)
@@ -714,12 +747,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     percentage = 0;
   else
     percentage = 100 * ((noprim - bValid) / float(noprim));
-  ss << "# valid: " << setw(22) << bValid;
+  ss << "  # valid: " << setw(20) << bValid;
   if (noprim == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << (noprim - bValid);
+  ss << "  # invalid: " << setw(18) << (noprim - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   std::set<int> theprimitives;
   for (auto& f : lsFeatures)
@@ -769,21 +802,21 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     //-- primitives
     for (auto e : errors_p)
     {
-      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
+      ss << "  " << e.first << " -- " << ALL_ERRORS[e.first] << std::endl;
       ss << setw(11) << e.second;
       ss << " primitive(s)";
       ss << std::endl;
     }
     for (auto e : errors_f)
     {
-      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
+      ss << "  " << e.first << " -- " << ALL_ERRORS[e.first] << std::endl;
       ss << setw(11) << e.second;
       ss << " feature(s)";
       ss << std::endl;
     }
     for (auto& e : ioerrs.get_unique_error_codes())
     {
-      ss << "  " << e << " -- " << errorcode2description(e) << std::endl;
+      ss << "  " << e << " -- " << ALL_ERRORS[e] << std::endl;
     }
   }
 

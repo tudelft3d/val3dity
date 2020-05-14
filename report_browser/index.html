@@ -37,7 +37,8 @@
                       </tr>
                       <tr>
                         <th scope="row">input file type</th>
-                        <td>{{ report.input_file_type }}</td>
+                        <td v-if="report.input_file_type == 'CityGML'">CityGML <span class="text-muted">(watchout: CityGML support is deprecated, future version will not support it, upgrade to <a href="https://www.cityjson.org/">CityJSON 🚀</a>)</span></td>
+                        <td v-else>{{ report.input_file_type }}</td>
                       </tr>
                       </tr>
                       <tr>

@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:3.10
 LABEL maintainer.email="b.dukai@tudelft.nl" maintainer.name="Balázs Dukai"
 
 ENV CXX="g++ -std=c++98"
@@ -104,9 +104,9 @@ RUN mkdir /data && \
     
 RUN val3dity --version
 
-USER 1001
-
 COPY --chown=1001:0 uid_entrypoint.sh /usr/local/bin/
+
+USER 1001
 
 WORKDIR /data
 

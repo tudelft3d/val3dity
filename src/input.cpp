@@ -94,7 +94,7 @@ std::string IOErrors::get_report_text()
   {
     for (auto i : err.second)
     {
-      ss << err.first << " -- " << errorcode2description(err.first) << std::endl;
+      ss << err.first << " -- " << ALL_ERRORS[err.first] << std::endl;
       ss << "\tInfo: " << i << std::endl;
     }
   }
@@ -112,7 +112,7 @@ json IOErrors::get_report_json()
       json jj;
       jj["type"] = "Error";
       jj["code"] = err.first;
-      jj["description"] = errorcode2description(err.first);
+      jj["description"] = ALL_ERRORS[err.first];
       jj["info"] = i;
       j.push_back(jj);
     }
@@ -131,60 +131,6 @@ void IOErrors::set_input_file_type(std::string s) {
 }
 
 
-std::string errorcode2description(int code) {
-  switch(code)
-  {
-    case 0:   return string("STATUS_OK"); break;
-    //-- RING
-    case 101: return string("TOO_FEW_POINTS"); break;
-    case 102: return string("CONSECUTIVE_POINTS_SAME"); break;
-    case 103: return string("RING_NOT_CLOSED"); break;
-    case 104: return string("RING_SELF_INTERSECTION"); break;
-    //-- POLYGON
-    case 201: return string("INTERSECTION_RINGS"); break;
-    case 202: return string("DUPLICATED_RINGS"); break;
-    case 203: return string("NON_PLANAR_POLYGON_DISTANCE_PLANE"); break;
-    case 204: return string("NON_PLANAR_POLYGON_NORMALS_DEVIATION"); break;
-    case 205: return string("POLYGON_INTERIOR_DISCONNECTED"); break;
-    case 206: return string("INNER_RING_OUTSIDE"); break;
-    case 207: return string("INNER_RINGS_NESTED"); break;
-    case 208: return string("ORIENTATION_RINGS_SAME"); break;
-    //-- SHELL
-    case 300: return string("NOT_VALID_2_MANIFOLD"); break;
-    case 301: return string("TOO_FEW_POLYGONS"); break;
-    case 302: return string("SHELL_NOT_CLOSED"); break;
-    case 303: return string("NON_MANIFOLD_CASE"); break;
-    case 305: return string("MULTIPLE_CONNECTED_COMPONENTS"); break;
-    case 306: return string("SHELL_SELF_INTERSECTION"); break;
-    case 307: return string("POLYGON_WRONG_ORIENTATION"); break;
-    // case 309: return string("VERTICES_NOT_USED"); break;
-    //-- SOLID & MULTISOLID
-    case 401: return string("INTERSECTION_SHELLS"); break;
-    case 402: return string("DUPLICATED_SHELLS"); break;
-    case 403: return string("INNER_SHELL_OUTSIDE"); break;
-    case 404: return string("SOLID_INTERIOR_DISCONNECTED"); break;
-    case 405: return string("WRONG_ORIENTATION_SHELL"); break;
-    //-- COMPOSITESOLID
-    case 501: return string("INTERSECTION_SOLIDS"); break;
-    case 502: return string("DUPLICATED_SOLIDS"); break;
-    case 503: return string("DISCONNECTED_SOLIDS"); break;
-    //-- CityGML objects
-    case 601: return string("BUILDINGPARTS_OVERLAP"); break;
-    case 609: return string("CITYOBJECT_HAS_NO_GEOMETRY"); break;
-    //-- IndoorGML objects
-    case 701: return string("CELLS_OVERLAP"); break;
-    case 702: return string("DUAL_VERTEX_OUTSIDE_CELL"); break;
-    case 703: return string("PRIMAL_DUAL_XLINKS_ERROR"); break;
-    case 704: return string("PRIMAL_DUAL_ADJACENCIES_INCONSISTENT"); break;
-    //-- OTHERS
-    case 901: return string("INVALID_INPUT_FILE"); break;
-    case 902: return string("EMPTY_PRIMITIVE"); break;
-    case 903: return string("WRONG_INPUT_PARAMETERS"); break;
-    case 904: return string("FORMAT_NOT_SUPPORTED"); break;
-    case 999: return string("UNKNOWN_ERROR"); break;
-    default:  return string("UNKNOWN_ERROR"); break;
-  }
-}
 
 //-- ignore XML namespace
 std::string localise(std::string s)
