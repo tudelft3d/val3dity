@@ -3,6 +3,7 @@
 
 ## [Unreleased]
 - validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
+- support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 - phasing out CityGML support
 
 ## [2.2.0] - 2020-05-13
