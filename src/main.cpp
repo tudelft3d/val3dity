@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -21,13 +21,12 @@
   For any information or further details about the use of val3dity, contact
   Hugo Ledoux
   <h.ledoux@tudelft.nl>
-  Faculty of Architecture & the Built Environment
+  Faculty of the Built Environment & Architecture
   Delft University of Technology
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
 #include "input.h"
-#include "reportoutput.h"
 #include "Primitive.h"
 #include "Surface.h"
 #include "MultiSurface.h"
@@ -36,7 +35,6 @@
 #include "Feature.h"
 #include "CityObject.h"
 #include "GenericObject.h"
-
 #include "validate_prim_toporel.h"
 
 #include <tclap/CmdLine.h>
@@ -48,15 +46,20 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.1.1";
+std::string VAL3DITY_VERSION = "2.2.0";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
-void        get_report_json(json& jr, std::string ifile, std::vector<Feature*>& lsFeatures, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, bool onlyinvalid);
-void        print_license();
-void        write_report_html(json& jr, std::string report);
 void        write_report_json(json& jr, std::string report);
+void        get_report_json(json& jr, 
+                            std::string ifile, 
+                            std::vector<Feature*>& lsFeatures, 
+                            double snap_tol, 
+                            double overlap_tol, 
+                            double planarity_d2p_tol, 
+                            double planarity_n_tol, 
+                            IOErrors ioerrs);
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -79,26 +82,27 @@ public:
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
     
-    std::cout << "\tval3dity CityGMLinput.gml" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in CityGMLinput.gml" << std::endl;
-    std::cout << "\t\tand outputs a summary per city object" << std::endl;
+    std::cout << "\tval3dity input.json" << std::endl;
+    std::cout << "\t\tValidate each City Object and each 3D primitive in input.json (CityJSON file)" << std::endl;
+    std::cout << "\t\tand print a summary" << std::endl;
     
-    std::cout << "\tval3dity input.json -r /home/elvis/temp/r" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in input.json (CityJSON file)" << std::endl;
-    std::cout << "\t\tand outputs a detailed report '/home/elvis/temp/r/report.html'" << std::endl;
+    std::cout << "\tval3dity input.json --report /home/elvis/temp/myreport.json" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.json (CityJSON file)" << std::endl;
+    std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
+    std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
     
     std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
-    std::cout << "\t\tValidates each 3D primitive in input.gml," << std::endl;
-    std::cout << "\t\ta tolerance of 0.05 unit is used for the CompositeSolids and BuildingParts" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.gml (a GML file)," << std::endl;
+    std::cout << "\t\ta tolerance of 0.05 unit is used for the 3D adjacency between Solids." << std::endl;
     
     std::cout << "\tval3dity input.json --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
     
     std::cout << "\tval3dity input.obj" << std::endl;
-    std::cout << "\t\tValidates the geometries in input.obj as if they were a Solid (default)" << std::endl;
+    std::cout << "\t\tValidate the geometries in input.obj as if they were an ISO19107 Solid (default)" << std::endl;
     
     std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
-    std::cout << "\t\tValidates the geometries in input.off as a MultiSurface" << std::endl;
+    std::cout << "\t\tValidate the geometries in input.off as an ISO19107 MultiSurface" << std::endl;
     
     std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
@@ -117,6 +121,56 @@ public:
 
 };
 
+class LicensePrint : public TCLAP::Visitor
+{
+  public:
+  
+    LicensePrint() : Visitor() {};
+    void visit() 
+    {
+      std::string thelicense =
+      "\nval3dity\n\n"
+      "Copyright (C) 2011-2020  3D geoinformation research group, TU Delft\n\n"
+      "val3dity is free software: you can redistribute it and/or modify\n"
+      "it under the terms of the GNU General Public License as published by\n"
+      "the Free Software Foundation, either version 3 of the License, or\n"
+      "(at your option) any later version.\n\n"
+      "val3dity is distributed in the hope that it will be useful,\n"
+      "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+      "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+      "GNU General Public License for more details.\n\n"
+      "A copy of the GNU General Public License is available at\n"
+      "<http://www.gnu.org/licenses/> or\n"
+      "<https://github.com/tudelft3d/val3dity/blob/master/LICENSE\n\n"
+      "For any information or further details about the use of val3dity, contact:\n"
+      "Hugo Ledoux \n"
+      "<h.ledoux@tudelft.nl>\n"
+      "Faculty of the Built Environment & Architecture\n"
+      "Delft University of Technology\n"
+      "Julianalaan 134, Delft 2628BL, the Netherlands\n";
+ 
+      std::cout << thelicense << std::endl;  
+      exit(0); 
+    };
+};
+
+
+class ListErrorsPrint : public TCLAP::Visitor
+{
+  public:
+  
+    ListErrorsPrint() : Visitor() {};
+    void visit() 
+    {
+      for (auto& e: ALL_ERRORS) {
+        std::cout << e.first << " -- " << e.second << std::endl;
+      }
+      std::cout << std::endl;
+      std::string url = "https://val3dity.readthedocs.io/en/" + VAL3DITY_VERSION + "/errors/";
+      std::cout << "Explanations and examples of each error at " << url << std::endl;
+      exit(0); 
+    };
+};
 
 int main(int argc, char* const argv[])
 {
@@ -149,16 +203,10 @@ int main(int argc, char* const argv[])
                                               "string");
     TCLAP::ValueArg<std::string>            report("r",
                                               "report",
-                                              "output report in HTML format",
-                                              false,
-                                              "",
-                                              "string");    
-    TCLAP::ValueArg<std::string>            report_json("",
-                                              "report_json",
                                               "output report in JSON format",
                                               false,
                                               "",
-                                              "string");
+                                              "string");    
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
                                               "which geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
@@ -169,17 +217,19 @@ int main(int argc, char* const argv[])
                                               "verbose",
                                               "verbose output",
                                               false);
-    TCLAP::SwitchArg                        license("",
+    TCLAP::SwitchArg                        license("l",
                                               "license",
                                               "see the software license",
-                                              false);
+                                              false,
+                                              new LicensePrint() );
+    TCLAP::SwitchArg                        listerrors("",
+                                              "listerrors",
+                                              "list all the possible errors",
+                                              false,
+                                              new ListErrorsPrint() );
     TCLAP::SwitchArg                        unittests("",
                                               "unittests",
                                               "unit tests output",
-                                              false);
-    TCLAP::SwitchArg                        onlyinvalid("",
-                                              "onlyinvalid",
-                                              "only invalid primitives are reported",
                                               false);
     TCLAP::SwitchArg                        ignore204("",
                                               "ignore204",
@@ -229,31 +279,40 @@ int main(int argc, char* const argv[])
     cmd.add(geom_is_sem_surfaces);
     cmd.add(ignore204);
     cmd.add(unittests);
-    cmd.add(onlyinvalid);
     cmd.add(output_off);
-    // cmd.add(inputfile);
-    // cmd.add(license);
-    cmd.xorAdd( inputfile, license );
+    cmd.add(inputfile);
+    cmd.add(listerrors);
+    cmd.add(license);
     cmd.add(ishellfiles);
     cmd.add(report);
-    cmd.add(report_json);
     cmd.parse( argc, argv );
 
-    //-- vector with Features: CityObject, GenericObject, or IndoorObject (or others in the future)
+    //-- vector with Features: CityObject, GenericObject, 
+    //-- or IndoorModel (or others in the future)
     std::vector<Feature*> lsFeatures;
     
     InputTypes inputtype = OTHER;
     std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
-    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) 
+    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
       inputtype = GML;
-    else if ( (extension == "poly") || (extension == "POLY") ) 
+      ioerrs.set_input_file_type("GML");
+    }
+    else if ( (extension == "poly") || (extension == "POLY") ) {
       inputtype = POLY;    
-    else if ( (extension == "json") || (extension == "JSON") ) 
+      ioerrs.set_input_file_type("POLY");
+    }
+    else if ( (extension == "json") || (extension == "JSON") ) {
       inputtype = JSON;
-    else if ( (extension == "obj") || (extension == "OBJ") ) 
+      ioerrs.set_input_file_type("CityJSON");
+    }
+    else if ( (extension == "obj") || (extension == "OBJ") ) {
       inputtype = OBJ;
-    else if ( (extension == "off") || (extension == "OFF") ) 
+      ioerrs.set_input_file_type("OBJ");
+    }
+    else if ( (extension == "off") || (extension == "OFF") ) {
       inputtype = OFF;
+      ioerrs.set_input_file_type("OFF");
+    }
 
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
@@ -261,16 +320,6 @@ int main(int argc, char* const argv[])
       savedBufferCLOG = clog.rdbuf();
       mylog.open("val3dity.log");
       std::clog.rdbuf(mylog.rdbuf());
-    }
-    if (license.getValue() == true)
-    {
-      print_license();
-      if (verbose.getValue() == false)
-      {
-        clog.rdbuf(savedBufferCLOG);
-        mylog.close();
-      }
-      return(0);
     }
 
     //-- no negative snap_tol value
@@ -282,8 +331,9 @@ int main(int argc, char* const argv[])
     
     if (inputtype == OTHER) {
       std::stringstream ss;
-      ss << "Input file (" << inputfile.getValue() << ") not supported.";
-      ioerrs.add_error(901, ss.str());
+      ss << "Format of file " << inputfile.getValue() << " not supported (based on its extension).";
+      ioerrs.add_error(904, ss.str());
+      ioerrs.set_input_file_type("UNKNOWN");
     }
 
     Primitive3D prim3d;
@@ -303,7 +353,7 @@ int main(int argc, char* const argv[])
     }
 
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
@@ -448,7 +498,7 @@ int main(int argc, char* const argv[])
         std::cout << "CompositeSurface" << std::endl;
       else {
         std::cout << "All" << std::endl;
-        std::cout << "(CityGML/CityJSON have all their 3D primitives validated)" << std::endl;
+        std::cout << "(CityGML/CityJSON/IndoorGML have all their 3D primitives validated)" << std::endl;
       }
       //-- report on parameters used
       if (ignore204.getValue() == true)
@@ -464,12 +514,14 @@ int main(int argc, char* const argv[])
         std::cout << "   overlap_tol" << setw(19)  << "none" << std::endl;
       else
         std::cout << "   overlap_tol" << setw(19)  << overlap_tol.getValue() << std::endl;
+      std::cout << std::endl;
     }
     
     //-- now the validation starts
     if ( (lsFeatures.empty() == false) && (ioerrs.has_errors() == false) )
     {
       int i = 1;
+      std::cout << "Validation of " << lsFeatures.size() << " feature(s):" << std::endl;
       for (auto& f : lsFeatures)
       {
         if ( (i % 10 == 0) && (verbose.getValue() == false) )
@@ -547,8 +599,8 @@ int main(int argc, char* const argv[])
       std::cout << std::endl;
     }
 
-    //-- output report
-    if ( (report.getValue() != "") || (report_json.getValue() != "") )
+    //-- output report in JSON 
+    if (report.getValue() != "") 
     {
       //-- save the json report in memory first
       json jr;
@@ -559,17 +611,12 @@ int main(int argc, char* const argv[])
                        overlap_tol.getValue(),
                        planarity_d2p_tol.getValue(),
                        planarity_n_tol_updated,
-                       ioerrs,
-                       onlyinvalid.getValue());
-      // HTML report
-      if (report.getValue() != "") 
-        write_report_html(jr, report.getValue());
-      // JSON report
-      if (report_json.getValue() != "")
-        write_report_json(jr, report_json.getValue());
+                       ioerrs);
+      if (report.getValue() != "")
+        write_report_json(jr, report.getValue());
     }
     else
-      std::cout << "-->The validation report wasn't saved, use option '--report' (or '--report_json')." << std::endl;
+      std::cout << "==> The validation report wasn't saved, use option '--report'." << std::endl;
 
     //-- unittests 
     if (unittests.getValue() == true)
@@ -593,59 +640,22 @@ int main(int argc, char* const argv[])
 void write_report_json(json& jr, std::string report)
 {
   boost::filesystem::path outpath(report);
-  if (boost::filesystem::exists(outpath.parent_path()) == false)
-    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-  else {
-    if (boost::filesystem::extension(outpath) != ".json")
-      outpath += ".json";
-    std::ofstream o(outpath.string());
-    o << jr.dump(2) << std::endl;                                
-    std::cout << "Full validation report (in JSON format) saved to " << outpath << std::endl;
+  if (boost::filesystem::exists(outpath.parent_path()) == false) {
+    boost::filesystem::path fullpath(boost::filesystem::current_path() / report);
+    if (boost::filesystem::exists(fullpath.parent_path()) == false) {
+      std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+      return;
+    }
+    else
+      outpath = fullpath;
   }
-
-}
-
-
-
-void write_report_html(json& jr, std::string report)
-{
-  boost::filesystem::path outpath(report);
-  if (boost::filesystem::exists(outpath.parent_path()) == false)
-    std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
-  else {
-    if (boost::filesystem::exists(outpath) == false)
-      boost::filesystem::create_directory(outpath);
-    boost::filesystem::path outfile = outpath / "report.html";
-    std::ofstream o(outfile.string());
-    o << report_indexhtml << std::endl;                                
-    std::cout << "Full validation report (in HTML format) saved to " << outfile << std::endl;
-    o.close();
-
-    outfile = outpath / "report.js";
-    o.open(outfile.string());
-    o << "var report =" << jr << std::endl;                                
-    o.close();
-
-    outfile = outpath / "tree.html";
-    o.open(outfile.string());
-    o << report_tree << std::endl;                                
-    o.close();
-
-    outfile = outpath / "treeview.js";
-    o.open(outfile.string());
-    o << report_treeviewjs << std::endl;                                
-    o.close();
-
-    outfile = outpath / "val3dityconfig.js";
-    o.open(outfile.string());
-    o << report_val3dityconfigjs << std::endl;                                
-    o.close();
-    
-    outfile = outpath / "index.css";
-    o.open(outfile.string());
-    o << report_indexcss << std::endl;                                
-    o.close();
-  }
+  if (boost::filesystem::extension(outpath) != ".json")
+    outpath += ".json";
+  std::ofstream o(outpath.string());
+  o << jr.dump(2) << std::endl;                                
+  std::cout << "Validation report saved to " << boost::filesystem::canonical(outpath) << std::endl;
+  std::cout << "Browse its content:" << std::endl;
+  std::cout << "==>http://geovalidation.bk.tudelft.nl/val3dity/browser/\n" << std::endl;
 }
 
 
@@ -689,6 +699,15 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     for (auto& p : o->get_primitives())
       noprim++;
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  ss << "Input file type:" << std::endl;
+  std::string ft = ioerrs.get_input_file_type();
+  if (ft == "CityGML") {
+    ft += "\n  [watchout: CityGML support is deprecated]";
+    ft += "\n  [future version will not support it]";
+    ft += "\n  [upgrade to CityJSON]";
+  }
+  ss << "  " << ft << std::endl;
+  ss << "+++++" << std::endl;
   int fInvalid = 0;
   for (auto& f : lsFeatures)
   {
@@ -701,12 +720,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     percentage = 0;
   else
     percentage = 100 * (fInvalid / float(lsFeatures.size()));
-  ss << "# valid: " << setw(22) << lsFeatures.size() - fInvalid;
+  ss << "  # valid: " << setw(20) << lsFeatures.size() - fInvalid;
   if (lsFeatures.size() == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << fInvalid;
+  ss << "  # invalid: " << setw(18) << fInvalid;
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   std::set<std::string> thetypes;
   for (auto& f : lsFeatures)
@@ -728,12 +747,12 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
     percentage = 0;
   else
     percentage = 100 * ((noprim - bValid) / float(noprim));
-  ss << "# valid: " << setw(22) << bValid;
+  ss << "  # valid: " << setw(20) << bValid;
   if (noprim == 0)
     ss << " (" << 0 << "%)" << std::endl;
   else
     ss << std::fixed << setprecision(1) << " (" << 100 - percentage << "%)" << std::endl;
-  ss << "# invalid: " << setw(20) << (noprim - bValid);
+  ss << "  # invalid: " << setw(18) << (noprim - bValid);
   ss << std::fixed << setprecision(1) << " (" << percentage << "%)" << std::endl;
   std::set<int> theprimitives;
   for (auto& f : lsFeatures)
@@ -752,63 +771,58 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
         case 2: ss << "MultiSolid"        << std::endl; break;
         case 3: ss << "CompositeSurface"  << std::endl; break;
         case 4: ss << "MultiSurface"      << std::endl; break;
-        case 5: ss << "ALL"               << std::endl; break;
+        case 5: ss << "GeometryTemplate"  << std::endl; break;
+        case 9: ss << "ALL"               << std::endl; break;
       }
     }
   }
   //-- overview of errors
-  std::map<int,int> errors;
-  for (auto& f : lsFeatures) 
+  std::map<int,int> errors_f; //-- features
+  for (auto& f : lsFeatures)
     for (auto& code : f->get_unique_error_codes())
-        errors[code] = 0;
-  for (auto& f : lsFeatures) 
+      if (code > 600)
+        errors_f[code] = 0;
+  for (auto& f : lsFeatures)
     for (auto& code : f->get_unique_error_codes())
-        errors[code] += 1;
-
-  if ( (errors.size() > 0) || (ioerrs.has_errors() == true) )
+      if (code > 600)
+        errors_f[code] += 1;
+  std::map<int,int> errors_p; //-- primitives
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors_p[code] = 0;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors_p[code] += 1;
+  if ( (errors_p.size() > 0) || (errors_p.size() > 0) || (ioerrs.has_errors() == true) )
   {
     ss << "+++++" << std::endl;
     ss << "Errors present:" << std::endl;
-    for (auto e : errors)
+    //-- primitives
+    for (auto e : errors_p)
     {
-      ss << "  " << e.first << " -- " << errorcode2description(e.first) << std::endl;
-      ss << setw(11) << "(" << e.second << " primitives)" << std::endl;
+      ss << "  " << e.first << " -- " << ALL_ERRORS[e.first] << std::endl;
+      ss << setw(11) << e.second;
+      ss << " primitive(s)";
+      ss << std::endl;
+    }
+    for (auto e : errors_f)
+    {
+      ss << "  " << e.first << " -- " << ALL_ERRORS[e.first] << std::endl;
+      ss << setw(11) << e.second;
+      ss << " feature(s)";
+      ss << std::endl;
     }
     for (auto& e : ioerrs.get_unique_error_codes())
     {
-      ss << "  " << e << " -- " << errorcode2description(e) << std::endl;
+      ss << "  " << e << " -- " << ALL_ERRORS[e] << std::endl;
     }
   }
 
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
 }
-
-
-void print_license() {
-  std::string thelicense =
-    "\nval3dity\n\n"
-    "Copyright (C) 2011-2018  3D geoinformation research group, TU Delft\n\n"
-    "val3dity is free software: you can redistribute it and/or modify\n"
-    "it under the terms of the GNU General Public License as published by\n"
-    "the Free Software Foundation, either version 3 of the License, or\n"
-    "(at your option) any later version.\n\n"
-    "val3dity is distributed in the hope that it will be useful,\n"
-    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-    "GNU General Public License for more details.\n\n"
-    "A copy of the GNU General Public License is available at\n"
-    "<http://www.gnu.org/licenses/> or\n"
-    "<https://github.com/tudelft3d/val3dity/blob/master/LICENSE\n\n"
-    "For any information or further details about the use of val3dity, contact:\n"
-    "Hugo Ledoux \n"
-    "<h.ledoux@tudelft.nl>\n"
-    "Faculty of Architecture & the Built Environment\n"
-    "Delft University of Technology\n"
-    "Julianalaan 134, Delft 2628BL, the Netherlands\n";
-  std::cout << thelicense << std::endl;
-}
-
 
 void get_report_json(json& jr,
                      std::string ifile, 
@@ -817,12 +831,12 @@ void get_report_json(json& jr,
                      double overlap_tol,
                      double planarity_d2p_tol,
                      double planarity_n_tol,
-                     IOErrors ioerrs,
-                     bool onlyinvalid)
+                     IOErrors ioerrs)
 {
-  jr["type"] = "val3dity report";
+  jr["type"] = "val3dity_report";
   jr["val3dity_version"] = VAL3DITY_VERSION; 
   jr["input_file"] = ifile;
+  jr["input_file_type"] = ioerrs.get_input_file_type();
   //-- time
   std::time_t rawtime;
   struct tm * timeinfo;
@@ -832,78 +846,99 @@ void get_report_json(json& jr,
   std::strftime(buffer, 80, "%c %Z", timeinfo);
   jr["time"] = buffer;
   //-- user-defined param
-  jr["snap_tol"] = snap_tol;
-  jr["overlap_tol"] = overlap_tol;
-  jr["planarity_d2p_tol"] = planarity_d2p_tol;
-  jr["planarity_n_tol"] = planarity_n_tol;
-  
+  jr["parameters"];
+  jr["parameters"]["snap_tol"] = snap_tol;
+  jr["parameters"]["overlap_tol"] = overlap_tol;
+  jr["parameters"]["planarity_d2p_tol"] = planarity_d2p_tol;
+  jr["parameters"]["planarity_n_tol"] = planarity_n_tol;
+
+  //-- primitives overview
+  std::map<int, std::tuple<int,int> > prim_o; //-- <primID, total, valid>
   std::set<int> theprimitives;
-  int noprim = 0;
   for (auto& f : lsFeatures)
-  {
     for (auto& p : f->get_primitives())
-    {
       theprimitives.insert(p->get_type());
-      noprim++;
-    }
-  }
-  jr["overview_primitives"];    
   for (auto& each : theprimitives)
-  {
-    switch(each)
-    {
-      case 0: jr["overview_primitives"].push_back("Solid"); break;
-      case 1: jr["overview_primitives"].push_back("CompositeSolid"); break;
-      case 2: jr["overview_primitives"].push_back("MultiSolid"); break;
-      case 3: jr["overview_primitives"].push_back("CompositeSurface"); break;
-      case 4: jr["overview_primitives"].push_back("MultiSurface"); break;
-      case 5: jr["overview_primitives"].push_back("ALL"); break;
+    prim_o[each] = std::make_tuple(0, 0);
+  for (auto& f : lsFeatures) {
+    for (auto& p : f->get_primitives()) {
+      std::get<0>(prim_o[p->get_type()]) += 1;
+      if (p->is_valid() == true) {
+        std::get<1>(prim_o[p->get_type()]) += 1;
+      }
     }
   }
-  jr["total_primitives"] = noprim;
-  int bValid = 0;
-  for (auto& f : lsFeatures)
-    for (auto& p : f->get_primitives())
-      if (p->is_valid() == true)
-        bValid++;
-  jr["valid_primitives"] = bValid;
-  jr["invalid_primitives"] = noprim - bValid;
-  //-- features
-  std::set<std::string> thefeatures;
-  jr["total_features"] = lsFeatures.size();
-  bValid = 0;
-  for (auto& f : lsFeatures)
-  {
-    thefeatures.insert(f->get_type());
-    if (f->is_valid() == true)
-      bValid++;
+  jr["primitives_overview"] = json::array();
+  for (auto& each : prim_o) {
+    json j;
+    switch(each.first)
+    {
+      case 0: j["type"] = "Solid"; break;
+      case 1: j["type"] = "CompositeSolid"; break;
+      case 2: j["type"] = "MultiSolid"; break;
+      case 3: j["type"] = "CompositeSurface"; break;
+      case 4: j["type"] = "MultiSurface"; break;
+      case 5: j["type"] = "GeometryTemplate"; break;
+      case 9: j["type"] = "ALL"; break;
+    }
+    j["total"] = std::get<0>(each.second);
+    j["valid"] = std::get<1>(each.second);
+    jr["primitives_overview"].push_back(j);
   }
-  jr["overview_features"];    
+
+  //-- features overview
+  std::map<std::string, std::tuple<int,int> > feat_o; //-- <featureID, total, valid>
+  std::set<std::string> thefeatures;
+  for (auto& f : lsFeatures)
+    thefeatures.insert(f->get_type());
   for (auto& each : thefeatures)
-    jr["overview_features"].push_back(each);
-  jr["valid_features"] = bValid;
-  jr["invalid_features"] = lsFeatures.size() - bValid;
-  //-- overview of errors
-  // "overview-errors": [101, 203],
-  // "overview-errors-primitives": [5, 1],
-  std::map<int,int> errors;
-  for (auto& f : lsFeatures) 
-    for (auto& code : f->get_unique_error_codes())
-        errors[code] = 0;
-  for (auto& f : lsFeatures) 
-    for (auto& code : f->get_unique_error_codes())
-        errors[code] += 1;
-  jr["overview_errors"];    
-  for (auto e : errors)
-    jr["overview_errors"].push_back(e.first);
-  for (auto& e : ioerrs.get_unique_error_codes())
-    jr["overview_errors"].push_back(e);
-  jr["errors_dataset"];
-  jr["features"];
+    feat_o[each] = std::make_tuple(0, 0);
+  for (auto& f : lsFeatures) {
+    std::get<0>(feat_o[f->get_type()]) += 1;
+    if (f->is_valid() == true) {
+      std::get<1>(feat_o[f->get_type()]) += 1;
+    }
+  }
+  jr["features_overview"] = json::array();
+  for (auto& each : feat_o) {
+    json j;
+    j["type"] = each.first; 
+    j["total"] = std::get<0>(each.second);
+    j["valid"] = std::get<1>(each.second);
+    jr["features_overview"].push_back(j);
+  }
+
+  //-- each of the features with their primitives listed
+  jr["features"] = json::array();
+  for (auto& f : lsFeatures)
+    jr["features"].push_back(f->get_report_json());
+  
+  //-- dataset errors (9xx)
+  jr["dataset_errors"] = json::array();
   if (ioerrs.has_errors() == true)
-    jr["errors_dataset"] = ioerrs.get_report_json();
-  for (auto& f : lsFeatures) 
-    jr["features"].push_back(f->get_report_json()); 
+    jr["dataset_errors"] = ioerrs.get_report_json();
+
+  //-- overview of errors
+  std::set<int> unique_errors;
+  for (auto& f : lsFeatures)
+    for (auto& code : f->get_unique_error_codes())
+      unique_errors.insert(code);
+  jr["all_errors"] = json::array();
+  for (auto& e : unique_errors)
+    jr["all_errors"].push_back(e);
+  for (auto& e : ioerrs.get_unique_error_codes())
+    jr["all_errors"].push_back(e);
+
+  bool bValid = true;
+  for (auto& f : lsFeatures) {
+    if (f->is_valid() == false) {
+      bValid = false;
+      break;
+    }
+  }
+  if (ioerrs.has_errors() == true)
+    bValid = false;
+  jr["validity"] = bValid;
 }
 
 

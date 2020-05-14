@@ -67,7 +67,7 @@ bool CityObject::validate_building(double tol_overlap)
     return bValid;
   std::clog << "--- Interactions between BuildingParts ---" << std::endl;
   std::vector<Error> lsErrors;
-  if (do_primitives_overlap(_lsPrimitives, 601, lsErrors, tol_overlap) == true)
+  if (do_primitives_interior_overlap(_lsPrimitives, 601, lsErrors, tol_overlap) == true)
   {
     bValid = false;
     std::clog << "Error: overlapping building parts" << std::endl;

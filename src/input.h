@@ -52,10 +52,12 @@ namespace val3dity
   class Solid;
   class CompositeSolid;
   class MultiSolid;
+  class GeometryTemplate;
 
 
 class IOErrors {
   std::map<int, std::vector<std::string> >  _errors;
+  std::string                               _inputfiletype;
 public:
   bool          has_errors();
   void          add_error(int code, std::string info);
@@ -63,6 +65,8 @@ public:
   json          get_report_json();
   std::set<int> get_unique_error_codes();
   bool          has_specific_error(int i);
+  std::string   get_input_file_type();
+  void          set_input_file_type(std::string s);
 };
 
   
@@ -159,13 +163,11 @@ void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 void              read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              print_information(std::string &ifile);
-void              report_primitives(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
-void              report_building(pugi::xml_document& doc, std::map<std::string, std::string>& ns);
-void              report_building_each_lod(pugi::xml_document& doc, std::map<std::string, std::string>& ns, int lod, int& total_solid, int& total_ms, int& total_sem);
-void              get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml);
+void              report_primitives(pugi::xml_document& doc);
+void              report_building(pugi::xml_document& doc);
+void              report_building_each_lod(pugi::xml_document& doc, int lod, int& total_solid, int& total_ms, int& total_sem);
 void              print_info_aligned(std::string o, size_t number, bool tab = false);
 
-std::string       errorcode2description(int code);
 void              read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
 Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs);
@@ -178,10 +180,15 @@ Solid*            process_gml_solid(const pugi::xml_node& nsolid, std::map<std::
 MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
+
+void              process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap);
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
+void              process_cityjson_geometrytemplates(json& jgt, std::vector<GeometryTemplate*>& lsGTs, double tol_snap);
+void              process_json_surface_geometrytemplate(std::vector< std::vector<int> >& pgn, json& j, Surface* sh);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 void              process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
+void              process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
 
 void              printProgressBar(int percent);
 std::string       localise(std::string s);

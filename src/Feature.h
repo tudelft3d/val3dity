@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -57,6 +57,8 @@ public:
   void                    add_primitive(Primitive* p);
 
   const std::vector<Primitive*>&  get_primitives();
+
+  int                     number_of_primitives();
 
   void                    add_error(int code, std::string info, std::string whichgeoms);
   json                    get_report_json();

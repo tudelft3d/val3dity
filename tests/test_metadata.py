@@ -11,7 +11,7 @@ def test_metadata():
     file = os.path.abspath(os.path.join(root, data_dir, "test_metadata.yml"))
     
     with open(file, "r") as stream:
-        ds = yaml.load(stream)
+        ds = yaml.load(stream, Loader=yaml.Loader)
     
     cases = ds.keys()
     for case in cases:

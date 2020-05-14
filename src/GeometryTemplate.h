@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -26,32 +26,40 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#ifndef Validate_prim_toporel_h
-#define Validate_prim_toporel_h
+#ifndef GeometryTemplate_h
+#define GeometryTemplate_h
 
-#include "definitions.h"
+#include "Primitive.h"
 #include "Solid.h"
+
+#include <string>
+#include <vector>
 
 namespace val3dity
 {
 
+class GeometryTemplate : public Primitive 
+{
+public:
+                GeometryTemplate(std::string id = ""); 
+                ~GeometryTemplate(); 
 
-class Primitive;
+  bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
+  int           is_valid();
+  bool          is_empty();
+  json          get_report_json();
+  Primitive3D   get_type();
+  std::set<int> get_unique_error_codes();
 
-bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives, 
-                                    int errorcode_to_assign, 
-                                    std::vector<Error>& lsErrors, 
-                                    double tol_overlap);
+  void          get_min_bbox(double& x, double& y);
+  void          translate_vertices();
 
-bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::string,Solid*>>& lsCells,
-                                               int errorcode_to_assign, 
-                                               std::vector<Error>& lsErrors, 
-                                               double tol_overlap);
+  bool          add_primitive(Primitive* s);
 
-int are_primitives_adjacent(Primitive* p1, Primitive* p2, double tol_overlap);
-
-
+protected:
+  std::vector<Primitive*> _lsPrimitives;
+};
 
 } // namespace val3dity
 
-#endif /* Validate_prim_toporel_h */
+#endif /* GeometryTemplate_h */

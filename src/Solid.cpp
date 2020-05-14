@@ -137,6 +137,12 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
 {
   if (this->is_valid() == 0)
   {
+    std::string s;
+    for (auto& e : this->get_unique_error_codes()) {
+      s += std::to_string(e);
+      s += "; ";
+    }
+    std::clog << "Errors: " << s << std::endl;
     return false;
   }
   bool isValid = true;
@@ -187,7 +193,7 @@ json Solid::get_report_json()
   j["numbershells"] = (this->num_ishells() + 1);
   j["numberfaces"] = this->num_faces();
   j["numbervertices"] = this->num_vertices();
-  j["errors"];
+  j["errors"] = json::array();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -195,7 +201,7 @@ json Solid::get_report_json()
       json jj;
       jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
-      jj["description"] = errorcode2description(std::get<0>(err));
+      jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
       j["errors"].push_back(jj);
@@ -233,6 +239,31 @@ Nef_polyhedron* Solid::get_nef_polyhedron()
     *re -= nefs[i];
   }
   _nef = re;
+  return re;
+}
+
+
+/*
+ -2 = not valid polyhedron
+ -1 = outside
+  0 = directly on the boundary of polyhedron
+  1 = inside
+ */
+int Solid::is_point_in_solid(Point3& p)
+{
+  int re = -2;
+  if (this->is_valid() == 1)
+  {
+    auto& s = _shells[0];
+    re = s->side_of_triangle_surface(p);
+    for (int i = 1; i <= this->num_ishells(); i++)
+    {
+      s = _shells[i];
+      int re2 = s->side_of_triangle_surface(p);
+      if ( (re2 == 0) || (re2 == 1) )
+        re = -1;
+    }
+  }
   return re;
 }
 
@@ -407,5 +438,13 @@ bool Solid::validate_solid_with_nef()
   }
   return isValid;
 }
+
+
+CGAL::Bbox_3 Solid::get_bbox() 
+{
+  CgalPolyhedron* poly = this->get_oshell()->get_cgal_polyhedron();
+  return CGAL::Polygon_mesh_processing::bbox(*poly);
+}
+
 
 } // namespace val3dity

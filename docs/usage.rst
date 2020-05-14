@@ -24,21 +24,14 @@ To validate all the 3D primitives in a CityJSON file and see a summary output:
   $ val3dity my3dcity.json 
 
 
-To validate all the 3D primitives in a CityGML file and get a HTML report, provide the path to the folder (eg ``/report_dir``) that will contain the report ``report.html``:
+To validate all the 3D primitives in a CityGML file and get a JSON report ``myreport.json``:
 
 .. code-block:: bash
 
-  $ val3dity -r /report_dir input.gml
+  $ val3dity input.gml --report ./myreport.json
 
 
-To validate all the 3D primitives in a CityGML file and get a `JSON <http://json.org/>`_ report:
-
-.. code-block:: bash
-
-  $ val3dity --report_json report.json input.gml
-
-
-To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm:
+To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm (0.2):
 
 .. code-block:: bash
 
@@ -63,17 +56,19 @@ Accepted input
 
 val3dity accepts as input:
 
-  - `CityJSON <http://www.cityjson.org>`_
-  - `CityGML <https://www.citygml.org>`_ 
   - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
+  - `CityJSON <http://www.cityjson.org>`_
+  - `CityGML (v1 & v2 only, v3 will not be supported) <https://www.citygml.org>`_ 
+  - `IndoorGML <http://indoorgml.net/>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
 
-For **CityGML/CityJSON** files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
+For **CityJSON/CityGML** files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
 The 3D primitives are bundled under their City Objects in the report.
-
 If your CityGML/CityJSON contains ``Buildings`` with one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
 If there is one or more intersections, then :ref:`error_601` will be reported.
+
+For **IndoorGML** files, all the cells (in the primal subdivisions, the rooms) are validated individually, and then some extra validation tests are run on the dual navigation network. All errors 7xx are related specifically to IndoorGML.
 
 For **GML** files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
 
@@ -128,14 +123,6 @@ Options for the validation
 
 ----
 
-
-``--onlyinvalid``
-*****************
-|  Only the invalid primitives are reported in the validation report.
-
-
-----
-
 .. _option_overlap_tol:
 
 ``--overlap_tol``
@@ -143,7 +130,7 @@ Options for the validation
 |  Tolerance for testing the overlap between primitives in ``CompositeSolids`` and ``BuildingParts``
 |  default = -1 (disabled)
 
-The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid`` or the ``BuildingParts`` of a building.
+The maximum allowed distance for overlaps. Helps to validate the topological relationship between ``Solids`` forming a ``CompositeSolid``, the ``BuildingParts`` of a building in CityJSON, or the cells in IndoorGML.
 The tolerance ``--overlap_tol 0.05`` means that each of the solids is given a 0.05unit *fuzzy* boundary (thus 5cm if meters are the unit of the input), and thus this is considered when validating. ``0.0unit`` means that the original boundaries are used.
 Using an overlap tolerance significantly reduces the speed of the validator, because rather complex geometric operations are performed.
 
@@ -190,17 +177,15 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ``-r, --report``
 ****************
-|  Outputs the validation report to the file given. The report is an navigable HTML that can be viewed in a web browser. For this option, the path to the report directory (eg ``/report_dir``) is required. This directory will contain ``report.html`` together with the required files to render it. Open it in a web browser.
-
+|  Outputs the validation report to the file given. The report is in JSON file format, and can be used to produce nice reports automatically or to extract statistics. Use `val3dity report browser <http://geovalidation.bk.tudelft.nl/val3dity/browse/>`_ with your report.
 
 ----
 
-.. _report_json:
+.. _listerrors:
 
-``--report_json``
-*****************
-|  Outputs the validation report to the file given. The report is in JSON file format, and can be used to produce nice reports automatically (our HTML reports does exactly this) or to extract statistics.
-
+``--listerrors``
+****************
+|  Outputs a list of the val3dity errors.
 
 ----
 

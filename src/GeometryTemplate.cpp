@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2017, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -26,31 +26,31 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#include "MultiSolid.h"
+#include "GeometryTemplate.h"
 #include "input.h"
 
 namespace val3dity
 {
 
-MultiSolid::MultiSolid(std::string id) {
+GeometryTemplate::GeometryTemplate(std::string id) {
   _id = id;
   _is_valid = -1;
 }
 
-MultiSolid::~MultiSolid() {
+GeometryTemplate::~GeometryTemplate() {
 }
 
-Primitive3D MultiSolid::get_type() 
+Primitive3D GeometryTemplate::get_type() 
 {
-  return MULTISOLID;
+  return GEOMETRYTEMPLATE;
 }
 
-bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
+bool GeometryTemplate::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap) 
 {
   bool isValid = true;
-  for (auto& s : _lsSolids)
+  for (auto& p : _lsPrimitives)
   {
-    if (s->validate(tol_planarity_d2p, tol_planarity_normals) == false)
+    if (p->validate(tol_planarity_d2p, tol_planarity_normals) == false)
       isValid = false;
   }
   _is_valid = isValid;
@@ -58,7 +58,7 @@ bool MultiSolid::validate(double tol_planarity_d2p, double tol_planarity_normals
 }
 
 
-int MultiSolid::is_valid() 
+int GeometryTemplate::is_valid() 
 {
   if ( (_is_valid == 1) && (this->is_empty() == false) && (_errors.empty() == true) )
     return 1;
@@ -67,47 +67,33 @@ int MultiSolid::is_valid()
 }
 
 
-void MultiSolid::get_min_bbox(double& x, double& y)
+void GeometryTemplate::get_min_bbox(double& x, double& y)
 {
-  double tmpx, tmpy;
-  double minx = 9e10;
-  double miny = 9e10;
-  for (auto& s : _lsSolids)
-  {
-    s->get_min_bbox(tmpx, tmpy);
-    if (tmpx < minx)
-      minx = tmpx;
-    if (tmpy < miny)
-      miny = tmpy;
-  }
-  x = minx;
-  y = miny;
+  x = 0.0;
+  y = 0.0;
 }
 
 
-void MultiSolid::translate_vertices()
-{
-  for (auto& s : _lsSolids)
-    s->translate_vertices();
-}
+void GeometryTemplate::translate_vertices()
+{}
 
-bool MultiSolid::is_empty() 
+bool GeometryTemplate::is_empty() 
 {
-  return _lsSolids.empty();
+  return _lsPrimitives.empty();
 }
 
 
-json MultiSolid::get_report_json()
+json GeometryTemplate::get_report_json()
 {
   json j;
   bool isValid = true;
-  j["type"] = "MultiSolid";
+  j["type"] = "GeometryTemplate";
   if (this->get_id() != "")
     j["id"] = this->_id;
   else
     j["id"] = "none";
-  j["numbersolids"] = this->number_of_solids();
-  j["errors"]  = json::array();
+  // j["numbersolids"] = this->number_of_solids();
+  j["errors"] = json::array();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
@@ -122,10 +108,10 @@ json MultiSolid::get_report_json()
       isValid = false;
     }
   }
-  for (auto& s : _lsSolids)
+  for (auto& p : _lsPrimitives)
   {
-    j["primitives"].push_back(s->get_report_json());
-    if (s->is_valid() == false)
+    j["primitives"].push_back(p->get_report_json());
+    if (p->is_valid() == false)
       isValid = false;
   }
   j["validity"] = isValid;
@@ -134,22 +120,22 @@ json MultiSolid::get_report_json()
 
 
 
-bool MultiSolid::add_solid(Solid* s) {
-  _lsSolids.push_back(s);
+bool GeometryTemplate::add_primitive(Primitive* s) {
+  _lsPrimitives.push_back(s);
   return true;
 }
 
-std::set<int> MultiSolid::get_unique_error_codes() {
+std::set<int> GeometryTemplate::get_unique_error_codes() {
   std::set<int> errs = Primitive::get_unique_error_codes();
-  for (auto& s : _lsSolids) {
-    std::set<int> tmp = s->get_unique_error_codes();
+  for (auto& p : _lsPrimitives) {
+    std::set<int> tmp = p->get_unique_error_codes();
     errs.insert(tmp.begin(), tmp.end());
   }
   return errs;
 }
 
-int MultiSolid::number_of_solids() {
-  return _lsSolids.size();
-}
+// int GeometryTemplate::number_of_solids() {
+//   return _lsSolids.size();
+// }
 
 } // namespace val3dity

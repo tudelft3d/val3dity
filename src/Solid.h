@@ -33,6 +33,8 @@
 #include "definitions.h"
 #include "Surface.h"
 
+#include <CGAL/Polygon_mesh_processing/bbox.h>
+
 #include <vector>
 #include <string>
 
@@ -65,6 +67,10 @@ public:
   bool            is_empty();
   Primitive3D     get_type();
   std::set<int>   get_unique_error_codes();
+
+  int             is_point_in_solid(Point3& p);
+
+  CGAL::Bbox_3    get_bbox();
   
   const std::vector<Surface*>&  get_shells();
 

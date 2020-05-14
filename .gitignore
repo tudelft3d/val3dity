@@ -36,6 +36,8 @@ x86/
 /build
 /buildx
 /docs/_build
+/docs/build
+
 
 # Vagrant
 .vagrant/
@@ -48,3 +50,6 @@ x86/
 .settings/
 /.cache
 /buildx
+
+.idea/
+cmake-build-debug/

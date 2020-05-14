@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bc945c94ff.js"></script>
+
+    <title>val3dity report browser</title>
+  </head>
+  <body>
+    <div id="app">
+      <div v-if="file_loaded">
+        <div class="container">
+          <div class="row">
+            <main class="col-12 py-md-3">
+              <div class="page-header text-center">
+                <h2><img src="./img/val3dity2.png" width=250 alt=""/></h2>
+              </div>
+              <br>
+              <!-- OVERVIEW -->
+              <div class="card">
+                <div class="card-header text-center bg-dark text-white">
+                  Input
+                </div>
+                <div class="card-body">
+                  <table class="table table-sm">
+                    <tbody>
+                      <tr>
+                        <th scope="row">input file</th>
+                        <td>{{ report.input_file }}</td>
+                      </tr>
+                      </tr>
+                      <tr>
+                        <th scope="row">input file type</th>
+                        <td v-if="report.input_file_type == 'CityGML'">CityGML <span class="text-muted">(watchout: CityGML support is deprecated, future version will not support it, upgrade to <a href="https://www.cityjson.org/">CityJSON 🚀</a>)</span></td>
+                        <td v-else>{{ report.input_file_type }}</td>
+                      </tr>
+                      </tr>
+                      <tr>
+                        <th scope="row">val3dity version</th>
+                        <td>{{ report.val3dity_version }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">validation time</th>
+                        <td>{{ report.time }}</td>
+                      </tr>
+                      <tr v-for="(value, name) in report.parameters">
+                        <th scope="row">{{ name }}</th>
+                        <td>{{ value }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card my-3">
+                <div class="card-header text-center bg-dark text-white">
+                  Overview
+                </div>
+                <div class="card-body">
+                  <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active" id="isitvalid-tab" data-toggle="tab" href="#isitvalid" role="tab" aria-controls="isitvalid" aria-selected="true">
+                        Summary
+                        <span class="badge badge-success" :class="[ report.validity ? 'badge-success' : 'badge-danger' ]">{{ report.validity ? 'valid' : 'invalid' }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">
+                        Features
+                        <span class="badge badge-info badge-pill">{{ report.features_overview.length }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="primitives-tab" data-toggle="tab" href="#primitives" role="tab" aria-controls="primitives" aria-selected="false">
+                        Primitives
+                        <span class="badge badge-info badge-pill">{{ report.primitives_overview.length }}</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">
+                        Errors in the file
+                        <span class="badge badge-pill" :class="[ report.all_errors.length == 0 ? 'badge-success' : 'badge-danger' ]">{{ report.all_errors.length }}</span>
+                      </a>
+                    </li>                    
+                    <li class="nav-item">
+                      <a class="nav-link" id="dataseterrors-tab" data-toggle="tab" href="#dataseterrors" role="tab" aria-controls="dataseterrors" aria-selected="false">
+                        File errors
+                        <span class="badge badge-pill" :class="[ report.dataset_errors.length == 0 ? 'badge-success' : 'badge-danger' ]">{{ report.dataset_errors.length }}</span>
+                      </a>
+                    </li>
+                  </ul>
+                  <div class="tab-content" id="myTabContent">
+                    <!-- ISITVALID -->
+                    <div class="tab-pane fade show active" id="isitvalid" role="tabpanel" aria-labelledby="isitvalid-tab">
+                      <br>
+                      <img v-if="report.validity == true" src="./img/welldone.png" width=100 alt=""/>
+                      <div v-if="report.validity == false">
+                        <ul class="list-unstyled">
+                          <li class="mb-3">
+                            <b>Primitives</b>
+                            <div class="progress">
+                              <!-- <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div> -->
+                              <div class="progress-bar bg-success" role="progressbar" :style="{ width: getOverviewPercentage(report.primitives_overview) + '%' }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">{{ getOverviewPercentage(report.primitives_overview) }}%</div>
+                              <div class="progress-bar bg-danger" role="progressbar" :style="{ width: (100 - getOverviewPercentage(report.primitives_overview)) + '%' }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{ (100 - getOverviewPercentage(report.primitives_overview)) }}%</div>
+                            </div>
+                          </li>
+                          <li>
+                            <b>Features</b>
+                            <div class="progress">
+                              <!-- <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div> -->
+                              <div class="progress-bar bg-success" role="progressbar" :style="{ width: getOverviewPercentage(report.features_overview) + '%' }" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">{{ getOverviewPercentage(report.features_overview) + '%' }}</div>
+                              <div class="progress-bar bg-danger" role="progressbar" :style="{ width: (100 - getOverviewPercentage(report.features_overview)) + '%' }" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">{{ (100 - getOverviewPercentage(report.features_overview)) + '%' }}</div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>                    
+                    <!-- FEATURES -->
+                    <div class="tab-pane fade" id="features" role="tabpanel" aria-labelledby="features-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">total</th>
+                            <th class="text-success" scope="col">valid</th>
+                            <th class="text-danger" scope="col">invalid</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="f in report.features_overview">
+                            <th scope="row">{{ f.type }}</th>
+                            <td>{{ f.total }}</td>
+                            <td>{{ f.valid }}</td>
+                            <td>{{ f.total - f.valid }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- PRIMITIVES -->
+                    <div class="tab-pane fade" id="primitives" role="tabpanel" aria-labelledby="primitives-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">total</th>
+                            <th class="text-success" scope="col">valid</th>
+                            <th class="text-danger" scope="col">invalid</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="f in report.primitives_overview">
+                            <th scope="row">{{ f.type }}</th>
+                            <td>{{ f.total }}</td>
+                            <td>{{ f.valid }}</td>
+                            <td>{{ f.total - f.valid }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- ERRORS -->
+                    <div class="tab-pane fade" id="errors" role="tabpanel" aria-labelledby="errors-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <tbody>
+                          <tr v-if="report.all_errors !== null" v-for="e in report.all_errors">
+                            <th scope="row">{{ e }}</th>
+                            <td><a v-bind:href="errors[e].link">{{ errors[e].name }}</a></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>                    
+                    <!-- FILE LEVEL -->
+                    <div class="tab-pane fade" id="dataseterrors" role="tabpanel" aria-labelledby="dataseterrors-tab">
+                      <br>
+                      <table class="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col">error</th>
+                            <th scope="col">description</th>
+                            <th scope="col">information</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="e in report.dataset_errors">
+                            <th scope="row">{{ e.code }}</th>
+                            <td>{{ e.description }}</td>
+                            <td>{{ e.info }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header text-center bg-dark text-white">
+                  All features with details
+                </div>
+                <div class="form-row align-items-center">
+                  <div class="col-auto">
+                    <div class="input-group m-2">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Search</span>
+                      </div>
+                      <input type="text" class="form-control" placeholder="Type an id..." v-model="search_term"/>
+                    </div>
+                  </div>
+                  <div class="col-auto text-center">
+                    <span class="mx-3">Show:</span>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="featureFilter" id="show_all" value="all" v-model="feature_filter">
+                      <label class="form-check-label" for="show_all">all</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="featureFilter" id="show_valid" value="valid" v-model="feature_filter">
+                      <label class="form-check-label" for="show_valid">valid</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="featureFilter" id="show_invalid" value="invalid" v-model="feature_filter">
+                      <label class="form-check-label" for="show_invalid">invalid</label>
+                    </div>
+                    <span class="ml-3">Error types:</span>
+                    <div
+                      class="form-check form-check-inline"
+                      v-for="error_type in report.all_errors">
+                      <input class="form-check-input" type="checkbox" name="featureFilter" :id="error_type" :value="error_type" v-model="error_filters" :disabled="feature_filter != 'invalid'">
+                      <label class="form-check-label" for="error_type">{{ error_type }}</label>
+                    </div>
+                  </div>
+                </div>
+                <ul class="list-unstyled">
+                  <feature-item :feature="feature" v-for="feature in filteredFeatures" :key="feature.id" v-show="search_term == null || search_term == '' || feature.id.includes(search_term)"></feature-item>
+                </ul>
+              </div>
+              <br>
+              <div class="text-center">
+                <button type="button" class="btn btn-outline-danger" v-on:click="reset"><i class="fas fa-redo"></i> Start over</button>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <div class="container">
+          <div class="row">
+            <main class="col-12 py-md-3">
+              <div class="jumbotron jumbotron-fluid">
+                <div class="container text-center">
+                  <div class="page-header text-center">
+                    <h2><img src="./img/val3dity2.png" width=250 alt=""/></h2>
+                  </div>    
+                  <h2 class="display-4 text-secondary">report browser</h2>
+                  <br>  
+                  <div class="custom-file col-6">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01" ref="reportFile" @change="selectedFile">
+                    <label class="custom-file-label" for="inputGroupFile01">drag your val3dity report here</label>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.min.js"></script>
+    <script src="js/vue2-filters.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>
