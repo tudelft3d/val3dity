@@ -6,7 +6,7 @@
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 - phasing out CityGML support
 
-## [2.2.0] - 2020-05-13
+## [2.2.0] - 2020-05-14
 ### Added
 - support for IndoorGML datasets, not just the geometries but specific validation tests for the primal-dual consistency were added
 - support for GeometryTemplates in CityJSON (https://www.cityjson.org/specs/#geometry-templates)
