@@ -67,7 +67,7 @@ install:
   - cd %CGAL_DIR% 
   - pwd
   - ls -a
-  - cmake -G "Visual Studio 15 Win64" -S C:\deps\CGAL-5.0.2 -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF -DWITH_Eigen3=ON -DEIGEN3_INCLUDE_DIR=C:\deps\eigen3.3.6
+  - cmake -G "Visual Studio 15 Win64" -S C:\deps\CGAL-5.0.2 -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF -DWITH_Eigen3=ON -DEIGEN3_INCLUDE_DIR=C:\deps\eigen3.3.6 -DBoost_INCLUDE_DIR=C:\Libraries\boost_1_73_0
   - cd %CGAL_DIR%
   - MSBUILD "C:\deps\CGAL-5.0.2\CGAL.sln" /property:Configuration=Release /property:Platform=x64 /verbosity:minimal
   #- cd %CGAL_DIR%
