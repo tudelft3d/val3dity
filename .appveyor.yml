@@ -96,7 +96,7 @@ install:
   
   
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cmake -G "Visual Studio 15 Win64" -S %APPVEYOR_BUILD_FOLDER% -B %APPVEYOR_BUILD_FOLDER%\build -DCGAL_DIR=C:\deps\CGAL-5.0.2 -DGEOS_INCLUDE_DIR=%DEPS_DIR%\OSGeo4W\include -DGEOS_LIBRARY=%DEPS_DIR%\OSGeo4W\lib\geos_c.lib
+  - cmake -G "Visual Studio 15 Win64" -S %APPVEYOR_BUILD_FOLDER% -B %APPVEYOR_BUILD_FOLDER%\build -DCGAL_DIR=C:\deps\CGAL-5.0.2 -DGEOS_INCLUDE_DIR=%DEPS_DIR%\OSGeo4W\include -DGEOS_LIBRARY=%DEPS_DIR%\OSGeo4W\lib\geos_c.lib -DBoost_INCLUDE_DIR=C:/Libraries/boost_1_67_0
     
         
   
