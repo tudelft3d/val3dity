@@ -23,9 +23,9 @@ install:
     ############################################################################
   # Set boost variables
   ############################################################################
-  - set BOOST_ROOT=C:\Libraries\boost_1_73_0
-  - set BOOST_INCLUDEDIR=C:\Libraries\boost_1_73_0
-  - set BOOST_LIBRARYDIR=C:\Libraries\boost_1_73_0\lib64-msvc-14.1
+  - set Boost_DIR=C:\Libraries\boost_1_73_0
+  - set Boost_INCLUDE_DIR=C:\Libraries\boost_1_73_0
+  - set Boost_LIBRARY_DIR=C:\Libraries\boost_1_73_0\lib64-msvc-14.1
    
   
   - set DEPS_DIR=C:\deps
