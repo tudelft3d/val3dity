@@ -52,6 +52,10 @@ install:
   
   - appveyor DownloadFile https://github.com/CGAL/cgal/releases/download/releases/CGAL-5.0.2/CGAL-5.0.2.zip -FileName CGAL-5.02.zip
   - 7z x CGAL-5.02.zip -o"C:\deps" > nul
+  
+  - cd C:\deps
+  - ls -a   
+  - pwd
    
   - appveyor DownloadFile https://www.dropbox.com/s/okbl2nvdj36y31i/gmp.zip?dl=1 -FileName gmp.zip
   - 7z x gmp.zip -aoa -o%CGAL_DIR%\auxiliary > nul
