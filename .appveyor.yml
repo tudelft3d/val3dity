@@ -23,9 +23,9 @@ install:
     ############################################################################
   # Set boost variables
   ############################################################################
-  - set Boost_DIR=C:\Libraries\boost_1_73_0
-  - set Boost_INCLUDE_DIR=C:\Libraries\boost_1_73_0
-  - set Boost_LIBRARY_DIR=C:\Libraries\boost_1_73_0\lib64-msvc-14.1
+  - set Boost_DIR=C:\Libraries\boost_1_67_0
+  - set Boost_INCLUDE_DIR=C:\Libraries\boost_1_67_0
+  - set Boost_LIBRARY_DIR=C:\Libraries\boost_1_67_0\lib64-msvc-14.1
    
   
   - set DEPS_DIR=C:\deps
@@ -67,7 +67,7 @@ install:
   - cd %CGAL_DIR% 
   - pwd
   - ls -a
-  - cmake -G "Visual Studio 15 Win64" -S C:\deps\CGAL-5.0.2 -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF -DWITH_Eigen3=ON -DEIGEN3_INCLUDE_DIR=C:/deps/eigen3.3.6 -DBoost_INCLUDE_DIR=C:/Libraries/boost_1_73_0
+  - cmake -G "Visual Studio 15 Win64" -S C:\deps\CGAL-5.0.2 -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF -DWITH_Eigen3=ON -DEIGEN3_INCLUDE_DIR=C:/deps/eigen3.3.6 -DBoost_INCLUDE_DIR=C:/Libraries/boost_1_67_0
   - cd %CGAL_DIR%
   - MSBUILD "C:\deps\CGAL-5.0.2\CGAL.sln" /property:Configuration=Release /property:Platform=x64 /verbosity:minimal
   #- cd %CGAL_DIR%
@@ -113,9 +113,9 @@ after_build:
   - if exist %APPVEYOR_BUILD_FOLDER%\build\Release\val3dity.exe
     7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "%OSGEO4W_ROOT%\bin\geos_c.dll"
   - if exist %APPVEYOR_BUILD_FOLDER%\build\Release\val3dity.exe
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_73_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_73.dll"
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_67_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_67.dll"
   - if exist %APPVEYOR_BUILD_FOLDER%\build\Release\val3dity.exe
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_73_0\lib64-msvc-14.1\boost_system-vc141-mt-x64-1_73.dll"
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_67_0\lib64-msvc-14.1\boost_system-vc141-mt-x64-1_67.dll"
   
   - if exist C:\deps\CGAL-5.0.2\auxiliary\gmp\lib\libgmp-10.dll
     7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-5.0.2\auxiliary\gmp\lib\libgmp-10.dll"     
@@ -143,7 +143,7 @@ deploy:
   
   #you need add your own github personal token here
   auth_token:    
-    secure: 9ShYWJn/eiwXjAl+2xazcOxbkgQt6FqfJISw0lq/P9UtS6Ng1j8W66u1a5d4w73y
+    secure: 0bb94d531b10ef3082dac597dc977756ecd161c5
   artifact: val3dity-windows-x64-v$(appveyor_build_version).zip
   draft: true
   prerelease: false
