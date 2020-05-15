@@ -23,9 +23,9 @@ install:
     ############################################################################
   # Set boost variables
   ############################################################################
-  - set BOOST_ROOT=C:\Libraries\boost_1_67_0
-  - set BOOST_INCLUDEDIR=C:\Libraries\boost_1_67_0
-  - set BOOST_LIBRARYDIR=C:\Libraries\boost_1_67_0\lib64-msvc-14.1
+  - set BOOST_ROOT=C:\Libraries\boost_1_73_0
+  - set BOOST_INCLUDEDIR=C:\Libraries\boost_1_73_0
+  - set BOOST_LIBRARYDIR=C:\Libraries\boost_1_73_0\lib64-msvc-14.1
    
   
   - set DEPS_DIR=C:\deps
@@ -48,10 +48,10 @@ install:
   
  #  install CGAL
   - cd %DEPS_DIR%    
-  - set CGAL_DIR=%DEPS_DIR%\CGAL-4.14
+  - set CGAL_DIR=%DEPS_DIR%\CGAL-5.02
   
-  - appveyor DownloadFile https://github.com/CGAL/cgal/releases/download/releases/CGAL-4.14/CGAL-4.14.zip -FileName CGAL-4.14.zip
-  - 7z x CGAL-4.14.zip -o"C:\deps" > nul
+  - appveyor DownloadFile https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-5.0.2/CGAL-5.0.2.zip -FileName CGAL-5.02.zip
+  - 7z x CGAL-5.02.zip -o"C:\deps" > nul
    
   - appveyor DownloadFile https://www.dropbox.com/s/okbl2nvdj36y31i/gmp.zip?dl=1 -FileName gmp.zip
   - 7z x gmp.zip -aoa -o%CGAL_DIR%\auxiliary > nul
@@ -61,10 +61,9 @@ install:
   
   
   - cd %CGAL_DIR% 
-  - cmake -G "Visual Studio 15 Win64" -S C:\deps\CGAL-4.14 -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF -DWITH_Eigen3=ON 
-  #-DEIGEN3_INCLUDE_DIR=C:\deps\eigen3.3.6
+  - cmake -G "Visual Studio 15 Win64" -S C:\deps\CGAL-5.02 -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF -DWITH_Eigen3=ON -DEIGEN3_INCLUDE_DIR=C:\deps\eigen3.3.6
   - cd %CGAL_DIR%
-  - MSBUILD "C:\deps\CGAL-4.14\CGAL.sln" /property:Configuration=Release /property:Platform=x64 /verbosity:minimal
+  - MSBUILD "C:\deps\CGAL-5.02\CGAL.sln" /property:Configuration=Release /property:Platform=x64 /verbosity:minimal
   #- cd %CGAL_DIR%
   #- MSBUILD "C:\deps\CGAL-4.14\CGAL.sln" /property:Configuration=Debug /property:Platform=x64 /verbosity:minimal
 
@@ -91,7 +90,7 @@ install:
   
   
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cmake -G "Visual Studio 15 Win64" -S %APPVEYOR_BUILD_FOLDER% -B %APPVEYOR_BUILD_FOLDER%\build -DCGAL_DIR=C:\deps\CGAL-4.14 -DGEOS_INCLUDE_DIR=%DEPS_DIR%\OSGeo4W\include -DGEOS_LIBRARY=%DEPS_DIR%\OSGeo4W\lib\geos_c.lib
+  - cmake -G "Visual Studio 15 Win64" -S %APPVEYOR_BUILD_FOLDER% -B %APPVEYOR_BUILD_FOLDER%\build -DCGAL_DIR=C:\deps\CGAL-5.02 -DGEOS_INCLUDE_DIR=%DEPS_DIR%\OSGeo4W\include -DGEOS_LIBRARY=%DEPS_DIR%\OSGeo4W\lib\geos_c.lib
     
         
   
@@ -108,24 +107,24 @@ after_build:
   - if exist %APPVEYOR_BUILD_FOLDER%\build\Release\val3dity.exe
     7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "%OSGEO4W_ROOT%\bin\geos_c.dll"
   - if exist %APPVEYOR_BUILD_FOLDER%\build\Release\val3dity.exe
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_67_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_67.dll"
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_73_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_73.dll"
   - if exist %APPVEYOR_BUILD_FOLDER%\build\Release\val3dity.exe
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_67_0\lib64-msvc-14.1\boost_system-vc141-mt-x64-1_67.dll"
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\Libraries\boost_1_73_0\lib64-msvc-14.1\boost_system-vc141-mt-x64-1_73.dll"
   
-  - if exist C:\deps\CGAL-4.14\auxiliary\gmp\lib\libgmp-10.dll
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-4.14\auxiliary\gmp\lib\libgmp-10.dll"     
-  - if exist C:\deps\CGAL-4.14\auxiliary\gmp\lib\libmpfr-4.dll
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-4.14\auxiliary\gmp\lib\libmpfr-4.dll" 
+  - if exist C:\deps\CGAL-5.02\auxiliary\gmp\lib\libgmp-10.dll
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-5.02\auxiliary\gmp\lib\libgmp-10.dll"     
+  - if exist C:\deps\CGAL-5.02\auxiliary\gmp\lib\libmpfr-4.dll
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-5.02\auxiliary\gmp\lib\libmpfr-4.dll" 
     
     
     
-  - if exist C:\deps\CGAL-4.14\bin\Release\CGAL_Core-vc140-mt-4.14.dll
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-4.14\bin\Release\CGAL_Core-vc140-mt-4.14.dll"        
+  - if exist C:\deps\CGAL-5.02\bin\Release\CGAL_Core-vc140-mt-5.0.2.dll
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-5.02\bin\Release\CGAL_Core-vc140-mt-5.0.2.dll"        
   
    
     
-  - if exist C:\deps\CGAL-4.14\bin\Release\CGAL-vc140-mt-4.14.dll
-    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-4.14\bin\Release\CGAL-vc140-mt-4.14.dll"    
+  - if exist C:\deps\CGAL-5.02\bin\Release\CGAL-vc140-mt-5.0.2.dll
+    7z a "%APPVEYOR_BUILD_FOLDER%\val3dity-windows-x64-v%APPVEYOR_BUILD_VERSION%.zip" "C:\deps\CGAL-5.02\bin\Release\CGAL-vc140-mt-5.0.2.dll"    
     
 
     
