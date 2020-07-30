@@ -50,12 +50,15 @@ However, a file is limited to 50MB.
 
 ## Installation of the command-line tool
 
-We provide the source code that you need to compile with CMake.
-This is relatively easy under Mac and Linux.
+### macOS
 
-[For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile val3dity yourself.
+The simplest, if you have [Homebrew](http://brew.sh/), is:
 
-To compile val3dity yourself, you first need to install the following free libraries:
+    $ brew tap tudelft3d/software
+    $ brew install val3dity
+
+You can also get the code here, and compile it yourself.
+You first need to install the following free libraries:
 
   1. [CGAL v5.0+](http://www.cgal.org) 
   1. [Eigen library](http://eigen.tuxfamily.org)
@@ -69,6 +72,16 @@ Under macOS, it's super easy, we suggest using [Homebrew](http://brew.sh/):
     $ brew install geos
     $ brew install cmake
 
+and then
+
+    $ mkdir build
+    $ cd build
+    $ cmake ..
+    $ make
+
+
+### linux
+
 Under Linux (at least Ubuntu), CGAL has to be compiled because apt-get doesn't give you a version with Eigen.
 Thus, in a nutshell,
 
@@ -78,13 +91,15 @@ Thus, in a nutshell,
     - if it's not CGAL5 that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
     - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.0.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
 
+### Windows
+
+[For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile val3dity yourself, see the Visual Studio project in the folder `vs_build`.
+
+
+## Usage
 To compile and run val3dity (from the val3dity folder):
 
-    $ mkdir build
-    $ cd build
-    $ cmake ..
-    $ make
-    $ ./val3dity ../data/cityjson/cube.json
+    $ ./val3dity /data/cityjson/cube.json
 
 The summary of the validation is reported, and you should see that `cube.json` contains one valid primitive.
 
