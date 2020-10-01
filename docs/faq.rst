@@ -45,9 +45,9 @@ There you get an overview of the statistics per features and primitives, and eac
 I get many errors 203 and 204, but my planes look planar to me. Why is that?
 ----------------------------------------------------------------------------
 
-This is a very common error, actually :ref:`error_203` is the most common error for `all the files so far uploaded to our web application <http://geovalidation.bk.tudelft.nl/val3dity/stats>`_.
+This is a very common error, actually :ref:`e203` is the most common error for `all the files so far uploaded to our web application <http://geovalidation.bk.tudelft.nl/val3dity/stats>`_.
 
-Read carefully the explanations of the errors :ref:`error_203` and :ref:`error_204`.
+Read carefully the explanations of the errors :ref:`e203` and :ref:`e204`.
 
 A surface is first check for error 203, if valid then error 204 is checked. 
 By definition, if an error 204 is reported then all the vertices are within 1cm (tolerance you used), thus you wouldn’t be able to visualise them. 
@@ -59,7 +59,7 @@ I don't see all the errors in my solid
 --------------------------------------
 
 It's normal: as shown in the figure below, a solid is validated *hierarchically*, ie first every surface (a polygon embedded in 3D) is validated in 2D (by projecting it to a plane), then every shell is validated, and finally the interactions between the shells are analysed to verify whether the solid is valid. 
-If at one stage there are errors, then the validation stops to avoid "cascading errors". So if you get the error :ref:`error_203`, then fix it and re-run the validator again. 
+If at one stage there are errors, then the validation stops to avoid "cascading errors". So if you get the error :ref:`e203`, then fix it and re-run the validator again. 
 That does mean that you might have to upload your file and get it validated several times---if that becomes too tedious we strongly suggest you to download the `code <https://github.com/tudelft3d/val3dity>`_, compile it and run it locally (it's open-source and free to use).
 
 
@@ -94,7 +94,7 @@ Yes, all the 3D primitives in the file will be validated, one by one.
 
 The validator says my CityGML file is invalid?
 ----------------------------------------------
-You can verify this by validating it against the CityGML schemas (this [online validator](http://geovalidation.bk.tudelft.nl/schemacitygml/) can be used).
+You can verify this by validating it against the CityGML schemas (this `online validator <http://geovalidation.bk.tudelft.nl/schemacitygml/>`_) can be used).
 
 
 Do you validate the topological relationships between the solids?
@@ -112,6 +112,10 @@ The IDs for the shells and surfaces in the report, are they 0-based or 1-based?
 
 Where can I get files containing ``gml:Solids`` or ``gml:CompositeSolid``?
 --------------------------------------------------------------------------
-In the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
+
+  - in the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
+  - `www.cityjson.org <https://www.cityjson.org/datasets/>`_ has many files
+  - `www.indoorgml.net <http://indoorgml.net/resources/>`_ has a few files
+  - `overview of cities with 3D city models <https://3d.bk.tudelft.nl/opendata/opencities/>`_
 
 
