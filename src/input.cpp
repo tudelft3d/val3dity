@@ -1166,11 +1166,15 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
 {
   std::cout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
-  if (!doc.load_file(ifile.c_str())) 
-  {
-    errs.add_error(901, "Input file not found.");
+  pugi::xml_parse_result result = doc.load_file(ifile.c_str());
+  if (!result) {
+    if (result.status == pugi::status_file_not_found)
+      errs.add_error(901, "Input file not found.");
+    else
+      errs.add_error(901, result.description());
     return;
   }
+
   //-- parse namespace
   pugi::xml_node ncm = doc.first_child();
   std::string vcitygml;
