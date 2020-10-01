@@ -536,7 +536,7 @@ int main(int argc, char* const argv[])
     //-- if error 901 then ignore what was read, it can't be validated
     //-- and is confusing for users to see a valid/invalid while nothing was done...
     if (ioerrs.has_specific_error(901) == true) {
-      std::cout << "ERROR 901" << std::endl;
+      // std::cout << "ERROR 901" << std::endl;
       lsFeatures.clear();
     }
 
