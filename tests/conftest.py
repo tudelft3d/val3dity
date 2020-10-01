@@ -162,7 +162,7 @@ def validate(val3dity):
         
         if rcode < 0:
             # For example Segmentation fault
-            return(["Something went really wrong. Validate the file separately with val3dity."])
+            return(["CRASH"])
         else:
             output = []
             if (out != ''):
