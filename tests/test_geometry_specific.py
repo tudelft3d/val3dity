@@ -93,28 +93,28 @@ def options_overlap(request):
 
 
 #----------------------------------------------------------------------- Tests
-def test_103(validate, data_103, citymodel):
-    error = validate(data_103, options=citymodel)
+def test_103(validate, data_103, unittests):
+    error = validate(data_103, options=unittests)
     assert(error == [103])
 
-def test_501(validate, data_501, citymodel):
-    error = validate(data_501, options=citymodel)
+def test_501(validate, data_501, unittests):
+    error = validate(data_501, options=unittests)
     assert(error == [501])
 
 def test_501_overlap(validate, data_501_overlap, options_overlap):
     error = validate(data_501_overlap, options=options_overlap)
     assert(error == [])
 
-def test_502(validate, data_502, citymodel):
-    error = validate(data_502, options=citymodel)
+def test_502(validate, data_502, unittests):
+    error = validate(data_502, options=unittests)
     assert(error == [502])
 
-def test_503(validate, data_503, citymodel):
-    error = validate(data_503, options=citymodel)
+def test_503(validate, data_503, unittests):
+    error = validate(data_503, options=unittests)
     assert(error == [503])
 
-def test_601(validate, data_601, citymodel):
-    error = validate(data_601, options=citymodel)
+def test_601(validate, data_601, unittests):
+    error = validate(data_601, options=unittests)
     assert(error == [601])
 
 def test_601_overlap(validate, data_601_overlap, options_overlap):

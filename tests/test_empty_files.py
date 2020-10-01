@@ -47,14 +47,14 @@ def dir_empty_primitive(request, dir_empty):
     return(file_path)
 
 #----------------------------------------------------------------------- Tests
-def test_completely_empty(validate, data_completely_empty, citymodel):
-    error = validate(data_completely_empty, options=citymodel)
+def test_completely_empty(validate, data_completely_empty, unittests):
+    error = validate(data_completely_empty, options=unittests)
     assert(error == [901] or error == [902])
 
-def test_empty_primitive(validate, dir_empty_primitive, citymodel):
-    error = validate(dir_empty_primitive, options=citymodel)
+def test_empty_primitive(validate, dir_empty_primitive, unittests):
+    error = validate(dir_empty_primitive, options=unittests)
     assert(error == [902])
 
-def test_no_geom(validate, data_cityobject_no_geom, citymodel):
-    error = validate(data_cityobject_no_geom, options=citymodel)
+def test_no_geom(validate, data_cityobject_no_geom, unittests):
+    error = validate(data_cityobject_no_geom, options=unittests)
     assert(error == [609])    
