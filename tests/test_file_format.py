@@ -22,26 +22,53 @@ def data_invalid_citygml(request, dir_file_format):
             request.param))
     return([file_path])
 
+
 @pytest.fixture(scope="module",
-                params=["composite_solid.gml",
-                        "composite_solid_1.gml"])
-def data_namespace(request, dir_valid):
+                params=["invalid_json_cityjson.json",
+                        "invalid_schema_cityjson_1.json"])
+def data_invalid_cityjson(request, dir_file_format):
     file_path = os.path.abspath(
         os.path.join(
-            dir_valid,
+            dir_file_format,
             request.param))
     return([file_path])
 
+
+@pytest.fixture(scope="module",
+                params=["invalid_schema_cityjson_2.json"])
+def data_cityjson_wrong_vindex(request, dir_file_format):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_file_format,
+            request.param))
+    return([file_path])
+
+
+@pytest.fixture(scope="module",
+                params=["invalid_indoorgml_1.gml",
+                        "invalid_indoorgml_2.gml"])
+def data_invalid_indoorgml(request, dir_file_format):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_file_format,
+            request.param))
+    return([file_path])
+
+
 #----------------------------------------------------------------------- Tests
-@pytest.mark.full
-def test_invalid_citygml(validate, data_invalid_citygml, citymodel):
-    error = validate(data_invalid_citygml, options=citymodel)
+def test_invalid_citygml(validate, data_invalid_citygml, unittests):
+    error = validate(data_invalid_citygml, options=unittests)
     assert(error == [901])
 
-@pytest.mark.full
-def test_namespace(val3dity, validate_full, data_namespace):
-    message = "CityGML input file"
-    command = [val3dity] + data_namespace
-    out, err = validate_full(command)
-    assert message in out
-    
+
+def test_invalid_cityjson(validate, data_invalid_cityjson, unittests):
+    error = validate(data_invalid_cityjson, options=unittests)
+    assert(error == [901])   
+
+def test_invalid_cityjson_vindex(validate, data_cityjson_wrong_vindex, unittests):
+    error = validate(data_cityjson_wrong_vindex, options=unittests)
+    assert(error == ["CRASH"])       
+
+def test_invalid_indoorgml(validate, data_invalid_indoorgml, unittests):
+    error = validate(data_invalid_indoorgml, options=unittests)
+    assert(error == [901])     
