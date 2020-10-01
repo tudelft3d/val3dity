@@ -10,6 +10,12 @@ test_empty:
 test_file_format:
   "invalid_citygml_1": "A GenericCityObject where the first surfaceMember missing a gml:Polygon tag"
   "invalid_citygml_2": "CityGML with missing City/GML namespace declarations"
+  "invalid_indoorgml_1": "IndoorGML with wrong xml tags that doesn't close"
+  "invalid_indoorgml_2": "FZK file"
+  "invalid_json_cityjson": "CityJSON file with a missing {, invalid JSON"
+  "invalid_schema_cityjson_1": "CityJSON with missing , at the end"
+  "invalid_schema_cityjson_2": "CityJSON file with a wrong vertex index (22), should cause segfault"
+
 
 test_geometry_generic:
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
