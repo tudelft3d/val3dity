@@ -698,7 +698,32 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
   for (auto& o : lsFeatures)
     for (auto& p : o->get_primitives())
       noprim++;
+  //-- overview of errors
+  std::map<int,int> errors_f; //-- features
+  for (auto& f : lsFeatures)
+    for (auto& code : f->get_unique_error_codes())
+      if (code > 600)
+        errors_f[code] = 0;
+  for (auto& f : lsFeatures)
+    for (auto& code : f->get_unique_error_codes())
+      if (code > 600)
+        errors_f[code] += 1;
+  std::map<int,int> errors_p; //-- primitives
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors_p[code] = 0;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors_p[code] += 1;
+
   ss << "+++++++++++++++++++ SUMMARY +++++++++++++++++++" << std::endl;
+  if ( (errors_f.size() > 0) || (errors_p.size() > 0) || (ioerrs.has_errors() == true) )
+    ss << "INVALID :(" << std::endl;
+  else
+    ss << "VALID :)" << std::endl;
+  ss << "+++++" << std::endl;
   ss << "Input file type:" << std::endl;
   std::string ft = ioerrs.get_input_file_type();
   if (ft == "CityGML") {
@@ -776,26 +801,7 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
       }
     }
   }
-  //-- overview of errors
-  std::map<int,int> errors_f; //-- features
-  for (auto& f : lsFeatures)
-    for (auto& code : f->get_unique_error_codes())
-      if (code > 600)
-        errors_f[code] = 0;
-  for (auto& f : lsFeatures)
-    for (auto& code : f->get_unique_error_codes())
-      if (code > 600)
-        errors_f[code] += 1;
-  std::map<int,int> errors_p; //-- primitives
-  for (auto& f : lsFeatures)
-    for (auto& p : f->get_primitives())
-      for (auto& code : p->get_unique_error_codes())
-        errors_p[code] = 0;
-  for (auto& f : lsFeatures)
-    for (auto& p : f->get_primitives())
-      for (auto& code : p->get_unique_error_codes())
-        errors_p[code] += 1;
-  if ( (errors_p.size() > 0) || (errors_p.size() > 0) || (ioerrs.has_errors() == true) )
+  if ( (errors_f.size() > 0) || (errors_p.size() > 0) || (ioerrs.has_errors() == true) )
   {
     ss << "+++++" << std::endl;
     ss << "Errors present:" << std::endl;
@@ -819,7 +825,6 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
       ss << "  " << e << " -- " << ALL_ERRORS[e] << std::endl;
     }
   }
-
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
 }
