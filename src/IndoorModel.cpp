@@ -104,7 +104,6 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           bValid = false;
           continue;
       }
-
       int gno = this->get_graph_containing_vertex(std::get<1>(el.second));
       if (gno == -1)
       {
@@ -200,6 +199,12 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   for (auto& el : _cells)
   {
     std::string pdid = std::get<1>(el.second);
+    if (pdid == "")
+    {
+      //-- this is allowed, a cell does not need to have a dual vertex
+      std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
+      continue;
+    }
     if (this->get_number_graphs() == 0) {
       std::stringstream msg;
       msg << "Cell id=" << el.first << " dual vertex doesn't exist";
