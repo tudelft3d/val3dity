@@ -100,5 +100,6 @@ test_valid:
   "nearly-collinear": another case from Marcin where the CDT was applied to solve. Tiny triangle created yields issues.
   
 test_indoorgml:
-  "igml": "a valid cube as the only cell, no dual"
-  "igml_2": "a valid cube as the only cell, one dual point outside the cube"
+  "igml_v1": "a valid cube as the only cell, no dual"
+  "igml_v2": "a valid cube as the only cell, one dual point inside the cube"
+  "igml_702": "a valid cube as the only cell, one dual point outside the cube"
