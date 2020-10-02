@@ -46,6 +46,13 @@ def val3dity(request):
 
 #-------------------------------------------------------------- data & folders
 @pytest.fixture(scope="session")
+def dir_indoorgml():
+    """path to the data for test_indoorgml"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_indoorgml")
+    return(dir_path)
+
+@pytest.fixture(scope="session")
 def dir_file_format():
     """path to the data for test_file_format"""
     root = os.getcwd()

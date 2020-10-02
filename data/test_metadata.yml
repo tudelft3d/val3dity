@@ -99,3 +99,6 @@ test_valid:
   "v104_2": like 104_1 but with very large z coords
   "nearly-collinear": another case from Marcin where the CDT was applied to solve. Tiny triangle created yields issues.
   
+test_indoorgml:
+  "igml": "a valid cube as the only cell, no dual"
+  "igml_2": "a valid cube as the only cell, one dual point outside the cube"
