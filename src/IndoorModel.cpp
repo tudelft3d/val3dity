@@ -101,6 +101,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           std::stringstream msg;
           msg << "CellSpace id=" << el.first;
           this->add_error(702, msg.str(), "The dual graph is not in the file.");
+          bValid = false;
           continue;
       }
 
@@ -122,6 +123,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           std::stringstream msg;
           msg << "CellSpace id=" << el.first;
           this->add_error(702, msg.str(), "");
+          bValid = false;
         }
         else
           std::clog << " --> ok" << std::endl;
@@ -147,12 +149,14 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       std::stringstream msg;
       msg << "CellSpace id=" << el.first;
       this->add_error(703, msg.str(), "The dual graph is not in the file.");
+      bValid = false;
       continue;
     }
     int gno = this->get_graph_containing_vertex(pdid);
     if (gno == -1) {
         std::stringstream msg;
         msg << "Cell id=" << el.first << " dual vertex doesn't exist";
+        bValid = false;
         this->add_error(703, msg.str(), "");
     }
     else
@@ -162,6 +166,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
       {
         std::stringstream msg;
         msg << "Cell id=" << el.first << " and its dual vertex id=" << pdid << " are not reciprocally linked";
+        bValid = false;
         this->add_error(703, msg.str(), "");
       }
     }
@@ -176,17 +181,18 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
         if (vadj == "") {
           std::stringstream msg;
           msg << "Dual vertex id=" << vid << " reference a non-existing edge/Transition";
+          bValid = false;
           this->add_error(703, msg.str(), "");
         }
         else if (g->has_vertex(vadj) == false) {
           std::stringstream msg;
           msg << "Dual vertex id=" << vadj << " does not exist (referenced from id=" << vid;
+          bValid = false;
           this->add_error(703, msg.str(), "");
         }
       }
     }
   }
-
 
 //-- 5. 704 - PRIMAL_DUAL_ADJACENCIES_INCONSISTENT  
 //--    if 2 cells are adjacent in the primal, are they also in the dual?
@@ -197,6 +203,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     if (this->get_number_graphs() == 0) {
       std::stringstream msg;
       msg << "Cell id=" << el.first << " dual vertex doesn't exist";
+      bValid = false;
       this->add_error(704, msg.str(), "");
       continue;
     }
