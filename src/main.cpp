@@ -33,9 +33,8 @@
 #include "CompositeSurface.h"
 #include "Solid.h"
 #include "Feature.h"
-#include "CityObject.h"
+
 #include "GenericObject.h"
-#include "validate_prim_toporel.h"
 
 #include <tclap/CmdLine.h>
 #include <time.h>  
@@ -336,7 +335,7 @@ int main(int argc, char* const argv[])
       ioerrs.set_input_file_type("UNKNOWN");
     }
 
-    Primitive3D prim3d;
+    Primitive3D prim3d = ALL;
     if ( (inputtype == JSON) || (inputtype == GML) )
     {
       prim3d = ALL;
