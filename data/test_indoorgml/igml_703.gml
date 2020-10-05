@@ -101,7 +101,7 @@
           <gml:name>002</gml:name>
           <cellSpaceGeometry>
             <Geometry3D>
-              <gml:Solid gml:name="elvis">
+              <gml:Solid gml:id="elvis">
                 <gml:exterior>
                   <gml:Shell>
                     <gml:surfaceMember>
