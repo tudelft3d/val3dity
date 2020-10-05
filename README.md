@@ -24,12 +24,12 @@ val3dity accepts as input:
 
   - [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) of any flavour
   - [CityJSON](http://www.cityjson.org)
-  - [CityGML (v1 & v2 only; v3 will not be supported)](https://www.citygml.org)
+  - [CityGML-XML (v1 & v2 only; v3 will not be supported)](https://www.citygml.org)
   - [IndoorGML](http://indoorgml.net/)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
-For the City/JSON/GML and IndoorGML formats, extra validations (specific to the format) are performed, eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
+For the City/JSON/GML and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
 
 ## Usage
@@ -57,7 +57,7 @@ The simplest, if you have [Homebrew](http://brew.sh/), is:
     $ brew tap tudelft3d/software
     $ brew install val3dity
 
-You can also get the code here, and compile it yourself.
+You can also get the code, and compile it yourself.
 You first need to install the following free libraries:
 
   1. [CGAL v5.0+](http://www.cgal.org) 
