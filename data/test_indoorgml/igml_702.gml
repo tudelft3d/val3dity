@@ -5,7 +5,6 @@
       <cellSpaceMember>
         <CellSpace gml:id="C1">
           <gml:name>002</gml:name>
-          <duality xlink:href="#N1"/>
           <cellSpaceGeometry>
             <Geometry3D>
               <gml:Solid gml:id="sl1">  
@@ -94,6 +93,7 @@
               </gml:Solid>
             </Geometry3D>   
           </cellSpaceGeometry>
+          <duality xlink:href="#N1"/>
         </CellSpace>
       </cellSpaceMember>
     </PrimalSpaceFeatures>
