@@ -35,6 +35,16 @@ def data_igml_702(request, dir_indoorgml):
             request.param))
     return([file_path])
 
+
+@pytest.fixture(scope="module",
+                params=["igml_703.gml"])
+def data_igml_703(request, dir_indoorgml):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_indoorgml,
+            request.param))
+    return([file_path])
+
 #----------------------------------------------------------------------- Tests
 def test_valid_indoorgml(validate, data_igml_valid, unittests):
     error = validate(data_igml_valid, options=unittests)
@@ -47,3 +57,8 @@ def test_igml_701(validate, data_igml_701, unittests):
 def test_igml_702(validate, data_igml_702, unittests):
     error = validate(data_igml_702, options=unittests)
     assert(error == [702])
+
+def test_igml_703(validate, data_igml_703, unittests):
+    error = validate(data_igml_703, options=unittests)
+    assert(error == [703])  
+      
