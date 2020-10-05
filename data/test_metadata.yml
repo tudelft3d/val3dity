@@ -102,4 +102,5 @@ test_valid:
 test_indoorgml:
   "igml_v1": "a valid cube as the only cell, no dual"
   "igml_v2": "a valid cube as the only cell, one dual point inside the cube"
+  "igml_701": "2 valid cubes as cells, they overlap a bit (1unit)"
   "igml_702": "a valid cube as the only cell, one dual point outside the cube"
