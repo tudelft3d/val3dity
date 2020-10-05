@@ -108,11 +108,11 @@
                       <gml:Polygon>
                         <gml:exterior>
                           <gml:LinearRing>
-                            <gml:pos>100.00 0.00 0.00</gml:pos>
-                            <gml:pos>100.00 100.00 0.00</gml:pos>
-                            <gml:pos>200.00 100.00 0.00</gml:pos>
+                            <gml:pos>99.0 0.00 0.00</gml:pos>
+                            <gml:pos>99.0 99.0 0.00</gml:pos>
+                            <gml:pos>200.00 99.0 0.00</gml:pos>
                             <gml:pos>200.00 0.00 0.00</gml:pos>
-                            <gml:pos>100.00 0.00 0.00</gml:pos>
+                            <gml:pos>99.0 0.00 0.00</gml:pos>
                           </gml:LinearRing>
                         </gml:exterior>
                       </gml:Polygon>
@@ -121,11 +121,11 @@
                       <gml:Polygon>
                         <gml:exterior>
                           <gml:LinearRing>
-                            <gml:pos>100.00 0.00 100.00</gml:pos>
-                            <gml:pos>200.00 0.00 100.00</gml:pos>
-                            <gml:pos>200.00 100.00 100.00</gml:pos>
-                            <gml:pos>100.00 100.00 100.00</gml:pos>
-                            <gml:pos>100.00 0.00 100.00</gml:pos>
+                            <gml:pos>99.0 0.00 99.0</gml:pos>
+                            <gml:pos>200.00 0.00 99.0</gml:pos>
+                            <gml:pos>200.00 99.0 99.0</gml:pos>
+                            <gml:pos>99.0 99.0 99.0</gml:pos>
+                            <gml:pos>99.0 0.00 99.0</gml:pos>
                           </gml:LinearRing>
                         </gml:exterior>
                       </gml:Polygon>
@@ -134,11 +134,11 @@
                       <gml:Polygon>
                         <gml:exterior>
                           <gml:LinearRing>
-                            <gml:pos>100.00 0.00 0.00</gml:pos>
+                            <gml:pos>99.0 0.00 0.00</gml:pos>
                             <gml:pos>200.00 0.00 0.00</gml:pos>
-                            <gml:pos>200.00 0.00 100.00</gml:pos>
-                            <gml:pos>100.00 0.00 100.00</gml:pos>
-                            <gml:pos>100.00 0.00 0.00</gml:pos>
+                            <gml:pos>200.00 0.00 99.0</gml:pos>
+                            <gml:pos>99.0 0.00 99.0</gml:pos>
+                            <gml:pos>99.0 0.00 0.00</gml:pos>
                           </gml:LinearRing>
                         </gml:exterior>
                       </gml:Polygon>
@@ -148,9 +148,9 @@
                         <gml:exterior>
                           <gml:LinearRing>
                             <gml:pos>200.00 0.00 0.00</gml:pos>
-                            <gml:pos>200.00 100.00 0.00</gml:pos>
-                            <gml:pos>200.00 100.00 100.00</gml:pos>
-                            <gml:pos>200.00 0.00 100.00</gml:pos>
+                            <gml:pos>200.00 99.0 0.00</gml:pos>
+                            <gml:pos>200.00 99.0 99.0</gml:pos>
+                            <gml:pos>200.00 0.00 99.0</gml:pos>
                             <gml:pos>200.00 0.00 0.00</gml:pos>
                           </gml:LinearRing>
                         </gml:exterior>
@@ -160,11 +160,11 @@
                       <gml:Polygon>
                         <gml:exterior>
                           <gml:LinearRing>
-                            <gml:pos>200.00 100.00 0.00</gml:pos>
-                            <gml:pos>100.00 100.00 0.00</gml:pos>
-                            <gml:pos>100.00 100.00 100.00</gml:pos>
-                            <gml:pos>200.00 100.00 100.00</gml:pos>
-                            <gml:pos>200.00 100.00 0.00</gml:pos>
+                            <gml:pos>200.00 99.0 0.00</gml:pos>
+                            <gml:pos>99.0 99.0 0.00</gml:pos>
+                            <gml:pos>99.0 99.0 99.0</gml:pos>
+                            <gml:pos>200.00 99.0 99.0</gml:pos>
+                            <gml:pos>200.00 99.0 0.00</gml:pos>
                           </gml:LinearRing>
                         </gml:exterior>
                       </gml:Polygon>
@@ -173,11 +173,11 @@
                       <gml:Polygon>
                         <gml:exterior>
                           <gml:LinearRing>
-                            <gml:pos>100.00 100.00 0.00</gml:pos>
-                            <gml:pos>100.00 0.00 0.00</gml:pos>
-                            <gml:pos>100.00 0.00 100.00</gml:pos>
-                            <gml:pos>100.00 100.00 100.00</gml:pos>
-                            <gml:pos>100.00 100.00 0.00</gml:pos>
+                            <gml:pos>99.0 99.0 0.00</gml:pos>
+                            <gml:pos>99.0 0.00 0.00</gml:pos>
+                            <gml:pos>99.0 0.00 99.0</gml:pos>
+                            <gml:pos>99.0 99.0 99.0</gml:pos>
+                            <gml:pos>99.0 99.0 0.00</gml:pos>
                           </gml:LinearRing>
                         </gml:exterior>
                       </gml:Polygon>
@@ -203,7 +203,17 @@
                   <duality xlink:href="#C1"/>
                   <geometry>
                     <gml:Point>
-                      <gml:pos>51.6 0.150000 0.400000</gml:pos>
+                      <gml:pos>51.6 50.150000 50.400000</gml:pos>
+                    </gml:Point>
+                  </geometry>
+                </State>
+              </stateMember>
+              <stateMember>
+                <State gml:id="N2">
+                  <duality xlink:href="#C2"/>
+                  <geometry>
+                    <gml:Point>
+                      <gml:pos>151.6 50.150000 50.400000</gml:pos>
                     </gml:Point>
                   </geometry>
                 </State>
