@@ -37,7 +37,8 @@ def data_igml_702(request, dir_indoorgml):
 
 
 @pytest.fixture(scope="module",
-                params=["igml_703.gml"])
+                params=["igml_703_1.gml",
+                        "igml_703_2.gml"])
 def data_igml_703(request, dir_indoorgml):
     file_path = os.path.abspath(
         os.path.join(
