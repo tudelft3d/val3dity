@@ -108,3 +108,6 @@ test_indoorgml:
   "igml_703_2": "2 valid cubes as cells, with 2 valid dual vertices. The dual edge points to a missing vertex. Invalid."
   "igml_704_1": "2 valid cubes as cells, adjacent. Their dual say they are adjacent, and they are. All valid thus."
   "igml_704_2": "2 valid cubes as cells, separated by 1unit. Their dual say they are adjacent, but they are not."
+
+test_cityjson:
+  "geomtemplate_1": "1 tree as a geometry template"

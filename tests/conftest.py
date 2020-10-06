@@ -52,6 +52,15 @@ def dir_indoorgml():
     dir_path = os.path.join(root, "data/test_indoorgml")
     return(dir_path)
 
+
+@pytest.fixture(scope="session")
+def dir_cityjson():
+    """path to the data for test_cityjson"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_cityjson")
+    return(dir_path)
+
+
 @pytest.fixture(scope="session")
 def dir_file_format():
     """path to the data for test_file_format"""
