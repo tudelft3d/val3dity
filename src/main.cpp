@@ -45,7 +45,7 @@ using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.2.0";
+std::string VAL3DITY_VERSION = "2.2.1-beta.1";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
@@ -442,7 +442,7 @@ int main(int argc, char* const argv[])
       else if (inputtype == OFF)
       {
         GenericObject* o = new GenericObject("none");
-        Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs);
+        Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs, snap_tol.getValue());
         if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
         {
           Solid* s = new Solid;
