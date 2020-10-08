@@ -100,6 +100,12 @@ def dir_geometry_specific():
     dir_path = os.path.join(root, "data/test_geometry_specific")
     return(dir_path)
 
+@pytest.fixture(scope="session")
+def dir_duplicates():
+    """path to the data for test_duplicates"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_duplicates")
+    return(dir_path)
 
 @pytest.fixture(scope="session")
 def data_basecube():
