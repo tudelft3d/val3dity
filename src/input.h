@@ -170,7 +170,7 @@ void              print_info_aligned(std::string o, size_t number, bool tab = fa
 
 void              read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
-Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs);
+Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs, double tol_snap);
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
