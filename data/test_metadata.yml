@@ -111,3 +111,4 @@ test_indoorgml:
 
 test_cityjson:
   "geomtemplate_1": "1 tree as a geometry template"
+  "geomtemplate_2": "1 tree as a geometry template, template is not a valid solid"
