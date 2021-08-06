@@ -1617,4 +1617,37 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   lsFeatures.push_back(o);
 } 
 
+
+void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
+  for (auto& f : j["features"]) {
+    GenericObject* go = new GenericObject("none");
+    if  (f["geometry"]["type"] == "Solid")
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      int c = 0;
+      for (auto& shell : f["geometry"]["boundaries"]) 
+      {
+        Surface* sh = new Surface(c, tol_snap);
+        c++;
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, f, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      go->add_primitive(s);
+    } 
+    lsFeatures.push_back(go);
+  }
+}
+
+
 } // namespace val3dity

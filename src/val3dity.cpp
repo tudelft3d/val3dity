@@ -11,9 +11,34 @@ namespace val3dity
 {
 
 
+std::vector<bool> validate_tu3djson(json& j,
+                                    double tol_snap, 
+                                    double planarity_d2p_tol, 
+                                    double planarity_n_tol, 
+                                    double overlap_tol)
+{
+  std::vector<Feature*> lsFeatures;
+  parse_tu3djson(j, lsFeatures, tol_snap);
+  //-- validate
+  for (auto& f : lsFeatures)
+  {
+    f->validate(0.001, 30, 0.0);
+  }
+  //-- compile errors
+  std::vector<bool> re;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      re.push_back(p->is_valid());
+  return re;
 
+}
 
-bool validate_cityjson(json& j, double tol_snap) {
+bool validate_cityjson(json& j, 
+                       double tol_snap, 
+                       double planarity_d2p_tol, 
+                       double planarity_n_tol, 
+                       double overlap_tol)
+{
   std::vector<Feature*> lsFeatures;
   //-- parse the cityjson object
   //-- compute (_minx, _miny)
@@ -61,5 +86,6 @@ bool validate_cityjson(json& j, double tol_snap) {
     return false;
   }
 }
+
 
 }
