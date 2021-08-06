@@ -5,7 +5,7 @@ using json = nlohmann::json;
 namespace val3dity
 {
 
-  bool validate(json& features);
+  bool validate_cityjson(json& j, double tol_snap);
 
 }
 
