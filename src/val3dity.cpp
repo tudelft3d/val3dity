@@ -38,6 +38,27 @@ namespace val3dity
 {
 
 
+bool validate_one_geom(json& j,
+                       double tol_snap, 
+                       double planarity_d2p_tol, 
+                       double planarity_n_tol, 
+                       double overlap_tol)
+{
+  std::vector<Feature*> lsFeatures;
+  parse_tu3djson_geom(j, lsFeatures, tol_snap);
+  //-- validate
+  for (auto& f : lsFeatures)
+  {
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  }
+  //-- compile errors
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      return p->is_valid();
+  return true;
+}
+
+
 std::vector<bool> validate_tu3djson(json& j,
                                     double tol_snap, 
                                     double planarity_d2p_tol, 
