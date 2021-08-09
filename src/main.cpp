@@ -51,14 +51,7 @@ std::string VAL3DITY_VERSION = "2.3.0-beta.1";
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        write_report_json(json& jr, std::string report);
-void        get_report_json(json& jr, 
-                            std::string ifile, 
-                            std::vector<Feature*>& lsFeatures, 
-                            double snap_tol, 
-                            double overlap_tol, 
-                            double planarity_d2p_tol, 
-                            double planarity_n_tol, 
-                            IOErrors ioerrs);
+
 
 
 class MyOutput : public TCLAP::StdOutput
@@ -606,6 +599,7 @@ int main(int argc, char* const argv[])
       get_report_json(jr, 
                        inputfile.getValue(),
                        lsFeatures,
+                       VAL3DITY_VERSION,
                        snap_tol.getValue(),
                        overlap_tol.getValue(),
                        planarity_d2p_tol.getValue(),
@@ -828,122 +822,6 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
   return ss.str();
 }
 
-void get_report_json(json& jr,
-                     std::string ifile, 
-                     std::vector<Feature*>& lsFeatures,
-                     double snap_tol,
-                     double overlap_tol,
-                     double planarity_d2p_tol,
-                     double planarity_n_tol,
-                     IOErrors ioerrs)
-{
-  jr["type"] = "val3dity_report";
-  jr["val3dity_version"] = VAL3DITY_VERSION; 
-  jr["input_file"] = ifile;
-  jr["input_file_type"] = ioerrs.get_input_file_type();
-  //-- time
-  std::time_t rawtime;
-  struct tm * timeinfo;
-  std::time (&rawtime);
-  timeinfo = std::localtime ( &rawtime );
-  char buffer[80];
-  std::strftime(buffer, 80, "%c %Z", timeinfo);
-  jr["time"] = buffer;
-  //-- user-defined param
-  jr["parameters"];
-  jr["parameters"]["snap_tol"] = snap_tol;
-  jr["parameters"]["overlap_tol"] = overlap_tol;
-  jr["parameters"]["planarity_d2p_tol"] = planarity_d2p_tol;
-  jr["parameters"]["planarity_n_tol"] = planarity_n_tol;
-
-  //-- primitives overview
-  std::map<int, std::tuple<int,int> > prim_o; //-- <primID, total, valid>
-  std::set<int> theprimitives;
-  for (auto& f : lsFeatures)
-    for (auto& p : f->get_primitives())
-      theprimitives.insert(p->get_type());
-  for (auto& each : theprimitives)
-    prim_o[each] = std::make_tuple(0, 0);
-  for (auto& f : lsFeatures) {
-    for (auto& p : f->get_primitives()) {
-      std::get<0>(prim_o[p->get_type()]) += 1;
-      if (p->is_valid() == true) {
-        std::get<1>(prim_o[p->get_type()]) += 1;
-      }
-    }
-  }
-  jr["primitives_overview"] = json::array();
-  for (auto& each : prim_o) {
-    json j;
-    switch(each.first)
-    {
-      case 0: j["type"] = "Solid"; break;
-      case 1: j["type"] = "CompositeSolid"; break;
-      case 2: j["type"] = "MultiSolid"; break;
-      case 3: j["type"] = "CompositeSurface"; break;
-      case 4: j["type"] = "MultiSurface"; break;
-      case 5: j["type"] = "GeometryTemplate"; break;
-      case 9: j["type"] = "ALL"; break;
-    }
-    j["total"] = std::get<0>(each.second);
-    j["valid"] = std::get<1>(each.second);
-    jr["primitives_overview"].push_back(j);
-  }
-
-  //-- features overview
-  std::map<std::string, std::tuple<int,int> > feat_o; //-- <featureID, total, valid>
-  std::set<std::string> thefeatures;
-  for (auto& f : lsFeatures)
-    thefeatures.insert(f->get_type());
-  for (auto& each : thefeatures)
-    feat_o[each] = std::make_tuple(0, 0);
-  for (auto& f : lsFeatures) {
-    std::get<0>(feat_o[f->get_type()]) += 1;
-    if (f->is_valid() == true) {
-      std::get<1>(feat_o[f->get_type()]) += 1;
-    }
-  }
-  jr["features_overview"] = json::array();
-  for (auto& each : feat_o) {
-    json j;
-    j["type"] = each.first; 
-    j["total"] = std::get<0>(each.second);
-    j["valid"] = std::get<1>(each.second);
-    jr["features_overview"].push_back(j);
-  }
-
-  //-- each of the features with their primitives listed
-  jr["features"] = json::array();
-  for (auto& f : lsFeatures)
-    jr["features"].push_back(f->get_report_json());
-  
-  //-- dataset errors (9xx)
-  jr["dataset_errors"] = json::array();
-  if (ioerrs.has_errors() == true)
-    jr["dataset_errors"] = ioerrs.get_report_json();
-
-  //-- overview of errors
-  std::set<int> unique_errors;
-  for (auto& f : lsFeatures)
-    for (auto& code : f->get_unique_error_codes())
-      unique_errors.insert(code);
-  jr["all_errors"] = json::array();
-  for (auto& e : unique_errors)
-    jr["all_errors"].push_back(e);
-  for (auto& e : ioerrs.get_unique_error_codes())
-    jr["all_errors"].push_back(e);
-
-  bool bValid = true;
-  for (auto& f : lsFeatures) {
-    if (f->is_valid() == false) {
-      bValid = false;
-      break;
-    }
-  }
-  if (ioerrs.has_errors() == true)
-    bValid = false;
-  jr["validity"] = bValid;
-}
 
 
 

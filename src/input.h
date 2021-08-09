@@ -202,6 +202,16 @@ void              set_min_xy(double minx, double miny);
 void              compute_min_xy(pugi::xml_document& doc);
 void              compute_min_xy(json& j);
 
+void              get_report_json(json& jr, 
+                                  std::string ifile, 
+                                  std::vector<Feature*>& lsFeatures, 
+                                  std::string val3dity_version,
+                                  double snap_tol, 
+                                  double overlap_tol, 
+                                  double planarity_d2p_tol, 
+                                  double planarity_n_tol, 
+                                  IOErrors ioerrs);
+
 } // namespace val3dity
 
 #endif
