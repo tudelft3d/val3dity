@@ -63,6 +63,7 @@ if ( LIBRARY )
   message(STATUS "Building val3dity library")
   list(REMOVE_ITEM SRC_FILES src/main.cpp)
   add_library(val3dity STATIC ${SRC_FILES})
+  target_include_directories(val3dity PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
   set_property(TARGET thirdparty PROPERTY POSITION_INDEPENDENT_CODE ON)
   set_property(TARGET val3dity PROPERTY POSITION_INDEPENDENT_CODE ON)
 else()
@@ -71,8 +72,6 @@ else()
   add_executable(val3dity ${SRC_FILES})
 endif()
 
-
-# target_include_directories(val3dity PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
 
 target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} CGAL::Eigen3_support ${GEOS_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} thirdparty)
 
