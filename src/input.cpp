@@ -1121,7 +1121,7 @@ void set_min_xy(double minx, double miny)
 {
   _minx = minx;
   _miny = miny;
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
@@ -1140,7 +1140,7 @@ void compute_min_xy(json& j)
     _minx = (_minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
     _miny = (_miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
