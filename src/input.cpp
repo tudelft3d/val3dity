@@ -1115,6 +1115,14 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
   }
 }
 
+void set_min_xy(double minx, double miny)
+{
+  _minx = minx;
+  _miny = miny;
+  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+}
 
 void compute_min_xy(json& j)
 {
@@ -1633,6 +1641,10 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
 
 void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {
+  std::cout << "tu3djson input file" << std::endl;
+  std::cout << "# Features found: " << j["features"].size() << std::endl;
+  //-- TODO: not translation for tu3djson, is that okay?
+  set_min_xy(0.0, 0.0);
   for (auto& f : j["features"]) {
     GenericObject* go = new GenericObject("none");
     if  (f["geometry"]["type"] == "Solid")

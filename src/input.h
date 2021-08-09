@@ -197,6 +197,7 @@ void              printProgressBar(int percent);
 std::string       localise(std::string s);
 std::string       remove_xml_namespace(const char* input);
 
+void              set_min_xy(double minx, double miny);
 void              compute_min_xy(pugi::xml_document& doc);
 void              compute_min_xy(json& j);
 
