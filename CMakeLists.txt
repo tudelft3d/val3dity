@@ -31,8 +31,8 @@ else()
 endif()
 
 # Eigen
-find_package(Eigen3)
-include( ${EIGEN3_USE_FILE} )  
+find_package(Eigen3 3.1.0 QUIET)
+include(CGAL_Eigen3_support)
 
 
 # Boost
