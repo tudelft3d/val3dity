@@ -1750,4 +1750,109 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 }
 
 
+void parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
+  //-- TODO: not translation for tu3djson, is that okay?
+  set_min_xy(0.0, 0.0);
+  GenericObject* go = new GenericObject("0");
+  if  (j["type"] == "Solid")
+  {
+    Solid* s = new Solid();
+    bool oshell = true;
+    int c = 0;
+    for (auto& shell : j["boundaries"]) 
+    {
+      Surface* sh = new Surface(c, tol_snap);
+      c++;
+      for (auto& polygon : shell) { 
+        std::vector< std::vector<int> > pa = polygon;
+        process_json_surface(pa, j, sh);
+      }
+      if (oshell == true)
+      {
+        oshell = false;
+        s->set_oshell(sh);
+      }
+      else
+        s->add_ishell(sh);
+    }
+    go->add_primitive(s);
+  }
+  else if ( (j["type"] == "MultiSurface") || (j["type"] == "CompositeSurface") ) 
+  {
+    Surface* sh = new Surface(-1, tol_snap);
+    for (auto& p : j["boundaries"]) 
+    { 
+      std::vector< std::vector<int> > pa = p;
+      process_json_surface(pa, j, sh);
+    }
+    if (j["type"] == "MultiSurface")
+    {
+      MultiSurface* ms = new MultiSurface();
+      ms->set_surface(sh);
+      go->add_primitive(ms);
+    }
+    else
+    {
+      CompositeSurface* cs = new CompositeSurface();
+      cs->set_surface(sh);
+      go->add_primitive(cs);
+    }
+  }
+  else if (j["type"] == "MultiSolid") 
+  {
+    MultiSolid* ms = new MultiSolid();
+    for (auto& solid : j["boundaries"]) 
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      for (auto& shell : solid) 
+      {
+        Surface* sh = new Surface(-1, tol_snap);
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, j, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      ms->add_solid(s);
+    }
+    go->add_primitive(ms);
+  }
+  else if (j["type"] == "CompositeSolid") 
+  {
+    CompositeSolid* cs = new CompositeSolid();
+    for (auto& solid : j["boundaries"]) 
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      for (auto& shell : solid) 
+      {
+        Surface* sh = new Surface(-1, tol_snap);
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, j, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      cs->add_solid(s);
+    }
+    go->add_primitive(cs);
+  } 
+  lsFeatures.push_back(go);
+}
+
+
 } // namespace val3dity
