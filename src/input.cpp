@@ -727,6 +727,8 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
   } 
   else if (j["type"] == "tu3djson") {
     errs.set_input_file_type("tu3djson");
+    std::cout << "tu3djson input file" << std::endl;
+    std::cout << "# Features found: " << j["features"].size() << std::endl;
     parse_tu3djson(j, lsFeatures, tol_snap);
   }
   else {
@@ -1641,8 +1643,7 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
 
 void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {
-  std::cout << "tu3djson input file" << std::endl;
-  std::cout << "# Features found: " << j["features"].size() << std::endl;
+
   //-- TODO: not translation for tu3djson, is that okay?
   set_min_xy(0.0, 0.0);
   int counter = 0;
