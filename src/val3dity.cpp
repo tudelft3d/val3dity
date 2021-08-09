@@ -25,6 +25,7 @@
   Delft University of Technology
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
+
 #include "val3dity.h"
 #include "Feature.h"
 #include "CityObject.h"
@@ -70,7 +71,7 @@ std::vector<bool> validate_tu3djson(json& j,
   //-- validate
   for (auto& f : lsFeatures)
   {
-    f->validate(0.001, 30, 0.0);
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   }
   //-- compile errors
   std::vector<bool> re;
@@ -78,8 +79,8 @@ std::vector<bool> validate_tu3djson(json& j,
     for (auto& p : f->get_primitives())
       re.push_back(p->is_valid());
   return re;
-
 }
+
 
 bool validate_cityjson(json& j, 
                        double tol_snap, 

@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
   std::cout.rdbuf(NULL);
   
 
-  std::ifstream input("/Users/hugo/data/cityjson/misc/cube.json");
+  std::ifstream input("/Users/hugo/data/tu3djson/cube.json");
+  // std::ifstream input("/Users/hugo/data/cityjson/misc/cube.json");
   // std::ifstream input("/Users/hugo/data/cityjson/examples/delft/v100/a2.json");
   json j;
   try 
@@ -26,16 +27,21 @@ int main(int argc, char *argv[])
     std::cerr << "Input file not a valid JSON file." << std::endl;
     return 0;
   }
-  if (j["type"] != "CityJSON") {
-    std::cerr << "Input file not a valid JSON file." << std::endl;
-    return 0;  
-  }
+  // if (j["type"] != "CityJSON") {
+  //   std::cerr << "Input file not a valid JSON file." << std::endl;
+  //   return 0;  
+  // }
+  
 
-  bool re = val3dity::validate_cityjson(j, 0.001);
+  bool re = val3dity::validate_one_geom(j["features"][0]["geometry"]);
+  // std::vector<bool> re = val3dity::validate_tu3djson(j);
+  // bool re = val3dity::validate_cityjson(j, 0.001);
 
   // restore buffer
   std::clog.rdbuf(clog_buf);
   std::cout.rdbuf(cout_buf);
+
+  // std::for_each(re.begin(), re.end(), [](const bool n) { std::cout << n << std::endl; });
 
   if (re == true)
     std::cout << "VALID" << std::endl;
