@@ -388,10 +388,10 @@ int main(int argc, char* const argv[])
       }
       else if (inputtype == JSON)
       {
-        read_file_cityjson(inputfile.getValue(), 
-                           lsFeatures,
-                           ioerrs, 
-                           snap_tol.getValue());
+        read_file_json(inputfile.getValue(), 
+                       lsFeatures,
+                       ioerrs, 
+                       snap_tol.getValue());
         if (ioerrs.has_errors() == true) {
           std::cout << "Errors while reading the input file, aborting." << std::endl;
           std::cout << ioerrs.get_report_text() << std::endl;

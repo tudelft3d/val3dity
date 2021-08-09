@@ -707,7 +707,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
   }
 }
 
-void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
+void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
   std::ifstream input(ifile);
   json j;
@@ -721,10 +721,23 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
     return;
   }
   // TODO: other validation for CityJSON or just let it crash?
-  if (j["type"] != "CityJSON") {
-    errs.add_error(901, "Input file not a CityJSON file.");
+  if (j["type"] == "CityJSON") {
+    errs.set_input_file_type("CityJSON");
+    parse_cityjson(j, lsFeatures, tol_snap);
+  } 
+  else if (j["type"] == "tu3djson") {
+    errs.set_input_file_type("tu3djson");
+    parse_tu3djson(j, lsFeatures, tol_snap);
+  }
+  else {
+    errs.add_error(901, "Input file not a supported JSON file (CityJSON|tu3djson).");
     return;  
   }
+}
+
+
+void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
   std::cout << "CityJSON input file" << std::endl;
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
   //-- compute (_minx, _miny)
@@ -1633,7 +1646,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
         c++;
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
-          process_json_surface(pa, f, sh);
+          process_json_surface(pa, f["geometry"], sh);
         }
         if (oshell == true)
         {

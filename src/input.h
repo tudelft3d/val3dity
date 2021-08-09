@@ -160,7 +160,7 @@ struct semantic_surfaces_walker: pugi::xml_tree_walker {
 void              read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
-void              read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
+void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              print_information(std::string &ifile);
 void              report_primitives(pugi::xml_document& doc);
@@ -173,6 +173,7 @@ Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs
 Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs);
 
 void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
+void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
