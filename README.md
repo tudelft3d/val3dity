@@ -108,6 +108,17 @@ Finally, to see all the options possible:
     $ ./val3dity --help
 
 
+## Using val3dity as a library
+
+val3dity can be compiled as a library:
+
+    $ cmake .. -DLIBRARY=true
+
+There is a simple example of how to use it in `./demo_lib`, to compile:
+
+    $ cmake .. -DLIBRARY=true
+
+
 ## Unit tests
 
 To verify that everything went fine during the compilation, run the unit tests (from the root folder of val3dity) (this requires `pip install pytest pyyaml`):
