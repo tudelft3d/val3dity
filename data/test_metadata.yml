@@ -111,3 +111,8 @@ test_indoorgml:
 
 test_cityjson:
   "geomtemplate_1": "1 tree as a geometry template"
+  "geomtemplate_2": "1 tree as a geometry template, template is not a valid solid"
+
+test_duplicates:
+  "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"
+  

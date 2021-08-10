@@ -1446,7 +1446,8 @@ void printProgressBar(int percent) {
   std::cout << percent << "%     " << std::flush;
 }
 
-Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
+
+Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   std::stringstream st;
@@ -1484,7 +1485,8 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
   infile >> s;
   infile >> numpt >> numf >> tmpint;
   //-- read the points
-  Surface* sh = new Surface(shellid);  
+  std::vector<int> newi;
+  Surface* sh = new Surface(shellid, tol_snap);
   for (int i = 0; i < numpt; i++)
   {
     double x, y, z;
@@ -1492,7 +1494,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
     x -= _minx;
     y -= _miny;
     Point3 p(x, y, z);
-    sh->add_point(p);
+    newi.push_back(sh->add_point(p));
   }
   //-- read the facets
   for (int i = 0; i < numf; i++)
@@ -1504,15 +1506,17 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs)
       errs.add_error(901, "Some surfaces not defined correctly or are empty");
       return NULL;
     }
-    for (int k = 0; k < tmpint; k++)
-      infile >> ids[k];
+    for (int k = 0; k < tmpint; k++) {
+      int t;
+      infile >> t;
+      ids[k] = newi[t];
+    }
     std::vector< std::vector<int> > pgnids;
     pgnids.push_back(ids);
     sh->add_face(pgnids);
   }
   return sh;
 }
-
 
 void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap)
 {
