@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2020, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2021, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -707,7 +707,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
   }
 }
 
-void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
+void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
   std::ifstream input(ifile);
   json j;
@@ -721,10 +721,25 @@ void read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, I
     return;
   }
   // TODO: other validation for CityJSON or just let it crash?
-  if (j["type"] != "CityJSON") {
-    errs.add_error(901, "Input file not a CityJSON file.");
+  if (j["type"] == "CityJSON") {
+    errs.set_input_file_type("CityJSON");
+    parse_cityjson(j, lsFeatures, tol_snap);
+  } 
+  else if (j["type"] == "tu3djson") {
+    errs.set_input_file_type("tu3djson");
+    std::cout << "tu3djson input file" << std::endl;
+    std::cout << "# Features found: " << j["features"].size() << std::endl;
+    parse_tu3djson(j, lsFeatures, tol_snap);
+  }
+  else {
+    errs.add_error(901, "Input file not a supported JSON file (CityJSON|tu3djson).");
     return;  
   }
+}
+
+
+void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
   std::cout << "CityJSON input file" << std::endl;
   std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
   //-- compute (_minx, _miny)
@@ -1102,6 +1117,14 @@ void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*
   }
 }
 
+void set_min_xy(double minx, double miny)
+{
+  _minx = minx;
+  _miny = miny;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  Primitive::set_translation_min_values(_minx, _miny);
+  Surface::set_translation_min_values(_minx, _miny);
+}
 
 void compute_min_xy(json& j)
 {
@@ -1117,7 +1140,7 @@ void compute_min_xy(json& j)
     _minx = (_minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
     _miny = (_miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
@@ -1616,5 +1639,340 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   allvertices.clear();
   lsFeatures.push_back(o);
 } 
+
+
+void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
+
+  //-- TODO: not translation for tu3djson, is that okay?
+  set_min_xy(0.0, 0.0);
+  int counter = 0;
+  for (auto& f : j["features"]) {
+    GenericObject* go = new GenericObject(std::to_string(counter));
+    counter++;
+    if  (f["geometry"]["type"] == "Solid")
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      int c = 0;
+      for (auto& shell : f["geometry"]["boundaries"]) 
+      {
+        Surface* sh = new Surface(c, tol_snap);
+        c++;
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, f["geometry"], sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      go->add_primitive(s);
+    }
+    else if ( (f["geometry"]["type"] == "MultiSurface") || (f["geometry"]["type"] == "CompositeSurface") ) 
+    {
+      Surface* sh = new Surface(-1, tol_snap);
+      for (auto& p : f["geometry"]["boundaries"]) 
+      { 
+        std::vector< std::vector<int> > pa = p;
+        process_json_surface(pa, f["geometry"], sh);
+      }
+      if (f["geometry"]["type"] == "MultiSurface")
+      {
+        MultiSurface* ms = new MultiSurface();
+        ms->set_surface(sh);
+        go->add_primitive(ms);
+      }
+      else
+      {
+        CompositeSurface* cs = new CompositeSurface();
+        cs->set_surface(sh);
+        go->add_primitive(cs);
+      }
+    }
+    else if (f["geometry"]["type"] == "MultiSolid") 
+    {
+      MultiSolid* ms = new MultiSolid();
+      for (auto& solid : f["geometry"]["boundaries"]) 
+      {
+        Solid* s = new Solid();
+        bool oshell = true;
+        for (auto& shell : solid) 
+        {
+          Surface* sh = new Surface(-1, tol_snap);
+          for (auto& polygon : shell) { 
+            std::vector< std::vector<int> > pa = polygon;
+            process_json_surface(pa, f["geometry"], sh);
+          }
+          if (oshell == true)
+          {
+            oshell = false;
+            s->set_oshell(sh);
+          }
+          else
+            s->add_ishell(sh);
+        }
+        ms->add_solid(s);
+      }
+      go->add_primitive(ms);
+    }
+    else if (f["geometry"]["type"] == "CompositeSolid") 
+    {
+      CompositeSolid* cs = new CompositeSolid();
+      for (auto& solid : f["geometry"]["boundaries"]) 
+      {
+        Solid* s = new Solid();
+        bool oshell = true;
+        for (auto& shell : solid) 
+        {
+          Surface* sh = new Surface(-1, tol_snap);
+          for (auto& polygon : shell) { 
+            std::vector< std::vector<int> > pa = polygon;
+            process_json_surface(pa, f["geometry"], sh);
+          }
+          if (oshell == true)
+          {
+            oshell = false;
+            s->set_oshell(sh);
+          }
+          else
+            s->add_ishell(sh);
+        }
+        cs->add_solid(s);
+      }
+      go->add_primitive(cs);
+    } 
+    lsFeatures.push_back(go);
+  }
+}
+
+
+void parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
+  //-- TODO: not translation for tu3djson, is that okay?
+  set_min_xy(0.0, 0.0);
+  GenericObject* go = new GenericObject("0");
+  if  (j["type"] == "Solid")
+  {
+    Solid* s = new Solid();
+    bool oshell = true;
+    int c = 0;
+    for (auto& shell : j["boundaries"]) 
+    {
+      Surface* sh = new Surface(c, tol_snap);
+      c++;
+      for (auto& polygon : shell) { 
+        std::vector< std::vector<int> > pa = polygon;
+        process_json_surface(pa, j, sh);
+      }
+      if (oshell == true)
+      {
+        oshell = false;
+        s->set_oshell(sh);
+      }
+      else
+        s->add_ishell(sh);
+    }
+    go->add_primitive(s);
+  }
+  else if ( (j["type"] == "MultiSurface") || (j["type"] == "CompositeSurface") ) 
+  {
+    Surface* sh = new Surface(-1, tol_snap);
+    for (auto& p : j["boundaries"]) 
+    { 
+      std::vector< std::vector<int> > pa = p;
+      process_json_surface(pa, j, sh);
+    }
+    if (j["type"] == "MultiSurface")
+    {
+      MultiSurface* ms = new MultiSurface();
+      ms->set_surface(sh);
+      go->add_primitive(ms);
+    }
+    else
+    {
+      CompositeSurface* cs = new CompositeSurface();
+      cs->set_surface(sh);
+      go->add_primitive(cs);
+    }
+  }
+  else if (j["type"] == "MultiSolid") 
+  {
+    MultiSolid* ms = new MultiSolid();
+    for (auto& solid : j["boundaries"]) 
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      for (auto& shell : solid) 
+      {
+        Surface* sh = new Surface(-1, tol_snap);
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, j, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      ms->add_solid(s);
+    }
+    go->add_primitive(ms);
+  }
+  else if (j["type"] == "CompositeSolid") 
+  {
+    CompositeSolid* cs = new CompositeSolid();
+    for (auto& solid : j["boundaries"]) 
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      for (auto& shell : solid) 
+      {
+        Surface* sh = new Surface(-1, tol_snap);
+        for (auto& polygon : shell) { 
+          std::vector< std::vector<int> > pa = polygon;
+          process_json_surface(pa, j, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      cs->add_solid(s);
+    }
+    go->add_primitive(cs);
+  } 
+  lsFeatures.push_back(go);
+}
+
+
+void get_report_json(json& jr,
+                     std::string ifile, 
+                     std::vector<Feature*>& lsFeatures,
+                     std::string val3dity_version,
+                     double snap_tol,
+                     double overlap_tol,
+                     double planarity_d2p_tol,
+                     double planarity_n_tol,
+                     IOErrors ioerrs)
+{
+  jr["type"] = "val3dity_report";
+  jr["val3dity_version"] = val3dity_version; 
+  jr["input_file"] = ifile;
+  jr["input_file_type"] = ioerrs.get_input_file_type();
+  //-- time
+  std::time_t rawtime;
+  struct tm * timeinfo;
+  std::time (&rawtime);
+  timeinfo = std::localtime ( &rawtime );
+  char buffer[80];
+  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  jr["time"] = buffer;
+  //-- user-defined param
+  jr["parameters"];
+  jr["parameters"]["snap_tol"] = snap_tol;
+  jr["parameters"]["overlap_tol"] = overlap_tol;
+  jr["parameters"]["planarity_d2p_tol"] = planarity_d2p_tol;
+  jr["parameters"]["planarity_n_tol"] = planarity_n_tol;
+
+  //-- primitives overview
+  std::map<int, std::tuple<int,int> > prim_o; //-- <primID, total, valid>
+  std::set<int> theprimitives;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      theprimitives.insert(p->get_type());
+  for (auto& each : theprimitives)
+    prim_o[each] = std::make_tuple(0, 0);
+  for (auto& f : lsFeatures) {
+    for (auto& p : f->get_primitives()) {
+      std::get<0>(prim_o[p->get_type()]) += 1;
+      if (p->is_valid() == true) {
+        std::get<1>(prim_o[p->get_type()]) += 1;
+      }
+    }
+  }
+  jr["primitives_overview"] = json::array();
+  for (auto& each : prim_o) {
+    json j;
+    switch(each.first)
+    {
+      case 0: j["type"] = "Solid"; break;
+      case 1: j["type"] = "CompositeSolid"; break;
+      case 2: j["type"] = "MultiSolid"; break;
+      case 3: j["type"] = "CompositeSurface"; break;
+      case 4: j["type"] = "MultiSurface"; break;
+      case 5: j["type"] = "GeometryTemplate"; break;
+      case 9: j["type"] = "ALL"; break;
+    }
+    j["total"] = std::get<0>(each.second);
+    j["valid"] = std::get<1>(each.second);
+    jr["primitives_overview"].push_back(j);
+  }
+
+  //-- features overview
+  std::map<std::string, std::tuple<int,int> > feat_o; //-- <featureID, total, valid>
+  std::set<std::string> thefeatures;
+  for (auto& f : lsFeatures)
+    thefeatures.insert(f->get_type());
+  for (auto& each : thefeatures)
+    feat_o[each] = std::make_tuple(0, 0);
+  for (auto& f : lsFeatures) {
+    std::get<0>(feat_o[f->get_type()]) += 1;
+    if (f->is_valid() == true) {
+      std::get<1>(feat_o[f->get_type()]) += 1;
+    }
+  }
+  jr["features_overview"] = json::array();
+  for (auto& each : feat_o) {
+    json j;
+    j["type"] = each.first; 
+    j["total"] = std::get<0>(each.second);
+    j["valid"] = std::get<1>(each.second);
+    jr["features_overview"].push_back(j);
+  }
+
+  //-- each of the features with their primitives listed
+  jr["features"] = json::array();
+  for (auto& f : lsFeatures)
+    jr["features"].push_back(f->get_report_json());
+  
+  //-- dataset errors (9xx)
+  jr["dataset_errors"] = json::array();
+  if (ioerrs.has_errors() == true)
+    jr["dataset_errors"] = ioerrs.get_report_json();
+
+  //-- overview of errors
+  std::set<int> unique_errors;
+  for (auto& f : lsFeatures)
+    for (auto& code : f->get_unique_error_codes())
+      unique_errors.insert(code);
+  jr["all_errors"] = json::array();
+  for (auto& e : unique_errors)
+    jr["all_errors"].push_back(e);
+  for (auto& e : ioerrs.get_unique_error_codes())
+    jr["all_errors"].push_back(e);
+
+  bool bValid = true;
+  for (auto& f : lsFeatures) {
+    if (f->is_valid() == false) {
+      bValid = false;
+      break;
+    }
+  }
+  if (ioerrs.has_errors() == true)
+    bValid = false;
+  jr["validity"] = bValid;
+}
+
 
 } // namespace val3dity

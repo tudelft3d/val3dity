@@ -2,7 +2,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2019, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2021, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -160,7 +160,7 @@ struct semantic_surfaces_walker: pugi::xml_tree_walker {
 void              read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
 
-void              read_file_cityjson(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
+void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              print_information(std::string &ifile);
 void              report_primitives(pugi::xml_document& doc);
@@ -171,6 +171,10 @@ void              print_info_aligned(std::string o, size_t number, bool tab = fa
 void              read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
 Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs);
+
+void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
+void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
+void              parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
@@ -194,8 +198,19 @@ void              printProgressBar(int percent);
 std::string       localise(std::string s);
 std::string       remove_xml_namespace(const char* input);
 
+void              set_min_xy(double minx, double miny);
 void              compute_min_xy(pugi::xml_document& doc);
 void              compute_min_xy(json& j);
+
+void              get_report_json(json& jr, 
+                                  std::string ifile, 
+                                  std::vector<Feature*>& lsFeatures, 
+                                  std::string val3dity_version,
+                                  double snap_tol, 
+                                  double overlap_tol, 
+                                  double planarity_d2p_tol, 
+                                  double planarity_n_tol, 
+                                  IOErrors ioerrs);
 
 } // namespace val3dity
 

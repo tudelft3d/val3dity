@@ -37,6 +37,7 @@ x86/
 /buildx
 /docs/_build
 /docs/build
+/demo_lib/build/
 
 
 # Vagrant

@@ -1,7 +1,7 @@
 
 project( val3dity )
 
-cmake_minimum_required (VERSION 3.2)
+cmake_minimum_required (VERSION 3.14)
 
 add_definitions(-std=c++14)
 
@@ -30,9 +30,11 @@ else()
   return()  
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 # Eigen
-find_package(Eigen3)
-include( ${EIGEN3_USE_FILE} )  
+find_package(Eigen3 3.1.0 QUIET)
+include(CGAL_Eigen3_support)
 
 
 # Boost
@@ -44,23 +46,35 @@ if ( NOT Boost_FOUND )
 endif()
 
 # GEOS
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package( GEOS )
 if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
 
 include_directories( ${GEOS_INCLUDE_DIR} )
-include_directories( ${CMAKE_SOURCE_DIR}/thirdparty )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty )
 
 FILE(GLOB_RECURSE THIRDPARTY thirdparty/*.cpp)
 add_library(thirdparty STATIC ${THIRDPARTY})
 
 FILE(GLOB SRC_FILES src/*.cpp)
-add_executable(val3dity ${SRC_FILES})
 
-# add_to_cached_list( CGAL_EXECUTABLE_TARGETS val3dity )
+if ( LIBRARY )
+  message(STATUS "Building val3dity library")
+  list(REMOVE_ITEM SRC_FILES src/main.cpp)
+  add_library(val3dity STATIC ${SRC_FILES})
+  target_include_directories(val3dity PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+  set_property(TARGET thirdparty PROPERTY POSITION_INDEPENDENT_CODE ON)
+  set_property(TARGET val3dity PROPERTY POSITION_INDEPENDENT_CODE ON)
+else()
+  message(STATUS "Building val3dity executable")
+  list(REMOVE_ITEM SRC_FILES src/val3dity.cpp)
+  add_executable(val3dity ${SRC_FILES})
+endif()
 
-target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} ${GEOS_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} thirdparty)
+
+target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} CGAL::Eigen3_support ${GEOS_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} thirdparty)
 
 install(TARGETS val3dity DESTINATION bin)
+
+
