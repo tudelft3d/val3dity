@@ -374,7 +374,6 @@ CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<s
 }
 
 
-
 MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   MultiSurface* ms = new MultiSurface;
@@ -385,6 +384,7 @@ MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::
   return ms;
 }
 
+
 CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   CompositeSurface* cs = new CompositeSurface;
@@ -393,172 +393,6 @@ CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::m
   Surface* s = process_gml_surface(nms, 0, dallpoly, tol_snap, errs);
   cs->set_surface(s);
   return cs;
-}
-
-void print_information(std::string &ifile)
-{
-  std::cout << "Reading file: " << ifile << std::endl;
-  pugi::xml_document doc;
-  if (!doc.load_file(ifile.c_str())) 
-  {
-    std::cout << "Input file not found and/or incorrect GML file." << std::endl;
-    return;
-  }
-  //-- parse namespace
-  std::map<std::string, std::string> ns;
-  pugi::xml_node ncm = doc.first_child();
-  std::string vcitygml;
-  get_namespaces(ncm, vcitygml);
-  if (vcitygml.empty() == true) {
-    std::cout << "File does not have the CityGML namespace. Abort." << std::endl;
-    return;
-  }
-  std::cout << "++++++++++++++++++++ GENERAL +++++++++++++++++++++" << std::endl;
-  std::cout << "CityGML version: " << vcitygml << std::endl;
-  report_primitives(doc);
-  report_building(doc);
-}
-
-void report_building(pugi::xml_document& doc) {
-  std::cout << "++++++++++++++++++++ BUILDINGS +++++++++++++++++++" << std::endl;
-  
-  std::string s = "//" + NS["building"] + "Building";
-  int nobuildings = doc.select_nodes(s.c_str()).size();
-  print_info_aligned("Building", nobuildings);
-
-  s = "//" + NS["building"] + "Building" + "/" + NS["building"] + "consistsOfBuildingPart" + "[1]";
-  int nobwbp = doc.select_nodes(s.c_str()).size();
-  print_info_aligned("without BuildingPart", (nobuildings - nobwbp), true);
-  print_info_aligned("having BuildingPart", nobwbp, true);
-  s = "//" + NS["building"] + "Building" + "[@" + NS["gml"] + "id]";
-  print_info_aligned("with gml:id", doc.select_nodes(s.c_str()).size(), true);
-
-  s = "//" + NS["building"] + "BuildingPart";
-  int nobuildingparts = doc.select_nodes(s.c_str()).size();
-  print_info_aligned("BuildingPart", nobuildingparts);
-  s = "//" + NS["building"] + "BuildingPart" + "[@" + NS["gml"] + "id]";
-  print_info_aligned("with gml:id", doc.select_nodes(s.c_str()).size(), true);
-  for (int lod = 1; lod <= 3; lod++) {
-    std::cout << "LOD" << lod << std::endl;
-    int totals = 0;
-    int totalms = 0;
-    int totalsem = 0;
-    report_building_each_lod(doc, lod, totals, totalms, totalsem);
-    print_info_aligned("Building stored in gml:Solid", totals, true);
-    print_info_aligned("Building stored in gml:MultiSurface", totalms, true);
-    print_info_aligned("Building with semantics for surfaces", totalsem, true);
-  }
-  std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-}
-
-void print_info_aligned(std::string o, size_t number, bool tab) {
-  if (tab == false)
-    std::cout << std::setw(40) << std::left  << o;
-  else
-    std::cout << "    " << std::setw(36) << std::left  << o;
-  std::cout << std::setw(10) << std::right << number << std::endl;
-}
-
-void report_building_each_lod(pugi::xml_document& doc, int lod, int& total_solid, int& total_ms, int& total_sem) {
-  total_solid = 0;
-  total_ms = 0;
-  total_sem = 0;
-  std::string slod = "lod" + std::to_string(lod);
-  std::string s = "//" + NS["building"] + "Building";
-  pugi::xpath_node_set nb = doc.select_nodes(s.c_str());
-  for (auto& b : nb) {
-    std::string s1 = ".//" + NS["building"] + slod + "Solid";
-    pugi::xpath_node_set tmp = b.node().select_nodes(s1.c_str());
-    if (tmp.empty() == false) {
-      for (auto& nbp : tmp) {
-        total_solid++;
-        break;
-      }
-    }
-    s1 = ".//" + NS["building"] + slod + "MultiSurface";
-    tmp = b.node().select_nodes(s1.c_str());
-    if (tmp.empty() == false) {
-      for (auto& nbp : tmp) {
-        total_ms++;
-        break;
-      }
-    }
-    s1 = ".//" + NS["building"] + "boundedBy" + "//" + NS["building"] + slod + "MultiSurface";
-    tmp = b.node().select_nodes(s1.c_str());
-    if (tmp.empty() == false) {
-      for (auto& nbp : tmp) {
-        total_sem++;
-        break;
-      }
-    }
-  }
-}
-
-
-void get_namespaces(pugi::xml_node& root, std::map<std::string, std::string>& ns, std::string& vcitygml) {
-  vcitygml = "";
-  for (pugi::xml_attribute attr = root.first_attribute(); attr; attr = attr.next_attribute()) {
-    std::string name = attr.name();
-    if (name.find("xmlns") != std::string::npos) {
-      std::string value = attr.value();
-      std::string sns;
-      if (value.find("http://www.opengis.net/citygml/0") != std::string::npos) {
-        sns = "citygml";
-        vcitygml = "v0.4";
-      }
-      else if (value.find("http://www.opengis.net/citygml/1") != std::string::npos) {
-        sns = "citygml";
-        vcitygml = "v1.0";
-      }
-      else if (value.find("http://www.opengis.net/citygml/2") != std::string::npos) {
-        sns = "citygml";
-        vcitygml = "v2.0";
-      }
-      else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
-                (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {
-          sns = "gml";
-      }
-      else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)
-        sns = "building";
-      else if (value.find("http://www.w3.org/1999/xlink") != std::string::npos)
-        sns = "xlink";
-      else
-        sns = "";
-      if (sns != "") {
-        size_t pos = name.find(":");
-        if (pos == std::string::npos) 
-          ns[sns] = "";
-        else 
-          ns[sns] = name.substr(pos + 1) + ":";
-      }    
-    }
-  }
-}
-
-
-
-void report_primitives(pugi::xml_document& doc) {
-  std::cout << "+++++++++++++++++++ PRIMITIVES +++++++++++++++++++" << std::endl;
-  
-  std::string s = "//" + NS["gml"] + "Solid";
-  print_info_aligned("gml:Solid", doc.select_nodes(s.c_str()).size());
-
-  s = "//" + NS["gml"] + "MultiSolid";
-  print_info_aligned("gml:MultiSolid", doc.select_nodes(s.c_str()).size());
-
-  s = "//" + NS["gml"] + "CompositeSolid";
-  print_info_aligned("gml:CompositeSolid", doc.select_nodes(s.c_str()).size());
-  
-  s = "//" + NS["gml"] + "MultiSurface";
-  print_info_aligned("gml:MultiSurface", doc.select_nodes(s.c_str()).size());
-  
-  s = "//" + NS["gml"] + "CompositeSurface";
-  print_info_aligned("gml:CompositeSurface", doc.select_nodes(s.c_str()).size());
-
-  s = "//" + NS["gml"] + "Polygon";
-  print_info_aligned("gml:Polygon", doc.select_nodes(s.c_str()).size());
-
-  std::cout << std::endl;
 }
 
 
@@ -1002,121 +836,6 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
 }
 
 
-
-
-void process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap)
-{
-  primitives_walker walker;
-  doc.traverse(walker);
-  std::cout << "# 3D primitives found: " << walker.lsNodes.size() << std::endl;
-  int primid = 0;
-  std::string coid = "Primitives";
-  GenericObject* o = new GenericObject("none");
-  for (auto& prim : walker.lsNodes)
-  {
-    if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
-    {
-      Solid* p = process_gml_solid(prim, dallpoly, tol_snap, errs);
-      if (p->get_id().compare("") == 0)
-        p->set_id(std::to_string(primid));
-      o->add_primitive(p);
-    }
-    else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
-    {
-      MultiSolid* p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
-      if (p->get_id().compare("") == 0)
-        p->set_id(std::to_string(primid));
-      o->add_primitive(p);
-    }      
-    else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
-    {
-      CompositeSolid* p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
-      if (p->get_id().compare("") == 0)
-        p->set_id(std::to_string(primid));
-      o->add_primitive(p);
-    }
-    else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
-    {
-      MultiSurface* p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
-      if (p->get_id().compare("") == 0)
-        p->set_id(std::to_string(primid));
-      o->add_primitive(p);
-    } 
-    else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
-    {
-      CompositeSurface* p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
-      if (p->get_id().compare("") == 0)
-        p->set_id(std::to_string(primid));
-      o->add_primitive(p);
-    } 
-    primid++;
-  }  
-  lsFeatures.push_back(o);
-}
-
-
-void process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
-{
-  //-- read each CityObject in the file
-  citygml_objects_walker walker;
-  doc.traverse(walker);
-  std::cout << "# City Objects found: " << walker.lsNodes.size() << std::endl;
-  int cocounter = 0;
-  //-- for each City Object parse its primitives
-  for (auto& co : walker.lsNodes)
-  {
-    std::string cotype = remove_xml_namespace(co.name());
-    std::string coid = "";
-    if (co.attribute("gml:id") != 0)
-      coid += co.attribute("gml:id").value();
-    else
-    {
-      coid += "MISSING_ID_";
-      coid += std::to_string(cocounter);
-      cocounter++;
-    }
-    CityObject* o = new CityObject(coid, cotype);
-    primitives_walker walker2;
-    co.traverse(walker2);
-    int pcounter = 0;
-    if ( (geom_is_sem_surfaces == true) && (walker2.lsNodes.size() == 0) ) 
-    { //-- WARNING: no geom in the CO!
-      semantic_surfaces_walker walker3;
-      co.traverse(walker3);
-      for (auto& prim : walker3.lsNodes)
-      {
-        Primitive* p;
-        p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
-        if (p->get_id() == "")
-          p->set_id("MISSING_ID_" + std::to_string(pcounter));
-        o->add_primitive(p);
-        pcounter++;
-      }
-    }
-    else {
-      for (auto& prim : walker2.lsNodes)
-      {
-        Primitive* p;
-        if (remove_xml_namespace(prim.name()).compare("Solid") == 0)
-          p = process_gml_solid(prim, dallpoly, tol_snap, errs);
-        else if (remove_xml_namespace(prim.name()).compare("MultiSolid") == 0)
-          p = process_gml_multisolid(prim, dallpoly, tol_snap, errs);
-        else if (remove_xml_namespace(prim.name()).compare("CompositeSolid") == 0)
-          p = process_gml_compositesolid(prim, dallpoly, tol_snap, errs);
-        else if (remove_xml_namespace(prim.name()).compare("MultiSurface") == 0)
-          p = process_gml_multisurface(prim, dallpoly, tol_snap, errs);
-        else if (remove_xml_namespace(prim.name()).compare("CompositeSurface") == 0)
-          p = process_gml_compositesurface(prim, dallpoly, tol_snap, errs);
-        if (p->get_id() == "")
-          p->set_id("MISSING_ID_" + std::to_string(pcounter));
-        o->add_primitive(p);
-        pcounter++;
-      }
-    }
-    lsFeatures.push_back(o);
-  }
-}
-
 void set_min_xy(double minx, double miny)
 {
   _minx = minx;
@@ -1185,7 +904,7 @@ void compute_min_xy(pugi::xml_document& doc)
 }
 
 
-void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces)
+void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
   std::cout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
@@ -1197,70 +916,34 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
       errs.add_error(901, result.description());
     return;
   }
-
   //-- parse namespace
   pugi::xml_node ncm = doc.first_child();
-  std::string vcitygml;
-  get_namespaces(ncm, vcitygml); //-- results in global variable NS in this unit
-
-  //-- CityGML v3 is not supported: warning to users
-  if (vcitygml == "v3.0") {
-    errs.add_error(904, "CityGML v3.0 files are not supported, use CityJSON (all versions fully supported) or downgrade to v2.0.");
-    return;
-  }
-
-  if (NS.count("gml") == 0)
-  {
-    errs.add_error(901, "Input file does not have the GML namespace.");
-    return;
-  }
-  //-- find (_minx, _miny)
-  compute_min_xy(doc);
-  //-- build dico of xlinks for <gml:Polygon>
-  std::map<std::string, pugi::xpath_node> dallpoly;
-  build_dico_xlinks(doc, dallpoly, errs);
-  if ( (NS.count("citygml") != 0) && (ncm.name() == (NS["citygml"] + "CityModel")) )
-  {
-    std::cout << "CityGML input file" << std::endl;
-    errs.set_input_file_type("CityGML");
-    process_gml_file_city_objects(doc, lsFeatures, dallpoly, errs, tol_snap, geom_is_sem_surfaces);
-  }
-  else if ( (NS.count("indoorgml") != 0) && (ncm.name() == (NS["indoorgml"] + "IndoorFeatures")) ) {
+  get_namespaces(ncm); //-- results in global variable NS in this unit
+  if ( (NS.count("indoorgml") != 0) && (ncm.name() == (NS["indoorgml"] + "IndoorFeatures")) ) {
     std::cout << "IndoorGML input file" << std::endl;
+    //-- find (_minx, _miny)
+    compute_min_xy(doc);
+    //-- build dico of xlinks for <gml:Polygon>
+    std::map<std::string, pugi::xpath_node> dallpoly;
+    build_dico_xlinks(doc, dallpoly, errs);
     errs.set_input_file_type("IndoorGML");
     process_gml_file_indoorgml(doc, lsFeatures, dallpoly, errs, tol_snap);
   }
   else
   {
-    std::cout << "GML input file (ie not CityGML)" << std::endl;
-    process_gml_file_primitives(doc, lsFeatures, dallpoly, errs, tol_snap);
+    errs.add_error(904, "GML files not supported (yes also CityGML files ==> upgrade to CityJSON)");
   }
 }
 
-
-void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
-  vcitygml = "";
+void get_namespaces(pugi::xml_node& root) {
   for (pugi::xml_attribute attr = root.first_attribute(); attr; attr = attr.next_attribute()) {
     std::string name = attr.name();
     if (name.find("xmlns") != std::string::npos) {
       // std::cout << attr.name() << "=" << attr.value() << std::endl;
       std::string value = attr.value();
       std::string sns;
-      if (value.find("http://www.opengis.net/citygml/0") != std::string::npos) {
+      if (value.find("http://www.opengis.net/citygml/") != std::string::npos) {
         sns = "citygml";
-        vcitygml = "v0.4";
-      }
-      else if (value.find("http://www.opengis.net/citygml/1") != std::string::npos) {
-        sns = "citygml";
-        vcitygml = "v1.0";
-      }
-      else if (value.find("http://www.opengis.net/citygml/2") != std::string::npos) {
-        sns = "citygml";
-        vcitygml = "v2.0";
-      }
-      else if (value.find("http://www.opengis.net/citygml/3") != std::string::npos) {
-        sns = "citygml";
-        vcitygml = "v3.0";
       }
       else if ( (value.find("http://www.opengis.net/gml") != std::string::npos) &&
                 (value.find("http://www.opengis.net/gmlcov") == std::string::npos) ) {
@@ -1270,22 +953,6 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
                 (value.find("core") != std::string::npos) ) {
         sns = "indoorgml";
       }
-      else if (value.find("http://www.opengis.net/citygml/building") != std::string::npos)
-        sns = "building";
-      else if (value.find("http://www.opengis.net/citygml/relief") != std::string::npos)
-        sns = "dem";
-      else if (value.find("http://www.opengis.net/citygml/vegetation") != std::string::npos)
-        sns = "veg";
-      else if (value.find("http://www.opengis.net/citygml/waterbody") != std::string::npos)
-        sns = "wtr";
-      else if (value.find("http://www.opengis.net/citygml/landuse") != std::string::npos)
-        sns = "luse";
-      else if (value.find("http://www.opengis.net/citygml/transportation") != std::string::npos)
-        sns = "tran";      
-      else if (value.find("http://www.opengis.net/citygml/cityfurniture") != std::string::npos)
-        sns = "frn";      
-      else if (value.find("http://www.opengis.net/citygml/appearance") != std::string::npos)
-        sns = "app";      
       else if (value.find("http://www.w3.org/1999/xlink") != std::string::npos)
         sns = "xlink";
       else
@@ -1300,9 +967,6 @@ void get_namespaces(pugi::xml_node& root, std::string& vcitygml) {
     }
   }
 }
-
-
-
 
 
 void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs)

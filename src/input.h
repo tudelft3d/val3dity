@@ -157,16 +157,10 @@ struct semantic_surfaces_walker: pugi::xml_tree_walker {
 
 //--
 
-void              read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
-void              get_namespaces(pugi::xml_node& root, std::string& vcitygml);
+void              read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
+void              get_namespaces(pugi::xml_node& root);
 
 void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
-
-void              print_information(std::string &ifile);
-void              report_primitives(pugi::xml_document& doc);
-void              report_building(pugi::xml_document& doc);
-void              report_building_each_lod(pugi::xml_document& doc, int lod, int& total_solid, int& total_ms, int& total_sem);
-void              print_info_aligned(std::string o, size_t number, bool tab = false);
 
 void              read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
@@ -190,8 +184,6 @@ void              process_json_surface(std::vector< std::vector<int> >& pgn, nlo
 void              process_cityjson_geometrytemplates(json& jgt, std::vector<GeometryTemplate*>& lsGTs, double tol_snap);
 void              process_json_surface_geometrytemplate(std::vector< std::vector<int> >& pgn, json& j, Surface* sh);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
-void              process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
-void              process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
 void              process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
 
 void              printProgressBar(int percent);

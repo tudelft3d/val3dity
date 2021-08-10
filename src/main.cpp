@@ -83,10 +83,6 @@ public:
     std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
     std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
     
-    std::cout << "\tval3dity input.gml --overlap_tol 0.05" << std::endl;
-    std::cout << "\t\tValidate each 3D primitive in input.gml (a GML file)," << std::endl;
-    std::cout << "\t\ta tolerance of 0.05 unit is used for the 3D adjacency between Solids." << std::endl;
-    
     std::cout << "\tval3dity input.json --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
     
@@ -96,8 +92,8 @@ public:
     std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
     std::cout << "\t\tValidate the geometries in input.off as an ISO19107 MultiSurface" << std::endl;
     
-    std::cout << "\tval3dity input.gml --snap_tol 0.1" << std::endl;
-    std::cout << "\t\tThe vertices in input.gml closer than 0.1unit are snapped together" << std::endl;
+    std::cout << "\tval3dity myindoorgml.gml --snap_tol 0.1" << std::endl;
+    std::cout << "\t\tThe vertices in myindoorgml.gml closer than 0.1unit are snapped together" << std::endl;
   }
 
   virtual void failure(TCLAP::CmdLineInterface& c, TCLAP::ArgException& e)
@@ -183,7 +179,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either GML, CityJSON, OBJ, or OFF",
+                                              "input file in either CityJSON, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
@@ -201,7 +197,7 @@ int main(int argc, char* const argv[])
                                               "string");    
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "which geometric primitive to validate <Solid|CompositeSurface|MultiSurface>",
+                                              "how to interpret OBJ/OFF/POLY input: which geometric primitive to use <Solid|CompositeSurface|MultiSurface> (default=Solid)",
                                               false,
                                               "Solid",
                                               &primVals);
@@ -227,10 +223,6 @@ int main(int argc, char* const argv[])
                                               "ignore204",
                                               "ignore error 204",
                                               false);    
-    TCLAP::SwitchArg                        geom_is_sem_surfaces("",
-                                              "geom_is_sem_surfaces",
-                                              "geometry of a CityGML object is formed by its semantic surfaces",
-                                              false);
     TCLAP::ValueArg<std::string>            output_off("",
                                               "output_off",
                                               "output each shell/surface in OFF format",
@@ -239,7 +231,7 @@ int main(int argc, char* const argv[])
                                               "string");        
     TCLAP::ValueArg<double>                 snap_tol("",
                                               "snap_tol",
-                                              "tolerance for snapping vertices in GML (default=0.001)",
+                                              "tolerance for snapping vertices (default=0.001)",
                                               false,
                                               0.001,
                                               "double");
@@ -268,7 +260,6 @@ int main(int argc, char* const argv[])
     cmd.add(overlap_tol);
     cmd.add(verbose);
     cmd.add(primitives);
-    cmd.add(geom_is_sem_surfaces);
     cmd.add(ignore204);
     cmd.add(unittests);
     cmd.add(output_off);
@@ -278,6 +269,13 @@ int main(int argc, char* const argv[])
     cmd.add(ishellfiles);
     cmd.add(report);
     cmd.parse( argc, argv );
+
+    std::string licensewarning =
+    "---\nval3dity Copyright (c) 2011-2021, 3D geoinformation research group, TU Delft  \n"
+    "This program comes with ABSOLUTELY NO WARRANTY.\n"
+    "This is free software, and you are welcome to redistribute it\n"
+    "under certain conditions; for details run val3dity with the '--license' option.\n---";
+    std::cout << licensewarning << std::endl;
 
     //-- vector with Features: CityObject, GenericObject, 
     //-- or IndoorModel (or others in the future)
@@ -344,14 +342,6 @@ int main(int argc, char* const argv[])
         ioerrs.add_error(903, "POLY files having inner shells cannot be validated as CompositeSurface (only Solids)");
     }
 
-    std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2021, 3D geoinformation research group, TU Delft  \n"
-    "This program comes with ABSOLUTELY NO WARRANTY.\n"
-    "This is free software, and you are welcome to redistribute it\n"
-    "under certain conditions; for details run val3dity with the '--license' option.\n---";
-    std::cout << licensewarning << std::endl;
-
-
     if (ioerrs.has_errors() == false)
     {
       if (inputtype == GML)
@@ -361,8 +351,7 @@ int main(int argc, char* const argv[])
           read_file_gml(inputfile.getValue(), 
                         lsFeatures,
                         ioerrs, 
-                        snap_tol.getValue(),
-                        geom_is_sem_surfaces.getValue());
+                        snap_tol.getValue());
           if (ioerrs.has_errors() == true) {
             std::cout << "Errors while reading the input file, aborting." << std::endl;
             std::cout << ioerrs.get_report_text() << std::endl;
@@ -376,7 +365,7 @@ int main(int argc, char* const argv[])
         catch (int e)
         {
           if (e == 901)
-            ioerrs.add_error(901, "Invalid GML structure, or that particular construction of GML is not supported yet. Please report at https://github.com/tudelft3d/val3dity/issues and provide the file.");
+            ioerrs.add_error(901, "Invalid GML structure, or that particular construction of GML is not supported. Please report at https://github.com/tudelft3d/val3dity/issues and provide the file.");
         }
       }
       else if (inputtype == JSON)
@@ -481,17 +470,6 @@ int main(int argc, char* const argv[])
     double planarity_n_tol_updated = planarity_n_tol.getValue();
     if (ioerrs.has_errors() == false) 
     {
-      std::cout << "Primitive(s) validated: ";
-      if (prim3d == SOLID)        
-        std::cout << "Solid" << std::endl;
-      else if (prim3d == MULTISURFACE)        
-        std::cout << "MultiSurface" << std::endl;
-      else if (prim3d == COMPOSITESURFACE)        
-        std::cout << "CompositeSurface" << std::endl;
-      else {
-        std::cout << "All" << std::endl;
-        std::cout << "(CityGML/CityJSON/IndoorGML have all their 3D primitives validated)" << std::endl;
-      }
       //-- report on parameters used
       if (ignore204.getValue() == true)
         planarity_n_tol_updated = 180.0;
@@ -719,11 +697,6 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
   ss << "+++++" << std::endl;
   ss << "Input file type:" << std::endl;
   std::string ft = ioerrs.get_input_file_type();
-  if (ft == "CityGML") {
-    ft += "\n  [watchout: CityGML support is deprecated]";
-    ft += "\n  [future version will not support it]";
-    ft += "\n  [upgrade to CityJSON]";
-  }
   ss << "  " << ft << std::endl;
   ss << "+++++" << std::endl;
   int fInvalid = 0;
