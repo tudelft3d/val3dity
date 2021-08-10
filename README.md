@@ -114,9 +114,7 @@ val3dity can be compiled as a library:
 
     $ cmake .. -DLIBRARY=true
 
-There is a simple example of how to use it in `./demo_lib`, to compile:
-
-    $ cmake .. -DLIBRARY=true
+There is a simple example of how to use it in `./demo_lib` with instructions to compile it.
 
 
 ## Unit tests
