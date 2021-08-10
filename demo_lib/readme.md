@@ -1,10 +1,10 @@
 
 ## how to use val3dity as a library in your code
 
-The API of the library is `val3dity.h`, 
+The API of the library is `val3dity.h`, you need to include the file in your source.
 
-
-and the functions read/return [nlohmann JSON objects](https://github.com/nlohmann/json), so you need to use it like this. There is no need to include or link to nlohmann JSON yourself, the cmake reuses that of val3dity.
+Also, the functions to validate read/return [nlohmann JSON objects](https://github.com/nlohmann/json), so you need to use this library. 
+There is however no need to include or link to nlohmann JSON yourself, the cmake reuses that of val3dity.
 
 ```cpp
 #include "val3dity.h" 
