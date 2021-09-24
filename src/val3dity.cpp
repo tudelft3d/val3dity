@@ -276,5 +276,24 @@ bool validate_cityjson(json& j,
   }
 }
 
+// ====================================================================================
+bool validate_arrays(std::string geom_type,
+                     std::vector<std::vector<std::vector<int>>> boundaries,
+                     std::vector<std::vector<double>> vertices,
+                     double tol_snap,
+                     double planarity_d2p_tol,
+                     double planarity_n_tol,
+                     double overlap_tol){
+    std::vector<Feature*> lsFeatures;
+    parse_tu3djson_geom_array(geom_type,boundaries,vertices,lsFeatures,tol_snap);
+    //-- validate
+    validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    //-- compile errors
+    bool isvalid;
+    for (auto& f : lsFeatures)
+        for (auto& p : f->get_primitives())
+            isvalid = p->is_valid();
+        return isvalid;
+}
 
 }

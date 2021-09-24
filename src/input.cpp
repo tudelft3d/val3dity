@@ -595,6 +595,39 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
   sh->add_face(pgnids);
 }
 
+void process_json_surface_array(std::vector <std::vector<int>> &pgn,
+                                std::vector<std::vector<double>> vertices,
+                                Surface *sh){
+    std::vector< std::vector<int> > pgnids;
+    for (auto& r : pgn)
+    {
+        std::vector<int> newr;
+        for (auto& i : r)
+        {
+            double x;
+            double y;
+            double z;
+            // if (j.count("transform") == 0)
+            // {
+            x = double(vertices[i][0]);
+            y = double(vertices[i][1]);
+            z = double(vertices[i][2]);
+            // }
+            // else
+            // {
+            //   x = (double(j["vertices"][i][0]) * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
+            //   y = (double(j["vertices"][i][1]) * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
+            //   z = (double(j["vertices"][i][2]) * double(j["transform"]["scale"][2])) + double(j["transform"]["translate"][2]);
+            // }
+            x -= _minx;
+            y -= _miny;
+            Point3 p3(x, y, z);
+            newr.push_back(sh->add_point(p3));
+        }
+        pgnids.push_back(newr);
+    }
+    sh->add_face(pgnids);
+}
 
 void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap)
 {
@@ -1859,6 +1892,132 @@ void parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_
   lsFeatures.push_back(go);
 }
 
+
+void parse_tu3djson_geom_array(std::string geom_type,
+                               std::vector<std::vector<std::vector<int>>> boundaries,
+                               std::vector<std::vector<double>> vertices,
+                               std::vector<Feature*>& lsFeatures,
+                               double tol_snap){
+    //-- TODO: not translation for tu3djson, is that okay?
+    set_min_xy(0.0, 0.0);
+    GenericObject* go = new GenericObject("0");
+    if  (geom_type == "Solid")
+    {
+        Solid* s = new Solid();
+        bool oshell = true;
+        int c = 0;
+        //
+        std::vector<std::vector<std::vector<std::vector<int>>>> temp;
+        temp.push_back(boundaries);
+
+        for (auto& shell : temp)
+        {
+            Surface* sh = new Surface(c, tol_snap);
+            c++;
+            for (auto& polygon : shell) {
+                std::vector< std::vector<int>> pa = polygon;
+                process_json_surface_array(pa, vertices, sh);
+            }
+            if (oshell == true)
+            {
+                oshell = false;
+                s->set_oshell(sh);
+            }
+            else
+                s->add_ishell(sh);
+        }
+        go->add_primitive(s);
+    }
+    else if ( (geom_type == "MultiSurface") || (geom_type == "CompositeSurface") )
+    {
+        Surface* sh = new Surface(-1, tol_snap);
+        //
+        //        std::vector<std::vector<std::vector<int>>> temp;
+        //        temp.push_back(boundaries);
+        for (auto& p : boundaries)
+        {
+            std::vector< std::vector<int> > pa = p;
+            process_json_surface_array(pa, vertices, sh);
+        }
+        if (geom_type == "MultiSurface")
+        {
+            MultiSurface* ms = new MultiSurface();
+            ms->set_surface(sh);
+            go->add_primitive(ms);
+        }
+        else
+        {
+            CompositeSurface* cs = new CompositeSurface();
+            cs->set_surface(sh);
+            go->add_primitive(cs);
+        }
+    }
+    else if (geom_type == "MultiSolid")
+    {
+        MultiSolid* ms = new MultiSolid();
+        //
+        std::vector<std::vector<std::vector<std::vector<int>>>> temp1;
+        temp1.push_back(boundaries);
+        std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> temp;
+        temp.push_back(temp1);
+
+        for (auto& solid : temp)
+        {
+            Solid* s = new Solid();
+            bool oshell = true;
+            for (auto& shell : solid)
+            {
+                Surface* sh = new Surface(-1, tol_snap);
+                for (auto& polygon : shell) {
+                    std::vector< std::vector<int> > pa = polygon;
+                    process_json_surface_array(pa, vertices, sh);
+                }
+                if (oshell == true)
+                {
+                    oshell = false;
+                    s->set_oshell(sh);
+                }
+                else
+                    s->add_ishell(sh);
+            }
+            ms->add_solid(s);
+        }
+        go->add_primitive(ms);
+    }
+    else if (geom_type == "CompositeSolid")
+    {
+        CompositeSolid* cs = new CompositeSolid();
+        //
+        std::vector<std::vector<std::vector<std::vector<int>>>> temp1;
+        temp1.push_back(boundaries);
+        std::vector<std::vector<std::vector<std::vector<std::vector<int>>>>> temp;
+        temp.push_back(temp1);
+
+        for (auto& solid : temp)
+        {
+            Solid* s = new Solid();
+            bool oshell = true;
+            for (auto& shell : solid)
+            {
+                Surface* sh = new Surface(-1, tol_snap);
+                for (auto& polygon : shell) {
+                    std::vector< std::vector<int> > pa = polygon;
+                    process_json_surface_array(pa, vertices, sh);
+                }
+                if (oshell == true)
+                {
+                    oshell = false;
+                    s->set_oshell(sh);
+                }
+                else
+                    s->add_ishell(sh);
+            }
+            cs->add_solid(s);
+        }
+        go->add_primitive(cs);
+    }
+    lsFeatures.push_back(go);
+}
 
 void get_report_json(json& jr,
                      std::string ifile, 

@@ -175,6 +175,12 @@ Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs,
 void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
+void              parse_tu3djson_geom_array(std::string geom_type,
+                                            std::vector<std::vector<std::vector<int>>> boundaries,
+                                            std::vector<std::vector<double>> vertices,
+                                            std::vector<Feature*>& lsFeatures,
+                                            double tol_snap);
+
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
@@ -189,6 +195,9 @@ void              process_json_geometries_of_co(json& jco, CityObject* co, std::
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
 void              process_cityjson_geometrytemplates(json& jgt, std::vector<GeometryTemplate*>& lsGTs, double tol_snap);
 void              process_json_surface_geometrytemplate(std::vector< std::vector<int> >& pgn, json& j, Surface* sh);
+void              process_json_surface_array(std::vector <std::vector<int>> &pgn,
+                                             std::vector<std::vector<double>> vertices,
+                                             Surface *sh);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
 void              process_gml_file_city_objects(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap, bool geom_is_sem_surfaces);
 void              process_gml_file_primitives(pugi::xml_document& doc, std::vector<Feature*>& lsFeatures, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs, double tol_snap);
