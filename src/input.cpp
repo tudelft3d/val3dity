@@ -1524,8 +1524,7 @@ void parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_
 }
 
 
-void get_report_json(json& jr,
-                     std::string ifile, 
+json get_report_json(std::string ifile, 
                      std::vector<Feature*>& lsFeatures,
                      std::string val3dity_version,
                      double snap_tol,
@@ -1534,6 +1533,7 @@ void get_report_json(json& jr,
                      double planarity_n_tol,
                      IOErrors ioerrs)
 {
+  json jr;
   jr["type"] = "val3dity_report";
   jr["val3dity_version"] = val3dity_version; 
   jr["input_file"] = ifile;
@@ -1640,6 +1640,8 @@ void get_report_json(json& jr,
   if (ioerrs.has_errors() == true)
     bValid = false;
   jr["validity"] = bValid;
+
+  return jr;
 }
 
 

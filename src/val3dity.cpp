@@ -95,19 +95,17 @@ json validate_onegeom(json& j,
     for (auto& p : f->get_primitives())
       isvalid = p->is_valid();
   //-- get report in json 
-  json jr;
   IOErrors ioerrs;
   ioerrs.set_input_file_type("tu3djson_geom");
-  get_report_json(jreport, 
-                  "JSON object",
-                  lsFeatures,
-                  VAL3DITY_VERSION,
-                  tol_snap,
-                  overlap_tol,
-                  planarity_d2p_tol,
-                  planarity_n_tol,
-                  ioerrs);
-  return isvalid;
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  return jr;
 }
 
 std::vector<bool> is_valid_tu3djson(json& j,
@@ -146,15 +144,15 @@ json validate_tu3djson(json& j,
   //-- get report in json 
   IOErrors ioerrs;
   ioerrs.set_input_file_type("tu3djson");
-  get_report_json(jreport, 
-                  "JSON object",
-                  lsFeatures,
-                  VAL3DITY_VERSION,
-                  tol_snap,
-                  overlap_tol,
-                  planarity_d2p_tol,
-                  planarity_n_tol,
-                  ioerrs);
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  return jr;
 }
 
 
@@ -251,24 +249,17 @@ json validate_cityjson(json& j,
       for (auto& code : p->get_unique_error_codes())
         errors.insert(code);
   //-- get report in json 
-  json jr;
   IOErrors ioerrs;
   ioerrs.set_input_file_type("CityJSON");
-  get_report_json(jreport, 
-                  "JSON object",
-                  lsFeatures,
-                  VAL3DITY_VERSION,
-                  tol_snap,
-                  overlap_tol,
-                  planarity_d2p_tol,
-                  planarity_n_tol,
-                  ioerrs);
-  if (errors.size() == 0) {
-    return true;
-  }
-  else {
-    return false;
-  }
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  return jr;
 }
 
 

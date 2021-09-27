@@ -573,16 +573,14 @@ int main(int argc, char* const argv[])
     if (report.getValue() != "") 
     {
       //-- save the json report in memory first
-      json jr;
-      get_report_json(jr, 
-                       inputfile.getValue(),
-                       lsFeatures,
-                       VAL3DITY_VERSION,
-                       snap_tol.getValue(),
-                       overlap_tol.getValue(),
-                       planarity_d2p_tol.getValue(),
-                       planarity_n_tol_updated,
-                       ioerrs);
+      json jr = get_report_json(inputfile.getValue(),
+                                lsFeatures,
+                                VAL3DITY_VERSION,
+                                snap_tol.getValue(),
+                                overlap_tol.getValue(),
+                                planarity_d2p_tol.getValue(),
+                                planarity_n_tol_updated,
+                                ioerrs);
       if (report.getValue() != "")
         write_report_json(jr, report.getValue());
     }
