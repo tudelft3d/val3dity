@@ -34,50 +34,51 @@ using json = nlohmann::json;
 namespace val3dity
 {
 
-bool validate_one_geom(json& j,
-                       double tol_snap=0.001, 
-                       double planarity_d2p_tol=0.01, 
-                       double planarity_n_tol=20.0, 
-                       double overlap_tol=-1.0);
+bool 
+is_valid_onegeom(json& j,
+                 double tol_snap=0.001, 
+                 double planarity_d2p_tol=0.01, 
+                 double planarity_n_tol=20.0, 
+                 double overlap_tol=-1.0);
   
 //-- with report
-bool validate_one_geom(json& j,
-                       json& jreport,
-                       double tol_snap=0.001, 
-                       double planarity_d2p_tol=0.01, 
-                       double planarity_n_tol=20.0, 
-                       double overlap_tol=-1.0);
+json
+validate_onegeom(json& j,
+                 double tol_snap=0.001, 
+                 double planarity_d2p_tol=0.01, 
+                 double planarity_n_tol=20.0, 
+                 double overlap_tol=-1.0);
 
 ///////////////////////////////////////////////////////////
 
-std::vector<bool> validate_tu3djson(json& j,
-                    double tol_snap=0.001, 
-                    double planarity_d2p_tol=0.01, 
-                    double planarity_n_tol=20.0, 
-                    double overlap_tol=-1.0);
-//-- with report
-std::vector<bool> validate_tu3djson(json& j,
-                    json& jreport,
-                    double tol_snap=0.001, 
-                    double planarity_d2p_tol=0.01, 
-                    double planarity_n_tol=20.0, 
-                    double overlap_tol=-1.0);
+std::vector<bool> 
+is_valid_tu3djson(json& j,
+                  double tol_snap=0.001, 
+                  double planarity_d2p_tol=0.01, 
+                  double planarity_n_tol=20.0, 
+                  double overlap_tol=-1.0);
+
+json
+validate_tu3djson(json& j,
+                  double tol_snap=0.001, 
+                  double planarity_d2p_tol=0.01, 
+                  double planarity_n_tol=20.0, 
+                  double overlap_tol=-1.0);
 
 ///////////////////////////////////////////////////////////
 
-bool validate_cityjson(json& j, 
-                       double tol_snap=0.001, 
-                       double planarity_d2p_tol=0.01, 
-                       double planarity_n_tol=20.0, 
-                       double overlap_tol=-1.0);
+bool 
+is_valid_cityjson(json& j, 
+                  double tol_snap=0.001, 
+                  double planarity_d2p_tol=0.01, 
+                  double planarity_n_tol=20.0, 
+                  double overlap_tol=-1.0);
 
-
-//-- with report
-bool validate_cityjson(json& j, 
-                       json& jreport, 
-                       double tol_snap=0.001, 
-                       double planarity_d2p_tol=0.01, 
-                       double planarity_n_tol=20.0, 
-                       double overlap_tol=-1.0);
+json
+validate_cityjson(json& j, 
+                  double tol_snap=0.001, 
+                  double planarity_d2p_tol=0.01, 
+                  double planarity_n_tol=20.0, 
+                  double overlap_tol=-1.0);
 
 }

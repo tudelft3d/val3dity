@@ -61,7 +61,7 @@ void validate_no_coutclog(std::vector<Feature*>& lsFeatures,
 }
 
 
-bool validate_one_geom(json& j,
+bool is_valid_onegeom(json& j,
                        double tol_snap, 
                        double planarity_d2p_tol, 
                        double planarity_n_tol, 
@@ -79,12 +79,11 @@ bool validate_one_geom(json& j,
   return isvalid;
 }
 
-bool validate_one_geom(json& j,
-                       json& jreport,
-                       double tol_snap, 
-                       double planarity_d2p_tol, 
-                       double planarity_n_tol, 
-                       double overlap_tol)
+json validate_onegeom(json& j,
+                      double tol_snap, 
+                      double planarity_d2p_tol, 
+                      double planarity_n_tol, 
+                      double overlap_tol)
 {
   std::vector<Feature*> lsFeatures;
   parse_tu3djson_geom(j, lsFeatures, tol_snap);
@@ -111,7 +110,7 @@ bool validate_one_geom(json& j,
   return isvalid;
 }
 
-std::vector<bool> validate_tu3djson(json& j,
+std::vector<bool> is_valid_tu3djson(json& j,
                                     double tol_snap, 
                                     double planarity_d2p_tol, 
                                     double planarity_n_tol, 
@@ -129,12 +128,11 @@ std::vector<bool> validate_tu3djson(json& j,
   return re;
 }
 
-std::vector<bool> validate_tu3djson(json& j,
-                                    json& jreport,
-                                    double tol_snap, 
-                                    double planarity_d2p_tol, 
-                                    double planarity_n_tol, 
-                                    double overlap_tol)
+json validate_tu3djson(json& j,
+                       double tol_snap, 
+                       double planarity_d2p_tol, 
+                       double planarity_n_tol, 
+                       double overlap_tol)
 {
   std::vector<Feature*> lsFeatures;
   parse_tu3djson(j, lsFeatures, tol_snap);
@@ -146,7 +144,6 @@ std::vector<bool> validate_tu3djson(json& j,
     for (auto& p : f->get_primitives())
       re.push_back(p->is_valid());
   //-- get report in json 
-  json jr;
   IOErrors ioerrs;
   ioerrs.set_input_file_type("tu3djson");
   get_report_json(jreport, 
@@ -158,11 +155,10 @@ std::vector<bool> validate_tu3djson(json& j,
                   planarity_d2p_tol,
                   planarity_n_tol,
                   ioerrs);
-  return re;
 }
 
 
-bool validate_cityjson(json& j, 
+bool is_valid_cityjson(json& j, 
                        double tol_snap, 
                        double planarity_d2p_tol, 
                        double planarity_n_tol, 
@@ -212,8 +208,7 @@ bool validate_cityjson(json& j,
   }
 }
 
-bool validate_cityjson(json& j,
-                       json& jreport, 
+json validate_cityjson(json& j,
                        double tol_snap, 
                        double planarity_d2p_tol, 
                        double planarity_n_tol, 
