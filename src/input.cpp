@@ -831,8 +831,8 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     }
     im->add_graph(ig);
   }
-  if (im->get_number_graphs() == 0)
-    std::cout << "\t!!! No dual graph was found in the input file" << std::endl;
+  // if (im->get_number_graphs() == 0)
+  //   std::cout << "\t!!! No dual graph was found in the input file" << std::endl;
 }
 
 
@@ -898,7 +898,7 @@ void compute_min_xy(pugi::xml_document& doc)
     if (std::stod(tokens[1]) < _miny)
       _miny = std::stod(tokens[1]);
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
