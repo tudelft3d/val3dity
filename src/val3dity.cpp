@@ -269,13 +269,56 @@ validate_cityjson(json& j,
 }
 
 bool 
-is_valid_indoorgml(std::string& inputfile, 
+is_valid_indoorgml(const char* input, 
                   double tol_snap, 
                   double planarity_d2p_tol, 
                   double planarity_n_tol, 
                   double overlap_tol)
 {
-
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("CityJSON");
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_string(input);
+  if (!result) {
+    ioerrs.add_error(901, "Input value not validXML");
+  }
+  std::vector<Feature*> lsFeatures;
+  if (ioerrs.has_errors() == false) {
+    //-- parse namespace
+    pugi::xml_node ncm = doc.first_child();
+    std::map<std::string, std::string> thens = get_namespaces(ncm); //-- results in global variable NS in this unit
+    if ( (thens.count("indoorgml") != 0) && (ncm.name() == (thens["indoorgml"] + "IndoorFeatures")) ) {
+      //-- find (_minx, _miny)
+      compute_min_xy(doc);
+      //-- build dico of xlinks for <gml:Polygon>
+      std::map<std::string, pugi::xpath_node> dallpoly;
+      build_dico_xlinks(doc, dallpoly, ioerrs);
+      ioerrs.set_input_file_type("IndoorGML");
+      process_gml_file_indoorgml(doc, lsFeatures, dallpoly, ioerrs, tol_snap);
+    }
+    else
+    {
+      ioerrs.add_error(904, "GML files not supported (yes that includes CityGML files ==> upgrade to CityJSON)");
+    }
+  }
+  //-- start the validation
+  if (ioerrs.has_errors() == false) {
+    validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  } else {
+    return false;
+  }
+  //-- compile errors
+  std::set<int> errors;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors.insert(code);
+  if (errors.size() == 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 json
@@ -286,7 +329,7 @@ validate_indoorgml(const char* input,
                   double overlap_tol) 
 {
   IOErrors ioerrs;
-  ioerrs.set_input_file_type("CityJSON");
+  ioerrs.set_input_file_type("IndoorGML");
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_string(input);
   if (!result) {
