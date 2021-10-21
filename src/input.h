@@ -158,7 +158,8 @@ struct semantic_surfaces_walker: pugi::xml_tree_walker {
 //--
 
 void              read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
-void              get_namespaces(pugi::xml_node& root);
+std::map<std::string, std::string> 
+                  get_namespaces(pugi::xml_node& root);
 
 void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 

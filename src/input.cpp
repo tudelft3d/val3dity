@@ -931,11 +931,11 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
   }
   else
   {
-    errs.add_error(904, "GML files not supported (yes also CityGML files ==> upgrade to CityJSON)");
+    errs.add_error(904, "GML files not supported (yes that includes CityGML files ==> upgrade to CityJSON)");
   }
 }
 
-void get_namespaces(pugi::xml_node& root) {
+std::map<std::string, std::string> get_namespaces(pugi::xml_node& root) {
   for (pugi::xml_attribute attr = root.first_attribute(); attr; attr = attr.next_attribute()) {
     std::string name = attr.name();
     if (name.find("xmlns") != std::string::npos) {
@@ -966,6 +966,8 @@ void get_namespaces(pugi::xml_node& root) {
       }    
     }
   }
+  std::map<std::string, std::string> tmp = NS;
+  return tmp;
 }
 
 
