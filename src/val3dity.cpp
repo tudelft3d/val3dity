@@ -38,7 +38,7 @@
 namespace val3dity
 {
 
-std::string VAL3DITY_VERSION = "2.3.0-beta.1";
+std::string VAL3DITY_VERSION = "2.3.0-beta.2";
 
 void 
 validate_no_coutclog(std::vector<Feature*>& lsFeatures,                        
