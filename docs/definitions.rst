@@ -87,6 +87,17 @@ Validating a ``MultiSurface`` simply means that each Polygon is validated indivi
 
 
 ----
+I would like to suggest to edit this part. MultiSurface is not that arbitrary and it does 
+have also own validation rules in OpenGIS® Implementation Standard for Geographic information
+- Simple feature access - Part 1: Common architecture
+
+"A MultiSurface is a 2-dimensional GeometryCollection whose elements are Surfaces, all using coordinates from
+the same coordinate reference system. The geometric interiors of any two Surfaces in a MultiSurface may not
+intersect in the full coordinate system. The boundaries of any two coplanar elements in a MultiSurface may
+intersect, at most, at a finite number of Points. If they were to meet along a curve, they could be merged into a
+single surface."
+
+Arbitratry collection of polygons can be expressed as a GeometryCollection.
 
 
 ``CompositeSurface`` 
