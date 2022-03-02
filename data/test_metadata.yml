@@ -93,6 +93,11 @@ test_valid:
   "v104_1": the bug raised by the Marcin in Poland about wrong error 104, caused by CGAL and Eigen (Plane_3.to_2d())
   "v104_2": like 104_1 but with very large z coords
   "nearly-collinear": another case from Marcin where the CDT was applied to solve. Tiny triangle created yields issues.
+
+test_tu3djson:
+  "cube": "a valid cube as the only cell"
+  "cube2": "two geoms, one MultiSolid, all valid"
+  "geojson": "a GeoJSON file, invalid"
   
 test_indoorgml:
   "igml_v1": "a valid cube as the only cell, no dual"
