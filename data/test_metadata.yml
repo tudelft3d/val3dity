@@ -2,14 +2,11 @@
 
 # test case
 test_empty:
-  "completely_empty": Completely empty files
-  "empty_primitive": A CompositeSolid where one Solid is empty
+  "completely_empty": "An empty file"
+  "empty_primitive": "A CompositeSolid where one Solid is empty"
   "empty_primitive_1": "A variation of empty_primitive.json"
-  "cityobject_no_geom": "one building in CityGML without any geometry (only Bounding Surfaces)"
 
 test_file_format:
-  "invalid_citygml_1": "A GenericCityObject where the first surfaceMember missing a gml:Polygon tag"
-  "invalid_citygml_2": "CityGML with missing City/GML namespace declarations"
   "invalid_indoorgml_1": "IndoorGML with wrong xml tags that doesn't close"
   "invalid_indoorgml_2": "FZK file"
   "invalid_json_cityjson": "CityJSON file with a missing {, invalid JSON"
@@ -28,7 +25,6 @@ test_geometry_generic:
   "104_4": cube with top face having small fold (Kevin Wiebe's case); vertical shift can't be made (old pfold2.poly)
   "201": Unit cube with intersecting rings in top face
   "201_1": A single 3D polygon with an interior ring that instersects its exterior
-  "201_2": Unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point
   "202": Unit cube with a duplicate inner ring top face
   "203": Unit cube where the top face has 5 vertices, one of them (8) is not on the plane of the other 4 (+0.05)
   "203_1": Unit cube with a rectangular hole drilled through it, where one vertex (8) on the inner ring in the top face of the cube is not on the plane of the face (+0.5)
@@ -38,6 +34,7 @@ test_geometry_generic:
   "204_1": Unit cube with small fold in the top face (old pfold1.poly)
   "205": Unit cube with a polygon with interior disconnected in top face
   "206": Unit cube with a hole in top face located outside (in 2D the top face is not acc. to SFS)
+  "206_1": Unit cube with a hole in top face located outside and the hole is intersecting the exterior in one point
   "207": Unit cube with a polygon with nested rings in top face
   "207_1": Unit cube with a polygon with a nested ring in a nested ring in the top face
   "207_2": Same as 207_1 but the holes are defined according to the .poly manual
@@ -72,7 +69,6 @@ test_geometry_generic:
   "405": Pyramid with the normals pointing inwards
 
 test_geometry_specific:
-  "103":    A unit cube where the bottom surface is not closed
   "501":    CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
   "501_1":  CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
   "502":    CompositeSolid with 3 cubes, where cube 1-2 are identical
@@ -94,7 +90,6 @@ test_valid:
   "inner_shell_4": "+ inner_shell + basecube = Unit cube with two cavities (pyramids), one touches a face of the other"
   "composite_solid": Two unit cubes in a CompositeSolid as CityJSON and CityGML
   "multi_solid": Two unit cubes in a MultiSolid as CityJSON
-  "composite_solid_1": "Two unit cubes in a CompositeSolid CityGML, with <CityModel>, <cityObjectMember> part of the 'core' namespace"
   "v104_1": the bug raised by the Marcin in Poland about wrong error 104, caused by CGAL and Eigen (Plane_3.to_2d())
   "v104_2": like 104_1 but with very large z coords
   "nearly-collinear": another case from Marcin where the CDT was applied to solve. Tiny triangle created yields issues.
@@ -112,6 +107,7 @@ test_indoorgml:
 test_cityjson:
   "geomtemplate_1": "1 tree as a geometry template"
   "geomtemplate_2": "1 tree as a geometry template, template is not a valid solid"
+  "torus.city": "a squared torus in CityJSON v1.1"
 
 test_duplicates:
   "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"
