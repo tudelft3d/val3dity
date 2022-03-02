@@ -9,9 +9,7 @@ import os.path
 
 #------------------------------------------------------------------------ Data
 @pytest.fixture(scope="module",
-                params=["completely_empty.gml",
-                        "completely_empty.xml",
-                        "completely_empty.obj",
+                params=["completely_empty.obj",
                         "completely_empty.off",
                         "completely_empty.json",])
 def data_completely_empty(request, dir_empty):
@@ -22,22 +20,12 @@ def data_completely_empty(request, dir_empty):
     return(file_path)
 
 
-@pytest.fixture(scope="module",
-                params=["cityobject_no_geom.gml"])
-def data_cityobject_no_geom(request, dir_empty):
-    file_path = os.path.abspath(
-        os.path.join(
-            dir_empty,
-            request.param))
-    return(file_path)
-
 
 @pytest.fixture(scope="module",
-                params=["empty_primitive.gml",
-                        "empty_primitive.xml",
-                        "empty_primitive.json",
+                params=["empty_primitive.json",
                         "empty_primitive_1.json",
                         "empty_primitive.obj",
+                        "empty_primitive.poly",
                         "empty_primitive.off"])
 def dir_empty_primitive(request, dir_empty):
     file_path = os.path.abspath(
@@ -55,6 +43,3 @@ def test_empty_primitive(validate, dir_empty_primitive, unittests):
     error = validate(dir_empty_primitive, options=unittests)
     assert(error == [902])
 
-def test_no_geom(validate, data_cityobject_no_geom, unittests):
-    error = validate(data_cityobject_no_geom, options=unittests)
-    assert(error == [609])    
