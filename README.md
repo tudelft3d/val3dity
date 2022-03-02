@@ -6,7 +6,7 @@
 val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
 Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS only validates 2D primitives).
 
-In short, it verifies whether a 3D primitive respects the definition as given in [ISO 19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language).
+In short, it verifies whether a 3D primitive respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language).
 
 The validation of the following 3D primitives is fully supported:
 
