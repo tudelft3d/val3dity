@@ -566,7 +566,7 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
     parse_tu3djson(j, lsFeatures, tol_snap);
   }
   else {
-    errs.add_error(901, "Input file not a supported JSON file (CityJSON|tu3djson).");
+    errs.add_error(904, "Input file type not a supported JSON file (CityJSON and tu3djson only).");
     return;  
   }
 }
