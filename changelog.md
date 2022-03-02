@@ -4,13 +4,22 @@
 ## [Unreleased]
 - validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
-- phasing out CityGML support
+
+
+## [2.3.0] - 2022-03-02
+### Added
+- val3dity can now be compiled as a library and easily used in other C++ binary
+- unit test for IndoorGML files
+### Changed
+- fixed a few bugs for the parsing of IndoorGML files
+### Removed
+- removed the support for CityGML files and 'vanilla' GML files. Only IndoorGML files can be read, and support for GML 3.3 is not fully there yet. Most errors/issues that are reported with val3dity have to do with a faulty parser of CityGML, and not with val3dity itself. I cannot justify spending 100s of hours fixing the parser, I tried hard but this not possible anymore. If someone wants to do it then great I am willing to help them, but I will not invest time on this anymore. Just upgrade your files to CityJSON (https://www.cityjson.org/tutorials/conversion/), I'll always maintain a full CityJSON parser!
+
 
 ## [2.2.0] - 2020-05-14
 ### Added
 - support for IndoorGML datasets, not just the geometries but specific validation tests for the primal-dual consistency were added
 - support for GeometryTemplates in CityJSON (https://www.cityjson.org/specs/#geometry-templates)
-
 ### Changed
 - completely revamped the JSON error report, it's better and clearer
 - no more HTML output for the report (output of report is now with option `--report`, be careful), but you can just drag your JSON report to the HTML page (in folder `/report_browser/index.html`) or at http://geovalidation.bk.tudelft.nl/val3dity/browser/
