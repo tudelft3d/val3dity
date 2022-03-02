@@ -22,14 +22,12 @@ There is no plan to support these geometries.
 
 val3dity accepts as input:
 
-  - [GML files](https://en.wikipedia.org/wiki/Geography_Markup_Language) of any flavour
   - [CityJSON](http://www.cityjson.org)
-  - [CityGML-XML (v1 & v2 only; v3 will not be supported)](https://www.citygml.org)
   - [IndoorGML](http://indoorgml.net/)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
 
-For the City/JSON/GML and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
+For the CityJSON and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
 
 ## Usage
@@ -90,6 +88,7 @@ Thus, in a nutshell,
   1. install CGAL: `$ sudo apt-get install libcgal-dev`
     - if it's not CGAL5 that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
     - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.0.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
+
 
 ### Windows
 
