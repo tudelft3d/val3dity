@@ -1,6 +1,6 @@
 # Testing val3dity
 
-This README is solely concerned with the integration tests for val3dity. These tests are implemented in **Python3**, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its boundary conditions. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
+This README is solely concerned with the integration tests for val3dity. These tests are implemented in **Python**, with the `pytest` library. The tests call val3dity using the `subprocess` library and feed it with various files. Every file materializes a specific error case, or one of its boundary conditions. Thus validating a test file should result in a single error, unless there is good reason to do otherwise.
 
 Due to the current setup of file referencing in the tests, `pytest` need to be run from the `/val3dity` root directory, thus `somepath/val3dity $ pytest`
 
