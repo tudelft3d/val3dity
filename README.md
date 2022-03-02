@@ -23,9 +23,10 @@ There is no plan to support these geometries.
 val3dity accepts as input:
 
   - [CityJSON](http://www.cityjson.org)
-  - [IndoorGML](http://indoorgml.net/)
+  - [tu3djson](https://github.com/tudelft3d/tu3djson)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
+  - [IndoorGML](http://indoorgml.net/)
 
 For the CityJSON and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 

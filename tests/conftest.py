@@ -60,6 +60,12 @@ def dir_cityjson():
     dir_path = os.path.join(root, "data/test_cityjson")
     return(dir_path)
 
+@pytest.fixture(scope="session")
+def dir_tu3djson():
+    """path to the data for test_cityjson"""
+    root = os.getcwd()
+    dir_path = os.path.join(root, "data/test_tu3djson")
+    return(dir_path)
 
 @pytest.fixture(scope="session")
 def dir_file_format():
