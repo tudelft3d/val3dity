@@ -74,16 +74,16 @@ public:
     }
     std::cout << "==SOME EXAMPLES==" << std::endl;
     
-    std::cout << "\tval3dity input.json" << std::endl;
+    std::cout << "\tval3dity input.city.json" << std::endl;
     std::cout << "\t\tValidate each City Object and each 3D primitive in input.json (CityJSON file)" << std::endl;
     std::cout << "\t\tand print a summary" << std::endl;
     
-    std::cout << "\tval3dity input.json --report /home/elvis/temp/myreport.json" << std::endl;
-    std::cout << "\t\tValidate each 3D primitive in input.json (CityJSON file)" << std::endl;
+    std::cout << "\tval3dity input.city.json --report /home/elvis/temp/myreport.json" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.city.json (CityJSON file)" << std::endl;
     std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
     std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
     
-    std::cout << "\tval3dity input.json --verbose" << std::endl;
+    std::cout << "\tval3dity input.city.json --verbose" << std::endl;
     std::cout << "\t\tAll details of the validation are printed out" << std::endl;
     
     std::cout << "\tval3dity input.obj" << std::endl;
