@@ -102,26 +102,26 @@ def test_options_valid(validate, data_composite_solid, options_valid):
     error = validate(data_composite_solid, options=options_valid)
     assert(error == [])
 
-@pytest.mark.full
-def test_default_options_primitive(val3dity, validate_full, data_basecube):
-    """See issue  #72"""
-    p_option = 'Solid' # default -p is Solid
-    pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
-    options = ["--unittests"]
-    command = [val3dity] + options + data_basecube
-    out, err = validate_full(command)
-    p_validated = pat_re.search(out).group()
-    assert p_validated == p_option
+# @pytest.mark.full
+# def test_default_options_primitive(val3dity, validate_full, data_basecube):
+#     """See issue  #72"""
+#     p_option = 'Solid' # default -p is Solid
+#     pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
+#     options = ["--unittests"]
+#     command = [val3dity] + options + data_basecube
+#     out, err = validate_full(command)
+#     p_validated = pat_re.search(out).group()
+#     assert p_validated == p_option
 
-def test_options_primitive(val3dity, validate_full, data_basecube,
-                           options_primitive):
-    """See issue  #72"""
-    p_option = options_primitive[2]
-    pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
-    command = [val3dity] + options_primitive + data_basecube
-    out, err = validate_full(command)
-    p_validated = pat_re.search(out).group()
-    assert p_validated == p_option
+# def test_options_primitive(val3dity, validate_full, data_basecube,
+#                            options_primitive):
+#     """See issue  #72"""
+#     p_option = options_primitive[2]
+#     pat_re = re.compile(r"(?<=Primitive\(s\) validated: ).+", re.MULTILINE)
+#     command = [val3dity] + options_primitive + data_basecube
+#     out, err = validate_full(command)
+#     p_validated = pat_re.search(out).group()
+#     assert p_validated == p_option
     
 
 @pytest.mark.full
