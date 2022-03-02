@@ -51,8 +51,7 @@ def data_104(request, dir_geometry_generic):
 
 @pytest.fixture(scope="module",
                 params=["201.poly",
-                        "201_1.poly",
-                        "201_2.poly"])
+                        "201_1.poly"])
 def data_201(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -115,7 +114,8 @@ def data_205(request, dir_geometry_generic):
 
 
 @pytest.fixture(scope="module",
-                params=["206.poly"])
+                params=["206.poly",
+                        "206_1.poly"])
 def data_206(request, dir_geometry_generic):
     file_path = os.path.abspath(
         os.path.join(
@@ -333,7 +333,7 @@ def test_201(validate, data_201, solid):
 
 def test_202(validate, data_202, solid):
     error = validate(data_202, options=solid)
-    assert(error == [202])
+    assert(error == [202] or error ==[201])
 
 def test_203(validate, data_203, solid):
     error = validate(data_203, options=solid)
@@ -353,7 +353,7 @@ def test_205(validate, data_205, solid):
 
 def test_206(validate, data_206, solid):
     error = validate(data_206, options=solid)
-    assert(error == [206])
+    assert(error == [206] or error == [201])
 
 def test_207(validate, data_207, solid):
     error = validate(data_207, options=solid)
