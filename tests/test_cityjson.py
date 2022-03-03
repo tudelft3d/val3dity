@@ -33,6 +33,24 @@ def data_cj_v11(request, dir_cityjson):
             request.param))
     return([file_path])
 
+@pytest.fixture(scope="module",
+                params=["several_lods_valid.json"])
+def data_several_lods_valid(request, dir_cityjson):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_cityjson,
+            request.param))
+    return([file_path])
+
+@pytest.fixture(scope="module",
+                params=["several_lods_invalid.json"])
+def data_several_lods_invalid(request, dir_cityjson):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_cityjson,
+            request.param))
+    return([file_path])
+
 #----------------------------------------------------------------------- Tests
 def test_valid_geomtemplates(validate, data_cj_v_gt, unittests):
     error = validate(data_cj_v_gt, options=unittests)
@@ -42,7 +60,14 @@ def test_invalid_geomtemplates(validate, data_cj_iv_gt, unittests):
     error = validate(data_cj_iv_gt, options=unittests)
     assert(error == [203])
 
-
 def test_cityjson_v11(validate, data_cj_v11, unittests):
     error = validate(data_cj_v11, options=unittests)
     assert(error == [])
+
+def test_several_lods_valid(validate, data_several_lods_valid, unittests):
+    error = validate(data_several_lods_valid, options=unittests)
+    assert(error == [])
+
+def test_several_lods_invalid(validate, data_several_lods_invalid, unittests):
+    error = validate(data_several_lods_invalid, options=unittests)
+    assert(error == [601])

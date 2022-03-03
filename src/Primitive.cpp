@@ -60,6 +60,17 @@ void Primitive::set_id(std::string id)
   _id = id;
 }
 
+std::string  Primitive::get_lod()
+{
+  return _lod;
+}
+
+void Primitive::set_lod(std::string lod)
+{
+  _lod = lod;
+}
+
+
 void Primitive::add_error(int code, std::string whichgeoms, std::string info)
 {
   _is_valid = 0;

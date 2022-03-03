@@ -78,8 +78,8 @@ public:
     std::cout << "\t\tValidate each City Object and each 3D primitive in input.json (CityJSON file)" << std::endl;
     std::cout << "\t\tand print a summary" << std::endl;
     
-    std::cout << "\tval3dity input.city.json --report /home/elvis/temp/myreport.json" << std::endl;
-    std::cout << "\t\tValidate each 3D primitive in input.city.json (CityJSON file)" << std::endl;
+    std::cout << "\tval3dity input.json --report /home/elvis/temp/myreport.json" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.json (tu3djson file)" << std::endl;
     std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
     std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
     
@@ -179,7 +179,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either CityJSON, IndoorGML, OBJ, or OFF",
+                                              "input file in either CityJSON, tu3djson, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");

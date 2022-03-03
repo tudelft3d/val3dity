@@ -67,12 +67,33 @@ bool CityObject::validate_building(double tol_overlap)
     return bValid;
   std::clog << "--- Interactions between BuildingParts ---" << std::endl;
   std::vector<Error> lsErrors;
-  if (do_primitives_interior_overlap(_lsPrimitives, 601, lsErrors, tol_overlap) == true)
-  {
-    bValid = false;
-    std::clog << "Error: overlapping building parts" << std::endl;
-    for (auto& e : lsErrors)
-      this->add_error(e.errorcode, e.info1, e.info2);
+  //-- process each LoDs separately
+  std::set<std::string> uniquelods;
+  for (auto& each: _lsPrimitives) {
+    uniquelods.insert(each->get_lod());
+  }
+  for (auto& lod: uniquelods) {
+    std::vector<Primitive*> g1lod;
+    for (auto& p: _lsPrimitives) {
+      if (p->get_lod() == lod) {
+        g1lod.push_back(p);
+      }
+    }
+    // std::cout << g1lod.size() << std::endl;
+    if (g1lod.size() > 1) {
+      std::clog << "LoD" << lod << " has " << g1lod.size() 
+        << " geometries, validating for overlaps." << std::endl;
+      if (do_primitives_interior_overlap(g1lod, 601, lsErrors, tol_overlap) == true)
+      {
+        bValid = false;
+        std::clog << "Error: overlapping building parts (LoD" << lod << ")" << std::endl;
+        for (auto& e : lsErrors) {
+          std::stringstream msg;
+          msg << "Geometries for LoD" << lod;
+          this->add_error(e.errorcode, e.info1, msg.str());
+        }
+      }
+    }
   }
   return bValid;
 }

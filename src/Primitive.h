@@ -60,12 +60,15 @@ public:
 
   std::string           get_id();
   void                  set_id(std::string id);
+  std::string           get_lod();
+  void                  set_lod(std::string lod);  
   void                  add_error(int code, std::string whichgeoms, std::string info);
   virtual std::set<int> get_unique_error_codes();
 
 protected:
   std::string           _id;
   int                   _is_valid; 
+  std::string           _lod;
   static double         _shiftx;
   static double         _shifty;
 

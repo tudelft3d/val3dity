@@ -438,6 +438,13 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     if  (g["type"] == "Solid")
     {
       Solid* s = new Solid(theid);
+      std::string thelod = "";
+      if (g["lod"].is_number()) {
+        thelod = std::to_string(g["lod"].get<double>());
+      } else {
+        thelod = g["lod"].get<std::string>();
+      }
+      s->set_lod(thelod);
       bool oshell = true;
       int c = 0;
       for (auto& shell : g["boundaries"]) 
@@ -466,15 +473,23 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
         std::vector< std::vector<int> > pa = p;
         process_json_surface(pa, j, sh);
       }
+      std::string thelod = "";
+      if (g["lod"].is_number()) {
+        thelod = std::to_string(g["lod"].get<double>());
+      } else {
+        thelod = g["lod"].get<std::string>();
+      }
       if (g["type"] == "MultiSurface")
       {
         MultiSurface* ms = new MultiSurface(theid);
+        ms->set_lod(thelod);
         ms->set_surface(sh);
         co->add_primitive(ms);
       }
       else
       {
         CompositeSurface* cs = new CompositeSurface(theid);
+        cs->set_lod(thelod);
         cs->set_surface(sh);
         co->add_primitive(cs);
       }
@@ -482,6 +497,13 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     else if (g["type"] == "MultiSolid") 
     {
       MultiSolid* ms = new MultiSolid(theid);
+      std::string thelod = "";
+      if (g["lod"].is_number()) {
+        thelod = std::to_string(g["lod"].get<double>());
+      } else {
+        thelod = g["lod"].get<std::string>();
+      }
+      ms->set_lod(thelod);
       for (auto& solid : g["boundaries"]) 
       {
         Solid* s = new Solid();
@@ -508,6 +530,14 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     else if (g["type"] == "CompositeSolid") 
     {
       CompositeSolid* cs = new CompositeSolid(theid);
+      
+      std::string thelod = "";
+      if (g["lod"].is_number()) {
+        thelod = std::to_string(g["lod"].get<double>());
+      } else {
+        thelod = g["lod"].get<std::string>();
+      }
+      cs->set_lod(thelod);
       for (auto& solid : g["boundaries"]) 
       {
         Solid* s = new Solid();
