@@ -93,6 +93,9 @@ test_valid:
   "v104_1": the bug raised by the Marcin in Poland about wrong error 104, caused by CGAL and Eigen (Plane_3.to_2d())
   "v104_2": like 104_1 but with very large z coords
   "nearly-collinear": another case from Marcin where the CDT was applied to solve. Tiny triangle created yields issues.
+  "two_objects_1": "an OBJ with two objects 'o' that are labelled cube_1 and cube_2"
+  "two_objects_2": "same as two_objects_1 but the first one in the file has no 'o' line"
+
 
 test_tu3djson:
   "cube": "a valid cube as the only cell"

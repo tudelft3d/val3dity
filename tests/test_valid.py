@@ -89,6 +89,15 @@ def data_multi_solid(request, dir_valid):
             request.param))
     return(file_path)
 
+@pytest.fixture(scope="module",
+                params=["two_objects_1.obj",
+                        "two_objects_2.obj"])
+def data_two_obj(request, dir_valid):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_valid,
+            request.param))
+    return(file_path)
 
 @pytest.fixture(scope="module",
                 params=["inner_shell.poly",
@@ -159,3 +168,7 @@ def test_multi_solid(validate, data_multi_solid, solid):
 def test_composite_solid(validate, data_composite_solid, solid):
     error = validate(data_composite_solid, options=solid)
     assert(error == [])
+
+def test_two_obj(validate, data_two_obj, solid):
+    error = validate(data_two_obj, options=solid)
+    assert(error == [102])    

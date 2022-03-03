@@ -1245,6 +1245,7 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   infile.close();
   infile.open(ifile.c_str(), std::ifstream::in);
   int primid = 0;
+  std::string primids = "";
   Surface* sh = new Surface(0, tol_snap);
   std::vector<Point3*> allvertices;
   GenericObject* o = new GenericObject("none");
@@ -1260,33 +1261,39 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
       allvertices.push_back(p);
     }
     else if (l.substr(0, 2) == "o ") {
-      if (sh->is_empty() == false)
-      {
+      if (sh->is_empty() == true) { //-- for the first "o" before any faces
+        std::string tmp;
+        iss >> tmp >> primids; 
+      }
+      else{
+        std::string theid = "";
+        if (primids != "")
+          theid = primids;
+        else
+          theid = std::to_string(primid);
         if (prim3d == SOLID)
         {
-          Solid* sol = new Solid(std::to_string(primid));
+          Solid* sol = new Solid(theid);
           sol->set_oshell(sh);
           o->add_primitive(sol);
         }
         else if ( prim3d == COMPOSITESURFACE)
         {
-          CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
+          CompositeSurface* cs = new CompositeSurface(theid);
           cs->set_surface(sh);
           o->add_primitive(cs);
         }
         else if (prim3d == MULTISURFACE)
         {
-          MultiSurface* ms = new MultiSurface(std::to_string(primid));
+          MultiSurface* ms = new MultiSurface(theid);
           ms->set_surface(sh);
           o->add_primitive(ms);
         }
         primid++;
+        std::string tmp;
+        iss >> tmp >> primids; 
         sh = new Surface(0, tol_snap);
       }
-      // else {
-      //   errs.add_error(901, "Some surfaces not defined correctly or are empty");
-      //   return;
-      // }
     }
     else if (l.substr(0, 2) == "f ") {
       std::vector<int> r;
@@ -1313,24 +1320,29 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
     }
   }
   if (sh->is_empty() == true) {
-    errs.add_error(902, "Some surfaces not defined correctly or are empty");
+    errs.add_error(902, "Some surfaces are not defined correctly or are empty");
     return;
   }
+  std::string theid = "";
+  if (primids != "")
+    theid = primids;
+  else
+    theid = std::to_string(primid);
   if (prim3d == SOLID)
   {
-    Solid* sol = new Solid(std::to_string(primid));
+    Solid* sol = new Solid(theid);
     sol->set_oshell(sh);
     o->add_primitive(sol);
   }
   else if ( prim3d == COMPOSITESURFACE)
   {
-    CompositeSurface* cs = new CompositeSurface(std::to_string(primid));
+    CompositeSurface* cs = new CompositeSurface(theid);
     cs->set_surface(sh);
     o->add_primitive(cs);
   }
   else if (prim3d == MULTISURFACE)
   {
-    MultiSurface* ms = new MultiSurface(std::to_string(primid));
+    MultiSurface* ms = new MultiSurface(theid);
     ms->set_surface(sh);
     o->add_primitive(ms);
   }
