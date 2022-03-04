@@ -78,28 +78,10 @@ Please `report the issue <https://github.com/tudelft3d/val3dity/issues>`_ and pr
   3. which platform you use, and whether you compiled it yourself or used the web-application
 
 
-The validation report says that there are no solids in my CityGML file, but I can see the buildings with my viewer!
--------------------------------------------------------------------------------------------------------------------
-
-There are many (or more precisely: `too many <http://erouault.blogspot.nl/2014/04/gml-madness.html>`_) ways to model geometries in GML, and that applies for buildings in CityGML. 
-See `on this page <https://www.citygml.org/samplefiles/building/>`_ the same simple volumetric objects is modelled with different primitives.
-
-If your dataset contains only Semantic Surfaces, then use the option :ref:`option_geom_is_sem_surfaces`.
-
-
-Can my GML file contain more than one ``gml:Solid`` or ``gml:MultiSurface``?
-----------------------------------------------------------------------------
-Yes, all the 3D primitives in the file will be validated, one by one.
-
-
-The validator says my CityGML file is invalid?
-----------------------------------------------
-You can verify this by validating it against the CityGML schemas (this `online validator <http://geovalidation.bk.tudelft.nl/schemacitygml/>`_) can be used).
-
 
 Do you validate the topological relationships between the solids?
 -----------------------------------------------------------------
-If these solids are part of a ``gml:CompositeSolid`` then yes, otherwise no.
+If these solids are part of a ``CompositeSolid`` then yes, otherwise no.
 We do verify whether two ``BuildingParts`` forming a ``Building`` overlap though.
 
 We however plan to offer in the future this for all primitives/buildings in a file, so that one can verify whether two different buildings overlap for instance.
@@ -110,11 +92,11 @@ The IDs for the shells and surfaces in the report, are they 0-based or 1-based?
 0-based.
 
 
-Where can I get files containing ``gml:Solids`` or ``gml:CompositeSolid``?
+Where can I get files containing ``Solids`` or ``CompositeSolid``?
 --------------------------------------------------------------------------
 
-  - in the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
   - `www.cityjson.org <https://www.cityjson.org/datasets/>`_ has many files
+  - in the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
   - `www.indoorgml.net <http://indoorgml.net/resources/>`_ has a few files
   - `overview of cities with 3D city models <https://3d.bk.tudelft.nl/opendata/opencities/>`_
 

@@ -21,21 +21,14 @@ To validate all the 3D primitives in a CityJSON file and see a summary output:
 
 .. code-block:: bash
 
-  $ val3dity my3dcity.json 
+  $ val3dity my3dcity.city.json 
 
 
-To validate all the 3D primitives in a CityGML file and get a JSON report ``myreport.json``:
-
-.. code-block:: bash
-
-  $ val3dity input.gml --report ./myreport.json
-
-
-To validate each 3D primitive in ``input.json``, and use a tolerance for testing the planarity of the surface of 20cm (0.2):
+To validate each 3D primitive in ``input.city.json``, and use a tolerance for testing the planarity of the surface of 20cm (0.2):
 
 .. code-block:: bash
 
-  $ val3dity --planarity_d2p_tol 0.2 input.json
+  $ val3dity --planarity_d2p_tol 0.2 input.city.json
 
 
 To validate an OBJ file and verify whether the 3D primitives from a Solid (this is the default):
@@ -56,21 +49,18 @@ Accepted input
 
 val3dity accepts as input:
 
-  - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
   - `CityJSON <http://www.cityjson.org>`_
-  - `CityGML (v1 & v2 only, v3 will not be supported) <https://www.citygml.org>`_ 
-  - `IndoorGML <http://indoorgml.net/>`_
+  - `tu3djson <https://github.com/tudelft3d/tu3djson>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
+  - `IndoorGML <http://indoorgml.net/>`_
 
-For **CityJSON/CityGML** files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
+For **CityJSON** files, all the City Objects (eg ``Building`` or ``Bridge``) are processed and their 3D primitives are validated.
 The 3D primitives are bundled under their City Objects in the report.
-If your CityGML/CityJSON contains ``Buildings`` with one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
-If there is one or more intersections, then :ref:`error_601` will be reported.
+If your CityJSON contains ``Buildings`` with one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
+If there is one or more intersections, then :ref:`e601` will be reported.
 
 For **IndoorGML** files, all the cells (in the primal subdivisions, the rooms) are validated individually, and then some extra validation tests are run on the dual navigation network. All errors 7xx are related specifically to IndoorGML.
-
-For **GML** files, the file is simply scanned for the 3D primitives and validates these according to the rules in ISO19107, all the rest is ignored. 
 
 For **OBJ** and **OFF** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
@@ -78,7 +68,6 @@ Observe that OBJ files have no mechanism to define inner shells, and thus a soli
 Validating one primitive in an OBJ as a MultiSurface (``-p MultiSurface`` option) will individually validate each surface according to the ISO19107 rules, without ensuring that they form a 2-manifold.
 If your OBJ contains triangles only (often the case), then using the option `-p MultiSurface` is rather meaningless since most likely all your triangles are valid. Validation could however catch cases where triangles are collapsed to a line/point.
 Validating it as a solid verifies whether the primitive is a 2-manifold, ie whether it is closed/watertight and whether all normals are pointing outwards.
-
 
 
 How are 3D primitives validated?
@@ -111,15 +100,7 @@ Options for the validation
 
 ``--ignore204``
 ***************
-|  Ignore the error :ref:`error_204`.
-
-----
-
-.. _option_geom_is_sem_surfaces:
-
-``--geom_is_sem_surfaces``
-**************************
-| The geometry of a CityGML object is formed by its semantic surfaces instead of the geometry (which is missing in the file). Only to be used if :ref:`error_609` occurs. If no semantic surfaces are present, then 609 can still occur even the use of this option.
+|  Ignore the error :ref:`e204`.
 
 ----
 
@@ -146,7 +127,7 @@ Using an overlap tolerance significantly reduces the speed of the validator, bec
 
 The distance between every point forming a surface and a plane must be less than ``--planarity_d2p_tol`` (eg 1cm, which is the default).
 This plane is fitted with least-square adjustment, and the distance between each of the point to the plane is calculated.
-If this distance is larger than the defined value, then :ref:`error_203` is reported. Read more at :ref:`error_203`.
+If this distance is larger than the defined value, then :ref:`e203` is reported. Read more at :ref:`e203`.
 
 .. note::  
   Planarity is defined with two tolerances: ``--planarity_d2p_tol`` and ``--planarity_n_tol``.
@@ -158,7 +139,7 @@ If this distance is larger than the defined value, then :ref:`error_203` is repo
 |  Tolerance for planarity based on normals deviation 
 |  default = 20 (degree)
 
-Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the normal of each triangle after the surface has been triangulated. If the triangle normals deviate from each other more than the given tolerance, then error :ref:`error_204` is reported. Read more at :ref:`error_204`.
+Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the normal of each triangle after the surface has been triangulated. If the triangle normals deviate from each other more than the given tolerance, then error :ref:`e204` is reported. Read more at :ref:`e204`.
 
 .. note::  
   Planarity is defined with two tolerances: ``--planarity_d2p_tol`` and ``--planarity_n_tol``.
@@ -168,7 +149,7 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ``-p, --primitive``
 *******************
-|  Which geometric primitive to validate. Only relevant for OBJ/OFF, because for CityGML/CityJSON all primitives are validated. Read more geometric primitives at :ref:`def`.
+|  Which geometric primitive to validate. Only relevant for OBJ/OFF, because for CityJSON all primitives are validated. Read more geometric primitives at :ref:`def`.
 |  One of ``Solid``, ``CompositeSurface``, ``MultiSurface``.
 
 ----

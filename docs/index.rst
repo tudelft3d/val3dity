@@ -13,7 +13,7 @@ In short, it verifies whether a 3D primitive respects the definition as given in
 The validation of the following 3D primitives is fully supported:
 
   - ``MultiSurface``
-  - ``CompositeSurface>`` 
+  - ``CompositeSurface`` 
   - ``Solid``
   - ``MultiSolid``
   - ``CompositeSolid``
@@ -24,14 +24,13 @@ There is no plan to support these geometries.
 
 val3dity accepts as input:
 
-  - `GML file <https://en.wikipedia.org/wiki/Geography_Markup_Language>`_ of any flavour
   - `CityJSON <http://www.cityjson.org>`_
-  - `CityGML (v1 & v2 only, v3 will not be supported) <https://www.citygml.org>`_ 
-  - `IndoorGML <http://indoorgml.net/>`_
+  - `tu3djson <https://github.com/tudelft3d/tu3djson>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
+  - `IndoorGML <http://indoorgml.net/>`_
 
-For the City/JSON/GML and IndoorGML formats, extra validations (specific to the format) are performed, eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
+For the CityJSON and IndoorGML formats, extra validations (specific to the format) are performed, eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
 .. note::  
   If you use val3dity in a scientific context, please cite these articles:

@@ -57,7 +57,7 @@ For instance, a valid Solid cannot have as one of its surfaces a Polygon having 
 A Polygon in the context of val3dity is always embedded in :math:`\mathbb{R}^d`, ie its vertices have (*x, y, z*) coordinates.
 To be valid, it needs to fulfil the 6 assertions below, which are given on pages 27-28 of the `Simple Features document <http://portal.opengeospatial.org/files/?artifact_id=25355>`_.
 These rules are verified by first projecting each Polygon to a plane, this plane is obtained in val3dity by least-square adjustment of all the points of a Polygon.
-A Polygon must also be *planar* to be valid: its points (used for both the exterior and interior rings) have to lie on a plane (see :ref:`error_203` and :ref:`error_204` more information about this).
+A Polygon must also be *planar* to be valid: its points (used for both the exterior and interior rings) have to lie on a plane (see :ref:`e203` and :ref:`e204` more information about this).
 
 
 .. image:: _static/ogcassertions.png
