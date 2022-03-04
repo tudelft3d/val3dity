@@ -3,10 +3,11 @@
 
 The API of the library is `val3dity.h`, you need to include the file in your source.
 
-Also, the functions to validate read/return [nlohmann JSON objects](https://github.com/nlohmann/json), so you need to use this library. 
+Also, the functions to validate read/return [nlohmann JSON objects](https://github.com/nlohmann/json), so you need to include this library. 
 There is however no need to include or link to nlohmann JSON yourself, the cmake reuses that of val3dity.
 
-The API reads `const char*` for XML data (so [IndoorGML](http://indoorgml.net/) input), because I don't want to enforce a specific XML library.
+The API reads `const char*` for XML data ([IndoorGML](http://indoorgml.net/) input), because I don't want to enforce a specific XML library.
+
 
 ```cpp
 #include "val3dity.h" 
@@ -34,12 +35,13 @@ int main(int argc, char *argv[])
 1. modify `CMakeLists.txt` to ensure that `add_subdirectory` (line 9) points to where you have the root folder of val3dity (in this demo it's the parent directory)
 1. `mkdir build && cd build`
 1. `cmake .. -DLIBRARY=true`
+1. `make`
 1. `./myprogram`
 
 
 ## input accepted
 
-1. one [CityJSON object](https://www.cityjson.org/specs/1.0.3/#cityjson-object)
+1. one [CityJSON object](https://www.cityjson.org/specs/#cityjson-object)
 2. one [tu3djson object](https://github.com/tudelft3d/tu3djson#tu3djson-object)
 3. [one geometry of a tu3djson object](https://github.com/tudelft3d/tu3djson#geometry-object)
 4. one [IndoorGML](http://indoorgml.net/) file (represented as a string)
