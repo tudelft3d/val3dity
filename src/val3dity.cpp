@@ -38,7 +38,7 @@
 namespace val3dity
 {
 
-std::string VAL3DITY_VERSION = "2.3.0-beta.2";
+std::string VAL3DITY_VERSION = "2.3.0-beta.3";
 
 void 
 validate_no_coutclog(std::vector<Feature*>& lsFeatures,                        
@@ -276,11 +276,11 @@ is_valid_indoorgml(const char* input,
                   double overlap_tol)
 {
   IOErrors ioerrs;
-  ioerrs.set_input_file_type("CityJSON");
+  ioerrs.set_input_file_type("IndoorGML");
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_string(input);
   if (!result) {
-    ioerrs.add_error(901, "Input value not validXML");
+    ioerrs.add_error(901, "Input value not valid XML");
   }
   std::vector<Feature*> lsFeatures;
   if (ioerrs.has_errors() == false) {
@@ -298,7 +298,7 @@ is_valid_indoorgml(const char* input,
     }
     else
     {
-      ioerrs.add_error(904, "GML files not supported (yes that includes CityGML files ==> upgrade to CityJSON)");
+      ioerrs.add_error(904, "Generic GML files not supported.");
     }
   }
   //-- start the validation
@@ -308,17 +308,14 @@ is_valid_indoorgml(const char* input,
     return false;
   }
   //-- compile errors
-  std::set<int> errors;
-  for (auto& f : lsFeatures)
-    for (auto& p : f->get_primitives())
-      for (auto& code : p->get_unique_error_codes())
-        errors.insert(code);
-  if (errors.size() == 0) {
-    return true;
+  bool bValid = true;
+  for (auto& f : lsFeatures) {
+    if (f->is_valid() == false) {
+      bValid = false;
+      break;
+    }
   }
-  else {
-    return false;
-  }
+  return bValid;
 }
 
 json
@@ -333,7 +330,7 @@ validate_indoorgml(const char* input,
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_string(input);
   if (!result) {
-    ioerrs.add_error(901, "Input value not validXML");
+    ioerrs.add_error(901, "Input value not valid XML");
   }
   std::vector<Feature*> lsFeatures;
   if (ioerrs.has_errors() == false) {
