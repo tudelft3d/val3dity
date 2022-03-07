@@ -92,7 +92,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     //-- check if there's a dual, something there's not (and it's valid)
     if (std::get<1>(el.second) == "") 
     {
-      std::clog << "\tNo dual vertex" << std::endl;
+      std::clog << " has no dual vertex" << std::endl;
     }
     else 
     {
@@ -141,7 +141,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     if (pdid == "") 
     {
       //-- this is allowed, a cell does not need to have a dual vertex
-      std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
+      std::clog << "Cell id=" << el.first << " has no dual vertex" << std::endl;
       continue;
     }
     if (this->get_number_graphs() == 0) {
@@ -202,7 +202,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     if (pdid == "")
     {
       //-- this is allowed, a cell does not need to have a dual vertex
-      std::clog << "Cell id=" << el.first << "has no dual vertex" << std::endl;
+      std::clog << "Cell id=" << el.first << " has no dual vertex" << std::endl;
       continue;
     }
     if (this->get_number_graphs() == 0) {
