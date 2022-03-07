@@ -1,0 +1,14 @@
+[bumpver]
+current_version = "2.3.0b3"
+version_pattern = "MAJOR.MINOR.PATCH[PYTAGNUM]"
+commit = false
+tag = false
+push = false
+
+[bumpver.file_patterns]
+"src/main.cpp" = [
+    'std::string VAL3DITY_VERSION = "{version}";',
+]
+"src/val3dity.cpp" = [
+    'std::string VAL3DITY_VERSION = "{version}";',
+]
