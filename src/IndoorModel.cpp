@@ -222,12 +222,13 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
                                          _lsPrimitives[std::get<0>(_cells[cadjid])],
                                          tol_overlap);
         if (re == 0) {
+          std::clog << " --> not valid" << std::endl;
           std::stringstream msg;
+          bValid = false;
           msg << "Cells id=" << el.first << " & id=" << cadjid;
           this->add_error(704, msg.str(), "");
-          std::clog << " NOT valid" << std::endl;
         } else if (re == -1) {
-          std::clog << " are not valid, skipped adjacency test" << std::endl;
+          std::clog << " --> not valid, skipped adjacency test" << std::endl;
         } else {
           std::clog << " --> ok" << std::endl;
         }
