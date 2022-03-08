@@ -232,7 +232,7 @@ is_valid_indoorgml(const char* input,
                   double overlap_tol)
 {
   json jr = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  return jr["val3dity"];
+  return jr["validity"];
 }
 
 json
