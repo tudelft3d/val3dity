@@ -100,6 +100,7 @@ test_valid:
 test_tu3djson:
   "cube": "a valid cube as the only cell"
   "cube2": "two geoms, one MultiSolid, all valid"
+  "cube3": "two geoms, one MultiSolid, first valid second invalid"
   "geojson": "a GeoJSON file, invalid"
   
 test_indoorgml:
