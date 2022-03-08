@@ -1463,7 +1463,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 }
 
 
-void parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+void parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {
   //-- TODO: not translation for tu3djson, is that okay?
   set_min_xy(0.0, 0.0);

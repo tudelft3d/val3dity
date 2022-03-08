@@ -168,7 +168,7 @@ Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs,
 
 void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
-void              parse_tu3djson_geom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
+void              parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
