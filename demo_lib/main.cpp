@@ -94,10 +94,10 @@ void indoorgml_demo()
   std::cout << "\n=== indoorgml_demo() ===" << std::endl;
   std::stringstream buffer;
   buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
-  json jreport = val3dity::validate_indoorgml(buffer.str().c_str());
 
+  bool re = val3dity::is_valid_indoorgml(buffer.str().c_str());
   std::cout << "Input file is ";
-  if (jreport["validity"])
+  if (re == true)
     std::cout << "VALID!" << std::endl;
   else
     std::cout << "INVALID :(" << std::endl;
