@@ -51,12 +51,19 @@ validate_onegeom(json& j,
 
 ///////////////////////////////////////////////////////////
 
-std::vector<bool> 
+bool 
 is_valid_tu3djson(json& j,
                   double tol_snap=0.001, 
                   double planarity_d2p_tol=0.01, 
                   double planarity_n_tol=20.0, 
                   double overlap_tol=-1.0);
+
+std::vector<bool>  
+is_valid_tu3djson_each(json& j,
+                       double tol_snap=0.001, 
+                       double planarity_d2p_tol=0.01, 
+                       double planarity_n_tol=20.0, 
+                       double overlap_tol=-1.0);
 
 json
 validate_tu3djson(json& j,
