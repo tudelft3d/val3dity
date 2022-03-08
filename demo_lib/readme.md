@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   json j;
   // define j as a tu3djson object, see https://github.com/tudelft3d/tu3djson
 
-  bool re = val3dity::is_valid_tu3djson(j);
+  std::vector<bool> re = val3dity::is_valid_tu3djson_each(j);
   std::for_each(re.begin(), re.end(), [](const bool n) { std::cout << n << std::endl; });
    
   return 0;
