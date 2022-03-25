@@ -1310,7 +1310,19 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
         }
         if (tmp.empty() == false) {
           std::size_t k = tmp.find("/");
-          Point3* tp = allvertices[std::stoi(tmp.substr(0, k)) - 1];
+          int index = std::stoi(tmp.substr(0, k));
+          if (index == 0) {
+            errs.add_error(901, "OBJ files are 1-indexed, vertex '0' found.");
+            return;
+          }
+          if (index > allvertices.size()) {
+            std::string r = "Vertex #";
+            r += std::to_string(index);
+            r += " doesn't exist in the input file.";
+            errs.add_error(901, r);
+            return;
+          }
+          Point3* tp = allvertices[index - 1];
           r.push_back(sh->add_point(*tp));
         }
       }

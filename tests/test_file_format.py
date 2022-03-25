@@ -46,6 +46,17 @@ def data_invalid_indoorgml(request, dir_file_format):
     return([file_path])
 
 
+@pytest.fixture(scope="module",
+                params=["index0.obj",
+                        "index901.obj"])
+def data_invalid_obj(request, dir_file_format):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_file_format,
+            request.param))
+    return([file_path])
+
+
 #----------------------------------------------------------------------- Tests
 
 
@@ -61,3 +72,6 @@ def test_invalid_indoorgml(validate, data_invalid_indoorgml, unittests):
     error = validate(data_invalid_indoorgml, options=unittests)
     assert(error == [901])    
 
+def test_invalid_obj(validate, data_invalid_obj, unittests):
+    error = validate(data_invalid_obj, options=unittests)
+    assert(error == [901])    
