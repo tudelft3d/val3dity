@@ -12,3 +12,7 @@ push = false
 "src/val3dity.cpp" = [
     'std::string VAL3DITY_VERSION = "{version}";',
 ]
+"docs/conf.py" = [
+    "release = u'{version}'",
+    "version = u'{version}'",
+]
