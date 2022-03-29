@@ -6,7 +6,7 @@
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 
 
-## [2.3.0] - 2022-03-08
+## [2.3.0] - 2022-03-29
 ### Added
 - val3dity can now be compiled as a library and easily used in other C++ binary (it's GPLv3 license, watch out)
 - this allows val3dity to be used with Python now, see https://github.com/tudelft3d/val3ditypy/
