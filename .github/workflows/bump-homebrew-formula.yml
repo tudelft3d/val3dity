@@ -16,7 +16,7 @@ jobs:
       - name: Update homebrew tap
         uses: mislav/bump-homebrew-formula-action@v2.1
         with:
-          formula-name: city4cfd
+          formula-name: val3dity
           formula-path: Formula/val3dity.rb
           homebrew-tap: tudelft3d/homebrew-software
           base-branch: main
