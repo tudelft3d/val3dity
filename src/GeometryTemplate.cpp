@@ -92,7 +92,6 @@ json GeometryTemplate::get_report_json(std::string preid)
     j["id"] = this->_id;
   else
     j["id"] = "none";
-  // j["numbersolids"] = this->number_of_solids();
   j["errors"] = json::array();
   for (auto& err : _errors)
   {
