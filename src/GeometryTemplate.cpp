@@ -107,9 +107,9 @@ json GeometryTemplate::get_report_json(std::string preid)
       isValid = false;
     }
   }
-  for (auto& p : _lsPrimitives)
+  for (auto& p : _lsPrimitives) //-- there should be just one by definition
   {
-    j["primitives"].push_back(p->get_report_json());
+    j["template"].push_back(p->get_report_json());
     if (p->is_valid() == false)
       isValid = false;
   }
