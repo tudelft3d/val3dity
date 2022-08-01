@@ -104,7 +104,7 @@ std::set<int> Surface::get_unique_error_codes()
 }
 
 
-json Surface::get_report_json()
+json Surface::get_report_json(std::string preid)
 {
   json j;
   for (auto& err : _errors)
@@ -115,7 +115,11 @@ json Surface::get_report_json()
       jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      jj["id"] = std::get<0>(e);
+      if (preid != "") {
+        jj["id"] = preid + " | " + std::get<0>(e);
+      } else {
+        jj["id"] = std::get<0>(e);
+      }
       jj["info"] = std::get<1>(e);
       j.push_back(jj);
     }

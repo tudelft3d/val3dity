@@ -209,7 +209,7 @@ bool CompositeSolid::is_empty() {
 }
 
 
-json CompositeSolid::get_report_json()
+json CompositeSolid::get_report_json(std::string preid)
 {
   json j;
   bool isValid = true;
@@ -234,11 +234,20 @@ json CompositeSolid::get_report_json()
       isValid = false;
     }
   }
-  for (auto& s : _lsSolids)
+  int solid = 0;
+  for (auto& sol : _lsSolids)
   {
-    j["primitives"].push_back(s->get_report_json());
-    if (s->is_valid() == false)
-      isValid = false;
+    int shid = 0;
+    for (auto& sh : sol->get_shells()) {
+      std::string t = std::to_string(solid) + " | " + std::to_string(shid);
+      for (auto& each: sh->get_report_json(t)) {
+        j["errors"].push_back(each);
+      }
+      if (sol->is_valid() == false)
+        isValid = false;
+      shid++;
+    }
+    solid++;
   }
   j["validity"] = isValid;
   return j;

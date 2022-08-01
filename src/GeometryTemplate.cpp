@@ -83,7 +83,7 @@ bool GeometryTemplate::is_empty()
 }
 
 
-json GeometryTemplate::get_report_json()
+json GeometryTemplate::get_report_json(std::string preid)
 {
   json j;
   bool isValid = true;

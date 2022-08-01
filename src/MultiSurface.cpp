@@ -98,7 +98,7 @@ bool MultiSurface::is_empty() {
 }
 
 
-json MultiSurface::get_report_json()
+json MultiSurface::get_report_json(std::string preid)
 {
   json j;
   bool isValid = true;
