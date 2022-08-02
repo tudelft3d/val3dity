@@ -212,8 +212,8 @@ json Solid::get_report_json(std::string preid)
     std::string t = std::to_string(shid);
     for (auto& each: sh->get_report_json(t)) {
       j["errors"].push_back(each); 
-      shid++;
     }
+    shid++;
   }
   if (this->is_valid() == 1)
     j["validity"] = true;
