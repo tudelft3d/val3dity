@@ -245,7 +245,7 @@ void Surface::add_face(std::vector< std::vector<int> > f, std::string id)
 {
   _lsFaces.push_back(f);
   if (id.empty() == true)
-    _lsFacesID.push_back(std::to_string(_lsFaces.size()));
+    _lsFacesID.push_back(std::to_string(_lsFaces.size() - 1));
   else
     _lsFacesID.push_back(id);
 }
