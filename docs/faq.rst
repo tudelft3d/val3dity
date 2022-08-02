@@ -24,12 +24,28 @@ How to interpret the report?
 
 With the option ``--report`` a JSON report is output.
 
-The report is rather simple, and lists errors at 3 levels:
+The report lists errors at 3 levels:
 
   1. errors with the input files (errors 9xx)
   2. errors with the features, eg Buildings in CityJSON (errors 6xx and 7xx)
   3. errors with the geometries (errors 1xx -- 5xx)
 
+If you use CityJSON, the sub-primitives cannot have IDs, so a 0-based system is used for reporting. For example, if you have a Solid with 2 Shells, then the first one is "0" and the second is "1", and the same applies for each of the surface of a Shell.
+
+In the report, if one error of a Solid is like this one:
+
+.. code-block:: json
+
+  {
+    "code": 102,
+    "description": "CONSECUTIVE_POINTS_SAME",
+    "id": "0 | 2",
+    "info": "",
+    "type": "Error"
+  }
+
+this means that the Shell with ID=0 (the first one, thus the outer Shell) and the 3rd surface in it (because of ID=2) has the error 102.
+The same principle applies to all primitives, the "|" separate the primitive IDs.
 
 You can navigate this report with a JSON browser (eg drag it in Firefox) or by loading it to the `val3dity report browser <http://geovalidation.bk.tudelft.nl/val3dity/browse/>`_:
 
