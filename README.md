@@ -1,5 +1,5 @@
 
-[![GitHub license](https://img.shields.io/github/license/tudelft3d/val3dity)](https://github.com/tudelft3d/val3dity/blob/master/LICENSE) [![docs](https://img.shields.io/badge/docs-val3dity.rtfd.io-brightgreen)](https://val3dity.rtfd.io/) [![webapp](https://img.shields.io/badge/webapp-geovalidation.bk.tudelft.nl%2Fval3dity%2F-fea93b)](http://geovalidation.bk.tudelft.nl/val3dity/) [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs40965--018--0043--x-blueviolet)](http://dx.doi.org/10.1186/s40965-018-0043-x)
+[![GitHub license](https://img.shields.io/github/license/tudelft3d/val3dity?style=flat-square)](https://github.com/tudelft3d/val3dity/blob/master/LICENSE) [![docs](https://img.shields.io/badge/docs-val3dity.rtfd.io-brightgreen?style=flat-square)](https://val3dity.rtfd.io/) [![webapp](https://img.shields.io/badge/webapp-geovalidation.bk.tudelft.nl%2Fval3dity%2F-fea93b?style=flat-square)](http://geovalidation.bk.tudelft.nl/val3dity/) [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs40965--018--0043--x-blueviolet?style=flat-square)](http://dx.doi.org/10.1186/s40965-018-0043-x)
 
 # val3dity
 
