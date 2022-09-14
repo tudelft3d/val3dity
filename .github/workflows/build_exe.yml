@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+
+# on:
+#   push:
+#     branches: [ main, develop ]
+
+on:
+  release:
+    types: [created]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  Windows-build:
+    name: Build Windows
+    runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
+      VCPKG_INSTALLATION_ROOT: C:\vcpkg
+      VCPKG_FEATURE_FLAGS: manifests
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: |
+        vcpkg install
+        mkdir Release
+        cd Release
+        cmake .. -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
+        cmake --build . --parallel 4 --config Release
+    - name: Package binary files
+      run: |
+        cd Release
+        7z a val3dity-win64.zip .\Release\*
+    - name: Upload binary files as artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: val3dity-win64
+        path: Release/val3dity-win64.zip
