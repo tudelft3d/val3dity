@@ -93,7 +93,11 @@ Thus, in a nutshell,
 
 ### Windows
 
-[For Windows, we offer an executable](https://github.com/tudelft3d/val3dity/releases), although it's also possible to compile val3dity yourself, see the Visual Studio project in the folder `vs_build`.
+For Windows, we offer [an executable](https://github.com/tudelft3d/val3dity/releases).
+
+It's also possible to compile val3dity yourself with the CMake file we offer, but it's slightly more complex with the dependencies.
+We suggest you look at [how we build it on GitHub Actions](https://github.com/tudelft3d/val3dity/blob/main/.github/workflows/exe_build.yml) to get some inspirate (and help).
+
 
 
 ## Usage
