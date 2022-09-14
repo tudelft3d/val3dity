@@ -1,7 +1,12 @@
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+  cmake_policy(SET CMP0011 NEW)
+endif(COMMAND cmake_policy)
 
 project( val3dity )
 
 cmake_minimum_required (VERSION 3.14)
+
 
 add_definitions(-std=c++14)
 
@@ -46,7 +51,7 @@ if ( NOT Boost_FOUND )
 endif()
 
 # GEOS
-find_package( GEOS )
+find_package( GEOS REQUIRED CONFIG)
 if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
@@ -73,8 +78,6 @@ else()
 endif()
 
 
-target_link_libraries(val3dity ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} CGAL::Eigen3_support ${GEOS_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} thirdparty)
+target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support GEOS::geos_c thirdparty Boost::filesystem)
 
 install(TARGETS val3dity DESTINATION bin)
-
-
