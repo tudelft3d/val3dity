@@ -1,6 +1,6 @@
 {
     "name": "val3dity",
-    "version-string": "2.3.0",
+    "version-string": "2.3.1b0",
     "dependencies": [
         "boost-program-options",
         "boost-geometry",

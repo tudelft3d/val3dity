@@ -16,3 +16,6 @@ push = false
     "release = u'{version}'",
     "version = u'{version}'",
 ]
+"vcpkg.json" = [
+    '"version-string": "{version}"',
+]
