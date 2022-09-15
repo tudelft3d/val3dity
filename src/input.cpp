@@ -434,7 +434,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
 {
   int idgeom = co->number_of_primitives();
   for (auto& g : jco["geometry"]) {
-    std::string theid = co->get_id() + "(" + std::to_string(idgeom) + ")";
+    std::string theid = std::to_string(idgeom);
     if  (g["type"] == "Solid")
     {
       Solid* s = new Solid(theid);
@@ -530,7 +530,6 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     else if (g["type"] == "CompositeSolid") 
     {
       CompositeSolid* cs = new CompositeSolid(theid);
-      
       std::string thelod = "";
       if (g["lod"].is_number()) {
         thelod = std::to_string(g["lod"].get<double>());

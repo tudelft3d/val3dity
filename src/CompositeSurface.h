@@ -46,7 +46,7 @@ public:
   bool          validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   int           is_valid();
   bool          is_empty();
-  json          get_report_json();
+  json          get_report_json(std::string preid = "");
   Primitive3D   get_type();
 
   void          get_min_bbox(double& x, double& y);
