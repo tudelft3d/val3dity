@@ -6,6 +6,14 @@
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 
 
+## [2.3.1] - 2022-09-15
+### Changed
+- the structure of the report was fixed (it is more flat, as it should have always been), it made little sense for Composite/Multi/Solid
+- geometry IDs in the report are 0-based (as they should, a bug made them start at 1, now fixed)
+- compilation under Windows to get a binary is now automised with GitHub Actions
+
+
+
 ## [2.3.0] - 2022-03-29
 ### Added
 - val3dity can now be compiled as a library and easily used in other C++ binary (it's GPLv3 license, watch out)

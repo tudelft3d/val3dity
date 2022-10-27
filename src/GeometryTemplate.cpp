@@ -83,7 +83,7 @@ bool GeometryTemplate::is_empty()
 }
 
 
-json GeometryTemplate::get_report_json()
+json GeometryTemplate::get_report_json(std::string preid)
 {
   json j;
   bool isValid = true;
@@ -92,7 +92,6 @@ json GeometryTemplate::get_report_json()
     j["id"] = this->_id;
   else
     j["id"] = "none";
-  // j["numbersolids"] = this->number_of_solids();
   j["errors"] = json::array();
   for (auto& err : _errors)
   {
@@ -108,9 +107,9 @@ json GeometryTemplate::get_report_json()
       isValid = false;
     }
   }
-  for (auto& p : _lsPrimitives)
+  for (auto& p : _lsPrimitives) //-- there should be just one by definition
   {
-    j["primitives"].push_back(p->get_report_json());
+    j["template"].push_back(p->get_report_json());
     if (p->is_valid() == false)
       isValid = false;
   }

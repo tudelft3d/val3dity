@@ -92,7 +92,7 @@ bool CompositeSurface::is_empty() {
 }
 
 
-json CompositeSurface::get_report_json()
+json CompositeSurface::get_report_json(std::string preid)
 {
   json j;
   bool isValid = true;

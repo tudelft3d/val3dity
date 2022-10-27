@@ -70,7 +70,7 @@ def verbose_reference():
     reference = """
 ======== Validating Primitive ========
 CompositeSolid
-id: id-1(0)
+id: 0
 --
 --- Shell validation (#-1) ---
 -----2D validation of each surface
