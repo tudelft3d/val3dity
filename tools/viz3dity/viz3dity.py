@@ -57,6 +57,7 @@ def load_cityjson(path):
                 for child in j['CityObjects'][co]['children']:
                     extract_surfaces(child, j, vs, ts)
             lsurfs[co].append(len(ts) - 1)
+    # print(ts)
     ts = np.array(ts, dtype=np.uint32).reshape((-1, 3))
     return j, vs, ts, lsurfs
 
@@ -71,8 +72,9 @@ def extract_surfaces(co, j, vs, ts):
                         ts.append(re[0])
                     else:
                         re, b = geom_help.triangulate_face_mapbox_earcut(face, vs)
-                        for each in re:
-                            ts.append(each)
+                        if b == True:
+                            for each in re:
+                                ts.append(each)
             elif (geom['type'] == 'Solid'):
                 for sidx, shell in enumerate(geom['boundaries']):
                     for i, face in enumerate(shell):
@@ -81,8 +83,9 @@ def extract_surfaces(co, j, vs, ts):
                             ts.append(re[0])
                         else:
                             re, b = geom_help.triangulate_face_mapbox_earcut(face, vs)
-                            for each in re:
-                                ts.append(each)
+                            if b == True:
+                                for each in re:
+                                    ts.append(each)
             elif ((geom['type'] == 'MultiSolid') or (geom['type'] == 'CompositeSolid')):
                 for solididx, solid in enumerate(geom['boundaries']):
                     for sidx, shell in enumerate(solid):
@@ -92,11 +95,12 @@ def extract_surfaces(co, j, vs, ts):
                                 ts.append(re[0])
                             else:
                                 re, b = geom_help.triangulate_face_mapbox_earcut(face, vs)
-                                for each in re:
-                                    ts.append(each)
+                                if b == True:
+                                    for each in re:
+                                        ts.append(each)
             elif (geom['type'] == 'GeometryInstance'):
                 #-- TODO: implement GeometryInstance for the trees blocking the sun!
-                print("GeometryInstance")
+                print("GeometryInstance not supported in this viewer (yet)")
                 pass
 
 def get_bbox(vs):
@@ -108,10 +112,11 @@ def get_highest_error(f, v3re):
         for err in f["errors"]:
             if err["code"] > herr:
                 herr = err["code"]
-    for p in f["primitives"]:
-        for err in p["errors"]:
-            if err["code"] > herr:
-                herr = err["code"]
+    if f["primitives"] is not None:
+        for p in f["primitives"]:
+            for err in p.get("errors", []):
+                if err["code"] > herr:
+                    herr = err["code"]
     return herr
 
 
@@ -133,10 +138,10 @@ def visualise(vs, fs, lsurfs, v3re):
     fs2 = []
     for f in v3re["features"]:
         if f["validity"] == True:
-            surfs = lsurfs[f["id"]]
-            # print("surfs:", surfs)
-            for each in fs[surfs[0]:surfs[1]]:
-                fs2.append(each)
+            if f["id"] in lsurfs:
+                surfs = lsurfs[f["id"]]
+                for each in fs[surfs[0]:surfs[1]]:
+                    fs2.append(each)
     ts = np.array(fs2, dtype=np.uint32).reshape((-1, 3))    
     mesh_valid = ps.register_surface_mesh("valid", vs2, ts, color=[0.8,0.8,0.8], edge_width=0)
     mesh_valid.set_transparency(0.2)
@@ -145,11 +150,12 @@ def visualise(vs, fs, lsurfs, v3re):
     ferrs = []
     for f in v3re["features"]:
         if f["validity"] == False:
-            surfs = lsurfs[f["id"]]
-            herr = get_highest_error(f, v3re)
-            for each in fs[surfs[0]:surfs[1]]:
-                fs2.append(each)
-                ferrs.append(herr)
+            if f["id"] in lsurfs:
+                surfs = lsurfs[f["id"]]
+                herr = get_highest_error(f, v3re)
+                for each in fs[surfs[0]:surfs[1]]:
+                    fs2.append(each)
+                    ferrs.append(herr)
     ts = np.array(fs2, dtype=np.uint32).reshape((-1, 3))    
     mesh_invalid = ps.register_surface_mesh("invalid", vs2, ts, color=[1.0, 0.2, 0.2], edge_color=[0.1, 0.1, 0.1], edge_width=1.0)
     mesh_invalid.set_transparency(0.9)
