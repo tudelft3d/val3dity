@@ -228,19 +228,6 @@ int Surface::add_point(Point3 pi)
   return (_lsPts.size() - 1);
 }
 
-// int Surface::add_point(Point3 p)
-// {
-//   _vertices_added += 1;
-//   auto it = _dPts.find(get_coords_key(&p));
-//   if (it == _dPts.end()) 
-//   {
-//     _lsPts.push_back(p);
-//     _dPts[get_coords_key(&p)] = (_lsPts.size() - 1); 
-//     return (_lsPts.size() - 1);
-//   }
-//   return it->second;
-// }
-
 void Surface::add_face(std::vector< std::vector<int> > f, std::string id)
 {
   _lsFaces.push_back(f);

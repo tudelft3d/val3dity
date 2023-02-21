@@ -97,7 +97,6 @@ private:
   bool validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals);
   std::string get_coords_key(Point3* p);
   bool triangulate_shell();
-  // bool construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane);
   std::vector<int*> construct_ct_one_face(const std::vector<std::vector<int>>& pgnids);
   bool validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid);
   bool validate_projected_ring(Polygon &pgn, std::string id);
