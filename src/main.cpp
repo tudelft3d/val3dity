@@ -617,7 +617,7 @@ void write_report_json(json& jr, std::string report)
     else
       outpath = fullpath;
   }
-  if (boost::filesystem::extension(outpath) != ".json")
+  if (outpath.extension() != ".json")
     outpath += ".json";
   std::ofstream o(outpath.string());
   o << jr.dump(2) << std::endl;                                
