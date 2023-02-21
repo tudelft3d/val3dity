@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -118,7 +118,7 @@ class LicensePrint : public TCLAP::Visitor
     {
       std::string thelicense =
       "\nval3dity\n\n"
-      "Copyright (c) 2011-2022  3D geoinformation research group, TU Delft\n\n"
+      "Copyright (c) 2011-2023  3D geoinformation research group, TU Delft\n\n"
       "val3dity is free software: you can redistribute it and/or modify\n"
       "it under the terms of the GNU General Public License as published by\n"
       "the Free Software Foundation, either version 3 of the License, or\n"
@@ -136,7 +136,6 @@ class LicensePrint : public TCLAP::Visitor
       "Faculty of the Built Environment & Architecture\n"
       "Delft University of Technology\n"
       "Julianalaan 134, Delft 2628BL, the Netherlands\n";
- 
       std::cout << thelicense << std::endl;  
       exit(0); 
     };
@@ -618,7 +617,7 @@ void write_report_json(json& jr, std::string report)
     else
       outpath = fullpath;
   }
-  if (boost::filesystem::extension(outpath) != ".json")
+  if (outpath.extension() != ".json")
     outpath += ".json";
   std::ofstream o(outpath.string());
   o << jr.dump(2) << std::endl;                                

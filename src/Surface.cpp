@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -228,19 +228,6 @@ int Surface::add_point(Point3 pi)
   return (_lsPts.size() - 1);
 }
 
-// int Surface::add_point(Point3 p)
-// {
-//   _vertices_added += 1;
-//   auto it = _dPts.find(get_coords_key(&p));
-//   if (it == _dPts.end()) 
-//   {
-//     _lsPts.push_back(p);
-//     _dPts[get_coords_key(&p)] = (_lsPts.size() - 1); 
-//     return (_lsPts.size() - 1);
-//   }
-//   return it->second;
-// }
-
 void Surface::add_face(std::vector< std::vector<int> > f, std::string id)
 {
   _lsFaces.push_back(f);
@@ -284,122 +271,64 @@ bool Surface::triangulate_shell()
       _lsTr.push_back(oneface);
       continue;
     }
-    
-    std::vector<Point3> allpts;
-    std::vector<int>::const_iterator itp = idsob.begin();
-    for ( ; itp != idsob.end(); itp++)
-      allpts.push_back(_lsPts[*itp]);
-    //-- irings
-    for (int j = 1; j < static_cast<int>(numf); j++)
-    {
-      std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
-      std::vector<int>::const_iterator itp2 = ids2.begin();
-      for ( ; itp2 != ids2.end(); itp2++)
-        allpts.push_back(_lsPts[*itp2]);
-    }
-    CgalPolyhedron::Plane_3 bestfitplane = get_best_fitted_plane(allpts);
-    
-    // int proj = projection_plane(_lsPts, idsob);
-    // Vector v0 = bestfitplane.orthogonal_vector();
-
-    //-- get projected Polygon
-    Polygon pgn;
-    std::vector<Polygon> lsRings;
-    create_cgal_polygon(_lsPts, idsob, bestfitplane, pgn);
-    //-- all polygons should be cw for Triangle
-    //-- if reversed then re-reversed later
-    bool reversed = false;
-    if (pgn.is_counterclockwise_oriented() == false) {
-      pgn.reverse_orientation();
-      reversed = true;
-    }
-    lsRings.push_back(pgn);
-    std::vector< std::vector<int> > pgnids;
-    pgnids.push_back(idsob);
-    //-- check for irings
-    for (int j = 1; j < static_cast<int>(numf); j++)
-    {
-      std::vector<int> &ids2 = _lsFaces[i][j]; // helpful alias for the inner boundary
-      //-- get projected Polygon
-      Polygon pgn;
-      create_cgal_polygon(_lsPts, ids2, bestfitplane, pgn);
-      if (pgn.is_counterclockwise_oriented() == false) {
-        pgn.reverse_orientation();
-      }
-      lsRings.push_back(pgn);
-      pgnids.push_back(ids2);
-    }
     //-- get projected CT
-    std::vector<int*> oneface;
-    if (construct_ct(pgnids, lsRings, oneface, i, bestfitplane) == false)
+    std::vector<int*> tris = construct_ct_one_face(_lsFaces[i]);
+    if (tris.size() == 0)
     {
       this->add_error(999, _lsFacesID[i], "face does not have an outer boundary.");
       return false;
     }
-    if (reversed == true) //-- reversed back to keep orientation of original surface
-    {
-      std::vector<int*>::iterator it3 = oneface.begin();
-      int tmp;
-      int* id;
-      for ( ; it3 != oneface.end(); it3++)
-      {
-        id = *it3;
-        tmp = id[0];
-        id[0] = id[1];
-        id[1] = tmp;
-      }
-    }
-    _lsTr.push_back(oneface);
+    _lsTr.push_back(tris);
   }
   return true;
 }
 
 
-bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const std::vector<Polygon>& lsRings, std::vector<int*>& oneface, int faceNum, const CgalPolyhedron::Plane_3 &plane)
+std::vector<int*> 
+Surface::construct_ct_one_face(const std::vector<std::vector<int>>& pgnids)
 {
-  std::vector<int> ids = pgnids[0];
+  std::vector<int*> re;
+
+  std::vector<Point3> planepts;
+  for (auto& each : pgnids[0]) {
+    planepts.push_back(_lsPts[each]);
+  }
+  Plane bestfitplane = get_best_fitted_plane(planepts);
+  //-- check orientation (for good normals for the output, pointing outwards)
+  bool reversed = false;
+  Polygon pgn;
+  for (auto& each : pgnids[0]) {
+    Point3 p = _lsPts[each];
+    pgn.push_back(bestfitplane.to_2d(p));
+  }
+  //-- check orientation, this works all must be ccw
+  if (pgn.is_counterclockwise_oriented() == false) {
+    reversed = true;
+  }
   CT ct;
-  std::vector< std::vector<int> >::const_iterator it = pgnids.begin();
-  size_t numpts = 0;
-  for ( ; it != pgnids.end(); it++)
-  {
-    numpts += it->size();
-  }
-  for ( it = pgnids.begin(); it != pgnids.end(); it++)
-  {
-    std::vector<Point2> pts2d;
-    std::vector<int>::const_iterator it2 = it->begin();
-    for ( ; it2 != it->end(); it2++)
-    {
-      Point3 p1 = _lsPts[*it2];
-      pts2d.push_back(plane.to_2d(p1));
+  for (auto& ring : pgnids) {
+    //-- make another *closed* ring for simplicity
+    std::vector<int> r2 = ring;
+    r2.push_back(ring.front());
+    std::vector<int>::const_iterator it;
+    std::vector<int>::iterator it2 = std::prev(r2.end());
+    for (it = r2.begin(); it != it2; it++) {
+      Point2 p0 = bestfitplane.to_2d(_lsPts[*it]);
+      CT::Vertex_handle v0 = ct.insert(p0);
+      v0->id() = *it;
+      auto it3 = it;
+      it3++;
+      Point2 p1 = bestfitplane.to_2d(_lsPts[*it3]);
+      CT::Vertex_handle v1 = ct.insert(p1);
+      v1->id() = *it3;
+      if (v0 != v1) {
+        ct.insert_constraint(v0, v1);
+      }
     }
-    std::vector<Point2>::const_iterator itPt;
-    CT::Vertex_handle v0;
-    CT::Vertex_handle v1;
-    CT::Vertex_handle firstv;
-    itPt = pts2d.begin();
-    v0 = ct.insert(*itPt);
-    firstv = v0;
-    it2 = it->begin();
-    v0->id() = *it2;
-    itPt++;
-    it2++;
-    for (; itPt != pts2d.end(); itPt++)
-    {
-      v1 = ct.insert(*itPt);
-      v1->id() = *it2;
-      ct.insert_constraint(v0, v1);
-      v0 = v1;
-      it2++;
-    }
-    ct.insert_constraint(v0,firstv);
   }
-  //Mark facets that are inside the domain bounded by the polygon
   mark_domains(ct); 
   if (!ct.is_valid()) 
-    return false;
-    
+    return re;
   for (CT::Finite_faces_iterator fit = ct.finite_faces_begin();
        fit != ct.finite_faces_end(); 
        ++fit) 
@@ -407,12 +336,17 @@ bool Surface::construct_ct(const std::vector< std::vector<int> >& pgnids, const 
     if (fit->info().in_domain()) {
       int* tr = new int[3];
       tr[0] = fit->vertex(0)->id();
-      tr[1] = fit->vertex(1)->id();
-      tr[2] = fit->vertex(2)->id();
-      oneface.push_back(tr);
+      if (reversed) {
+        tr[1] = fit->vertex(2)->id();
+        tr[2] = fit->vertex(1)->id();
+      } else {
+        tr[1] = fit->vertex(1)->id();
+        tr[2] = fit->vertex(2)->id();
+      }
+      re.push_back(tr);
     }
   }
-  return true;
+  return re;
 }
 
 
