@@ -220,8 +220,9 @@ int Surface::add_point(Point3 pi)
   for (auto& p : _lsPts)
   {
     auto d = CGAL::squared_distance(pi, p);
-    if (d <= (_tol_snap*_tol_snap))
+    if (d < (_tol_snap*_tol_snap)) {
       return i;
+    }
     i++;
   }
   _lsPts.push_back(pi);
