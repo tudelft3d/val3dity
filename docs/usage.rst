@@ -158,7 +158,7 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 
 ``-r, --report``
 ****************
-|  Outputs the validation report to the file given. The report is in JSON file format, and can be used to produce nice reports automatically or to extract statistics. Use `val3dity report browser <http://geovalidation.bk.tudelft.nl/val3dity/browse/>`_ with your report.
+|  Outputs the validation report to the file given. The report is in JSON file format, and can be used to produce nice reports automatically or to extract statistics. Use `val3dity report browser <http://geovalidation.bk.tudelft.nl/val3dity/browser/>`_ with your report.
 
 ----
 
