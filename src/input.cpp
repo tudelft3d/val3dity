@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -430,6 +430,26 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
+void process_jsonfg_surface(std::vector<std::vector<std::vector<double>>>& pgn, Surface* sh)
+{
+  std::vector<std::vector<int>> pgnids;
+  for (auto& r : pgn)
+  {
+    std::vector<int> newr;
+    for (auto& p : r) {
+      double x = p[0];
+      double y = p[1];
+      double z = p[2];
+      Point3 p3(x, y, z);
+      newr.push_back(sh->add_point(p3));
+    }
+    newr.pop_back(); //-- delete last one because jsonfg "closes" its rings
+    pgnids.push_back(newr);
+  }
+  sh->add_face(pgnids);
+}
+
+
 void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap)
 {
   int idgeom = co->number_of_primitives();
@@ -594,8 +614,17 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
     std::cout << "# Features found: " << j["features"].size() << std::endl;
     parse_tu3djson(j, lsFeatures, tol_snap);
   }
+  else if ( (j["type"] == "Feature") || (j["type"] == "FeatureCollection") ) {
+    errs.set_input_file_type("JSON-FG");
+    std::cout << "JSON-FG input file" << std::endl;
+    if (j["type"] == "Feature")
+      std::cout << "# Features found: " << j["features"].size() << std::endl;
+    else
+      std::cout << "# Features found: " << j["features"].size() << std::endl;
+    parse_jsonfg(j, lsFeatures, tol_snap);
+  }
   else {
-    errs.add_error(904, "Input file type not a supported JSON file (CityJSON and tu3djson only).");
+    errs.add_error(904, "Input file type not a supported JSON file (only: CityJSON, JSON-FG, and tu3djson ).");
     return;  
   }
 }
@@ -1363,6 +1392,60 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   lsFeatures.push_back(o);
 } 
 
+void parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+{
+  //-- TODO: not translation for json-fg, is that okay?
+  set_min_xy(0.0, 0.0);
+  if (j["type"] == "Feature") {
+    parse_jsonfg_onefeature(j, lsFeatures, tol_snap, 0);
+    return;
+  }  
+  else { //-- then it's FeatureCollection
+    int counter = 0;
+    for (auto& f : j["features"]) {
+      parse_jsonfg_onefeature(f, lsFeatures, tol_snap, counter);
+      counter++;
+    }
+  }
+}
+
+
+void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, int counter) 
+{
+  //-- find the id, counter is not present
+  std::string sid = std::to_string(counter);
+  if (j.contains("id")) {
+    if (j["id"].is_number())
+      sid = std::to_string(j["id"].get<double>());
+    else
+      sid = j["id"];
+  }
+  //-- create the object
+  GenericObject* go = new GenericObject(sid);
+  if (j["place"]["type"] == "Polyhedron") {
+    Solid* s = new Solid();
+    bool oshell = true;
+    int c = 0;
+    for (auto& shell : j["place"]["coordinates"]) 
+    {
+      Surface* sh = new Surface(c, tol_snap);
+      c++;
+      for (auto& polygon : shell) { 
+        std::vector<std::vector<std::vector<double>>> pa = polygon;
+        process_jsonfg_surface(pa, sh);
+      }
+      if (oshell == true)
+      {
+        oshell = false;
+        s->set_oshell(sh);
+      }
+      else
+        s->add_ishell(sh);
+    }
+    go->add_primitive(s);
+  }
+  lsFeatures.push_back(go);
+}
 
 void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {

@@ -178,7 +178,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either CityJSON, tu3djson, IndoorGML, OBJ, or OFF",
+                                              "input file in either CityJSON, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
@@ -270,7 +270,7 @@ int main(int argc, char* const argv[])
     cmd.parse( argc, argv );
 
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
@@ -292,7 +292,7 @@ int main(int argc, char* const argv[])
     }
     else if ( (extension == "json") || (extension == "JSON") ) {
       inputtype = JSON;
-      ioerrs.set_input_file_type("CityJSON");
+      ioerrs.set_input_file_type("JSON");
     }
     else if ( (extension == "obj") || (extension == "OBJ") ) {
       inputtype = OBJ;
