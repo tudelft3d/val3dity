@@ -1444,6 +1444,31 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
     }
     go->add_primitive(s);
   }
+  else if (j["place"]["type"] == "MultiPolyhedron") {
+    MultiSolid* ms = new MultiSolid();
+    for (auto& solid : j["place"]["coordinates"]) 
+    {
+      Solid* s = new Solid();
+      bool oshell = true;
+      for (auto& shell : solid) 
+      {
+        Surface* sh = new Surface(-1, tol_snap);
+        for (auto& polygon : shell) { 
+          std::vector<std::vector<std::vector<double>>> pa = polygon;
+          process_jsonfg_surface(pa, sh);
+        }
+        if (oshell == true)
+        {
+          oshell = false;
+          s->set_oshell(sh);
+        }
+        else
+          s->add_ishell(sh);
+      }
+      ms->add_solid(s);
+    }
+    go->add_primitive(ms);
+  }
   lsFeatures.push_back(go);
 }
 
