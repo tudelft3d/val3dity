@@ -430,7 +430,7 @@ void process_json_surface(std::vector< std::vector<int> >& pgn, json& j, Surface
 }
 
 
-void process_jsonfg_surface(std::vector<std::vector<std::vector<double>>>& pgn, Surface* sh)
+void process_jsonfg_surface(std::vector<std::vector<std::vector<double>>>& pgn, Surface* sh, IOErrors& errs)
 {
   std::vector<std::vector<int>> pgnids;
   for (auto& r : pgn)
@@ -442,6 +442,9 @@ void process_jsonfg_surface(std::vector<std::vector<std::vector<double>>>& pgn, 
       double z = p[2];
       Point3 p3(x, y, z);
       newr.push_back(sh->add_point(p3));
+    }
+    if ( newr.front() != newr.back() ) {
+      sh->add_error(103, "First-last must be the same for JSON-FG rings");
     }
     newr.pop_back(); //-- delete last one because jsonfg "closes" its rings
     pgnids.push_back(newr);
@@ -621,7 +624,7 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
       std::cout << "# Features found: " << j["features"].size() << std::endl;
     else
       std::cout << "# Features found: " << j["features"].size() << std::endl;
-    parse_jsonfg(j, lsFeatures, tol_snap);
+    parse_jsonfg(j, lsFeatures, tol_snap, errs);
   }
   else {
     errs.add_error(904, "Input file type not a supported JSON file (only: CityJSON, JSON-FG, and tu3djson ).");
@@ -1392,25 +1395,25 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   lsFeatures.push_back(o);
 } 
 
-void parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
+void parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, IOErrors& errs)
 {
   //-- TODO: not translation for json-fg, is that okay?
   set_min_xy(0.0, 0.0);
   if (j["type"] == "Feature") {
-    parse_jsonfg_onefeature(j, lsFeatures, tol_snap, 0);
+    parse_jsonfg_onefeature(j, lsFeatures, tol_snap, 0, errs);
     return;
   }  
   else { //-- then it's FeatureCollection
     int counter = 0;
     for (auto& f : j["features"]) {
-      parse_jsonfg_onefeature(f, lsFeatures, tol_snap, counter);
+      parse_jsonfg_onefeature(f, lsFeatures, tol_snap, counter, errs);
       counter++;
     }
   }
 }
 
 
-void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, int counter) 
+void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, int counter, IOErrors& errs) 
 {
   //-- find the id, counter is not present
   std::string sid = std::to_string(counter);
@@ -1432,7 +1435,7 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
       c++;
       for (auto& polygon : shell) { 
         std::vector<std::vector<std::vector<double>>> pa = polygon;
-        process_jsonfg_surface(pa, sh);
+        process_jsonfg_surface(pa, sh, errs);
       }
       if (oshell == true)
       {
@@ -1455,7 +1458,7 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
         Surface* sh = new Surface(-1, tol_snap);
         for (auto& polygon : shell) { 
           std::vector<std::vector<std::vector<double>>> pa = polygon;
-          process_jsonfg_surface(pa, sh);
+          process_jsonfg_surface(pa, sh, errs);
         }
         if (oshell == true)
         {

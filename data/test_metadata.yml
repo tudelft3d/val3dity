@@ -98,12 +98,17 @@ test_valid:
   "two_objects_1": "an OBJ with two objects 'o' that are labelled cube_1 and cube_2"
   "two_objects_2": "same as two_objects_1 but the first one in the file has no 'o' line"
 
-
 test_tu3djson:
   "cube": "a valid cube as the only cell"
   "cube2": "two geoms, one MultiSolid, all valid"
   "cube3": "two geoms, one MultiSolid, first valid second invalid"
-  "geojson": "a GeoJSON file, invalid"
+
+test_jsonfg:
+  "building.fg": "a simple building, taken (and fixed!) from JSON-FG website, stored as a 'Feature'"
+  "cubes.fg": "a 'FeatureCollection', one valid cube (Polyhedron) and another one stored as a MultiPolyhedron"
+  "e103.fg": "like the first feature of cubes.fg.json but w/o the repeat first-last, thus e103"
+  "geojson": "a 'standard' GeoJSON file, should return e609"
+
   
 test_indoorgml:
   "igml_v1": "a valid cube as the only cell, no dual"
