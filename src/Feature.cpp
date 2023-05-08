@@ -105,7 +105,7 @@ bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_no
   std::clog << "--" << std::endl;
   bool bValid = true;
   if (this->is_empty() == true) {
-    this->add_error(609, "Feature has no geometry defined.", "");
+    this->add_error(906, "Feature has no geometry defined (or val3dity doesn't handle this type).", "");
     bValid = false;
   }
   if (_lsPrimitives.size() > 500) {

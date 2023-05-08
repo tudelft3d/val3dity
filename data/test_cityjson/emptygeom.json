@@ -1,0 +1,17 @@
+{
+  "CityObjects": {
+    "id-1": {
+      "type": "Building",
+      "attributes": {
+        "potatoe": "yeah"
+      }
+    }
+  }, 
+  "version": "1.1", 
+  "type": "CityJSON", 
+  "vertices": [],
+  "transform": {
+    "scale": [1.0, 1.0, 1.0],
+    "translate": [0.0, 0.0, 0.0]
+  }
+}

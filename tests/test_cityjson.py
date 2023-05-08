@@ -51,6 +51,15 @@ def data_several_lods_invalid(request, dir_cityjson):
             request.param))
     return([file_path])
 
+@pytest.fixture(scope="module",
+                params=["emptygeom.json"])
+def data_empty_geom(request, dir_cityjson):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_cityjson,
+            request.param))
+    return([file_path])
+
 #----------------------------------------------------------------------- Tests
 def test_valid_geomtemplates(validate, data_cj_v_gt, unittests):
     error = validate(data_cj_v_gt, options=unittests)
@@ -68,6 +77,6 @@ def test_several_lods_valid(validate, data_several_lods_valid, unittests):
     error = validate(data_several_lods_valid, options=unittests)
     assert(error == [])
 
-def test_several_lods_invalid(validate, data_several_lods_invalid, unittests):
-    error = validate(data_several_lods_invalid, options=unittests)
-    assert(error == [601])
+def test_empty_geom(validate, data_empty_geom, unittests):
+    error = validate(data_empty_geom, options=unittests)
+    assert(error == [906])

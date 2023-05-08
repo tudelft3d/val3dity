@@ -312,16 +312,6 @@ Two ``Solids`` in a ``CompositeSolid`` are disconnected.
 ----------------------------
 Some primitives in a Building and/or BuildingPart have their interior overlapping.
 
-.. _e609:
-
-609 -- CITYOBJECT_HAS_NO_GEOMETRY
----------------------------------
-The CityGML object (a Building, a Bridge, a Road, etc.) has no geometry defined.
-That is, it has no 3D Primitives declared as geometry, for instance for a Building there no tags ``<lod2Solid>`` or ``<lod2MultiSurface>``.
-If with a viewer you can see the geometry of the CityGML object, then that error occurs because the surfaces are *only* declared as semantic surfaces (the surfaces are children of the tag ``<boundedBy>``).
-To circumvent the issue, we advise you to add a geometry to your objects, this is an error that could affect many processes and software.
-Another option is to use the option ``--geom_is_sem_surfaces`` which gathers all the semantic surfaces of a City Object and validates them.
-We only offer this option as a convenience (and because we are nice people), and we strongly encourage you to define a geometry.
 
 
 .. _e701: 
@@ -376,6 +366,16 @@ The parameters used for the validation are not valid.
 904 -- FORMAT_NOT_SUPPORTED
 ---------------------------
 It can be that certain versions of a supported format are not supported, eg v3.0 of CityGML is not.
+
+
+.. _e906:
+
+906 -- PRIMITIVE_NO_GEOMETRY
+----------------------------
+The primitive has no geometry that val3dity recognises.
+It could be that the primitive has a geometry, but that it is a 2D geometry or a format that is not processed by val3dity.
+In CityJSON, it is possible to have for instance a ``Building`` without geometry, so this error would be reported.
+In JSON-FG, the 2D geometries in ``"geometry"`` are not processed, and neither as the 3D geometries of type ``"Prism"``.
 
 .. _e999:
 

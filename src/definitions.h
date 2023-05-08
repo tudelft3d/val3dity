@@ -157,7 +157,6 @@ static std::map<int,std::string> ALL_ERRORS = {
   {503, "DISCONNECTED_SOLIDS"}, 
   //-- CityGML objects
   {601, "BUILDINGPARTS_OVERLAP"}, 
-  {609, "CITYOBJECT_HAS_NO_GEOMETRY"}, 
   //-- IndoorGML objects
   {701, "CELLS_OVERLAP"}, 
   {702, "DUAL_VERTEX_OUTSIDE_CELL"}, 
@@ -168,6 +167,7 @@ static std::map<int,std::string> ALL_ERRORS = {
   {902, "EMPTY_PRIMITIVE"}, 
   {903, "WRONG_INPUT_PARAMETERS"}, 
   {904, "FORMAT_NOT_SUPPORTED"}, 
+  {906, "PRIMITIVE_NO_GEOMETRY"}, 
   {999, "UNKNOWN_ERROR"} 
 };
 
