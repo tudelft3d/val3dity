@@ -50,7 +50,7 @@ This ring is for instance invalid:
 103 -- RING_NOT_CLOSED 
 ----------------------
 
-*This applies only to GML rings, in CityJSON/OBJ/OFF it is ignored.* 
+*This applies only to GML rings and to JSON-FG, in CityJSON/OBJ/OFF it is ignored.* 
 The first and last points have to be identical (at the same location). 
 This is verified after the points have been merged with the :ref:`snap_tol` option.
 

@@ -51,6 +51,7 @@ val3dity accepts as input:
 
   - `CityJSON <http://www.cityjson.org>`_
   - `tu3djson <https://github.com/tudelft3d/tu3djson>`_
+  - `JSON-FG (OGC Features and Geometries JSON) <https://github.com/opengeospatial/ogc-feat-geo-json>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
   - `OFF <https://en.wikipedia.org/wiki/OFF_(file_format)>`_
   - `IndoorGML <http://indoorgml.net/>`_
