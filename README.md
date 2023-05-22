@@ -100,8 +100,8 @@ It's also possible to compile val3dity yourself with the CMake file we offer, bu
 We suggest you look at [how we build it on GitHub Actions](https://github.com/tudelft3d/val3dity/blob/main/.github/workflows/build_exe.yml) to get some inspirate (and help).
 
 
-
 ## Usage
+
 To compile and run val3dity (from the val3dity folder):
 
     $ ./val3dity /data/cityjson/cube.json
@@ -133,7 +133,7 @@ You shouldn't get any errors.
 
 ## Simple visualiser for the errors: viz3dity
 
-![](./tools/screenshot.png)
+![](./tools/viz3dity/screenshot.png)
 
 In the folder `tools/viz3dity/` folder, there is a simple Python script where you load your files with geometries and the val3dity report, and you can see which objects have specific errors (each error gets a colour).
 
