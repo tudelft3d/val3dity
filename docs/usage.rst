@@ -63,6 +63,9 @@ If there is one or more intersections, then :ref:`e601` will be reported.
 
 For **IndoorGML** files, all the cells (in the primal subdivisions, the rooms) are validated individually, and then some extra validation tests are run on the dual navigation network. All errors 7xx are related specifically to IndoorGML.
 
+For **JSON-FG** files, only ``Polyhedron`` and ``MultiPolyhedron`` are processed, the other possible types are ignored (``Prism``, ``MultiPrism``, and all the 2D types inherited from `GeoJSON <https://geojson.org/>`_). 
+It should be noticed that the JSON-FG nomenclature is different: a ``Polyhedron`` is a ``Solid``, and a ``MultiPolyhedron`` is a ``MultiSolid`` (an arbitrary aggregation of several solids and there is no assumption regarding their topological relationships).
+
 For **OBJ** and **OFF** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
 Observe that OBJ files have no mechanism to define inner shells, and thus a solid will be formed by only its exterior shell.
