@@ -47,4 +47,4 @@ def test_data_jsonfg_invalid(validate, data_jsonfg_invalid, unittests):
 
 def test_vanilla_geojson(validate, data_vanilla_geojson, unittests):
     error = validate(data_vanilla_geojson, options=unittests)
-    assert(error == [609])
+    assert(error == [906])
