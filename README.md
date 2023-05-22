@@ -131,6 +131,16 @@ To verify that everything went fine during the compilation, run the unit tests (
 You shouldn't get any errors.
 
 
+## Simple visualiser for the errors: viz3dity
+
+![](./tools/screenshot.png)
+
+In the folder `tools/viz3dity/` folder, there is a simple Python script where you load your files with geometries and the val3dity report, and you can see which objects have specific errors (each error gets a colour).
+
+However, it's not possible to see where in an object the error is (eg which surface is not planar).
+This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
+
+
 ## Usage of Docker
 
 To run val3dity over Docker simply execute:
