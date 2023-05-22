@@ -38,6 +38,8 @@ x86/
 /docs/_build
 /docs/build
 /demo_lib/build/
+tools/viz3dity/.polyscope.ini
+tools/viz3dity/imgui.ini
 
 
 # Vagrant
