@@ -14,16 +14,8 @@ import click
 def main(file, report):
     """viz3dity: a simple visualiser for val3dity reports."""
     ps.init()
-
-    # ifile_cj = './data/DenHaag_01.city.json'
-    # ifile_report = './data/dhr.json'
-    # ifile_cj = './data/5.json'
-    # ifile_report = './data/r.json'
-
     j, vs, fs, lsurfs = load_cityjson(file)
-
     v3re = json.loads(open(report).read())
-    
     visualise(vs, fs, lsurfs, v3re)
 
 
