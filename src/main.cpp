@@ -60,8 +60,16 @@ public:
   
   virtual void usage(TCLAP::CmdLineInterface& c)
   {
-    std::cout << "===== val3dity =====" << std::endl;
-    std::cout << "OPTIONS" << std::endl;
+    std::cout << "USAGE:" << std::endl;
+    std::cout << "\tval3dity [OPTION] myinput.json" << std::endl;
+    std::cout << "ALLOWED FORMATS:" << std::endl;
+    std::cout << "\tCityJSON" << std::endl;
+    std::cout << "\ttu3djson" << std::endl;
+    std::cout << "\tJSON-FG" << std::endl;
+    std::cout << "\tOBJ" << std::endl;
+    std::cout << "\tOFF" << std::endl;
+    std::cout << "\tIndoorGML" << std::endl;
+    std::cout << "OPTIONS:" << std::endl;
     std::list<TCLAP::Arg*> args = c.getArgList();
     for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
       if ( ((*it)->getName() == "ishell") || ((*it)->getName() == "output_off") )
@@ -72,7 +80,7 @@ public:
         std::cout << "\t-" << (*it)->getFlag() << ", --" << (*it)->getName() << std::endl;
       std::cout << "\t\t" << (*it)->getDescription() << std::endl;
     }
-    std::cout << "==SOME EXAMPLES==" << std::endl;
+    std::cout << "SOME EXAMPLES:" << std::endl;
     
     std::cout << "\tval3dity input.city.json" << std::endl;
     std::cout << "\t\tValidate each City Object and each 3D primitive in input.json (CityJSON file)" << std::endl;
@@ -178,7 +186,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "input file in either CityJSON, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
+                                              "allowed formats: CityJSON, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
@@ -196,7 +204,7 @@ int main(int argc, char* const argv[])
                                               "string");    
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
-                                              "how to interpret OBJ/OFF/POLY input: which geometric primitive to use <Solid|CompositeSurface|MultiSurface> (default=Solid)",
+                                              "geometric type of the input: <Solid|CompositeSurface|MultiSurface> (default=Solid)",
                                               false,
                                               "Solid",
                                               &primVals);
