@@ -145,6 +145,7 @@ def visualise(vs, fs, lsurfs, v3re):
     ts = np.array(fs2, dtype=np.uint32).reshape((-1, 3))    
     mesh_valid = ps.register_surface_mesh("valid", vs2, ts, color=[0.8,0.8,0.8], edge_width=0)
     mesh_valid.set_transparency(0.2)
+    mesh_valid.reset_transform()
     #-- invalid buildings
     fs2 = []
     ferrs = []
@@ -161,6 +162,7 @@ def visualise(vs, fs, lsurfs, v3re):
     mesh_invalid.set_transparency(0.9)
     ferrs2 = np.array(ferrs, dtype=np.uint32)
     mesh_invalid.add_scalar_quantity("errors", ferrs2, defined_on='faces', cmap='spectral', enabled=True)
+    mesh_invalid.reset_transform()
     ps.show()
 
 
