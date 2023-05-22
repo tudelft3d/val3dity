@@ -1,0 +1,151 @@
+{
+   "type": "Feature",
+   "id": "DENW19AL0000giv5BL",
+   "featureType": "app:building",
+   "time": {
+      "interval": [ "2014-04-24T10:50:18Z", ".." ]
+   },
+   "coordRefSys": "http://www.opengis.net/def/crs/EPSG/0/5555",
+   "place": {
+      "type": "Polyhedron",
+      "coordinates": [
+         [
+            [
+               [
+                  [ 479816.67, 5705861.672, 100 ],
+                  [ 479822.187, 5705866.783, 100 ],
+                  [ 479829.666, 5705858.785, 100 ],
+                  [ 479824.155, 5705853.684, 100 ],
+                  [ 479816.67, 5705861.672, 100 ]
+               ]
+            ],
+            [
+               [
+                  [ 479816.67, 5705861.672, 110 ],
+                  [ 479824.155, 5705853.684, 110 ],
+                  [ 479829.666, 5705858.785, 120 ],
+                  [ 479822.187, 5705866.783, 120 ],
+                  [ 479816.67, 5705861.672, 110 ]
+               ]
+            ],
+            [
+               [
+                  [ 479816.67, 5705861.672, 110 ],
+                  [ 479816.67, 5705861.672, 100 ],
+                  [ 479824.155, 5705853.684, 100 ],
+                  [ 479824.155, 5705853.684, 110 ],
+                  [ 479816.67, 5705861.672, 110 ]
+               ]
+            ],
+            [
+               [
+                  [ 479824.155, 5705853.684, 110 ],
+                  [ 479824.155, 5705853.684, 100 ],
+                  [ 479829.666, 5705858.785, 100 ],
+                  [ 479829.666, 5705858.785, 120 ],
+                  [ 479824.155, 5705853.684, 110 ]
+               ]
+            ],
+            [
+               [
+                  [ 479829.666, 5705858.785, 120 ],
+                  [ 479829.666, 5705858.785, 100 ],
+                  [ 479822.187, 5705866.783, 100 ],
+                  [ 479822.187, 5705866.783, 120 ],
+                  [ 479829.666, 5705858.785, 120 ]
+               ]
+            ],
+            [
+               [
+                  [ 479822.187, 5705866.783, 120 ],
+                  [ 479822.187, 5705866.783, 100 ],
+                  [ 479816.67, 5705861.672, 100 ],
+                  [ 479816.67, 5705861.672, 110 ],
+                  [ 479822.187, 5705866.783, 120 ]
+               ]
+            ]
+         ]
+      ]
+   },
+   "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+         [
+            [ 8.7092045, 51.5035285, 100 ],
+            [ 8.7093128, 51.5034570, 100 ],
+            [ 8.7093919, 51.5035030, 100 ],
+            [ 8.7092837, 51.5035747, 100 ],
+            [ 8.7092045, 51.5035285, 100 ]
+         ]
+      ]
+   },
+   "links": [
+      {
+         "href": "https://example.org/data/v1/collections/buildings/items/DENW19AL0000giv5BL?f=jsonfg",
+         "rel": "self",
+         "type": "application/vnd.ogc.fg+json",
+         "title": "This document"
+      },
+      {
+         "href": "https://example.org/data/v1/collections/buildings/items/DENW19AL0000giv5BL?f=json",
+         "rel": "alternate",
+         "type": "application/geo+json",
+         "title": "This document as GeoJSON"
+      },
+      {
+         "href": "https://example.org/data/v1/collections/buildings/items/DENW19AL0000giv5BL?f=html",
+         "rel": "alternate",
+         "type": "text/html",
+         "title": "This document as HTML"
+      },
+      {
+         "href": "https://example.org/data/v1/collections/buildings",
+         "rel": "collection",
+         "title": "The collection the feature belongs to"
+      },
+      {
+         "href" : "https://example.org/data/v1/collections/cadastralparcel/items/05297001600313______",
+         "rel" : "http://www.opengis.net/def/rel/ogc/1.0/within",
+         "title" : "Cadastral parcel 313 in district Wünnenberg (016)"
+      },
+      {
+         "href":"https://inspire.ec.europa.eu/featureconcept/Building",
+         "rel":"type",
+         "title":"This feature is of type 'building'"
+      },
+      {
+         "href": "https://example.org/data/v1/collections/buildings/schemas/item?type=jsonfg",
+         "rel": "describedby",
+         "type": "application/schema+json",
+         "title": "JSON Schema of building features"
+      },
+      {
+         "href":"https://beta.schemas.opengis.net/json-fg/feature.json",
+         "rel":"describedby",
+         "type":"application/schema+json",
+         "title":"This document is a JSON-FG Feature"
+      },
+      {
+         "href":"https://geojson.org/schema/Feature.json",
+         "rel":"describedby",
+         "type":"application/schema+json",
+         "title":"This document is a GeoJSON Feature"
+      }
+   ],
+   "properties": {
+      "lastChange": "2014-04-24T10:50:18Z",
+      "built": "2012-03",
+      "function": "Agricultural building",
+      "height_m": 20.0,
+      "owners": [
+         {
+            "href": "https://example.org/john-doe",
+            "title": "John Doe"
+         },
+         {
+            "href": "https://example.org/jane-doe",
+            "title": "Jane Doe"
+         }
+      ]
+   }
+}

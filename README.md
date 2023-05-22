@@ -24,6 +24,7 @@ val3dity accepts as input:
 
   - [CityJSON](http://www.cityjson.org)
   - [tu3djson](https://github.com/tudelft3d/tu3djson)
+  - [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
   - [IndoorGML](http://indoorgml.net/)
@@ -59,7 +60,7 @@ The simplest, if you have [Homebrew](http://brew.sh/), is:
 You can also get the code, and compile it yourself.
 You first need to install the following free libraries:
 
-  1. [CGAL v5.0+](http://www.cgal.org) 
+  1. [CGAL v5.4+](http://www.cgal.org) 
   1. [Eigen library](http://eigen.tuxfamily.org)
   1. [GEOS](http://trac.osgeo.org/geos/)
   1. [CMake](http://www.cmake.org)
@@ -88,7 +89,7 @@ Thus, in a nutshell,
   1. install GEOS library: `$ sudo apt install libgeos++-dev`
   1. install CGAL: `$ sudo apt-get install libcgal-dev`
     - if it's not CGAL5 that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
-    - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.0.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
+    - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.4.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
 
 
 ### Windows

@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -169,6 +169,8 @@ Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs,
 void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
+void              parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, IOErrors& errs);
+void              parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, int counter, IOErrors& errs);
 
 std::vector<int>  process_gml_ring(const pugi::xml_node& n, Surface* sh, IOErrors& errs);
 Surface*          process_gml_surface(const pugi::xml_node& n, int id, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
@@ -181,6 +183,7 @@ CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map
 
 void              process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap);
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
+void              process_jsonfg_surface(std::vector< std::vector<int> >& pgn, Surface* s, IOErrors& errs);
 void              process_cityjson_geometrytemplates(json& jgt, std::vector<GeometryTemplate*>& lsGTs, double tol_snap);
 void              process_json_surface_geometrytemplate(std::vector< std::vector<int> >& pgn, json& j, Surface* sh);
 void              build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpath_node>& dallpoly, IOErrors& errs);
