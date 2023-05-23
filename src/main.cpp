@@ -64,7 +64,7 @@ public:
     std::cout << "\tval3dity [OPTION] myinput.json" << std::endl;
     std::cout << "ALLOWED FORMATS:" << std::endl;
     std::cout << "\tCityJSON" << std::endl;
-    std::cout << "\tCityJSONFeature" << std::endl;
+    std::cout << "\tCityJSON Lines (CityJSONL)" << std::endl;
     std::cout << "\ttu3djson" << std::endl;
     std::cout << "\tJSON-FG" << std::endl;
     std::cout << "\tOBJ" << std::endl;
@@ -187,7 +187,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "allowed formats: CityJSON, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
+                                              "allowed formats: CityJSON, CityJSONL, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
