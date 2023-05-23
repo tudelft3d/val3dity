@@ -632,6 +632,48 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
   }
 }
 
+void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
+{
+  std::cout << "Reading file: " << ifile << std::endl;
+  std::ifstream infile(ifile.c_str(), std::ifstream::in);
+  if (!infile)
+  {
+    errs.add_error(901, "Input file not found.");
+    return;
+  }
+  //-- read and store the GeometryTemplates
+  std::vector<GeometryTemplate*> lsGTs;
+  //-- transform
+  json jtransform;
+  std::string l;
+  int linecount = 0;
+  while (std::getline(infile, l)) 
+  {
+    std::istringstream iss(l);
+    json j;
+    try 
+    {
+      iss >> j;
+    }
+    catch (nlohmann::detail::parse_error e) 
+    {
+      std::string s = "Input file has invalid JSON at line #" + std::to_string(linecount);
+      errs.add_error(901, s);
+      break;
+    }
+    if (j["type"] == "CityJSON") {
+      if (j.count("geometry-templates") == 1)
+        process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
+      jtransform = j["transform"];
+    }
+    if (j["type"] == "CityJSONFeature") {
+      errs.set_input_file_type("CityJSONL");
+      j["transform"] = jtransform; //-- add transform b/c BuildingPart overlap uses a tolerance
+      parse_cityjsonl(j, lsFeatures, tol_snap, lsGTs);
+    }
+    linecount++;
+  }
+}
 
 void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {
@@ -645,6 +687,30 @@ void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
   {
     process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
   }
+  //-- process each CO
+  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
+  {
+    //-- BuildingParts geometries are put with those of a Building
+    if (it.value()["type"] == "BuildingPart")
+      continue;
+    CityObject* co = new CityObject(it.key(), it.value()["type"]);
+    process_json_geometries_of_co(it.value(), co, lsGTs, j, tol_snap);
+    //-- if Building has Parts, put them here in _lsPrimitives
+    if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) ) 
+    {
+      for (std::string bpid : it.value()["children"])
+      {
+        process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, tol_snap);
+      }
+    }
+    lsFeatures.push_back(co);
+  }
+}
+
+void parse_cityjsonl(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs)
+{
+  //-- compute (_minx, _miny)
+  compute_min_xy(j);
   //-- process each CO
   for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
   {
