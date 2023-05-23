@@ -55,7 +55,7 @@ void cityjson_demo()
 
 void cityjsonfeature_demo() {
   std::cout << "\n=== cityjsonfeature_demo() ===" << std::endl;
-  std::string input("/Users/hugo/data/cityjson/v1.1/denhaag/5.jsonl");
+  std::string input("../../data/test_cityjsonl/denhaag_random_5.jsonl");
   std::ifstream infile(input.c_str(), std::ifstream::in);
   if (!infile)
     return;
