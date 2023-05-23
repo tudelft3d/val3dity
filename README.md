@@ -23,6 +23,7 @@ There is no plan to support these geometries.
 val3dity accepts as input:
 
   - [CityJSON](http://www.cityjson.org)
+  - [CityJSON Lines (CityJSONL)](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature)
   - [tu3djson](https://github.com/tudelft3d/tu3djson)
   - [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)

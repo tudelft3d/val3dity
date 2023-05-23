@@ -64,6 +64,7 @@ public:
     std::cout << "\tval3dity [OPTION] myinput.json" << std::endl;
     std::cout << "ALLOWED FORMATS:" << std::endl;
     std::cout << "\tCityJSON" << std::endl;
+    std::cout << "\tCityJSON Lines (CityJSONL)" << std::endl;
     std::cout << "\ttu3djson" << std::endl;
     std::cout << "\tJSON-FG" << std::endl;
     std::cout << "\tOBJ" << std::endl;
@@ -186,7 +187,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "allowed formats: CityJSON, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
+                                              "allowed formats: CityJSON, CityJSONL, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
@@ -302,6 +303,10 @@ int main(int argc, char* const argv[])
       inputtype = JSON;
       ioerrs.set_input_file_type("JSON");
     }
+    else if ( (extension == "jsonl") || (extension == "JSONL") ) {
+      inputtype = JSONL;
+      ioerrs.set_input_file_type("JSONL");
+    }
     else if ( (extension == "obj") || (extension == "OBJ") ) {
       inputtype = OBJ;
       ioerrs.set_input_file_type("OBJ");
@@ -387,10 +392,26 @@ int main(int argc, char* const argv[])
         }
         if (ishellfiles.getValue().size() > 0)
         {
-          std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-          ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+          std::cout << "No inner shells allowed when JSON file used as input." << std::endl;
+          ioerrs.add_error(901, "No inner shells allowed when JSON file used as input.");
         }
       }
+      else if (inputtype == JSONL)
+      {
+        read_file_jsonl(inputfile.getValue(), 
+                        lsFeatures,
+                        ioerrs, 
+                        snap_tol.getValue());
+        if (ioerrs.has_errors() == true) {
+          std::cout << "Errors while reading the input file, aborting." << std::endl;
+          std::cout << ioerrs.get_report_text() << std::endl;
+        }
+        if (ishellfiles.getValue().size() > 0)
+        {
+          std::cout << "No inner shells allowed when JSONL file used as input." << std::endl;
+          ioerrs.add_error(901, "No inner shells allowed when JSONL file used as input.");
+        }
+      }      
       else if (inputtype == POLY)
       {
         GenericObject* o = new GenericObject("none");

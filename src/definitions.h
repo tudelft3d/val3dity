@@ -108,10 +108,11 @@ typedef enum
 {
   GML   = 0,
   JSON  = 1,
-  OBJ   = 2,
-  POLY  = 3,
-  OFF   = 4,
-  OTHER = 5,
+  JSONL = 2,
+  OBJ   = 3,
+  POLY  = 4,
+  OFF   = 5,
+  OTHER = 6,
 } InputTypes;
 
 

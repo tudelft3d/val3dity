@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -32,6 +32,7 @@
 #include "input.h"
 
 #include <iostream>
+#include <exception>      // std::exception
 
 
 
@@ -39,6 +40,145 @@ namespace val3dity
 {
 
 std::string VAL3DITY_VERSION = "2.3.1";
+
+//-----
+
+json
+validate_cityjson(json& j, 
+                  double tol_snap=0.001, 
+                  double planarity_d2p_tol=0.01, 
+                  double planarity_n_tol=20.0, 
+                  double overlap_tol=-1.0);
+
+json
+validate_cityjsonfeature(json& j, 
+                         json jtransform,
+                         double tol_snap=0.001, 
+                         double planarity_d2p_tol=0.01, 
+                         double planarity_n_tol=20.0, 
+                         double overlap_tol=-1.0);
+
+json
+validate_tu3djson(json& j,
+                  double tol_snap=0.001, 
+                  double planarity_d2p_tol=0.01, 
+                  double planarity_n_tol=20.0, 
+                  double overlap_tol=-1.0);
+
+json 
+validate_jsonfg(json& j,
+                double tol_snap=0.001, 
+                double planarity_d2p_tol=0.01, 
+                double planarity_n_tol=20.0, 
+                double overlap_tol=-1.0);
+
+json 
+validate_onegeom(json& j,
+                 double tol_snap=0.001, 
+                 double planarity_d2p_tol=0.01, 
+                 double planarity_n_tol=20.0, 
+                 double overlap_tol=-1.0);
+
+json
+validate_indoorgml(const char* input, 
+                   double tol_snap, 
+                   double planarity_d2p_tol, 
+                   double planarity_n_tol, 
+                   double overlap_tol); 
+
+//-----
+
+struct verror : std::exception {
+  std::string whattext;
+  verror(std::string s) : whattext(s){};
+  const char* what() const noexcept {return whattext.c_str();}
+};
+
+
+bool 
+is_valid(json& j,
+         json jtransform,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  json re = validate(j, jtransform, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
+  return re["validity"];
+}
+
+
+json 
+validate(json& j,
+         json jtransform,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  //-- CityJSON
+  if (j["type"] == "CityJSON") {
+    json jr = validate_cityjson(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return jr;
+  
+  //-- CityJSONFeature
+  } else if (j["type"] == "CityJSONFeature") {
+    json jr = validate_cityjsonfeature(j, jtransform, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return jr;
+  
+  //-- tu3djson
+  } else if (j["type"] == "tu3djson") {
+    json jr = validate_tu3djson(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return jr;
+  
+  //-- JSON-FG
+  } else if (j["type"] == "Feature") { 
+    json jr = validate_jsonfg(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return jr;
+  } else if (j["type"] == "FeatureCollection") { 
+    json jr = validate_jsonfg(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return jr;
+
+  //-- tu3djson onegeom
+  } else if ( (j["type"] == "MultiSurface") || 
+              (j["type"] == "CompositeSurface") ||
+              (j["type"] == "Solid") ||
+              (j["type"] == "MultiSolid") ||
+              (j["type"] == "CompositeSolid") ) { 
+    json jr = validate_onegeom(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return jr;
+
+  //-- then we don't support it   
+  } else {
+    throw verror("Flavour of JSON not supported");
+  }  
+  return true;
+}
+
+//-- for XML/ASCII-based formats
+bool 
+is_valid(const char* input,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  return re["validity"];
+}
+
+json
+validate(const char* input,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  return re;
+}
+
+
 
 void 
 validate_no_coutclog(std::vector<Feature*>& lsFeatures,                        
@@ -59,18 +199,6 @@ validate_no_coutclog(std::vector<Feature*>& lsFeatures,
   //-- reenable cout+clog  
   std::clog.rdbuf(clog_buf);
   std::cout.rdbuf(cout_buf);
-}
-
-
-bool 
-is_valid_onegeom(json& j,
-                 double tol_snap, 
-                 double planarity_d2p_tol, 
-                 double planarity_n_tol, 
-                 double overlap_tol)
-{
-  json jr = validate_onegeom(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  return jr["validity"];
 }
 
 json 
@@ -109,27 +237,38 @@ is_valid_tu3djson(json& j,
   return jr["validity"];
 }
 
-std::vector<bool>  
-is_valid_tu3djson_each(json& j,
-                       double tol_snap, 
-                       double planarity_d2p_tol, 
-                       double planarity_n_tol, 
-                       double overlap_tol)
+
+json validate_jsonfg(json& j,
+                     double tol_snap, 
+                     double planarity_d2p_tol, 
+                     double planarity_n_tol, 
+                     double overlap_tol)
 {
+  //-- disable cout+clog
+  std::streambuf* clog_buf = std::clog.rdbuf();
+  std::clog.rdbuf(NULL);
+  std::streambuf* cout_buf = std::cout.rdbuf();
+  std::cout.rdbuf(NULL);
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("JSON-FG");
   std::vector<Feature*> lsFeatures;
-  parse_tu3djson(j, lsFeatures, tol_snap);
+  parse_jsonfg(j, lsFeatures, tol_snap, ioerrs);
   //-- validate
   validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  //-- compile errors
-  std::vector<bool> re;
-  for (auto& f : lsFeatures) {
-    for (auto& p : f->get_primitives()) {
-      re.push_back(p->is_valid());
-    }
-  }
-  return re;
+  //-- get report in json 
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  //-- reenable cout+clog  
+  std::clog.rdbuf(clog_buf);
+  std::cout.rdbuf(cout_buf);
+  return jr;
 }
-
 
 json validate_tu3djson(json& j,
                        double tol_snap, 
@@ -153,17 +292,6 @@ json validate_tu3djson(json& j,
                             planarity_n_tol,
                             ioerrs);
   return jr;
-}
-
-bool 
-is_valid_cityjson(json& j, 
-                  double tol_snap, 
-                  double planarity_d2p_tol, 
-                  double planarity_n_tol, 
-                  double overlap_tol)
-{
-  json jr = validate_cityjson(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  return jr["validity"];
 }
 
 
@@ -224,23 +352,68 @@ validate_cityjson(json& j,
   return jr;
 }
 
-bool 
-is_valid_indoorgml(const char* input, 
-                  double tol_snap, 
-                  double planarity_d2p_tol, 
-                  double planarity_n_tol, 
-                  double overlap_tol)
+
+json 
+validate_cityjsonfeature(json& j,
+                         json jtransform,
+                         double tol_snap, 
+                         double planarity_d2p_tol, 
+                         double planarity_n_tol, 
+                         double overlap_tol)
 {
-  json jr = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  return jr["validity"];
+  j["transform"] = jtransform;
+  std::vector<Feature*> lsFeatures;
+  //-- compute (_minx, _miny)
+  compute_min_xy(j);
+  //-- list empty GeometryTemplate TODO: populate this?
+  std::vector<GeometryTemplate*> lsGTs;
+  //-- process each CO
+  for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) 
+  {
+    //-- BuildingParts geometries are put with those of a Building
+    if (it.value()["type"] == "BuildingPart")
+      continue;
+    CityObject* co = new CityObject(it.key(), it.value()["type"]);
+    process_json_geometries_of_co(it.value(), co, lsGTs, j, tol_snap);
+    //-- if Building has Parts, put them here in _lsPrimitives
+    if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) ) 
+    {
+      for (std::string bpid : it.value()["children"])
+      {
+        process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, tol_snap);
+      }
+    }
+    lsFeatures.push_back(co);
+  }
+  //-- validate
+  validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  //-- compile errors
+  std::set<int> errors;
+  for (auto& f : lsFeatures)
+    for (auto& p : f->get_primitives())
+      for (auto& code : p->get_unique_error_codes())
+        errors.insert(code);
+  //-- get report in json 
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("CityJSONFeature");
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  return jr;
 }
+
 
 json
 validate_indoorgml(const char* input, 
-                  double tol_snap, 
-                  double planarity_d2p_tol, 
-                  double planarity_n_tol, 
-                  double overlap_tol) 
+                   double tol_snap, 
+                   double planarity_d2p_tol, 
+                   double planarity_n_tol, 
+                   double overlap_tol) 
 {
   IOErrors ioerrs;
   ioerrs.set_input_file_type("IndoorGML");

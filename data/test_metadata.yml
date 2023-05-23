@@ -128,6 +128,10 @@ test_cityjson:
   "several_lods_invalid": "one 3dbag building with 3 lods: 0/1.3/1.3/2.2, so two overlapping ==> e601"
   "emptygeom": "a Building with no geometry, to test e906"
 
+test_cityjsonl:
+  "a": "first line has transform missing"
+  "denhaag_random_5": "5 random building from Den Haag, 2 valid 3 invalid"
+
 test_duplicates:
   "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"
   
