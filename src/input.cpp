@@ -664,7 +664,13 @@ void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOEr
     if (j["type"] == "CityJSON") {
       if (j.count("geometry-templates") == 1)
         process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
-      jtransform = j["transform"];
+      if (j.count("transform") == 0) {
+        std::string s = "Input file first line has no \"transform\" property";
+        errs.add_error(901, s);
+        break;
+      } else {
+        jtransform = j["transform"];
+      }
     }
     if (j["type"] == "CityJSONFeature") {
       errs.set_input_file_type("CityJSONL");
