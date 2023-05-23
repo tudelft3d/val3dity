@@ -83,7 +83,7 @@ std::set<int> IOErrors::get_unique_error_codes()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  std::cout << "ERROR " << code << " : " << info << std::endl;
+  // std::cout << "ERROR " << code << " : " << info << std::endl;
 }
 
 
@@ -634,7 +634,7 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
 
 void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
+  std::cout << "CityJSONL input file" << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
   if (!infile)
   {
