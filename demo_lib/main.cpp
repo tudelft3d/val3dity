@@ -13,7 +13,7 @@ void cityjsonfeature_demo();
 void jsonfg_demo();
 void tu3djson_demo();
 void onegeom_demo();
-// void indoorgml_demo();
+void indoorgml_demo();
 
 int main(int argc, char *argv[])
 {
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   jsonfg_demo();
   tu3djson_demo();
   onegeom_demo();
-  // indoorgml_demo();
+  indoorgml_demo();
   return 0;
 }
 
@@ -163,16 +163,16 @@ void onegeom_demo()
 }
 
 
-// void indoorgml_demo() 
-// {
-//   std::cout << "\n=== indoorgml_demo() ===" << std::endl;
-//   std::stringstream buffer;
-//   buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
-
-//   bool re = val3dity::is_valid_indoorgml(buffer.str().c_str());
-//   std::cout << "Input file is ";
-//   if (re == true)
-//     std::cout << "VALID!" << std::endl;
-//   else
-//     std::cout << "INVALID :(" << std::endl;
-// }
+void indoorgml_demo() 
+{
+  std::cout << "\n=== indoorgml_demo() ===" << std::endl;
+  std::stringstream buffer;
+  buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
+  bool re = val3dity::is_valid(buffer.str().c_str());
+   // re = val3dity::validate(buffer.str().c_str());
+  std::cout << "Input file is ";
+  if (re == true)
+    std::cout << "VALID!" << std::endl;
+  else
+    std::cout << "INVALID :(" << std::endl;
+}

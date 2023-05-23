@@ -79,6 +79,13 @@ validate_onegeom(json& j,
                  double planarity_n_tol=20.0, 
                  double overlap_tol=-1.0);
 
+json
+validate_indoorgml(const char* input, 
+                   double tol_snap, 
+                   double planarity_d2p_tol, 
+                   double planarity_n_tol, 
+                   double overlap_tol); 
+
 //-----
 
 struct verror : std::exception {
@@ -143,7 +150,7 @@ validate(json& j,
 
   //-- then we don't support it   
   } else {
-    throw verror("File format not supported");
+    throw verror("Flavour of JSON not supported");
   }  
   return true;
 }
@@ -156,8 +163,19 @@ is_valid(const char* input,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  throw verror("File format not supported");
-  return true;
+  json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  return re["validity"];
+}
+
+json
+validate(const char* input,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  return re;
 }
 
 
@@ -389,65 +407,55 @@ validate_cityjsonfeature(json& j,
   return jr;
 }
 
-// bool 
-// is_valid_indoorgml(const char* input, 
-//                   double tol_snap, 
-//                   double planarity_d2p_tol, 
-//                   double planarity_n_tol, 
-//                   double overlap_tol)
-// {
-//   json jr = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-//   return jr["validity"];
-// }
 
-// json
-// validate_indoorgml(const char* input, 
-//                   double tol_snap, 
-//                   double planarity_d2p_tol, 
-//                   double planarity_n_tol, 
-//                   double overlap_tol) 
-// {
-//   IOErrors ioerrs;
-//   ioerrs.set_input_file_type("IndoorGML");
-//   pugi::xml_document doc;
-//   pugi::xml_parse_result result = doc.load_string(input);
-//   if (!result) {
-//     ioerrs.add_error(901, "Input value not valid XML");
-//   }
-//   std::vector<Feature*> lsFeatures;
-//   if (ioerrs.has_errors() == false) {
-//     //-- parse namespace
-//     pugi::xml_node ncm = doc.first_child();
-//     std::map<std::string, std::string> thens = get_namespaces(ncm); //-- results in global variable NS in this unit
-//     if ( (thens.count("indoorgml") != 0) && (ncm.name() == (thens["indoorgml"] + "IndoorFeatures")) ) {
-//       //-- find (_minx, _miny)
-//       compute_min_xy(doc);
-//       //-- build dico of xlinks for <gml:Polygon>
-//       std::map<std::string, pugi::xpath_node> dallpoly;
-//       build_dico_xlinks(doc, dallpoly, ioerrs);
-//       ioerrs.set_input_file_type("IndoorGML");
-//       process_gml_file_indoorgml(doc, lsFeatures, dallpoly, ioerrs, tol_snap);
-//     }
-//     else
-//     {
-//       ioerrs.add_error(904, "GML files not supported (yes that includes CityGML files ==> upgrade to CityJSON)");
-//     }
-//   }
-//   //-- start the validation
-//   if (ioerrs.has_errors() == false) {
-//     validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-//   }
-//   //-- get report in json 
-//   json jr = get_report_json("JSON object",
-//                             lsFeatures,
-//                             VAL3DITY_VERSION,
-//                             tol_snap,
-//                             overlap_tol,
-//                             planarity_d2p_tol,
-//                             planarity_n_tol,
-//                             ioerrs);
-//   return jr;
-// }
+json
+validate_indoorgml(const char* input, 
+                   double tol_snap, 
+                   double planarity_d2p_tol, 
+                   double planarity_n_tol, 
+                   double overlap_tol) 
+{
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("IndoorGML");
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_string(input);
+  if (!result) {
+    ioerrs.add_error(901, "Input value not valid XML");
+  }
+  std::vector<Feature*> lsFeatures;
+  if (ioerrs.has_errors() == false) {
+    //-- parse namespace
+    pugi::xml_node ncm = doc.first_child();
+    std::map<std::string, std::string> thens = get_namespaces(ncm); //-- results in global variable NS in this unit
+    if ( (thens.count("indoorgml") != 0) && (ncm.name() == (thens["indoorgml"] + "IndoorFeatures")) ) {
+      //-- find (_minx, _miny)
+      compute_min_xy(doc);
+      //-- build dico of xlinks for <gml:Polygon>
+      std::map<std::string, pugi::xpath_node> dallpoly;
+      build_dico_xlinks(doc, dallpoly, ioerrs);
+      ioerrs.set_input_file_type("IndoorGML");
+      process_gml_file_indoorgml(doc, lsFeatures, dallpoly, ioerrs, tol_snap);
+    }
+    else
+    {
+      ioerrs.add_error(904, "GML files not supported (yes that includes CityGML files ==> upgrade to CityJSON)");
+    }
+  }
+  //-- start the validation
+  if (ioerrs.has_errors() == false) {
+    validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  }
+  //-- get report in json 
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  return jr;
+}
 
 
 }
