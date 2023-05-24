@@ -6,6 +6,18 @@
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 
 
+## [2.4.0] - 2023-05-24
+### Added
+- support for [CityJSON Lines (CityJSONL) files](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature), the 1st line of the file must be with the `"transform"`, best is to use cjio output
+- support for 3D types of [JSON-FG](https://github.com/opengeospatial/ogc-feat-geo-json), only the `Polyhedron` and `MultiPolyhedron` (not for `Prism`)
+- added a simple Python-based viewer to visualise the errors, see `/tools/viz3dity/` for more details
+### Changed
+- the API is new and simpler, only 2 functions are now used: `is_valid()` + `validate()`
+- error 609 has been renamed 906 (no geometry is for more formats than only CityJSON)
+- simplified the code for CDT of each surface (faster too)
+
+
+
 ## [2.3.1] - 2022-09-15
 ### Changed
 - the structure of the report was fixed (it is more flat, as it should have always been), it made little sense for Composite/Multi/Solid
