@@ -9,10 +9,10 @@
 ## [2.4.0] - 2023-05-24
 ### Added
 - support for [CityJSON Lines (CityJSONL) files](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature), the 1st line of the file must be with the `"transform"`, best is to use cjio output
-- support for 3D types of [JSON-FG](https://github.com/opengeospatial/ogc-feat-geo-json), only the `Polyhedron` and `MultiPolyhedron` (not for `Prism`)
+- support for 3D types of [JSON-FG](https://github.com/opengeospatial/ogc-feat-geo-json), only the `Polyhedron` and `MultiPolyhedron` (not for `Prism` and `MultiPrism`)
 - added a simple Python-based viewer to visualise the errors, see `/tools/viz3dity/` for more details
 ### Changed
-- the API is new and simpler, only 2 functions are now used: `is_valid()` + `validate()`
+- the API is new and simpler, only 2 functions are now used: `is_valid()` + `validate()` 
 - error 609 has been renamed 906 (no geometry is for more formats than only CityJSON)
 - simplified the code for CDT of each surface (faster too)
 
