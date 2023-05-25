@@ -37,7 +37,6 @@ namespace val3dity
 
 bool 
 is_valid(json& j,
-         json jtransform=json::object(),
          double tol_snap=0.001, 
          double planarity_d2p_tol=0.01, 
          double planarity_n_tol=20.0, 
@@ -45,7 +44,6 @@ is_valid(json& j,
 
 json
 validate(json& j,
-         json jtransform=json::object(),
          double tol_snap=0.001, 
          double planarity_d2p_tol=0.01, 
          double planarity_n_tol=20.0, 

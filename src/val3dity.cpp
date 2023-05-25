@@ -52,7 +52,6 @@ validate_cityjson(json& j,
 
 json
 validate_cityjsonfeature(json& j, 
-                         json jtransform,
                          double tol_snap=0.001, 
                          double planarity_d2p_tol=0.01, 
                          double planarity_n_tol=20.0, 
@@ -97,20 +96,18 @@ struct verror : std::exception {
 
 bool 
 is_valid(json& j,
-         json jtransform,
          double tol_snap, 
          double planarity_d2p_tol, 
          double planarity_n_tol, 
          double overlap_tol)
 {
-  json re = validate(j, jtransform, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
+  json re = validate(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
   return re["validity"];
 }
 
 
 json 
 validate(json& j,
-         json jtransform,
          double tol_snap, 
          double planarity_d2p_tol, 
          double planarity_n_tol, 
@@ -123,7 +120,7 @@ validate(json& j,
   
   //-- CityJSONFeature
   } else if (j["type"] == "CityJSONFeature") {
-    json jr = validate_cityjsonfeature(j, jtransform, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    json jr = validate_cityjsonfeature(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
     return jr;
   
   //-- tu3djson
@@ -355,13 +352,12 @@ validate_cityjson(json& j,
 
 json 
 validate_cityjsonfeature(json& j,
-                         json jtransform,
                          double tol_snap, 
                          double planarity_d2p_tol, 
                          double planarity_n_tol, 
                          double overlap_tol)
 {
-  j["transform"] = jtransform;
+  // j["transform"] = jtransform;
   std::vector<Feature*> lsFeatures;
   //-- compute (_minx, _miny)
   compute_min_xy(j);

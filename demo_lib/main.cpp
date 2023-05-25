@@ -78,7 +78,9 @@ void cityjsonfeature_demo() {
     }
     if (j["type"] == "CityJSONFeature") {
       try {
-        bool re = val3dity::is_valid(j, jtransform);
+        //-- you have to add the "transform" property so that the coordinates can be calculated
+        j["transform"] = jtransform;
+        bool re = val3dity::is_valid(j);
         std::cout << "Input line #" << linecount << " is " << re << std::endl;
       }
       catch (std::exception& ex) {
