@@ -60,6 +60,16 @@ def data_empty_geom(request, dir_cityjson):
             request.param))
     return([file_path])
 
+@pytest.fixture(scope="module",
+                params=["cube_v10.city.json",
+                        "cube_v11.city.json"])
+def data_versions(request, dir_cityjson):
+    file_path = os.path.abspath(
+        os.path.join(
+            dir_cityjson,
+            request.param))
+    return([file_path])    
+
 #----------------------------------------------------------------------- Tests
 def test_valid_geomtemplates(validate, data_cj_v_gt, unittests):
     error = validate(data_cj_v_gt, options=unittests)
@@ -80,3 +90,7 @@ def test_several_lods_valid(validate, data_several_lods_valid, unittests):
 def test_empty_geom(validate, data_empty_geom, unittests):
     error = validate(data_empty_geom, options=unittests)
     assert(error == [906])
+
+def test_versions(validate, data_versions, unittests):
+    error = validate(data_versions, options=unittests)
+    assert(error == [])
