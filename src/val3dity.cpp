@@ -79,11 +79,19 @@ validate_onegeom(json& j,
                  double overlap_tol=-1.0);
 
 json
-validate_indoorgml(const char* input, 
-                   double tol_snap, 
-                   double planarity_d2p_tol, 
-                   double planarity_n_tol, 
-                   double overlap_tol); 
+validate_indoorgml(std::string input, 
+                 double tol_snap=0.001, 
+                 double planarity_d2p_tol=0.01, 
+                 double planarity_n_tol=20.0, 
+                 double overlap_tol=-1.0);
+ 
+
+json
+validate_obj(std::string input, 
+             double tol_snap=0.001, 
+             double planarity_d2p_tol=0.01, 
+             double planarity_n_tol=20.0, 
+             double overlap_tol=-1.0);
 
 //-----
 
@@ -154,25 +162,37 @@ validate(json& j,
 
 //-- for XML/ASCII-based formats
 bool 
-is_valid(const char* input,
+is_valid(std::string input,
+         std::string format,
          double tol_snap, 
          double planarity_d2p_tol, 
          double planarity_n_tol, 
          double overlap_tol)
 {
-  json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  json re = validate(input, format, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
   return re["validity"];
 }
 
 json
-validate(const char* input,
+validate(std::string input,
+         std::string format,
          double tol_snap, 
          double planarity_d2p_tol, 
          double planarity_n_tol, 
          double overlap_tol)
 {
-  json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  return re;
+  if (format == "IndoorGML")
+    json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return re;
+  else if (format == "OBJ")
+    json re = validate_obj(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return re;
+  else if (format == "OFF")
+    json re = validate_off(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    return re;
+  else 
+    throw verror("Flavour of JSON not supported");
+  return json::object();
 }
 
 
@@ -405,7 +425,7 @@ validate_cityjsonfeature(json& j,
 
 
 json
-validate_indoorgml(const char* input, 
+validate_indoorgml(std::string input, 
                    double tol_snap, 
                    double planarity_d2p_tol, 
                    double planarity_n_tol, 
@@ -414,7 +434,7 @@ validate_indoorgml(const char* input,
   IOErrors ioerrs;
   ioerrs.set_input_file_type("IndoorGML");
   pugi::xml_document doc;
-  pugi::xml_parse_result result = doc.load_string(input);
+  pugi::xml_parse_result result = doc.load_string(input.c_str());
   if (!result) {
     ioerrs.add_error(901, "Input value not valid XML");
   }

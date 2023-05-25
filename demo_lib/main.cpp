@@ -171,7 +171,8 @@ void indoorgml_demo()
   std::stringstream buffer;
   buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
   bool re = val3dity::is_valid(buffer.str().c_str());
-   // re = val3dity::validate(buffer.str().c_str());
+  // json re = val3dity::validate(buffer.str().c_str());
+  // std::cout << re << std::endl;
   std::cout << "Input file is ";
   if (re == true)
     std::cout << "VALID!" << std::endl;
