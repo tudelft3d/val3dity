@@ -10,20 +10,40 @@ using json = nlohmann::json;
 
 void cityjson_demo();
 void cityjsonfeature_demo();
-void jsonfg_demo();
-void tu3djson_demo();
-void onegeom_demo();
 void indoorgml_demo();
+void jsonfg_demo();
+void obj_demo();
+void onegeom_demo();
+void tu3djson_demo();
 
 int main(int argc, char *argv[])
 {
   cityjson_demo();
   cityjsonfeature_demo();
-  jsonfg_demo();
-  tu3djson_demo();
-  onegeom_demo();
   indoorgml_demo();
+  jsonfg_demo();
+  obj_demo();
+  onegeom_demo();
+  tu3djson_demo();
   return 0;
+}
+
+
+void obj_demo() 
+{
+  std::cout << "\n=== obj_demo() ===" << std::endl;
+  std::stringstream buffer;
+  buffer << std::ifstream("../../data/obj/duplicatevertices.obj").rdbuf();
+  try {
+    bool re = val3dity::is_valid(buffer.str().c_str(), "OBJ1");
+    if (re == true)
+      std::cout << "VALID!" << std::endl;
+    else
+      std::cout << "INVALID :(" << std::endl;
+  }
+  catch (std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+  }
 }
 
 
@@ -132,8 +152,12 @@ void tu3djson_demo()
     std::cerr << "Input file not a valid JSON file." << std::endl;
     return;
   }
-  json re = val3dity::validate(j);
-  std::cout << re << std::endl;
+  try {
+    std::cout <<  val3dity::validate(j) << std::endl;
+  }
+  catch (std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+  }
 }
 
 
@@ -170,12 +194,14 @@ void indoorgml_demo()
   std::cout << "\n=== indoorgml_demo() ===" << std::endl;
   std::stringstream buffer;
   buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
-  bool re = val3dity::is_valid(buffer.str().c_str());
-  // json re = val3dity::validate(buffer.str().c_str());
-  // std::cout << re << std::endl;
-  std::cout << "Input file is ";
-  if (re == true)
-    std::cout << "VALID!" << std::endl;
-  else
-    std::cout << "INVALID :(" << std::endl;
+  try {
+    bool re = val3dity::is_valid(buffer.str().c_str(), "IndoorGML");
+    if (re == true)
+      std::cout << "VALID!" << std::endl;
+    else
+      std::cout << "INVALID :(" << std::endl;
+  }
+  catch (std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+  }
 }

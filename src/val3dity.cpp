@@ -121,28 +121,33 @@ validate(json& j,
          double planarity_n_tol, 
          double overlap_tol)
 {
+  std::streambuf* clog_buf = std::clog.rdbuf();
+  std::clog.rdbuf(NULL);
+  std::streambuf* cout_buf = std::cout.rdbuf();
+  std::cout.rdbuf(NULL);
+  json re;
   //-- CityJSON
   if (j["type"] == "CityJSON") {
     json jr = validate_cityjson(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return jr;
+    re = jr;
   
   //-- CityJSONFeature
   } else if (j["type"] == "CityJSONFeature") {
     json jr = validate_cityjsonfeature(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return jr;
+    re = jr;
   
   //-- tu3djson
   } else if (j["type"] == "tu3djson") {
     json jr = validate_tu3djson(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return jr;
+    re = jr;
   
   //-- JSON-FG
   } else if (j["type"] == "Feature") { 
     json jr = validate_jsonfg(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return jr;
+    re = jr;
   } else if (j["type"] == "FeatureCollection") { 
     json jr = validate_jsonfg(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return jr;
+    re = jr;
 
   //-- tu3djson onegeom
   } else if ( (j["type"] == "MultiSurface") || 
@@ -151,13 +156,17 @@ validate(json& j,
               (j["type"] == "MultiSolid") ||
               (j["type"] == "CompositeSolid") ) { 
     json jr = validate_onegeom(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return jr;
+    re = jr;
 
   //-- then we don't support it   
   } else {
+    std::clog.rdbuf(clog_buf);
+    std::cout.rdbuf(cout_buf);
     throw verror("Flavour of JSON not supported");
   }  
-  return true;
+  std::clog.rdbuf(clog_buf);
+  std::cout.rdbuf(cout_buf);
+  return re;
 }
 
 //-- for XML/ASCII-based formats
@@ -181,42 +190,33 @@ validate(std::string input,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  if (format == "IndoorGML")
-    json re = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return re;
-  else if (format == "OBJ")
-    json re = validate_obj(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return re;
-  else if (format == "OFF")
-    json re = validate_off(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-    return re;
-  else 
-    throw verror("Flavour of JSON not supported");
-  return json::object();
-}
-
-
-
-void 
-validate_no_coutclog(std::vector<Feature*>& lsFeatures,                        
-                     double planarity_d2p_tol, 
-                     double planarity_n_tol, 
-                     double overlap_tol)
-{
-  //-- disable cout+clog
   std::streambuf* clog_buf = std::clog.rdbuf();
   std::clog.rdbuf(NULL);
   std::streambuf* cout_buf = std::cout.rdbuf();
   std::cout.rdbuf(NULL);
-  //-- validate
-  for (auto& f : lsFeatures)
-  {
-    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  json re;
+  if (format == "IndoorGML") {
+    json j = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    re = j;
   }
-  //-- reenable cout+clog  
+  else if (format == "OBJ") {
+    json j = validate_obj(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    re = j;
+  }
+  // else if (format == "OFF") {
+  //   json j = validate_off(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  //   re = j;
+  // }
+  else { 
+    std::clog.rdbuf(clog_buf);
+    std::cout.rdbuf(cout_buf);
+    throw verror("Flavour of JSON not supported");
+  }
   std::clog.rdbuf(clog_buf);
   std::cout.rdbuf(cout_buf);
+  return re;
 }
+
 
 json 
 validate_onegeom(json& j,
@@ -228,7 +228,8 @@ validate_onegeom(json& j,
   std::vector<Feature*> lsFeatures;
   parse_tu3djson_onegeom(j, lsFeatures, tol_snap);
   //-- validate
-  validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  for (auto& f : lsFeatures)
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   //-- get report in json 
   IOErrors ioerrs;
   ioerrs.set_input_file_type("tu3djson_geom");
@@ -261,17 +262,13 @@ json validate_jsonfg(json& j,
                      double planarity_n_tol, 
                      double overlap_tol)
 {
-  //-- disable cout+clog
-  std::streambuf* clog_buf = std::clog.rdbuf();
-  std::clog.rdbuf(NULL);
-  std::streambuf* cout_buf = std::cout.rdbuf();
-  std::cout.rdbuf(NULL);
   IOErrors ioerrs;
   ioerrs.set_input_file_type("JSON-FG");
   std::vector<Feature*> lsFeatures;
   parse_jsonfg(j, lsFeatures, tol_snap, ioerrs);
   //-- validate
-  validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  for (auto& f : lsFeatures)  
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   //-- get report in json 
   json jr = get_report_json("JSON object",
                             lsFeatures,
@@ -281,9 +278,6 @@ json validate_jsonfg(json& j,
                             planarity_d2p_tol,
                             planarity_n_tol,
                             ioerrs);
-  //-- reenable cout+clog  
-  std::clog.rdbuf(clog_buf);
-  std::cout.rdbuf(cout_buf);
   return jr;
 }
 
@@ -296,7 +290,8 @@ json validate_tu3djson(json& j,
   std::vector<Feature*> lsFeatures;
   parse_tu3djson(j, lsFeatures, tol_snap);
   //-- validate
-  validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  for (auto& f : lsFeatures)
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   //-- get report in json 
   IOErrors ioerrs;
   ioerrs.set_input_file_type("tu3djson");
@@ -348,7 +343,8 @@ validate_cityjson(json& j,
     lsFeatures.push_back(co);
   }
   //-- validate
-  validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  for (auto& f : lsFeatures)
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   //-- compile errors
   std::set<int> errors;
   for (auto& f : lsFeatures)
@@ -402,7 +398,8 @@ validate_cityjsonfeature(json& j,
     lsFeatures.push_back(co);
   }
   //-- validate
-  validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  for (auto& f : lsFeatures)
+    f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   //-- compile errors
   std::set<int> errors;
   for (auto& f : lsFeatures)
@@ -459,7 +456,39 @@ validate_indoorgml(std::string input,
   }
   //-- start the validation
   if (ioerrs.has_errors() == false) {
-    validate_no_coutclog(lsFeatures, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    //-- validate
+    for (auto& f : lsFeatures)
+      f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  }
+  //-- get report in json 
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  return jr;
+}
+
+
+json
+validate_obj(std::string input, 
+             double tol_snap, 
+             double planarity_d2p_tol, 
+             double planarity_n_tol, 
+             double overlap_tol) 
+{
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("OBJ");
+  std::vector<Feature*> lsFeatures;
+  read_file_obj(lsFeatures, input, SOLID, ioerrs, tol_snap);
+  //-- start the validation
+  if (ioerrs.has_errors() == false) {
+    //-- validate
+    for (auto& f : lsFeatures)
+      f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   }
   //-- get report in json 
   json jr = get_report_json("JSON object",
