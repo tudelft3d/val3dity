@@ -29,6 +29,9 @@
 #include "val3dity.h"
 #include "Feature.h"
 #include "CityObject.h"
+#include "GenericObject.h"
+#include "Solid.h"
+#include "Surface.h"
 #include "input.h"
 
 #include <iostream>
@@ -93,6 +96,12 @@ validate_obj(std::string input,
              double planarity_n_tol=20.0, 
              double overlap_tol=-1.0);
 
+json
+validate_off(std::string input, 
+             double tol_snap=0.001, 
+             double planarity_d2p_tol=0.01, 
+             double planarity_n_tol=20.0, 
+             double overlap_tol=-1.0);
 //-----
 
 struct verror : std::exception {
@@ -190,10 +199,10 @@ validate(std::string input,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  std::streambuf* clog_buf = std::clog.rdbuf();
-  std::clog.rdbuf(NULL);
-  std::streambuf* cout_buf = std::cout.rdbuf();
-  std::cout.rdbuf(NULL);
+  // std::streambuf* clog_buf = std::clog.rdbuf();
+  // std::clog.rdbuf(NULL);
+  // std::streambuf* cout_buf = std::cout.rdbuf();
+  // std::cout.rdbuf(NULL);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
@@ -203,17 +212,17 @@ validate(std::string input,
     json j = validate_obj(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
     re = j;
   }
-  // else if (format == "OFF") {
-  //   json j = validate_off(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  //   re = j;
-  // }
-  else { 
-    std::clog.rdbuf(clog_buf);
-    std::cout.rdbuf(cout_buf);
-    throw verror("Flavour of JSON not supported");
+  else if (format == "OFF") {
+    json j = validate_off(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
+    re = j;
   }
-  std::clog.rdbuf(clog_buf);
-  std::cout.rdbuf(cout_buf);
+  else { 
+    // std::clog.rdbuf(clog_buf);
+    // std::cout.rdbuf(cout_buf);
+    throw verror("File type not supported");
+  }
+  // std::clog.rdbuf(clog_buf);
+  // std::cout.rdbuf(cout_buf);
   return re;
 }
 
@@ -499,6 +508,48 @@ validate_obj(std::string input,
                             planarity_d2p_tol,
                             planarity_n_tol,
                             ioerrs);
+  return jr;
+}
+
+json
+validate_off(std::string input, 
+             double tol_snap, 
+             double planarity_d2p_tol, 
+             double planarity_n_tol, 
+             double overlap_tol) 
+{
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("OFF");
+  std::vector<Feature*> lsFeatures;
+  GenericObject* o = new GenericObject("none");
+  Surface* sh = read_file_off(input, 0, ioerrs, tol_snap);
+  std::cout << "1" << std::endl;
+
+  Solid* s = new Solid;
+  s->set_oshell(sh);
+  o->add_primitive(s);
+  lsFeatures.push_back(o);
+  //-- start the validation
+  // std::cout << "errors: " << ioerrs.has_errors() << std::endl;
+  for (auto& each : ioerrs.get_unique_error_codes())
+    std::cout << each << std::endl;
+
+  // if (ioerrs.has_errors() == false) {
+    //-- validate
+    for (auto& f : lsFeatures)
+      f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  // }
+  std::cout << "2" << std::endl;
+  //-- get report in json 
+  json jr = get_report_json("JSON object",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  std::cout << "3" << std::endl;
   return jr;
 }
 

@@ -13,18 +13,20 @@ void cityjsonfeature_demo();
 void indoorgml_demo();
 void jsonfg_demo();
 void obj_demo();
+void off_demo();
 void onegeom_demo();
 void tu3djson_demo();
 
 int main(int argc, char *argv[])
 {
-  cityjson_demo();
-  cityjsonfeature_demo();
-  indoorgml_demo();
+  // cityjson_demo();
+  // cityjsonfeature_demo();
+  // indoorgml_demo();
   jsonfg_demo();
   obj_demo();
-  onegeom_demo();
-  tu3djson_demo();
+  off_demo();
+  // onegeom_demo();
+  // tu3djson_demo();
   return 0;
 }
 
@@ -35,7 +37,24 @@ void obj_demo()
   std::stringstream buffer;
   buffer << std::ifstream("../../data/obj/duplicatevertices.obj").rdbuf();
   try {
-    bool re = val3dity::is_valid(buffer.str().c_str(), "OBJ1");
+    bool re = val3dity::is_valid(buffer.str(), "OBJ");
+    if (re == true)
+      std::cout << "VALID!" << std::endl;
+    else
+      std::cout << "INVALID :(" << std::endl;
+  }
+  catch (std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+  }
+}
+
+void off_demo() 
+{
+  std::cout << "\n=== off_demo() ===" << std::endl;
+  std::stringstream buffer;
+  buffer << std::ifstream("../../data/test_valid/basecube.off").rdbuf();
+  try {
+    bool re = val3dity::is_valid(buffer.str(), "OFF");
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else
@@ -195,7 +214,7 @@ void indoorgml_demo()
   std::stringstream buffer;
   buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
   try {
-    bool re = val3dity::is_valid(buffer.str().c_str(), "IndoorGML");
+    bool re = val3dity::is_valid(buffer.str(), "IndoorGML");
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else

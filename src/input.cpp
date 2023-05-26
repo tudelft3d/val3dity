@@ -83,7 +83,7 @@ std::set<int> IOErrors::get_unique_error_codes()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  // std::cout << "ERROR " << code << " : " << info << std::endl;
+  std::cout << "ERROR " << code << " : " << info << std::endl;
 }
 
 
