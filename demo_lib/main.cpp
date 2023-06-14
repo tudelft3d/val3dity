@@ -37,7 +37,8 @@ void obj_demo()
   std::stringstream buffer;
   buffer << std::ifstream("../../data/obj/duplicatevertices.obj").rdbuf();
   try {
-    bool re = val3dity::is_valid(buffer.str(), "OBJ");
+    std::string s = buffer.str();
+    bool re = val3dity::is_valid(s, "OBJ");
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else
@@ -54,7 +55,8 @@ void off_demo()
   std::stringstream buffer;
   buffer << std::ifstream("../../data/test_valid/basecube.off").rdbuf();
   try {
-    bool re = val3dity::is_valid(buffer.str(), "OFF");
+    std::string s = buffer.str();
+    bool re = val3dity::is_valid(s, "OFF");
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else
@@ -214,7 +216,8 @@ void indoorgml_demo()
   std::stringstream buffer;
   buffer << std::ifstream("../../data/gml/FZK-Haus_full.gml").rdbuf();
   try {
-    bool re = val3dity::is_valid(buffer.str(), "IndoorGML");
+    std::string s = buffer.str();
+    bool re = val3dity::is_valid(s, "IndoorGML");
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else

@@ -1317,18 +1317,12 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double t
   return sh;
 }
 
-void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap)
+
+void parse_file_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive3D prim3d, IOErrors& errs, double tol_snap)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
-  std::ifstream infile(ifile.c_str(), std::ifstream::in);
-  if (!infile)
-  {
-    errs.add_error(901, "Input file not found.");
-    return;
-  }
   //-- find (minx, miny)
   std::string l;
-  while (std::getline(infile, l)) 
+  while (std::getline(input, l)) 
   {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
@@ -1345,14 +1339,14 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- read again file and parse everything
-  infile.close();
-  infile.open(ifile.c_str(), std::ifstream::in);
+  input.clear();
+  input.seekg(0);
   int primid = 0;
   std::string primids = "";
   Surface* sh = new Surface(0, tol_snap);
   std::vector<Point3*> allvertices;
   GenericObject* o = new GenericObject("none");
-  while (std::getline(infile, l)) {
+  while (std::getline(input, l)) {
     std::istringstream iss(l);
     if (l.substr(0, 2) == "v ") {
       std::string tmp;
@@ -1407,7 +1401,7 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
         tmp.clear();
         iss >> tmp;
         if (tmp.compare("\\") == 0) {
-          std::getline(infile, l);
+          std::getline(input, l);
           iss.str(l);
           continue;
         }
@@ -1464,8 +1458,9 @@ void read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primit
   for (auto& each : allvertices)
     delete each;
   allvertices.clear();
-  lsFeatures.push_back(o);
-} 
+  lsFeatures.push_back(o);  
+}
+
 
 void parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, IOErrors& errs)
 {

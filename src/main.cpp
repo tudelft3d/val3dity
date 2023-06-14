@@ -478,19 +478,21 @@ int main(int argc, char* const argv[])
       }    
       else if (inputtype == OBJ)
       {
-        read_file_obj(lsFeatures,
-                      inputfile.getValue(), 
-                      prim3d,
-                      ioerrs, 
-                      snap_tol.getValue());
-        if (ioerrs.has_errors() == true) {
-          std::cout << "Errors while reading the input file, aborting." << std::endl;
-          std::cout << ioerrs.get_report_text() << std::endl;
-        }
-        if (ishellfiles.getValue().size() > 0)
-        {
-          std::cout << "No inner shells allowed when GML file used as input." << std::endl;
-          ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+        std::cout << "Reading file: " << inputfile.getValue() << std::endl;
+        std::ifstream infile(inputfile.getValue().c_str(), std::ifstream::in);
+        if (!infile) {
+          ioerrs.add_error(901, "Input file not found.");
+        } else {
+          parse_file_obj(infile, lsFeatures, prim3d, ioerrs, snap_tol.getValue());
+          if (ioerrs.has_errors() == true) {
+            std::cout << "Errors while reading the input file, aborting." << std::endl;
+            std::cout << ioerrs.get_report_text() << std::endl;
+          }
+          if (ishellfiles.getValue().size() > 0)
+          {
+            std::cout << "No inner shells allowed when GML file used as input." << std::endl;
+            ioerrs.add_error(901, "No inner shells allowed when GML file used as input.");
+          }
         }
       }
     }

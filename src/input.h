@@ -163,7 +163,8 @@ std::map<std::string, std::string>
 void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 void              read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
-void              read_file_obj(std::vector<Feature*>& lsFeatures, std::string &ifile, Primitive3D prim3d, IOErrors& errs, double tol_snap);
+void              parse_file_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive3D prim3d, IOErrors& errs, double tol_snap);
+
 Surface*          read_file_poly(std::string &ifile, int shellid, IOErrors& errs);
 Surface*          read_file_off(std::string &ifile, int shellid, IOErrors& errs, double tol_snap);
 

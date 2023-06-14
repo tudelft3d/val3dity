@@ -82,22 +82,22 @@ validate_onegeom(json& j,
                  double overlap_tol=-1.0);
 
 json
-validate_indoorgml(std::string input, 
-                 double tol_snap=0.001, 
-                 double planarity_d2p_tol=0.01, 
-                 double planarity_n_tol=20.0, 
-                 double overlap_tol=-1.0);
+validate_indoorgml(std::string& input, 
+                   double tol_snap=0.001, 
+                   double planarity_d2p_tol=0.01, 
+                   double planarity_n_tol=20.0, 
+                   double overlap_tol=-1.0);
  
 
 json
-validate_obj(std::string input, 
+validate_obj(std::string& input, 
              double tol_snap=0.001, 
              double planarity_d2p_tol=0.01, 
              double planarity_n_tol=20.0, 
              double overlap_tol=-1.0);
 
 json
-validate_off(std::string input, 
+validate_off(std::string& input, 
              double tol_snap=0.001, 
              double planarity_d2p_tol=0.01, 
              double planarity_n_tol=20.0, 
@@ -178,9 +178,9 @@ validate(json& j,
   return re;
 }
 
-//-- for XML/ASCII-based formats
+//-- for ASCII + XML formats
 bool 
-is_valid(std::string input,
+is_valid(std::string& input,
          std::string format,
          double tol_snap, 
          double planarity_d2p_tol, 
@@ -192,7 +192,7 @@ is_valid(std::string input,
 }
 
 json
-validate(std::string input,
+validate(std::string& input,
          std::string format,
          double tol_snap, 
          double planarity_d2p_tol, 
@@ -431,7 +431,7 @@ validate_cityjsonfeature(json& j,
 
 
 json
-validate_indoorgml(std::string input, 
+validate_indoorgml(std::string& input, 
                    double tol_snap, 
                    double planarity_d2p_tol, 
                    double planarity_n_tol, 
@@ -483,7 +483,7 @@ validate_indoorgml(std::string input,
 
 
 json
-validate_obj(std::string input, 
+validate_obj(std::string& input, 
              double tol_snap, 
              double planarity_d2p_tol, 
              double planarity_n_tol, 
@@ -492,7 +492,8 @@ validate_obj(std::string input,
   IOErrors ioerrs;
   ioerrs.set_input_file_type("OBJ");
   std::vector<Feature*> lsFeatures;
-  read_file_obj(lsFeatures, input, SOLID, ioerrs, tol_snap);
+  std::istringstream iss(input);
+  parse_file_obj(iss, lsFeatures, SOLID, ioerrs, tol_snap);
   //-- start the validation
   if (ioerrs.has_errors() == false) {
     //-- validate
@@ -512,7 +513,7 @@ validate_obj(std::string input,
 }
 
 json
-validate_off(std::string input, 
+validate_off(std::string& input, 
              double tol_snap, 
              double planarity_d2p_tol, 
              double planarity_n_tol, 

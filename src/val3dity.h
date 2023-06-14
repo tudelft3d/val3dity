@@ -50,7 +50,7 @@ validate(json& j,
          double overlap_tol=-1.0);
 
 bool 
-is_valid(std::string input,
+is_valid(std::string& input,
          std::string format, 
          double tol_snap=0.001, 
          double planarity_d2p_tol=0.01, 
@@ -58,7 +58,7 @@ is_valid(std::string input,
          double overlap_tol=-1.0);
 
 json 
-validate(std::string input,
+validate(std::string& input,
          std::string format, 
          double tol_snap=0.001, 
          double planarity_d2p_tol=0.01, 
