@@ -199,10 +199,10 @@ validate(std::string& input,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  // std::streambuf* clog_buf = std::clog.rdbuf();
-  // std::clog.rdbuf(NULL);
-  // std::streambuf* cout_buf = std::cout.rdbuf();
-  // std::cout.rdbuf(NULL);
+  std::streambuf* clog_buf = std::clog.rdbuf();
+  std::clog.rdbuf(NULL);
+  std::streambuf* cout_buf = std::cout.rdbuf();
+  std::cout.rdbuf(NULL);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
@@ -217,12 +217,12 @@ validate(std::string& input,
     re = j;
   }
   else { 
-    // std::clog.rdbuf(clog_buf);
-    // std::cout.rdbuf(cout_buf);
+    std::clog.rdbuf(clog_buf);
+    std::cout.rdbuf(cout_buf);
     throw verror("File type not supported");
   }
-  // std::clog.rdbuf(clog_buf);
-  // std::cout.rdbuf(cout_buf);
+  std::clog.rdbuf(clog_buf);
+  std::cout.rdbuf(cout_buf);
   return re;
 }
 

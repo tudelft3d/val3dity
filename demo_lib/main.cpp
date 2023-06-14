@@ -19,14 +19,14 @@ void tu3djson_demo();
 
 int main(int argc, char *argv[])
 {
-  // cityjson_demo();
-  // cityjsonfeature_demo();
-  // indoorgml_demo();
+  cityjson_demo();
+  cityjsonfeature_demo();
+  indoorgml_demo();
   jsonfg_demo();
   obj_demo();
   off_demo();
-  // onegeom_demo();
-  // tu3djson_demo();
+  onegeom_demo();
+  tu3djson_demo();
   return 0;
 }
 
