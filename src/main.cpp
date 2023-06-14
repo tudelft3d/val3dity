@@ -426,16 +426,16 @@ int main(int argc, char* const argv[])
             Solid* s = new Solid;
             s->set_oshell(sh);
             int sid = 1;
-            // for (auto ifile : ishellfiles.getValue())
-            // {
-            //   std::ifstream if2(ifile.c_str(), std::ifstream::in);
-            //   Surface* sh = parse_poly(if2, sid, ioerrs);
-            //   if (ioerrs.has_errors() == false)
-            //   {
-            //     s->add_ishell(sh);
-            //     sid++;
-            //   }
-            // }
+            for (auto ifile : ishellfiles.getValue())
+            {
+              std::ifstream if2(ifile.c_str(), std::ifstream::in);
+              Surface* sh = parse_poly(if2, sid, ioerrs);
+              if (ioerrs.has_errors() == false)
+              {
+                s->add_ishell(sh);
+                sid++;
+              }
+            }
             if (ioerrs.has_errors() == false)
               o->add_primitive(s);
           }
