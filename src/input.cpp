@@ -1139,25 +1139,17 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
 }
 
 
-Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
+Surface* parse_poly(std::istream &input, int shellid, IOErrors& errs)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
-  std::stringstream st;
-  ifstream infile(ifile.c_str(), ifstream::in);
-  if (!infile)
-  {
-    errs.add_error(901, "Input file not found.");
-    return NULL;
-  }
   //-- read the points
   int num, tmpint;
   float tmpfloat;
   double x, y, z;
-  infile >> num >> tmpint >> tmpint >> tmpint;
+  input >> num >> tmpint >> tmpint >> tmpint;
   //-- compute (_minx, _miny)
   for (int i = 0; i < num; i++)
   {
-    infile >> tmpint >> x >> y >> z;
+    input >> tmpint >> x >> y >> z;
     if (x < _minx)
       _minx = x;
     if (y < _miny)
@@ -1166,62 +1158,62 @@ Surface* read_file_poly(std::string &ifile, int shellid, IOErrors& errs)
   std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
-  infile.close();
-  infile.open(ifile.c_str(), std::ifstream::in);
-  infile >> num >> tmpint >> tmpint >> tmpint;
+  input.clear();
+  input.seekg(0);
+  input >> num >> tmpint >> tmpint >> tmpint;
   //-- read verticess
   Surface* sh = new Surface(shellid);  
   for (int i = 0; i < num; i++)
   {
-    infile >> tmpint >> x >> y >> z;
+    input >> tmpint >> x >> y >> z;
     x -= _minx;
     y -= _miny;
     Point3 p(x, y, z);
     sh->add_point(p);
   }
   //-- read the facets
-  infile >> num >> tmpint;
+  input >> num >> tmpint;
   int numf, numpt, numholes;
   string s;
   for (int i = 0; i < num; i++)
   {
     numholes = 0;
-    infile >> numf;
+    input >> numf;
     while(true) {
-      if (infile.peek() == '\n')
+      if (input.peek() == '\n')
         break;
-      else if (infile.peek() == ' ')
-        infile.ignore();
+      else if (input.peek() == ' ')
+        input.ignore();
       else
-        infile >> numholes;
+        input >> numholes;
     }
     //-- read oring (there's always one and only one)
-    infile >> numpt;
+    input >> numpt;
     if (numpt == -1) {
       sh->add_error(103, std::to_string(i));
       continue;
     }
     std::vector<int> ids(numpt);
     for (int k = 0; k < numpt; k++)
-      infile >> ids[k];
+      input >> ids[k];
     std::vector< std::vector<int> > pgnids;
     pgnids.push_back(ids);
     //-- check for irings
     for (int j = 1; j < numf; j++)
     {
-      infile >> numpt;
+      input >> numpt;
       if (numpt == -1) {
         sh->add_error(103, std::to_string(i));
         continue;
       }
       std::vector<int> ids(numpt);
       for (int l = 0; l < numpt; l++)
-        infile >> ids[l];
+        input >> ids[l];
       pgnids.push_back(ids);
     }
     //-- skip the line about points defining holes (if present)
     for (int j = 0; j < numholes; j++)
-      infile >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
+      input >> tmpint >> tmpfloat >> tmpfloat >> tmpfloat;
     sh->add_face(pgnids);
   }
   return sh;
@@ -1246,21 +1238,13 @@ void printProgressBar(int percent) {
 }
 
 
-Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double tol_snap)
+Surface* parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_snap)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
-  std::stringstream st;
-  ifstream infile(ifile.c_str(), ifstream::in);
-  if (!infile)
-  {
-    errs.add_error(901, "Input file not found.");
-    return NULL;
-  }
   //-- read the points
   int numpt, numf, tmpint;
   std::string s;
-  infile >> s;
-  infile >> numpt >> numf >> tmpint;
+  input >> s;
+  input >> numpt >> numf >> tmpint;
   if ( (s != "OFF") || (numpt <= 0) ) {
     errs.add_error(901, "Input file not a valid OFF file.");
     return NULL;
@@ -1269,7 +1253,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double t
   for (int i = 0; i < numpt; i++)
   {
     double x, y, z;
-    infile >> x >> y >> z;
+    input >> x >> y >> z;
     if (x < _minx)
       _minx = x;
     if (y < _miny)
@@ -1279,17 +1263,17 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double t
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- reset the file
-  infile.close();
-  infile.open(ifile.c_str(), std::ifstream::in);
-  infile >> s;
-  infile >> numpt >> numf >> tmpint;
+  input.clear();
+  input.seekg(0);
+  input >> s;
+  input >> numpt >> numf >> tmpint;
   //-- read the points
   std::vector<int> newi;
   Surface* sh = new Surface(shellid, tol_snap);
   for (int i = 0; i < numpt; i++)
   {
     double x, y, z;
-    infile >> x >> y >> z;
+    input >> x >> y >> z;
     x -= _minx;
     y -= _miny;
     Point3 p(x, y, z);
@@ -1298,7 +1282,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double t
   //-- read the facets
   for (int i = 0; i < numf; i++)
   {
-    infile >> tmpint;
+    input >> tmpint;
     std::vector<int> ids(tmpint);
     if (ids.empty() == true)
     {
@@ -1307,7 +1291,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double t
     }
     for (int k = 0; k < tmpint; k++) {
       int t;
-      infile >> t;
+      input >> t;
       ids[k] = newi[t];
     }
     std::vector< std::vector<int> > pgnids;
@@ -1318,7 +1302,7 @@ Surface* read_file_off(std::string &ifile, int shellid, IOErrors& errs, double t
 }
 
 
-void parse_file_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive3D prim3d, IOErrors& errs, double tol_snap)
+void parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive3D prim3d, IOErrors& errs, double tol_snap)
 {
   //-- find (minx, miny)
   std::string l;

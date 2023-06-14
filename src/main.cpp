@@ -414,67 +414,80 @@ int main(int argc, char* const argv[])
       }      
       else if (inputtype == POLY)
       {
-        GenericObject* o = new GenericObject("none");
-        Surface* sh = read_file_poly(inputfile.getValue(), 0, ioerrs);
-        if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
-        {
-          Solid* s = new Solid;
-          s->set_oshell(sh);
-          int sid = 1;
-          for (auto ifile : ishellfiles.getValue())
+        std::cout << "Reading file: " << inputfile.getValue() << std::endl;
+        std::ifstream infile(inputfile.getValue().c_str(), std::ifstream::in);
+        if (!infile) {
+          ioerrs.add_error(901, "Input file not found.");
+        } else {
+          GenericObject* o = new GenericObject("none");
+          Surface* sh = parse_poly(infile, 0, ioerrs);
+          if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
           {
-            Surface* sh = read_file_poly(ifile, sid, ioerrs);
+            Solid* s = new Solid;
+            s->set_oshell(sh);
+            int sid = 1;
+            // for (auto ifile : ishellfiles.getValue())
+            // {
+            //   std::ifstream if2(ifile.c_str(), std::ifstream::in);
+            //   Surface* sh = parse_poly(if2, sid, ioerrs);
+            //   if (ioerrs.has_errors() == false)
+            //   {
+            //     s->add_ishell(sh);
+            //     sid++;
+            //   }
+            // }
             if (ioerrs.has_errors() == false)
-            {
-              s->add_ishell(sh);
-              sid++;
-            }
+              o->add_primitive(s);
           }
-          if (ioerrs.has_errors() == false)
-            o->add_primitive(s);
+          else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+          {
+            CompositeSurface* cs = new CompositeSurface;
+            cs->set_surface(sh);
+            if (ioerrs.has_errors() == false)
+              o->add_primitive(cs);
+          }
+          else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+          {
+            MultiSurface* ms = new MultiSurface;
+            ms->set_surface(sh);
+            if (ioerrs.has_errors() == false)
+              o->add_primitive(ms);
+          }
+          lsFeatures.push_back(o);      
         }
-        else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
-        {
-          CompositeSurface* cs = new CompositeSurface;
-          cs->set_surface(sh);
-          if (ioerrs.has_errors() == false)
-            o->add_primitive(cs);
-        }
-        else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
-        {
-          MultiSurface* ms = new MultiSurface;
-          ms->set_surface(sh);
-          if (ioerrs.has_errors() == false)
-            o->add_primitive(ms);
-        }
-        lsFeatures.push_back(o);      
       }
       else if (inputtype == OFF)
       {
-        GenericObject* o = new GenericObject("none");
-        Surface* sh = read_file_off(inputfile.getValue(), 0, ioerrs, snap_tol.getValue());
-        if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
-        {
-          Solid* s = new Solid;
-          s->set_oshell(sh);
-          if (ioerrs.has_errors() == false)
-            o->add_primitive(s);
+        std::cout << "Reading file: " << inputfile.getValue() << std::endl;
+        std::ifstream infile(inputfile.getValue().c_str(), std::ifstream::in);
+        if (!infile) {
+          ioerrs.add_error(901, "Input file not found.");
+        } else {
+          GenericObject* o = new GenericObject("none");
+          Surface* sh = parse_off(infile, 0, ioerrs, snap_tol.getValue());
+          if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
+          {
+            Solid* s = new Solid;
+            s->set_oshell(sh);
+            if (ioerrs.has_errors() == false)
+              o->add_primitive(s);
+          }
+          else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
+          {
+            CompositeSurface* cs = new CompositeSurface;
+            cs->set_surface(sh);
+            if (ioerrs.has_errors() == false)
+              o->add_primitive(cs);
+          }
+          else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
+          {
+            MultiSurface* ms = new MultiSurface;
+            ms->set_surface(sh);
+            if (ioerrs.has_errors() == false)
+              o->add_primitive(ms);
+          }
+          lsFeatures.push_back(o);
         }
-        else if ( (ioerrs.has_errors() == false) & (prim3d == COMPOSITESURFACE) )
-        {
-          CompositeSurface* cs = new CompositeSurface;
-          cs->set_surface(sh);
-          if (ioerrs.has_errors() == false)
-            o->add_primitive(cs);
-        }
-        else if ( (ioerrs.has_errors() == false) & (prim3d == MULTISURFACE) )
-        {
-          MultiSurface* ms = new MultiSurface;
-          ms->set_surface(sh);
-          if (ioerrs.has_errors() == false)
-            o->add_primitive(ms);
-        }
-        lsFeatures.push_back(o);
       }    
       else if (inputtype == OBJ)
       {
@@ -483,7 +496,7 @@ int main(int argc, char* const argv[])
         if (!infile) {
           ioerrs.add_error(901, "Input file not found.");
         } else {
-          parse_file_obj(infile, lsFeatures, prim3d, ioerrs, snap_tol.getValue());
+          parse_obj(infile, lsFeatures, prim3d, ioerrs, snap_tol.getValue());
           if (ioerrs.has_errors() == true) {
             std::cout << "Errors while reading the input file, aborting." << std::endl;
             std::cout << ioerrs.get_report_text() << std::endl;

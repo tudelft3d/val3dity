@@ -493,7 +493,7 @@ validate_obj(std::string& input,
   ioerrs.set_input_file_type("OBJ");
   std::vector<Feature*> lsFeatures;
   std::istringstream iss(input);
-  parse_file_obj(iss, lsFeatures, SOLID, ioerrs, tol_snap);
+  parse_obj(iss, lsFeatures, SOLID, ioerrs, tol_snap);
   //-- start the validation
   if (ioerrs.has_errors() == false) {
     //-- validate
@@ -523,9 +523,9 @@ validate_off(std::string& input,
   ioerrs.set_input_file_type("OFF");
   std::vector<Feature*> lsFeatures;
   GenericObject* o = new GenericObject("none");
-  Surface* sh = read_file_off(input, 0, ioerrs, tol_snap);
+  std::istringstream iss(input);
+  Surface* sh = parse_off(iss, 0, ioerrs, tol_snap);
   std::cout << "1" << std::endl;
-
   Solid* s = new Solid;
   s->set_oshell(sh);
   o->add_primitive(s);
