@@ -52,6 +52,8 @@ endif()
 
 # GEOS
 find_package( GEOS REQUIRED CONFIG)
+# if linux complains: 
+# find_package( GEOS )
 if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
@@ -79,5 +81,7 @@ endif()
 
 
 target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support GEOS::geos_c thirdparty Boost::filesystem)
+# if linux complains: 
+# target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support ${GEOS_LIBRARY} thirdparty Boost::filesystem)
 
 install(TARGETS val3dity DESTINATION bin)
