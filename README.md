@@ -89,7 +89,7 @@ Thus, in a nutshell,
   1. install Eigen library: `$ sudo apt install libeigen3-dev`
   1. install GEOS library: `$ sudo apt install libgeos++-dev`
   1. install CGAL: `$ sudo apt-get install libcgal-dev`
-    - if it's not CGAL5 that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
+    - if it's not CGAL v5.4+ that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
     - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.4.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
 
 
@@ -120,7 +120,7 @@ val3dity can be compiled as a library:
 
     $ cmake .. -DLIBRARY=true
 
-There is a simple example of how to use it in `./demo_lib` with instructions to compile it.
+There is a simple example in `./demo_lib` with instructions to compile it.
 
 
 ## Unit tests
@@ -136,7 +136,7 @@ You shouldn't get any errors.
 
 ![](./tools/viz3dity/screenshot.png)
 
-In the folder `tools/viz3dity/` folder, there is a simple Python script where you load your files with geometries and the val3dity report, and you can see which objects have specific errors (each error gets a colour).
+In the folder `tools/viz3dity/`, there is a simple Python script where you load a CityJSON file with geometries and one with the val3dity report, and you can see which objects have specific errors (each error gets a colour).
 
 However, it's not possible to see where in an object the error is (eg which surface is not planar).
 This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
