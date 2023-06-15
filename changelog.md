@@ -6,16 +6,16 @@
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 
 
-## [2.4.0] - 2023-05-24
+## [2.4.0] - xxx
 ### Added
 - support for [CityJSON Lines (CityJSONL) files](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature), the 1st line of the file must be with the `"transform"`, best is to use cjio output
-- support for 3D types of [JSON-FG](https://github.com/opengeospatial/ogc-feat-geo-json), only the `Polyhedron` and `MultiPolyhedron` (not for `Prism` and `MultiPrism`)
+- support for 3D types of [JSON-FG](https://github.com/opengeospatial/ogc-feat-geo-json), only the `Polyhedron` and `MultiPolyhedron` (not for `Prism` and `MultiPrism`) (JSON-FG is still beta, so I guess this might have to change)
 - added a simple Python-based viewer to visualise the errors, see `/tools/viz3dity/` for more details
 ### Changed
 - the API is new and simpler, only 2 functions are now used: `is_valid()` + `validate()` 
 - error 609 has been renamed 906 (no geometry is for more formats than only CityJSON)
 - simplified the code for CDT of each surface (faster too)
-
+- upgraded to latest version of pugixml, to parse XML files
 
 
 ## [2.3.1] - 2022-09-15
@@ -23,7 +23,6 @@
 - the structure of the report was fixed (it is more flat, as it should have always been), it made little sense for Composite/Multi/Solid
 - geometry IDs in the report are 0-based (as they should, a bug made them start at 1, now fixed)
 - compilation under Windows to get a binary is now automised with GitHub Actions
-
 
 
 ## [2.3.0] - 2022-03-29
@@ -63,21 +62,26 @@
 ### Added
 - pytest allows to specify the binary to use if not under 'build/'
 
+
 ## [2.0.4] - 2018-01-26
 ### Changed
 - fixed bug where inner rings of gml:Polygon wasn't read properly when that polygon is referenced by an XLink.
+
 
 ## [2.0.3] - 2018-01-23
 ### Changed
 - each surface are now triangulated with a constrained Delaunay triangulation (CDT) instead of a non-Delaunay one. That improves stability, especially when there are nearly collinear vertices in a surfaces: slivers are avoided, which means less errors 204, and less wrong errors caused by numerical stability.
 
+
 ## [2.0.2] - 2018-01-13 
 ### Changed
 - fixes issue with wrong errors 104 often raised. Explanation is there: https://github.com/CGAL/cgal/issues/2733. This releases fixes it with a hack, but I think this is solid (touch wood).
 
+
 ## [2.0.1] - 2017-12-12 
 ### Changed
 - fixed bug with least-square fitting that caused wrong 203 errors
+
 
 ## [2.0.0] - 2017-11-27 
 ### Added
@@ -85,6 +89,7 @@
 - complete unit test suite (with pytest)
 - support for all 3D primitives in ISO19107
 - support for new formats: CityJSON, OFF
+
 
 ## [2.0 beta 1] - 2017-08-01 
 ### Added
