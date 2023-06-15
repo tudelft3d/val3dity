@@ -6,6 +6,6 @@
 
 + To contribute **documentation** consider extending, fixing or adjusting the `/docs` and submit a pull request.
 
-+ To contribute **tests**, please follow the instructions the [test README](https://github.com/tudelft3d/val3dity/tree/master/tests).
++ To contribute **tests**, please follow the instructions the [test README](https://github.com/tudelft3d/val3dity/tree/main/tests).
    
 + To contribute **code**, please submit a pull request.
