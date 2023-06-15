@@ -66,7 +66,7 @@ You first need to install the following free libraries:
   1. [GEOS](http://trac.osgeo.org/geos/)
   1. [CMake](http://www.cmake.org)
 
-Under macOS, it's super easy, we suggest using [Homebrew](http://brew.sh/):
+Under macOS, we suggest using [Homebrew](http://brew.sh/):
 
     $ brew install cgal
     $ brew install eigen
