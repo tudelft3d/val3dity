@@ -165,9 +165,30 @@ However we ask you check first whether your problem has already been solved by s
 
 ## If you use val3dity in a scientific context, please cite these articles:
 
-Ledoux, Hugo (2019). val3dity: validation of 3D GIS primitives according to the international standards. *Open Geospatial Data, Software and Standards*, 3(1), 2018, pp.1 [[PDF](https://opengeospatialdata.springeropen.com/track/pdf/10.1186/s40965-018-0043-x.pdf)] [[DOI](http://dx.doi.org/10.1186/s40965-018-0043-x)]
+```bibtex
+@article{Ledoux18,
+    title = {{val3dity}: validation of {3D GIS} primitives according to the international standards},
+    author = {Ledoux, Hugo},
+    journal = {Open Geospatial Data, Software and Standards},
+    year = {2018},
+    volume = {3},
+    number = {1},
+    pages = {1},
+    doi = {http://dx.doi.org/10.1186/s40965-018-0043-x}
+}
 
-Ledoux, Hugo (2013). On the validation of solids represented with the international standards for geographic information. Computer-Aided Civil and Infrastructure Engineering, 28(9):693-706. [[PDF](https://3d.bk.tudelft.nl/hledoux/pdfs/13_cacaie.pdf)] [[DOI](http://dx.doi.org/10.1111/mice.12043)]
+@article{Ledoux13,
+  author = {Ledoux, Hugo},
+  title = {On the validation of solids represented with the international standards for geographic information},
+  journal = {Computer-Aided Civil and Infrastructure Engineering},
+  year = {2013},
+  volume = {28},
+  number = {9},
+  pages = {693--706},
+  doi = {http://dx.doi.org/10.1111/mice.12043}
+}
+```
+
 
 ## Error codes
 
