@@ -178,8 +178,8 @@ However we ask you check first whether your problem has already been solved by s
 }
 
 @article{Ledoux13,
-  author = {Ledoux, Hugo},
   title = {On the validation of solids represented with the international standards for geographic information},
+  author = {Ledoux, Hugo},
   journal = {Computer-Aided Civil and Infrastructure Engineering},
   year = {2013},
   volume = {28},
