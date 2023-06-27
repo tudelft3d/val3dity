@@ -6,7 +6,7 @@
 - support for all GML3 primitives (for IndoorGML): the so-called "Compact Geometries" (http://schemas.opengis.net/gml/3.3/geometryCompact.xsd)
 
 
-## [2.4.0] - xxx
+## [2.4.0] - 2023-06-27
 ### Added
 - support for [CityJSON Lines (CityJSONL) files](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature), the 1st line of the file must be with the `"transform"`, best is to use cjio output
 - support for 3D types of [JSON-FG](https://github.com/opengeospatial/ogc-feat-geo-json), only the `Polyhedron` and `MultiPolyhedron` (not for `Prism` and `MultiPrism`) (JSON-FG is still beta, so I guess this might have to change)
