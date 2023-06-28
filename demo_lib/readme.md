@@ -19,12 +19,27 @@ using json = nlohmann::json;
 
 int main(int argc, char *argv[])
 {
+  //-- read a CityJSON file
+  std::ifstream input("../../data/cityjson/cube.json");
   json j;
-  // define j as a tu3djson object, see https://github.com/tudelft3d/tu3djson
-
-  std::vector<bool> re = val3dity::is_valid_tu3djson_each(j);
-  std::for_each(re.begin(), re.end(), [](const bool n) { std::cout << n << std::endl; });
-   
+  try 
+  {
+    input >> j;
+  }
+  catch (nlohmann::detail::parse_error e) 
+  {
+    std::cerr << "Input file not a valid JSON file." << std::endl;
+    return;
+  }
+  //-- validate it
+  try {
+    json re = val3dity::validate(j);
+    // bool re = val3dity::is_valid(j); 
+    std::cout << re << std::endl;
+  }
+  catch (std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+  }
   return 0;
 }
 ```
@@ -41,75 +56,11 @@ int main(int argc, char *argv[])
 
 ## input accepted
 
-1. one [CityJSON object](https://www.cityjson.org/specs/#cityjson-object)
-2. one [tu3djson object](https://github.com/tudelft3d/tu3djson#tu3djson-object)
-3. [one geometry of a tu3djson object](https://github.com/tudelft3d/tu3djson#geometry-object)
-4. one [IndoorGML](http://indoorgml.net/) file (represented as a string)
+  - [CityJSON](http://www.cityjson.org)
+  - [CityJSON Lines (CityJSONL)](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature)
+  - [tu3djson](https://github.com/tudelft3d/tu3djson)
+  - [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
+  - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
+  - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
+  - [IndoorGML](http://indoorgml.net/)
 
-## functions 
-
-```cpp
-bool 
-is_valid_onegeom(json& j,
-                 double tol_snap=0.001, 
-                 double planarity_d2p_tol=0.01, 
-                 double planarity_n_tol=20.0, 
-                 double overlap_tol=-1.0);
-  
-
-json
-validate_onegeom(json& j,
-                 double tol_snap=0.001, 
-                 double planarity_d2p_tol=0.01, 
-                 double planarity_n_tol=20.0, 
-                 double overlap_tol=-1.0);
-
-bool 
-is_valid_tu3djson(json& j,
-                  double tol_snap=0.001, 
-                  double planarity_d2p_tol=0.01, 
-                  double planarity_n_tol=20.0, 
-                  double overlap_tol=-1.0);
-
-std::vector<bool> 
-is_valid_tu3djson_each(json& j,
-                       double tol_snap=0.001, 
-                       double planarity_d2p_tol=0.01, 
-                       double planarity_n_tol=20.0, 
-                       double overlap_tol=-1.0);
-
-json
-validate_tu3djson(json& j,
-                  double tol_snap=0.001, 
-                  double planarity_d2p_tol=0.01, 
-                  double planarity_n_tol=20.0, 
-                  double overlap_tol=-1.0);
-
-bool 
-is_valid_cityjson(json& j, 
-                  double tol_snap=0.001, 
-                  double planarity_d2p_tol=0.01, 
-                  double planarity_n_tol=20.0, 
-                  double overlap_tol=-1.0);
-
-json
-validate_cityjson(json& j, 
-                  double tol_snap=0.001, 
-                  double planarity_d2p_tol=0.01, 
-                  double planarity_n_tol=20.0, 
-                  double overlap_tol=-1.0);
-
-bool 
-is_valid_indoorgml(const char* input, 
-                  double tol_snap=0.001, 
-                  double planarity_d2p_tol=0.01, 
-                  double planarity_n_tol=20.0, 
-                  double overlap_tol=-1.0);
-
-json
-validate_indoorgml(const char* input, 
-                  double tol_snap=0.001, 
-                  double planarity_d2p_tol=0.01, 
-                  double planarity_n_tol=20.0, 
-                  double overlap_tol=-1.0);
-```
