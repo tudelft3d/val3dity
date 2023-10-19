@@ -118,7 +118,7 @@ json Surface::get_report_json(std::string preid)
       if (preid != "") {
         jj["id"] = "shell:" + preid + " -- " + "face:" + std::get<0>(e);
       } else {
-        jj["id"] = std::get<0>(e);
+        jj["id"] = "face:" + std::get<0>(e);
       }
       jj["info"] = std::get<1>(e);
       j.push_back(jj);
