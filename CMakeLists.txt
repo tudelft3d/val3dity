@@ -3,9 +3,9 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0011 NEW)
 endif(COMMAND cmake_policy)
 
+cmake_minimum_required (VERSION 3.16)
 project( val3dity )
 
-cmake_minimum_required (VERSION 3.16)
 
 
 add_definitions(-std=c++14)
