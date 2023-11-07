@@ -109,6 +109,7 @@ json MultiSurface::get_report_json(std::string preid)
     j["id"] = "none";
   j["numberfaces"] = this->num_faces();
   j["numbervertices"] = this->num_vertices();
+  j["errors"] = json::array();
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
