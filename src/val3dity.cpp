@@ -42,7 +42,7 @@
 namespace val3dity
 {
 
-std::string VAL3DITY_VERSION = "2.4.0";
+std::string VAL3DITY_VERSION = "2.4.1b0";
 
 //-----
 
