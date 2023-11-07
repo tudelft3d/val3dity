@@ -1756,12 +1756,12 @@ json get_report_json(std::string ifile,
   jr["input_file"] = ifile;
   jr["input_file_type"] = ioerrs.get_input_file_type();
   //-- time
-  std::time_t rawtime;
-  struct tm * timeinfo;
-  std::time (&rawtime);
-  timeinfo = std::localtime ( &rawtime );
+  std::time_t currentTime;
+  struct tm * localTime;
+  std::time (&currentTime);
+  localTime = std::localtime ( &currentTime );
   char buffer[80];
-  std::strftime(buffer, 80, "%c %Z", timeinfo);
+  std::strftime(buffer, 80, "%FT%T (%Z)", localTime);
   jr["time"] = buffer;
   //-- user-defined param
   jr["parameters"];
