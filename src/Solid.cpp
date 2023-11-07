@@ -209,7 +209,7 @@ json Solid::get_report_json(std::string preid)
   }
   int shid = 0;
   for (auto& sh : _shells) {
-    std::string t = std::to_string(shid);
+    std::string t = "shell:" + std::to_string(shid);
     for (auto& each: sh->get_report_json(t)) {
       j["errors"].push_back(each); 
     }

@@ -125,9 +125,10 @@ json MultiSolid::get_report_json(std::string preid)
   int solid = 0;
   for (auto& sol : _lsSolids)
   {
+    std::string t = "solid: " + std::to_string(solid);
     int shid = 0;
     for (auto& sh : sol->get_shells()) {
-      std::string t = std::to_string(solid) + " | " + std::to_string(shid);
+      std::string t = "solid:" + std::to_string(solid) + " | shell:" + std::to_string(shid);
       for (auto& each: sh->get_report_json(t)) {
         j["errors"].push_back(each);
       }
