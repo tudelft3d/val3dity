@@ -491,7 +491,7 @@ validate_obj(std::string& input,
       f->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
   }
   //-- get report in json 
-  json jr = get_report_json("JSON object",
+  json jr = get_report_json("OBJ object",
                             lsFeatures,
                             VAL3DITY_VERSION,
                             tol_snap,
@@ -532,7 +532,7 @@ validate_off(std::string& input,
   // }
   std::cout << "2" << std::endl;
   //-- get report in json 
-  json jr = get_report_json("JSON object",
+  json jr = get_report_json("OFF object",
                             lsFeatures,
                             VAL3DITY_VERSION,
                             tol_snap,
