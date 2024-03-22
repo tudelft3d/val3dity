@@ -65,5 +65,21 @@ validate(std::string& input,
          double planarity_n_tol=20.0, 
          double overlap_tol=-1.0);
 
+json 
+validate(const std::vector<std::vector<double>>& vertices,
+         const std::vector<std::vector<int>>& triangle_ids,
+         double tol_snap=0.001, 
+         double planarity_d2p_tol=0.01, 
+         double planarity_n_tol=20.0, 
+         double overlap_tol=-1.0);
+
+// json 
+// validate(std::string& input,
+//          std::string format, 
+//          double tol_snap=0.001, 
+//          double planarity_d2p_tol=0.01, 
+//          double planarity_n_tol=20.0, 
+//          double overlap_tol=-1.0);
+
 
 }
