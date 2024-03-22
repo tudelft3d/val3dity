@@ -53,6 +53,7 @@ public:
   virtual bool          is_empty() = 0;
   virtual json          get_report_json(std::string preid = "") = 0;
   virtual Primitive3D   get_type() = 0;
+  virtual std::vector<json> get_errors(std::string preid = "") = 0;
 
   virtual void          get_min_bbox(double& x, double& y) = 0;
   virtual void          translate_vertices() = 0;

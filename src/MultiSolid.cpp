@@ -96,6 +96,33 @@ bool MultiSolid::is_empty()
   return _lsSolids.empty();
 }
 
+std::vector<json> MultiSolid::get_errors(std::string preid)
+{
+  std::vector<json> js;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json j;
+      j["code"] = std::get<0>(err);
+      j["description"] = ALL_ERRORS[std::get<0>(err)];
+      j["id"] = std::get<0>(e);
+      j["info"] = std::get<1>(e);
+      js.push_back(j);
+    }
+  }
+  int solid = 0;
+  for (auto& sol : _lsSolids)
+  {
+    std::string t = "solid: " + std::to_string(solid);
+    auto e = sol->get_errors(t);
+    js.insert(js.end(), e.begin(), e.end());    
+    solid++;
+  }
+  return js;
+}
+
+
 
 json MultiSolid::get_report_json(std::string preid)
 {

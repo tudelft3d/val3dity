@@ -91,6 +91,26 @@ bool CompositeSurface::is_empty() {
   return _surface->is_empty();
 }
 
+std::vector<json> CompositeSurface::get_errors(std::string preid)
+{
+  std::vector<json> js;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["code"] = std::get<0>(err);
+      jj["description"] = ALL_ERRORS[std::get<0>(err)];
+      jj["id"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      js.push_back(jj);
+    }
+  }
+  auto e = _surface->get_errors();
+  js.insert(js.end(), e.begin(), e.end());
+  return js;
+}
+
 
 json CompositeSurface::get_report_json(std::string preid)
 {

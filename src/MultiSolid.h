@@ -48,6 +48,7 @@ public:
   int           is_valid();
   bool          is_empty();
   json          get_report_json(std::string preid = "");
+  std::vector<json> get_errors(std::string preid = "");
   Primitive3D   get_type();
   std::set<int> get_unique_error_codes();
 

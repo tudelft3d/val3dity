@@ -55,6 +55,8 @@ public:
   int             num_ishells();
   int             num_faces();
   int             num_vertices();
+
+  std::vector<json> get_errors(std::string preid = "");
  
   bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1);
   Nef_polyhedron* get_nef_polyhedron();

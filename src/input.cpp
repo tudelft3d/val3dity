@@ -527,9 +527,10 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
         thelod = g["lod"].get<std::string>();
       }
       ms->set_lod(thelod);
+      int no_solid = 0;
       for (auto& solid : g["boundaries"]) 
       {
-        Solid* s = new Solid();
+        Solid* s = new Solid(std::to_string(no_solid));
         bool oshell = true;
         for (auto& shell : solid) 
         {
@@ -547,6 +548,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
             s->add_ishell(sh);
         }
         ms->add_solid(s);
+        no_solid++;
       }
       co->add_primitive(ms);
     }
@@ -560,9 +562,10 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
         thelod = g["lod"].get<std::string>();
       }
       cs->set_lod(thelod);
+      int no_solid = 0;
       for (auto& solid : g["boundaries"]) 
       {
-        Solid* s = new Solid();
+        Solid* s = new Solid(std::to_string(no_solid));
         bool oshell = true;
         for (auto& shell : solid) 
         {
@@ -580,6 +583,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
             s->add_ishell(sh);
         }
         cs->add_solid(s);
+        no_solid++;
       }
       co->add_primitive(cs);
     }

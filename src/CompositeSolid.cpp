@@ -112,9 +112,10 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
       {
         if (*lsNefs[i] == *lsNefs[j])
         {
-          std::stringstream msg;
-          msg << _lsSolids[i]->get_id() << " and " << _lsSolids[j]->get_id();
-          this->add_error(502, msg.str(), "");
+          std::stringstream msg1, msg2;
+          msg1 << "Geometry (CompositeSolid) #" << this->get_id();
+          msg2 << "solid #" << _lsSolids[i]->get_id() << " and solid #" << _lsSolids[j]->get_id();
+          this->add_error(502, msg1.str(), msg2.str());
           isValid = false;
         }
       }
@@ -142,9 +143,10 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           Nef_polyhedron* b = lsNefsEroded[j];
           if (a->interior() * b->interior() != emptynef)
           {
-            std::stringstream msg;
-            msg << _lsSolids[i]->get_id() << " and " << _lsSolids[j]->get_id();
-            this->add_error(501, msg.str(), "");
+            std::stringstream msg1, msg2;
+            msg1 << "Geometry (CompositeSolid) #" << this->get_id();
+            msg2 << "solid #" << _lsSolids[i]->get_id() << " and solid #" << _lsSolids[j]->get_id();
+            this->add_error(501, msg1.str(), msg2.str());
             isValid = false;
           }
         }
@@ -174,9 +176,10 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         unioned = unioned + *each;
       if (unioned.number_of_volumes() != 2)
       {
-        std::stringstream msg;
-        msg << "CompositeSolid is formed of " << (unioned.number_of_volumes() - 1) << " parts";
-        this->add_error(503, "", msg.str());
+        std::stringstream msg1, msg2;
+        msg1 << "Geometry (CompositeSolid) #" << this->get_id();
+        msg2 << "CompositeSolid is formed of " << (unioned.number_of_volumes() - 1) << " parts";
+        this->add_error(503, msg1.str(), msg2.str());
         isValid = false;
       }
       for (auto each : lsNefsDilated)
@@ -208,6 +211,32 @@ bool CompositeSolid::is_empty() {
   return _lsSolids.empty();
 }
 
+
+std::vector<json> CompositeSolid::get_errors(std::string preid)
+{
+  std::vector<json> js;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json j;
+      j["code"] = std::get<0>(err);
+      j["description"] = ALL_ERRORS[std::get<0>(err)];
+      j["id"] = std::get<0>(e);
+      j["info"] = std::get<1>(e);
+      js.push_back(j);
+    }
+  }
+  int solid = 0;
+  for (auto& sol : _lsSolids)
+  {
+    std::string t = "solid: " + std::to_string(solid);
+    auto e = sol->get_errors(t);
+    js.insert(js.end(), e.begin(), e.end());
+    solid++;
+  }
+  return js;
+}
 
 json CompositeSolid::get_report_json(std::string preid)
 {
