@@ -3,7 +3,7 @@
 
 The API of the library is `val3dity.h`, you need to include the file in your source.
 
-Also, the functions to validate read/return [nlohmann JSON objects](https://github.com/nlohmann/json), so you need to include this library. 
+Also, the functions to validate take as input and return as output [nlohmann JSON objects](https://github.com/nlohmann/json), so you need to include this library. 
 There is however no need to include or link to nlohmann JSON yourself, the cmake reuses that of val3dity.
 
 The API reads `const char*` for XML data ([IndoorGML](http://indoorgml.net/) input), because I don't want to enforce a specific XML library.
@@ -63,4 +63,35 @@ int main(int argc, char *argv[])
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
   - [IndoorGML](http://indoorgml.net/)
+
+It is also possible to use arrays of vertices and faces, basically the same structure as an OFF file (0-indexed vertices).
+
+```cpp
+  //-- add 8 corners of a cube
+  std::vector<std::vector<double>> pts;
+  pts.push_back({0.0, 0.0, 0.0});
+  pts.push_back({1.0, 0.0, 0.0});
+  pts.push_back({1.0, 1.0, 0.0});
+  pts.push_back({0.0, 1.0, 0.0});
+  pts.push_back({0.0, 0.0, 1.0});
+  pts.push_back({1.0, 0.0, 1.0});
+  pts.push_back({1.0, 1.0, 1.0});
+  pts.push_back({0.0, 1.0, 1.0});
+  //-- add 6 faces (watch out: 0-indexed!)
+  std::vector<std::vector<int>> faces;
+  faces.push_back({0, 3, 2, 1});
+  faces.push_back({4, 5, 6, 7});
+  faces.push_back({0, 1, 5, 4});
+  faces.push_back({1, 2, 6, 5});
+  faces.push_back({2, 3, 7, 6});
+  faces.push_back({3, 0, 4, 7});
+  //-- validate it
+  try {
+    bool re = val3dity::is_valid(pts, faces);
+    std::cout << re << std::endl;
+  }
+  catch (std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+  }
+```
 
