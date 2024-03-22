@@ -253,16 +253,6 @@ validate_onegeom(json& j,
   return jr;
 }
 
-bool
-is_valid_tu3djson(json& j,
-                  double tol_snap, 
-                  double planarity_d2p_tol, 
-                  double planarity_n_tol, 
-                  double overlap_tol)
-{
-  json jr = validate_tu3djson(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  return jr["validity"];
-}
 
 
 json validate_jsonfg(json& j,
