@@ -122,72 +122,6 @@ is_valid(json& j,
   return re["validity"];
 }
 
-
-json
-validate(const std::vector<std::vector<double>>& vertices,
-         const std::vector<std::vector<int>>& faces,
-         double tol_snap, 
-         double planarity_d2p_tol, 
-         double planarity_n_tol, 
-         double overlap_tol)
-{
-  double _minx = 9e15;
-  double _miny = 9e15; 
-  //-- find (minx, miny)
-  for (auto& v: vertices) {
-    if (v[0] < _minx)
-      _minx = v[0];
-    if (v[1] < _miny)
-      _miny = v[1];
-  }
-  //-- create a Surface (a 2-manifold)
-  Surface* sh = new Surface(0, tol_snap);
-  std::vector<Point3*> allvertices;
-  GenericObject* o = new GenericObject("none");
-  //-- read all the vertices
-  for (auto& v: vertices) {
-    double x, y, z;
-    x -= _minx;
-    y -= _miny;
-    Point3 *p = new Point3(x, y, z);
-    allvertices.push_back(p);
-  }
-  //-- read all the faces (0-indexed!)
-  for (auto& vids: faces) {
-    std::vector<int> r;
-    for (auto& vid: vids) {
-      Point3* tp = allvertices[vid];
-      r.push_back(sh->add_point(*tp));
-    }
-    std::vector< std::vector<int> > pgnids;
-    pgnids.push_back(r);
-    sh->add_face(pgnids);
-  }
-
-  //-- we assume it's a Solid (TODO: should this be a param?)
-  Solid* sol = new Solid("");
-  sol->set_oshell(sh);
-  o->add_primitive(sol);
-  o->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
-  
-  IOErrors ioerrs;
-  ioerrs.set_input_file_type("std::vectors");
-  std::vector<Feature*> lsFeatures;
-  lsFeatures.push_back(o); 
-
-  json jr = get_report_json("std::vectors",
-                          lsFeatures,
-                          VAL3DITY_VERSION,
-                          tol_snap,
-                          overlap_tol,
-                          planarity_d2p_tol,
-                          planarity_n_tol,
-                          ioerrs);
-  return true;
-}
-
-
-
 json 
 validate(json& j,
          double tol_snap, 
@@ -241,6 +175,81 @@ validate(json& j,
   std::clog.rdbuf(clog_buf);
   std::cout.rdbuf(cout_buf);
   return re;
+}
+
+bool 
+is_valid(const std::vector<std::vector<double>>& vertices,
+         const std::vector<std::vector<int>>& faces,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  json re = validate(vertices, faces, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
+  return re["validity"];
+}
+
+json
+validate(const std::vector<std::vector<double>>& vertices,
+         const std::vector<std::vector<int>>& faces,
+         double tol_snap, 
+         double planarity_d2p_tol, 
+         double planarity_n_tol, 
+         double overlap_tol)
+{
+  std::streambuf* clog_buf = std::clog.rdbuf();
+  std::clog.rdbuf(NULL);
+  std::streambuf* cout_buf = std::cout.rdbuf();
+  std::cout.rdbuf(NULL);
+  double _minx = 9e15;
+  double _miny = 9e15; 
+  //-- find (minx, miny)
+  for (auto& v: vertices) {
+    if (v[0] < _minx)
+      _minx = v[0];
+    if (v[1] < _miny)
+      _miny = v[1];
+  }
+  //-- create a Surface (a 2-manifold)
+  Surface* sh = new Surface(0, tol_snap);
+  std::vector<Point3*> allvertices;
+  GenericObject* o = new GenericObject("none");
+  //-- read all the vertices
+  for (auto& v: vertices) {
+    Point3 *p = new Point3(v[0] - _minx, v[1] - _miny, v[2]);
+    allvertices.push_back(p);
+  }
+  //-- read all the faces (0-indexed!)
+  for (auto& vids: faces) {
+    std::vector<int> r;
+    for (auto& vid: vids) {
+      Point3* tp = allvertices[vid];
+      r.push_back(sh->add_point(*tp));
+    }
+    std::vector< std::vector<int> > pgnids;
+    pgnids.push_back(r);
+    sh->add_face(pgnids);
+  }
+  //-- we assume it's a Solid (TODO: should this be a param?)
+  Solid* sol = new Solid("");
+  sol->set_oshell(sh);
+  o->add_primitive(sol);
+  o->validate(planarity_d2p_tol, planarity_n_tol, overlap_tol);
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("std::vectors");
+  std::vector<Feature*> lsFeatures;
+  lsFeatures.push_back(o); 
+  json jr = get_report_json("std::vectors",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            tol_snap,
+                            overlap_tol,
+                            planarity_d2p_tol,
+                            planarity_n_tol,
+                            ioerrs);
+  std::clog.rdbuf(clog_buf);
+  std::cout.rdbuf(cout_buf);
+  return jr;
 }
 
 //-- for ASCII + XML formats
