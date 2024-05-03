@@ -26,6 +26,7 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
+#include <iostream>
 
 #include "nlohmann-json/json.hpp"
 
@@ -33,14 +34,73 @@ using json = nlohmann::json;
 
 namespace val3dity {
 
+//todo move all this to a separate file
+
+class Val3dityBuffer : public std::streambuf
+{
+protected:
+    virtual int_type overflow(int_type c) = 0;
+};
+
+class CoutRedirectBuffer : public Val3dityBuffer
+{
+protected:
+  // Override the overflow method to handle character output
+  virtual int_type overflow(int_type c) override {
+    if (c != traits_type::eof()) {
+      // Write the character to std::cout
+      std::cout.put(char(c));
+    }
+    return c;
+  }
+};
+
+class ClogRedirectBuffer : public Val3dityBuffer
+{
+protected:
+    // Override the overflow method to handle character output
+    virtual int_type overflow(int_type c) override {
+        if (c != traits_type::eof()) {
+            // Write the character to std::clog
+            std::clog.put(char(c));
+        }
+        return c;
+    }
+};
+
+
+class NullBuffer : public Val3dityBuffer {
+protected:
+    // Override the overflow method to discard the output
+    virtual int_type overflow(int_type c) override {
+        // Return something other than EOF to signify success
+        return traits_type::not_eof(c);
+    }
+};
+
+std::unique_ptr<Val3dityBuffer> set_cout(bool terminal_output = true)
+{
+  if (terminal_output)
+    return std::make_unique<CoutRedirectBuffer>();
+  else
+    return std::make_unique<NullBuffer>();
+};
+std::unique_ptr<Val3dityBuffer> set_clog(bool terminal_output = true)
+{
+  if (terminal_output)
+    return std::make_unique<ClogRedirectBuffer>();
+  else
+    return std::make_unique<NullBuffer>();
+};
+
 struct Parameters {
     double _tol_snap = 0.001;
     double _planarity_d2p_tol = 0.01;
     double _planarity_n_tol = 20.0;
     double _overlap_tol = -1.0;
+    bool _terminal_output = true;
 
-    Parameters& tol_snap(double tol_snap) {
-        _tol_snap = tol_snap;
+    Parameters& tol_snap(double tol_snap) { _tol_snap = tol_snap;
         return *this;
     }
 
@@ -58,35 +118,40 @@ struct Parameters {
         _overlap_tol = overlap_tol;
         return *this;
     }
+
+    Parameters& terminal_output(bool terminal_output) {
+        _terminal_output = terminal_output;
+        return *this;
+    }
 };
 
 
 bool
-is_valid(json& j, Parameters param = Parameters());
+is_valid(json& j, Parameters params = Parameters());
 
 json
-validate(json& j, Parameters param = Parameters());
+validate(json& j, Parameters params = Parameters());
 
 bool
 is_valid(std::string& input,
               std::string format,
-              Parameters param = Parameters());
+              Parameters params = Parameters());
 
 json
 validate(std::string& input,
               std::string format,
-              Parameters param = Parameters());
+              Parameters params = Parameters());
 
 
 json
 validate(const std::vector<std::array<double, 3>>& vertices,
               const std::vector<std::vector<int>>& triangle_ids,
-              Parameters param = Parameters());
+              Parameters params = Parameters());
 
 
 bool
 is_valid(const std::vector<std::array<double, 3>>& vertices,
               const std::vector<std::vector<int>>& triangle_ids,
-              Parameters param = Parameters());
+              Parameters params = Parameters());
 
 }
