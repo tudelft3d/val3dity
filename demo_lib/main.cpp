@@ -37,7 +37,7 @@ void arrays_demo()
 {
   std::cout << "\n=== arrays_demo() ===" << std::endl;
   //-- add 8 corners of a cube
-  std::vector<std::vector<double>> pts;
+  std::vector<std::array<double, 3>> pts;
   pts.push_back({0.0, 0.0, 0.0});
   pts.push_back({1.0, 0.0, 0.0});
   pts.push_back({1.0, 1.0, 0.0});
