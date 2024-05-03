@@ -31,55 +31,62 @@
 
 using json = nlohmann::json;
 
-namespace val3dity
-{
+namespace val3dity {
+
+struct Parameters {
+    double _tol_snap = 0.001;
+    double _planarity_d2p_tol = 0.01;
+    double _planarity_n_tol = 20.0;
+    double _overlap_tol = -1.0;
+
+    Parameters& tol_snap(double tol_snap) {
+        _tol_snap = tol_snap;
+        return *this;
+    }
+
+    Parameters& planarity_d2p_tol(double planarity_d2p_tol) {
+        _planarity_d2p_tol = planarity_d2p_tol;
+        return *this;
+    }
+
+    Parameters& planarity_n_tol(double planarity_n_tol) {
+        _planarity_n_tol = planarity_n_tol;
+        return *this;
+    }
+
+    Parameters& overlap_tol(double overlap_tol) {
+        _overlap_tol = overlap_tol;
+        return *this;
+    }
+};
 
 
-bool 
-is_valid(json& j,
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+bool
+is_valid(json& j, Parameters param = Parameters());
 
 json
-validate(json& j,
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+validate(json& j, Parameters param = Parameters());
 
-bool 
+bool
 is_valid(std::string& input,
-         std::string format, 
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+              std::string format,
+              Parameters param = Parameters());
 
-json 
+json
 validate(std::string& input,
-         std::string format, 
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+              std::string format,
+              Parameters param = Parameters());
 
-json 
+
+json
 validate(const std::vector<std::array<double, 3>>& vertices,
-         const std::vector<std::vector<int>>& triangle_ids,
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+              const std::vector<std::vector<int>>& triangle_ids,
+              Parameters param = Parameters());
 
-bool 
+
+bool
 is_valid(const std::vector<std::array<double, 3>>& vertices,
-         const std::vector<std::vector<int>>& triangle_ids,
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
-
+              const std::vector<std::vector<int>>& triangle_ids,
+              Parameters param = Parameters());
 
 }
