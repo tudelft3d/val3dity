@@ -178,7 +178,7 @@ validate(json& j,
 }
 
 bool 
-is_valid(const std::vector<std::vector<double>>& vertices,
+is_valid(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          double tol_snap, 
          double planarity_d2p_tol, 
@@ -190,7 +190,7 @@ is_valid(const std::vector<std::vector<double>>& vertices,
 }
 
 json
-validate(const std::vector<std::vector<double>>& vertices,
+validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          double tol_snap, 
          double planarity_d2p_tol, 

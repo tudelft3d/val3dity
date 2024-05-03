@@ -66,7 +66,7 @@ validate(std::string& input,
          double overlap_tol=-1.0);
 
 json 
-validate(const std::vector<std::vector<double>>& vertices,
+validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& triangle_ids,
          double tol_snap=0.001, 
          double planarity_d2p_tol=0.01, 
@@ -74,7 +74,7 @@ validate(const std::vector<std::vector<double>>& vertices,
          double overlap_tol=-1.0);
 
 bool 
-is_valid(const std::vector<std::vector<double>>& vertices,
+is_valid(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& triangle_ids,
          double tol_snap=0.001, 
          double planarity_d2p_tol=0.01, 
