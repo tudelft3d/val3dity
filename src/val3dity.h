@@ -25,73 +25,29 @@
   Delft University of Technology
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
+#ifndef val3dity_h
+#define val3dity_h
 
 #include <iostream>
-
 #include "nlohmann-json/json.hpp"
 
 using json = nlohmann::json;
 
 namespace val3dity {
 
-//todo move all this to a separate file
-
-class Val3dityBuffer : public std::streambuf
-{
+//todo move these somewhere else
+class NullBuffer : public std::streambuf {
 protected:
-    virtual int_type overflow(int_type c) = 0;
+    virtual int_type overflow(int_type c);
 };
 
-class CoutRedirectBuffer : public Val3dityBuffer
-{
-protected:
-  // Override the overflow method to handle character output
-  virtual int_type overflow(int_type c) override {
-    if (c != traits_type::eof()) {
-      // Write the character to std::cout
-      std::cout.put(char(c));
-    }
-    return c;
-  }
-};
+extern NullBuffer nullBuffer;
+extern std::ostream nullStream;
+extern std::ostream* val3ditycout;
+extern std::ostream* val3dityclog;
 
-class ClogRedirectBuffer : public Val3dityBuffer
-{
-protected:
-    // Override the overflow method to handle character output
-    virtual int_type overflow(int_type c) override {
-        if (c != traits_type::eof()) {
-            // Write the character to std::clog
-            std::clog.put(char(c));
-        }
-        return c;
-    }
-};
+void output_terminal(bool output_terminal);
 
-
-class NullBuffer : public Val3dityBuffer {
-protected:
-    // Override the overflow method to discard the output
-    virtual int_type overflow(int_type c) override {
-        // Return something other than EOF to signify success
-        return traits_type::not_eof(c);
-    }
-};
-
-std::unique_ptr<Val3dityBuffer> set_cout(bool terminal_output = true)
-{
-  if (terminal_output)
-    return std::make_unique<CoutRedirectBuffer>();
-  else
-    return std::make_unique<NullBuffer>();
-};
-std::unique_ptr<Val3dityBuffer> set_clog(bool terminal_output = true)
-{
-  if (terminal_output)
-    return std::make_unique<ClogRedirectBuffer>();
-  else
-    return std::make_unique<NullBuffer>();
-};
 
 struct Parameters {
     double _tol_snap = 0.001;
@@ -155,3 +111,5 @@ is_valid(const std::vector<std::array<double, 3>>& vertices,
               Parameters params = Parameters());
 
 }
+
+#endif /* val3dity_h */

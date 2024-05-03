@@ -37,10 +37,29 @@
 #include <iostream>
 #include <exception>      // std::exception
 
+namespace val3dity {
 
+//todo move these somewhere else
+NullBuffer::int_type NullBuffer::overflow(int_type c) {
+    return traits_type::not_eof(c);
+}
 
-namespace val3dity
-{
+NullBuffer nullBuffer;
+std::ostream nullStream(&nullBuffer);
+std::ostream* val3ditycout = &nullStream; //&std::cout;
+std::ostream* val3dityclog = &nullStream; //&std::cout;
+
+void output_terminal(bool output_terminal) {
+    if (output_terminal) {
+//        val3ditycout = &std::cout;
+//        val3dityclog = &std::clog;
+        val3ditycout = &nullStream;
+        val3dityclog = &nullStream;
+    } else {
+        val3ditycout = &nullStream;
+        val3dityclog = &nullStream;
+    }
+}
 
 std::string VAL3DITY_VERSION = "2.4.1b0";
 
@@ -349,8 +368,7 @@ json
 validate(json& j,
          Parameters params)
 {
-  std::ostream val3ditycout(set_cout(params._terminal_output).get());
-  std::ostream val3dityclog(set_clog(params._terminal_output).get());
+  output_terminal(params._terminal_output);
 
   json re;
   //-- CityJSON
@@ -406,8 +424,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          Parameters params)
 {
-  std::ostream val3ditycout(set_cout(params._terminal_output).get());
-  std::ostream val3dityclog(set_clog(params._terminal_output).get());
+  output_terminal(params._terminal_output);
 
   double _minx = 9e15;
   double _miny = 9e15; 
@@ -473,8 +490,7 @@ validate(std::string& input,
          std::string format,
          Parameters params)
 {
-  std::ostream val3ditycout(set_cout(params._terminal_output).get());
-  std::ostream val3dityclog(set_clog(params._terminal_output).get());
+  output_terminal(params._terminal_output);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, params);
