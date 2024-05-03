@@ -1763,7 +1763,7 @@ json get_report_json(std::string ifile,
   char buffer[80];
   std::strftime(buffer, 80, "%FT%T (%Z)", localTime);
   jr["time"] = buffer;
-  //-- user-defined param
+  //-- user-defined params
   jr["parameters"];
   jr["parameters"]["snap_tol"] = snap_tol;
   jr["parameters"]["overlap_tol"] = overlap_tol;
