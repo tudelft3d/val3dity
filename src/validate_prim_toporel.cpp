@@ -32,7 +32,7 @@
 #include "input.h"
 #include "Solid.h"
 #include "CompositeSolid.h"
-#include <iostream>
+#include "val3dity_ostream.h"
 #include <sstream>
 
 #include <CGAL/box_intersection_d.h>
@@ -65,13 +65,13 @@ struct Report_intersections {
     if (*thecount % 25 == 0) {
       int r = rand() % 3;
       if (r == 0)
-        std::cout << "\b|" << std::flush;
+        *val3ditycout << "\b|" << std::flush;
       else if (r == 1)
-        std::cout << "\b/" << std::flush;
+        *val3ditycout << "\b/" << std::flush;
       else if (r == 2)
-        std::cout << "\b-" << std::flush;
+        *val3ditycout << "\b-" << std::flush;
       else
-        std::cout << "\b\\" << std::flush;
+        *val3ditycout << "\b\\" << std::flush;
     }
     //-- we check here if the 2 (usually eroded) Nefs are intersecting, 
     //-- if yes then an error is added to the list lsErrors
@@ -98,7 +98,7 @@ bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::strin
                                                std::vector<Error>& lsErrors, 
                                                double tol_overlap)
 {
-  std::clog << "--- Constructing Nef Polyhedra ---" << std::endl;
+  *val3dityclog << "--- Constructing Nef Polyhedra ---" << std::endl;
   std::vector<Nef_polyhedron*>                lsNefs;
   std::vector<std::tuple<std::string,Solid*>> subsetCells;
   for (auto& c : lsCells)
@@ -117,7 +117,7 @@ bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::strin
       lsNefs.push_back(tmpnef);
     subsetCells.push_back(c);
   }
-  std::clog << "--- Constructing AABB tree ---" << std::endl;
+  *val3dityclog << "--- Constructing AABB tree ---" << std::endl;
   std::vector<AABB> aabbs;
   int counter = 0;
   for ( Iterator i = lsNefs.begin(); i != lsNefs.end(); ++i)
@@ -129,14 +129,14 @@ bool are_cells_interior_disconnected_with_aabb(std::vector<std::tuple<std::strin
   std::vector<std::string> lsCellIDs;
   for (auto each : subsetCells)
     lsCellIDs.push_back(std::get<0>(each));
-  std::clog << "--- Testing intersections between Nefs ---" << std::endl;
+  *val3dityclog << "--- Testing intersections between Nefs ---" << std::endl;
   int n = lsErrors.size();
   int count = 0; 
   if (lsNefs.size() > 500) {
-    std::cout << "Testing intersections between " << lsNefs.size() << " cells, this could be slow." << std::endl << std::flush;
+    *val3ditycout << "Testing intersections between " << lsNefs.size() << " cells, this could be slow." << std::endl << std::flush;
   }
   CGAL::box_self_intersection_d( aabbs.begin(), aabbs.end(), Report_intersections(lsNefs, lsCellIDs, lsErrors, errorcode_to_assign, count));
-  std::clog << "Total AABB tests: " << count << std::endl;
+  *val3dityclog << "Total AABB tests: " << count << std::endl;
   if (lsErrors.size() > n)
     return false;
   else

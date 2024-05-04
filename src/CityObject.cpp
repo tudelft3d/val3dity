@@ -31,6 +31,7 @@
 #include "definitions.h"
 #include "input.h"
 #include "validate_prim_toporel.h"
+#include "val3dity_ostream.h"
 
 namespace val3dity
 {
@@ -65,7 +66,7 @@ bool CityObject::validate_building(double tol_overlap)
   bool bValid = true;
   if (_lsPrimitives.size() == 0)
     return bValid;
-  std::clog << "--- Interactions between BuildingParts ---" << std::endl;
+  *val3dityclog << "--- Interactions between BuildingParts ---" << std::endl;
   std::vector<Error> lsErrors;
   //-- process each LoDs separately
   std::set<std::string> uniquelods;
@@ -79,14 +80,14 @@ bool CityObject::validate_building(double tol_overlap)
         g1lod.push_back(p);
       }
     }
-    // std::cout << g1lod.size() << std::endl;
+    // *val3ditycout << g1lod.size() << std::endl;
     if (g1lod.size() > 1) {
-      std::clog << "LoD" << lod << " has " << g1lod.size() 
+      *val3dityclog << "LoD" << lod << " has " << g1lod.size()
         << " geometries, validating for overlaps." << std::endl;
       if (do_primitives_interior_overlap(g1lod, 601, lsErrors, tol_overlap) == true)
       {
         bValid = false;
-        std::clog << "Error: overlapping building parts (LoD" << lod << ")" << std::endl;
+        *val3dityclog << "Error: overlapping building parts (LoD" << lod << ")" << std::endl;
         for (auto& e : lsErrors) {
           std::stringstream msg;
           msg << "Geometries for LoD" << lod;

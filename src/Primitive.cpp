@@ -28,7 +28,7 @@
 
 #include "Primitive.h"
 #include "input.h"
-#include <iostream>
+#include "val3dity_ostream.h"
 
 namespace val3dity
 {
@@ -76,12 +76,12 @@ void Primitive::add_error(int code, std::string whichgeoms, std::string info)
   _is_valid = 0;
   std::tuple<std::string, std::string> a(whichgeoms, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
+  *val3dityclog << "\tERROR " << code << ": " << ALL_ERRORS[code];
   if (whichgeoms.empty() == false)
-    std::clog << " (id: " << whichgeoms << ")";
-  std::clog << std::endl;
+    *val3dityclog << " (id: " << whichgeoms << ")";
+  *val3dityclog << std::endl;
   if (info.empty() == false)
-    std::clog << "\t[" << info << "]" << std::endl;
+    *val3dityclog << "\t[" << info << "]" << std::endl;
 }
 
 std::set<int> Primitive::get_unique_error_codes()

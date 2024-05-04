@@ -33,33 +33,11 @@
 #include "Solid.h"
 #include "Surface.h"
 #include "input.h"
+#include "val3dity_ostream.h"
 
-#include <iostream>
 #include <exception>      // std::exception
 
 namespace val3dity {
-
-//todo move these somewhere else
-NullBuffer::int_type NullBuffer::overflow(int_type c) {
-    return traits_type::not_eof(c);
-}
-
-NullBuffer nullBuffer;
-std::ostream nullStream(&nullBuffer);
-std::ostream* val3ditycout = &nullStream; //&std::cout;
-std::ostream* val3dityclog = &nullStream; //&std::cout;
-
-void output_terminal(bool output_terminal) {
-    if (output_terminal) {
-//        val3ditycout = &std::cout;
-//        val3dityclog = &std::clog;
-        val3ditycout = &nullStream;
-        val3dityclog = &nullStream;
-    } else {
-        val3ditycout = &nullStream;
-        val3dityclog = &nullStream;
-    }
-}
 
 std::string VAL3DITY_VERSION = "2.4.1b0";
 
@@ -327,22 +305,22 @@ validate_off(std::string& input,
   GenericObject* o = new GenericObject("none");
   std::istringstream iss(input);
   Surface* sh = parse_off(iss, 0, ioerrs, params._tol_snap);
-  std::cout << "1" << std::endl;
+  *val3ditycout << "1" << std::endl;
   Solid* s = new Solid;
   s->set_oshell(sh);
   o->add_primitive(s);
   lsFeatures.push_back(o);
   //-- start the validation
-  // std::cout << "errors: " << ioerrs.has_errors() << std::endl;
+  // *val3ditycout << "errors: " << ioerrs.has_errors() << std::endl;
   for (auto& each : ioerrs.get_unique_error_codes())
-      std::cout << each << std::endl;
+      *val3ditycout << each << std::endl;
 
   // if (ioerrs.has_errors() == false) {
   //-- validate
   for (auto& f : lsFeatures)
       f->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
   // }
-  std::cout << "2" << std::endl;
+  *val3ditycout << "2" << std::endl;
   //-- get report in json
   json jr = get_report_json("OFF object",
                             lsFeatures,
@@ -352,7 +330,7 @@ validate_off(std::string& input,
                             params._planarity_d2p_tol,
                             params._planarity_n_tol,
                             ioerrs);
-  std::cout << "3" << std::endl;
+  *val3ditycout << "3" << std::endl;
   return jr;
 }
 

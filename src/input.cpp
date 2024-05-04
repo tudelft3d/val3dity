@@ -40,6 +40,7 @@
 #include "CompositeSolid.h"
 #include "MultiSolid.h"
 #include "GeometryTemplate.h"
+#include "val3dity_ostream.h"
 
 
 using namespace std;
@@ -83,7 +84,7 @@ std::set<int> IOErrors::get_unique_error_codes()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  std::cout << "ERROR " << code << " : " << info << std::endl;
+  *val3ditycout << "ERROR " << code << " : " << info << std::endl;
 }
 
 
@@ -613,17 +614,17 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
   } 
   else if (j["type"] == "tu3djson") {
     errs.set_input_file_type("tu3djson");
-    std::cout << "tu3djson input file" << std::endl;
-    std::cout << "# Features found: " << j["features"].size() << std::endl;
+    *val3ditycout << "tu3djson input file" << std::endl;
+    *val3ditycout << "# Features found: " << j["features"].size() << std::endl;
     parse_tu3djson(j, lsFeatures, tol_snap);
   }
   else if ( (j["type"] == "Feature") || (j["type"] == "FeatureCollection") ) {
     errs.set_input_file_type("JSON-FG");
-    std::cout << "JSON-FG input file" << std::endl;
+    *val3ditycout << "JSON-FG input file" << std::endl;
     if (j["type"] == "Feature")
-      std::cout << "# Features found: " << j["features"].size() << std::endl;
+      *val3ditycout << "# Features found: " << j["features"].size() << std::endl;
     else
-      std::cout << "# Features found: " << j["features"].size() << std::endl;
+      *val3ditycout << "# Features found: " << j["features"].size() << std::endl;
     parse_jsonfg(j, lsFeatures, tol_snap, errs);
   }
   else {
@@ -634,7 +635,7 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
 
 void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
-  std::cout << "CityJSONL input file" << std::endl;
+  *val3ditycout << "CityJSONL input file" << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
   if (!infile)
   {
@@ -683,8 +684,8 @@ void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOEr
 
 void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {
-  std::cout << "CityJSON input file" << std::endl;
-  std::cout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
+  *val3ditycout << "CityJSON input file" << std::endl;
+  *val3ditycout << "# City Objects found: " << j["CityObjects"].size() << std::endl;
   //-- compute (_minx, _miny)
   compute_min_xy(j);
   //-- read and store the GeometryTemplates
@@ -840,7 +841,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     std::string duality = "";
     //-- get the ID
     if (cs.attribute("gml:id") != 0) {
-      // std::cout << "\t" << it->node().attribute("gml:id").value() << std::endl;
+      // *val3ditycout << "\t" << it->node().attribute("gml:id").value() << std::endl;
       theid = cs.attribute("gml:id").value();
     }
     else 
@@ -868,7 +869,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
         s = NS["gml"] + "Solid";
         for (pugi::xml_node child3 : child2.children(s.c_str()))
         {
-          // std::cout << "Solid: " << child3.attribute("gml:id").value() << std::endl;
+          // *val3ditycout << "Solid: " << child3.attribute("gml:id").value() << std::endl;
           sol = process_gml_solid(child3, dallpoly, tol_snap, errs);
           if (sol->get_id() == "")
             sol->set_id("MISSING_ID");
@@ -919,7 +920,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
 //    pugi::xpath_node_set nstate = doc.select_nodes(s.c_str());
     for (pugi::xpath_node_set::const_iterator it = nstate.begin(); it != nstate.end(); ++it)
     {
-      // std::cout << "---\n" << it->node().attribute("gml:id").value() << std::endl;
+      // *val3ditycout << "---\n" << it->node().attribute("gml:id").value() << std::endl;
       std::string vid = it->node().attribute("gml:id").value();
       s = NS["indoorgml"] + "duality";
       std::string vdual;
@@ -928,7 +929,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
         vdual = child.attribute("xlink:href").value();
         if (vdual[0] == '#')
           vdual = vdual.substr(1);
-        // std::cout << "dual node: " << vdual << std::endl;
+        // *val3ditycout << "dual node: " << vdual << std::endl;
       }
       s = NS["indoorgml"] + "connects";
       std::vector<std::string> vadj;
@@ -944,7 +945,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
       }
       s = ".//" + NS["gml"] + "pos";
       pugi::xpath_node n = it->node().select_node(s.c_str());
-      // std::cout << n.node().child_value() << std::endl;
+      // *val3ditycout << n.node().child_value() << std::endl;
       
       std::string buf;
       std::stringstream ss(n.node().child_value());
@@ -965,7 +966,7 @@ void process_gml_file_indoorgml(pugi::xml_document& doc, std::vector<Feature*>& 
     im->add_graph(ig);
   }
   // if (im->get_number_graphs() == 0)
-  //   std::cout << "\t!!! No dual graph was found in the input file" << std::endl;
+  //   *val3ditycout << "\t!!! No dual graph was found in the input file" << std::endl;
 }
 
 
@@ -973,7 +974,7 @@ void set_min_xy(double minx, double miny)
 {
   _minx = minx;
   _miny = miny;
-  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // *val3ditycout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
@@ -992,7 +993,7 @@ void compute_min_xy(json& j)
     _minx = (_minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
     _miny = (_miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
   }
-  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // *val3ditycout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
@@ -1031,7 +1032,7 @@ void compute_min_xy(pugi::xml_document& doc)
     if (std::stod(tokens[1]) < _miny)
       _miny = std::stod(tokens[1]);
   }
-  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // *val3ditycout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
 }
@@ -1039,7 +1040,7 @@ void compute_min_xy(pugi::xml_document& doc)
 
 void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
-  std::cout << "Reading file: " << ifile << std::endl;
+  *val3ditycout << "Reading file: " << ifile << std::endl;
   pugi::xml_document doc;
   pugi::xml_parse_result result = doc.load_file(ifile.c_str());
   if (!result) {
@@ -1053,7 +1054,7 @@ void read_file_gml(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErro
   pugi::xml_node ncm = doc.first_child();
   get_namespaces(ncm); //-- results in global variable NS in this unit
   if ( (NS.count("indoorgml") != 0) && (ncm.name() == (NS["indoorgml"] + "IndoorFeatures")) ) {
-    std::cout << "IndoorGML input file" << std::endl;
+    *val3ditycout << "IndoorGML input file" << std::endl;
     //-- find (_minx, _miny)
     compute_min_xy(doc);
     //-- build dico of xlinks for <gml:Polygon>
@@ -1072,7 +1073,7 @@ std::map<std::string, std::string> get_namespaces(pugi::xml_node& root) {
   for (pugi::xml_attribute attr = root.first_attribute(); attr; attr = attr.next_attribute()) {
     std::string name = attr.name();
     if (name.find("xmlns") != std::string::npos) {
-      // std::cout << attr.name() << "=" << attr.value() << std::endl;
+      // *val3ditycout << attr.name() << "=" << attr.value() << std::endl;
       std::string value = attr.value();
       std::string sns;
       if (value.find("http://www.opengis.net/citygml/") != std::string::npos) {
@@ -1109,7 +1110,7 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
   std::string s = "//" + NS["gml"] + "Polygon" + "[@" + NS["gml"] + "id]";
   pugi::xpath_node_set nallpoly = doc.select_nodes(s.c_str());
   if (nallpoly.size() > 0)
-   std::cout << "XLinks found, resolving them..." << std::flush;
+   *val3ditycout << "XLinks found, resolving them..." << std::flush;
   for (pugi::xpath_node_set::const_iterator it = nallpoly.begin(); it != nallpoly.end(); ++it)
     dallpoly[it->node().attribute("gml:id").value()] = *it;
   //-- for <gml:OrientableSurface>
@@ -1135,7 +1136,7 @@ void build_dico_xlinks(pugi::xml_document& doc, std::map<std::string, pugi::xpat
     }
   }
   if (nallpoly.size() > 0)
-    std::cout << "done." << std::endl;
+    *val3ditycout << "done." << std::endl;
 }
 
 
@@ -1155,7 +1156,7 @@ Surface* parse_poly(std::istream &input, int shellid, IOErrors& errs)
     if (y < _miny)
       _miny = y;
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  *val3ditycout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   input.clear();
@@ -1232,9 +1233,9 @@ void printProgressBar(int percent) {
       bar.replace(i, 1, " ");
     }
   }
-  std::cout << "\r" "[" << bar << "] ";
-  std::cout.width(3);
-  std::cout << percent << "%     " << std::flush;
+  *val3ditycout << "\r" "[" << bar << "] ";
+  (*val3ditycout).width(3);
+  *val3ditycout << percent << "%     " << std::flush;
 }
 
 
@@ -1259,7 +1260,7 @@ Surface* parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_
     if (y < _miny)
       _miny = y;
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  *val3ditycout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- reset the file
@@ -1319,7 +1320,7 @@ void parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive
         _miny = y;
     }
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  *val3ditycout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- read again file and parse everything

@@ -28,26 +28,11 @@
 #ifndef val3dity_h
 #define val3dity_h
 
-#include <iostream>
 #include "nlohmann-json/json.hpp"
 
 using json = nlohmann::json;
 
 namespace val3dity {
-
-//todo move these somewhere else
-class NullBuffer : public std::streambuf {
-protected:
-    virtual int_type overflow(int_type c);
-};
-
-extern NullBuffer nullBuffer;
-extern std::ostream nullStream;
-extern std::ostream* val3ditycout;
-extern std::ostream* val3dityclog;
-
-void output_terminal(bool output_terminal);
-
 
 struct Parameters {
     double _tol_snap = 0.001;
@@ -59,22 +44,18 @@ struct Parameters {
     Parameters& tol_snap(double tol_snap) { _tol_snap = tol_snap;
         return *this;
     }
-
     Parameters& planarity_d2p_tol(double planarity_d2p_tol) {
         _planarity_d2p_tol = planarity_d2p_tol;
         return *this;
     }
-
     Parameters& planarity_n_tol(double planarity_n_tol) {
         _planarity_n_tol = planarity_n_tol;
         return *this;
     }
-
     Parameters& overlap_tol(double overlap_tol) {
         _overlap_tol = overlap_tol;
         return *this;
     }
-
     Parameters& terminal_output(bool terminal_output) {
         _terminal_output = terminal_output;
         return *this;

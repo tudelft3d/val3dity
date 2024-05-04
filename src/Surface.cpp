@@ -31,6 +31,7 @@
 #include "geomtools.h"
 #include "input.h"
 #include "validate_shell.h"
+#include "val3dity_ostream.h"
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <CGAL/Side_of_triangle_mesh.h>
 #include <geos_c.h>
@@ -85,12 +86,12 @@ void Surface::add_error(int code, std::string faceid, std::string info)
 {
   std::tuple<std::string, std::string> a(faceid, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
+  *val3dityclog << "\tERROR " << code << ": " << ALL_ERRORS[code];
   if (faceid.empty() == false)
-    std::clog << " (face " << faceid << ")";
-  std::clog << std::endl;
+    *val3dityclog << " (face " << faceid << ")";
+  *val3dityclog << std::endl;
   if (info.empty() == false)
-    std::clog << "\t[" << info << "]" << std::endl;
+    *val3dityclog << "\t[" << info << "]" << std::endl;
 }
 
 std::set<int> Surface::get_unique_error_codes()
@@ -253,7 +254,7 @@ int Surface::number_faces()
 
 bool Surface::triangulate_shell()
 {
-  std::clog << "-----Triangulation of each surface" << std::endl;
+  *val3dityclog << "-----Triangulation of each surface" << std::endl;
   //-- read the facets
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
@@ -388,7 +389,7 @@ void Surface::set_translation_min_values(double minx, double miny)
 
 bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "-----2D validation of each surface" << std::endl;
+  *val3dityclog << "-----2D validation of each surface" << std::endl;
   bool isValid = true;
   size_t num = _lsFaces.size();
   for (int i = 0; i < static_cast<int>(num); i++)
@@ -479,7 +480,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
     //-- triangulate faces of the shell
     triangulate_shell();
     //-- check planarity by normal deviation method (of all triangle)
-    std::clog << "-----Planarity of surfaces (with normals deviation)" << std::endl;
+    *val3dityclog << "-----Planarity of surfaces (with normals deviation)" << std::endl;
     std::vector< std::vector<int*> >::iterator it = _lsTr.begin();
     int j = 0;
     double deviation;
@@ -502,7 +503,7 @@ bool Surface::validate_2d_primitives(double tol_planarity_d2p, double tol_planar
 
 bool Surface::validate_as_multisurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "--- MultiSurface validation ---" << std::endl;
+  *val3dityclog << "--- MultiSurface validation ---" << std::endl;
   if (_is_valid_2d == -1)
     return validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   else
@@ -523,14 +524,14 @@ bool Surface::is_shell(double tol_planarity_d2p, double tol_planarity_normals)
 
 bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "--- CompositeSurface validation ---" << std::endl;
+  *val3dityclog << "--- CompositeSurface validation ---" << std::endl;
 //-- 1. Each surface should individually be valid
   if (_is_valid_2d == -1)
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)
     return false;
 //-- 2. Combinatorial consistency
-  std::clog << "--Combinatorial consistency" << std::endl;
+  *val3dityclog << "--Combinatorial consistency" << std::endl;
   _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
   if (this->has_errors() == true)
     return false;
@@ -561,7 +562,7 @@ bool Surface::validate_as_compositesurface(double tol_planarity_d2p, double tol_
   if (this->has_errors() == true)
     return false;
 //-- 2. Geometrical consistency (aka intersection tests between faces)
-  std::clog << "--Geometrical consistency" << std::endl;
+  *val3dityclog << "--Geometrical consistency" << std::endl;
   if (does_self_intersect() == false)
     return false;
   return true;
@@ -646,7 +647,7 @@ bool Surface::does_self_intersect()
 
 bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_normals)
 {
-  std::clog << "--- Shell validation (#" << _id << ") ---" << std::endl;
+  *val3dityclog << "--- Shell validation (#" << _id << ") ---" << std::endl;
   if (_is_valid_2d == -1)
     validate_2d_primitives(tol_planarity_d2p, tol_planarity_normals);
   if (_is_valid_2d == 0)
@@ -658,7 +659,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
     return false;
   }
 //-- 2. Combinatorial consistency
-  std::clog << "-----Combinatorial consistency" << std::endl;
+  *val3dityclog << "-----Combinatorial consistency" << std::endl;
   _polyhedron = construct_CgalPolyhedron_incremental(&(_lsTr), &(_lsPts), this);
   if (this->has_errors() == true)
     return false;
@@ -722,7 +723,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
     return false;
   }
 //-- 3. Geometrical consistency (aka intersection tests between faces)
-  std::clog << "-----Geometrical consistency" << std::endl;
+  *val3dityclog << "-----Geometrical consistency" << std::endl;
   if (does_self_intersect() == false)
     return false;
   return true;

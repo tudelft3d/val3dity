@@ -28,13 +28,10 @@
 
 #include "Feature.h"
 #include "input.h"
-#include <iostream>
+#include "val3dity_ostream.h"
 
 namespace val3dity
 {
-
-
-
 
 std::string Feature::get_id()
 {
@@ -99,40 +96,40 @@ const std::vector<Primitive*>& Feature::get_primitives()
 
 bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
-  std::clog << std::endl << "######### Validating Feature #########" << std::endl;
-  std::clog << "id:   " << this->get_id() << std::endl;
-  std::clog << "type: " << this->get_type() << std::endl;
-  std::clog << "--" << std::endl;
+  *val3dityclog << std::endl << "######### Validating Feature #########" << std::endl;
+  *val3dityclog << "id:   " << this->get_id() << std::endl;
+  *val3dityclog << "type: " << this->get_type() << std::endl;
+  *val3dityclog << "--" << std::endl;
   bool bValid = true;
   if (this->is_empty() == true) {
     this->add_error(906, "Feature has no geometry defined (or val3dity doesn't handle this type).", "");
     bValid = false;
   }
   if (_lsPrimitives.size() > 500) {
-    std::cout << "Validating " << _lsPrimitives.size() << " geometric primitives, this could be slow." << std::endl << std::flush;
+    *val3ditycout << "Validating " << _lsPrimitives.size() << " geometric primitives, this could be slow." << std::endl << std::flush;
   }
   for (auto& p : _lsPrimitives)
   {
-    std::clog << "======== Validating Primitive ========" << std::endl;
+    *val3dityclog << "======== Validating Primitive ========" << std::endl;
     switch(p->get_type())
     {
-      case 0: std::clog << "Solid"             << std::endl; break;
-      case 1: std::clog << "CompositeSolid"    << std::endl; break;
-      case 2: std::clog << "MultiSolid"        << std::endl; break;
-      case 3: std::clog << "CompositeSurface"  << std::endl; break;
-      case 4: std::clog << "MultiSurface"      << std::endl; break;
-      case 5: std::clog << "GeometryTemplate"  << std::endl; break;
-      case 9: std::clog << "ALL"               << std::endl; break;
+      case 0: *val3dityclog << "Solid"             << std::endl; break;
+      case 1: *val3dityclog << "CompositeSolid"    << std::endl; break;
+      case 2: *val3dityclog << "MultiSolid"        << std::endl; break;
+      case 3: *val3dityclog << "CompositeSurface"  << std::endl; break;
+      case 4: *val3dityclog << "MultiSurface"      << std::endl; break;
+      case 5: *val3dityclog << "GeometryTemplate"  << std::endl; break;
+      case 9: *val3dityclog << "ALL"               << std::endl; break;
     }
-    std::clog << "id: " << p->get_id() << std::endl;
-    std::clog << "--" << std::endl;
+    *val3dityclog << "id: " << p->get_id() << std::endl;
+    *val3dityclog << "--" << std::endl;
     if (p->validate(tol_planarity_d2p, tol_planarity_normals, tol_overlap) == false)
     {
-      std::clog << "======== INVALID ========" << std::endl;
+      *val3dityclog << "======== INVALID ========" << std::endl;
       bValid = false;
     }
     else
-      std::clog << "========= VALID =========" << std::endl;
+      *val3dityclog << "========= VALID =========" << std::endl;
   }
   _is_valid = bValid;
   return bValid;
@@ -144,12 +141,12 @@ void Feature::add_error(int code, std::string whichgeoms, std::string info)
   _is_valid = 0;
   std::tuple<std::string, std::string> a(whichgeoms, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
+  *val3dityclog << "\tERROR " << code << ": " << ALL_ERRORS[code];
   if (whichgeoms.empty() == false)
-    std::clog << " (id: " << whichgeoms << ")";
-  std::clog << std::endl;
+    *val3dityclog << " (id: " << whichgeoms << ")";
+  *val3dityclog << std::endl;
   if (info.empty() == false)
-    std::clog << "\t[" << info << "]" << std::endl;
+    *val3dityclog << "\t[" << info << "]" << std::endl;
 }
 
 std::set<int> Feature::get_unique_error_codes()

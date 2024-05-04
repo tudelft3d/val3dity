@@ -106,7 +106,7 @@ struct primitives_walker: pugi::xml_tree_walker
   virtual bool for_each(pugi::xml_node& node)
   { 
     const char *nodeType = node.name();
-    // std::cout << node.name() << std::endl;
+    // *val3ditycout << node.name() << std::endl;
     const char *namespaceSeparator = strchr(nodeType, ':');
     bool gmlboundedBy = false;
     //-- hack with namespace "gml:" hardcoded... with namespace list == I don't know how
@@ -117,7 +117,7 @@ struct primitives_walker: pugi::xml_tree_walker
     }
     if (depth() == depthprim)
     {
-      // std::cout << "back to reading mode -- " << node.name() << std::endl;
+      // *val3ditycout << "back to reading mode -- " << node.name() << std::endl;
       depthprim = 999;
     }
     if ((strcmp(nodeType, "boundedBy") == 0) && (gmlboundedBy == false))
@@ -130,8 +130,8 @@ struct primitives_walker: pugi::xml_tree_walker
            ( (strcmp(nodeType, "boundedBy") == 0) && (gmlboundedBy == false) )||
            (strcmp(nodeType, "CompositeSurface") == 0) ) )
     {
-      // std::cout << "----" << node.name() << std::endl;
-      // std::cout << "depth " << depth() << std::endl;
+      // *val3ditycout << "----" << node.name() << std::endl;
+      // *val3ditycout << "depth " << depth() << std::endl;
       depthprim = depth();
       lsNodes.push_back(node);
     }

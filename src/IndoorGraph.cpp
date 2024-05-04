@@ -30,6 +30,7 @@
 #include "IndoorGraph.h"
 #include "definitions.h"
 #include "input.h"
+#include "val3dity_ostream.h"
 
 namespace val3dity
 {
@@ -50,7 +51,7 @@ IndoorGraph::~IndoorGraph()
 
 void IndoorGraph::add_vertex(std::string theid, double x, double y, double z, std::string dual, std::vector<std::string> vadj)
 {
-  // std::cout << "ADDING VERTEX" << std::endl;
+  // *val3ditycout << "ADDING VERTEX" << std::endl;
   Point3 v(x, y, z);
   _vertices[theid] = std::make_tuple(v, dual, vadj);
 }
@@ -58,7 +59,7 @@ void IndoorGraph::add_vertex(std::string theid, double x, double y, double z, st
 
 bool IndoorGraph::validate() 
 {
-  std::cout << "VALIDATE IndoorGraph" << std::endl;
+  *val3ditycout << "VALIDATE IndoorGraph" << std::endl;
   return true;
   // if (_is_valid != -1)
   //   return _is_valid;
