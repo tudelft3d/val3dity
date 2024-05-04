@@ -41,10 +41,10 @@ static std::ostream nullStream(&nullBuffer);
 std::ostream* val3ditycout = &std::cout;
 std::ostream* val3dityclog = &std::clog;
 
-void output_terminal(bool output_terminal)
+void terminal_output(bool terminal_output)
 {
-  val3ditycout = output_terminal ? &std::cout : &nullStream;
-  val3dityclog = output_terminal ? &std::clog : &nullStream;
+  val3ditycout = terminal_output ? &std::cout : &nullStream;
+  val3dityclog = terminal_output ? &std::clog : &nullStream;
 }
 
 } // namespace val3dity

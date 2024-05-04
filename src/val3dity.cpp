@@ -346,7 +346,7 @@ json
 validate(json& j,
          Parameters params)
 {
-  output_terminal(params._terminal_output);
+    terminal_output(params._terminal_output);
 
   json re;
   //-- CityJSON
@@ -402,7 +402,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          Parameters params)
 {
-  output_terminal(params._terminal_output);
+    terminal_output(params._terminal_output);
 
   double _minx = 9e15;
   double _miny = 9e15; 
@@ -468,7 +468,7 @@ validate(std::string& input,
          std::string format,
          Parameters params)
 {
-  output_terminal(params._terminal_output);
+    terminal_output(params._terminal_output);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, params);

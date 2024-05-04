@@ -43,7 +43,7 @@ protected:
 extern std::ostream* val3ditycout;
 extern std::ostream* val3dityclog;
 
-void output_terminal(bool terminal_output);
+void terminal_output(bool terminal_output);
 
 } // namespace val3dity
 
