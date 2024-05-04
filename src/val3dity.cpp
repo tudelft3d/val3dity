@@ -37,11 +37,13 @@
 
 #include <exception>      // std::exception
 
-namespace val3dity {
+namespace val3dity
+{
 
 std::string VAL3DITY_VERSION = "2.4.1b0";
 
-struct verror : std::exception {
+struct verror : std::exception
+{
   std::string whattext;
   verror(std::string s) : whattext(s){};
   const char* what() const noexcept {return whattext.c_str();}
@@ -346,8 +348,7 @@ json
 validate(json& j,
          Parameters params)
 {
-    terminal_output(params._terminal_output);
-
+  terminal_output(params._terminal_output);
   json re;
   //-- CityJSON
   if (j["type"] == "CityJSON") {
@@ -402,8 +403,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          Parameters params)
 {
-    terminal_output(params._terminal_output);
-
+  terminal_output(params._terminal_output);
   double _minx = 9e15;
   double _miny = 9e15; 
   //-- find (minx, miny)
@@ -468,7 +468,7 @@ validate(std::string& input,
          std::string format,
          Parameters params)
 {
-    terminal_output(params._terminal_output);
+  terminal_output(params._terminal_output);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, params);
@@ -488,4 +488,4 @@ validate(std::string& input,
   return re;
 }
 
-}
+} // namespace val3dity

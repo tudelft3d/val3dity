@@ -26,10 +26,10 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
-#include <iostream>
-
 #ifndef val3dity_ostream_h
 #define val3dity_ostream_h
+
+#include <iostream>
 
 namespace val3dity
 {

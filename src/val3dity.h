@@ -25,6 +25,7 @@
   Delft University of Technology
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
+
 #ifndef val3dity_h
 #define val3dity_h
 
@@ -32,36 +33,43 @@
 
 using json = nlohmann::json;
 
-namespace val3dity {
+namespace val3dity
+{
 
-struct Parameters {
-    double _tol_snap = 0.001;
-    double _planarity_d2p_tol = 0.01;
-    double _planarity_n_tol = 20.0;
-    double _overlap_tol = -1.0;
-    bool _terminal_output = true;
+struct Parameters
+{
+  double _tol_snap = 0.001;
+  double _planarity_d2p_tol = 0.01;
+  double _planarity_n_tol = 20.0;
+  double _overlap_tol = -1.0;
+  bool _terminal_output = true;
 
-    Parameters& tol_snap(double tol_snap) { _tol_snap = tol_snap;
-        return *this;
-    }
-    Parameters& planarity_d2p_tol(double planarity_d2p_tol) {
-        _planarity_d2p_tol = planarity_d2p_tol;
-        return *this;
-    }
-    Parameters& planarity_n_tol(double planarity_n_tol) {
-        _planarity_n_tol = planarity_n_tol;
-        return *this;
-    }
-    Parameters& overlap_tol(double overlap_tol) {
-        _overlap_tol = overlap_tol;
-        return *this;
-    }
-    Parameters& terminal_output(bool terminal_output) {
-        _terminal_output = terminal_output;
-        return *this;
-    }
+  Parameters& tol_snap(double tol_snap)
+  {
+    _tol_snap = tol_snap;
+    return *this;
+  }
+  Parameters& planarity_d2p_tol(double planarity_d2p_tol)
+  {
+    _planarity_d2p_tol = planarity_d2p_tol;
+    return *this;
+  }
+  Parameters& planarity_n_tol(double planarity_n_tol)
+  {
+    _planarity_n_tol = planarity_n_tol;
+    return *this;
+  }
+  Parameters& overlap_tol(double overlap_tol)
+  {
+    _overlap_tol = overlap_tol;
+    return *this;
+  }
+  Parameters& terminal_output(bool terminal_output)
+  {
+    _terminal_output = terminal_output;
+    return *this;
+  }
 };
-
 
 bool
 is_valid(json& j,
@@ -81,18 +89,16 @@ validate(std::string& input,
          std::string format,
          Parameters params = Parameters());
 
-
 json
 validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& triangle_ids,
          Parameters params = Parameters());
-
 
 bool
 is_valid(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& triangle_ids,
          Parameters params = Parameters());
 
-}
+} // namespace val3dity
 
 #endif /* val3dity_h */
