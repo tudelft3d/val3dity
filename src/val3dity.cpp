@@ -38,11 +38,11 @@
 #include <exception>      // std::exception
 
 
-
 namespace val3dity
 {
 
 std::string VAL3DITY_VERSION = "2.4.1b0";
+
 
 //-----
 
@@ -118,6 +118,7 @@ is_valid(json& j,
          double planarity_n_tol, 
          double overlap_tol)
 {
+  spdlog::set_level(spdlog::level::off);
   json re = validate(j, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
   return re["validity"];
 }
@@ -129,10 +130,7 @@ validate(json& j,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  std::streambuf* clog_buf = std::clog.rdbuf();
-  std::clog.rdbuf(NULL);
-  std::streambuf* cout_buf = std::cout.rdbuf();
-  std::cout.rdbuf(NULL);
+  spdlog::set_level(spdlog::level::off);
   json re;
   //-- CityJSON
   if (j["type"] == "CityJSON") {
@@ -168,12 +166,8 @@ validate(json& j,
 
   //-- then we don't support it   
   } else {
-    std::clog.rdbuf(clog_buf);
-    std::cout.rdbuf(cout_buf);
     throw verror("Flavour of JSON not supported");
   }  
-  std::clog.rdbuf(clog_buf);
-  std::cout.rdbuf(cout_buf);
   return re;
 }
 
@@ -185,6 +179,7 @@ is_valid(const std::vector<std::array<double, 3>>& vertices,
          double planarity_n_tol, 
          double overlap_tol)
 {
+  spdlog::set_level(spdlog::level::off);
   json re = validate(vertices, faces, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
   return re["validity"];
 }
@@ -197,10 +192,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  std::streambuf* clog_buf = std::clog.rdbuf();
-  std::clog.rdbuf(NULL);
-  std::streambuf* cout_buf = std::cout.rdbuf();
-  std::cout.rdbuf(NULL);
+  spdlog::set_level(spdlog::level::off);
   double _minx = 9e15;
   double _miny = 9e15; 
   //-- find (minx, miny)
@@ -247,8 +239,6 @@ validate(const std::vector<std::array<double, 3>>& vertices,
                             planarity_d2p_tol,
                             planarity_n_tol,
                             ioerrs);
-  std::clog.rdbuf(clog_buf);
-  std::cout.rdbuf(cout_buf);
   return jr;
 }
 
@@ -261,6 +251,7 @@ is_valid(std::string& input,
          double planarity_n_tol, 
          double overlap_tol)
 {
+  spdlog::set_level(spdlog::level::off);
   json re = validate(input, format, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);  
   return re["validity"];
 }
@@ -273,10 +264,7 @@ validate(std::string& input,
          double planarity_n_tol, 
          double overlap_tol)
 {
-  std::streambuf* clog_buf = std::clog.rdbuf();
-  std::clog.rdbuf(NULL);
-  std::streambuf* cout_buf = std::cout.rdbuf();
-  std::cout.rdbuf(NULL);
+  spdlog::set_level(spdlog::level::off);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, tol_snap, planarity_d2p_tol, planarity_n_tol, overlap_tol);
@@ -291,12 +279,8 @@ validate(std::string& input,
     re = j;
   }
   else { 
-    std::clog.rdbuf(clog_buf);
-    std::cout.rdbuf(cout_buf);
     throw verror("File type not supported");
   }
-  std::clog.rdbuf(clog_buf);
-  std::cout.rdbuf(cout_buf);
   return re;
 }
 

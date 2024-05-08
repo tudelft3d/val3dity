@@ -58,7 +58,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   // 5. adj in dual == adj in primal
   // 
 
-  std::clog << "--- Validation of IndoorModel ---" << std::endl;
+  // std::clog << "--- Validation of IndoorModel ---" << std::endl;
   if (_is_valid != -1)
     return _is_valid;
 
@@ -69,7 +69,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 
 //-- 2. 701 - CELLS_OVERLAP
 //--    overlapping test
-  std::clog << "--- Overlapping tests between Cells ---" << std::endl;
+  // std::clog << "--- Overlapping tests between Cells ---" << std::endl;
   std::vector<std::tuple<std::string,Solid*>> lsCells;
   for (auto& el : _cells)
     lsCells.push_back(std::make_tuple(el.first, (Solid*)_lsPrimitives[std::get<0>(el.second)]));
@@ -77,22 +77,22 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
   if (are_cells_interior_disconnected_with_aabb(lsCells, 701, lsErrors, tol_overlap) == false)
   {
     bValid = false;
-    std::clog << "Error: Cells have overlapping interior" << std::endl;
+    // std::clog << "Error: Cells have overlapping interior" << std::endl;
     for (auto& e : lsErrors)
       this->add_error(e.errorcode, e.info1, e.info2);
   }
 
 //-- 3. 702 - DUAL_VERTEX_OUTSIDE_CELL
 //--    is dual vertex of each cell located inside its Cell?
-  std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;
+  // std::clog << "======== Validating Dual Vertex (Point-in-Solid tests) ========" << std::endl;
   for (auto& el : _cells)
   {
-    std::clog << "Cell (" << std::get<2>(el.second) << ") id=" << el.first;
+    // std::clog << "Cell (" << std::get<2>(el.second) << ") id=" << el.first;
     // TODO : what to do with many graphs here?
     //-- check if there's a dual, something there's not (and it's valid)
     if (std::get<1>(el.second) == "") 
     {
-      std::clog << " has no dual vertex" << std::endl;
+      // std::clog << " has no dual vertex" << std::endl;
     }
     else 
     {
@@ -110,7 +110,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
         // std::stringstream msg;
         // msg << "Cell (" << std::get<2>(el.second) << ") id=" << el.first << " dual doesn't exist";
         // this->add_error(704, msg.str(), "");
-        std::clog << " ==> dual does not exist" << std::endl;
+        // std::clog << " ==> dual does not exist" << std::endl;
       } 
       else 
       {
@@ -124,8 +124,8 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
           this->add_error(702, msg.str(), "");
           bValid = false;
         }
-        else
-          std::clog << " --> ok" << std::endl;
+        // else
+          // std::clog << " --> ok" << std::endl;
       }
     }
   }
@@ -133,7 +133,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 //-- 4. 703 - PRIMAL_DUAL_XLINKS_ERROR
 //--    are primal-dual graphs valid
 //--    this validates the XLinks basically, which is not done by XSD
-  std::clog << "======== Validating Primal-Dual links ========" << std::endl;
+  // std::clog << "======== Validating Primal-Dual links ========" << std::endl;
   for (auto& el : _cells)
   {
     std::string pdid = std::get<1>(el.second);
@@ -141,7 +141,7 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
     if (pdid == "") 
     {
       //-- this is allowed, a cell does not need to have a dual vertex
-      std::clog << "Cell id=" << el.first << " has no dual vertex" << std::endl;
+      // std::clog << "Cell id=" << el.first << " has no dual vertex" << std::endl;
       continue;
     }
     if (this->get_number_graphs() == 0) {
@@ -195,14 +195,14 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
 
 //-- 5. 704 - PRIMAL_DUAL_ADJACENCIES_INCONSISTENT  
 //--    if 2 cells are adjacent in the primal, are they also in the dual?
-  std::clog << "======== Validating Primal-Dual links ========" << std::endl;
+  // std::clog << "======== Validating Primal-Dual links ========" << std::endl;
   for (auto& el : _cells)
   {
     std::string pdid = std::get<1>(el.second);
     if (pdid == "")
     {
       //-- this is allowed, a cell does not need to have a dual vertex
-      std::clog << "Cell id=" << el.first << " has no dual vertex" << std::endl;
+      // std::clog << "Cell id=" << el.first << " has no dual vertex" << std::endl;
       continue;
     }
     if (this->get_number_graphs() == 0) {
@@ -217,20 +217,15 @@ bool IndoorModel::validate(double tol_planarity_d2p, double tol_planarity_normal
         std::string cadjid = std::get<1>(g->get_vertex(vadj));
         if (el.first > cadjid)
           continue;
-        std::clog << "Cells id=" << el.first << " id=" << cadjid;
+        // std::clog << "Cells id=" << el.first << " id=" << cadjid;
         int re = are_primitives_adjacent(_lsPrimitives[std::get<0>(el.second)],
                                          _lsPrimitives[std::get<0>(_cells[cadjid])],
                                          tol_overlap);
         if (re == 0) {
-          std::clog << " --> not valid" << std::endl;
           std::stringstream msg;
           bValid = false;
           msg << "Cells id=" << el.first << " & id=" << cadjid;
           this->add_error(704, msg.str(), "");
-        } else if (re == -1) {
-          std::clog << " --> not valid, skipped adjacency test" << std::endl;
-        } else {
-          std::clog << " --> ok" << std::endl;
         }
       }
     }

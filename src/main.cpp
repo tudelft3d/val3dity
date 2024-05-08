@@ -41,6 +41,8 @@
 #include "nlohmann-json/json.hpp"
 #include <boost/filesystem.hpp>
 #include <iostream>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 using namespace std;
 using namespace val3dity;
@@ -290,9 +292,7 @@ int main(int argc, char* const argv[])
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
-      savedBufferCLOG = clog.rdbuf();
-      mylog.open("val3dity.log");
-      std::clog.rdbuf(mylog.rdbuf());
+      spdlog::set_level(spdlog::level::off);
     }
 
     InputTypes inputtype = OTHER;
@@ -647,11 +647,6 @@ int main(int argc, char* const argv[])
     if (unittests.getValue() == true)
       std::cout << "\n" << unit_test(lsFeatures, ioerrs) << std::endl;
 
-    if (verbose.getValue() == false)
-    {
-      clog.rdbuf(savedBufferCLOG);
-      mylog.close();
-    }
     return(0);
   }
   catch (TCLAP::ArgException &e) 
