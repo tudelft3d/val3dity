@@ -632,9 +632,9 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
   }
 }
 
-void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
+void read_file_cjseq(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap)
 {
-  std::cout << "CityJSONL input file" << std::endl;
+  std::cout << "CityJSONSeq input file" << std::endl;
   std::ifstream infile(ifile.c_str(), std::ifstream::in);
   if (!infile)
   {
@@ -673,9 +673,9 @@ void read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOEr
       }
     }
     if (j["type"] == "CityJSONFeature") {
-      errs.set_input_file_type("CityJSONL");
+      errs.set_input_file_type("CityJSONSeq");
       j["transform"] = jtransform; //-- add transform b/c BuildingPart overlap uses a tolerance
-      parse_cityjsonl(j, lsFeatures, tol_snap, lsGTs);
+      parse_cjseq(j, lsFeatures, tol_snap, lsGTs);
     }
     linecount++;
   }
@@ -713,7 +713,7 @@ void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
   }
 }
 
-void parse_cityjsonl(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs)
+void parse_cjseq(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs)
 {
   //-- compute (_minx, _miny)
   compute_min_xy(j);

@@ -411,7 +411,7 @@ int main(int argc, char* const argv[])
       }
       else if (inputtype == JSONL)
       {
-        read_file_jsonl(inputfile.getValue(), 
+        read_file_cjseq(inputfile.getValue(), 
                         lsFeatures,
                         ioerrs, 
                         snap_tol.getValue());

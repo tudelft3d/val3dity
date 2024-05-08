@@ -161,14 +161,14 @@ std::map<std::string, std::string>
                   get_namespaces(pugi::xml_node& root);
 
 void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
-void              read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
+void              read_file_cjseq(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          parse_poly(std::istream &input, int shellid, IOErrors& errs);
 Surface*          parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_snap);
 
 void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
-void              parse_cityjsonl(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs);
+void              parse_cjseq(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs);
 void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, IOErrors& errs);
