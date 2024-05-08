@@ -662,14 +662,13 @@ int main(int argc, char* const argv[])
 }
 
 void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_planarity_n, double tol_overlap = -1) {
-  std::cout << "Reading from stdin" << std::endl;
   std::vector<Feature*> lsFeatures;
   //-- read and store the GeometryTemplates
   std::vector<GeometryTemplate*> lsGTs;
   //-- transform
   json jtransform;
   std::string l;
-  int linecount = 0;
+  int linecount = 1;
   while (std::getline(std::cin, l)) {
     std::istringstream iss(l);
     json j;
@@ -690,25 +689,24 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
       if (j.count("transform") == 0) {
         std::string s = "Input file first line has no \"transform\" property";
         std::cout << "ERROR: " << s << std::endl;
-        // errs.add_error(901, s);
         break;
       } else {
-        jtransform = j["transform"];
+      jtransform = j["transform"];
+      std::cout << "[]" << std::endl;
+
       }
-    }
-    if (j["type"] == "CityJSONFeature") {
+    } else if (j["type"] == "CityJSONFeature") {
       j["transform"] = jtransform; //-- add transform b/c BuildingPart overlap uses a tolerance
       parse_cjseq(j, lsFeatures, tol_snap, lsGTs);
       auto f = lsFeatures[0];
       f->validate(tol_planarity_d2p, tol_planarity_n, tol_overlap);
-      std::cout << "is_valid() " << f->is_valid() << std::endl;
-      std::cout << "error codes = [";
-      for (auto& c : f->get_unique_error_codes()) {
-        std::cout << c << " "; 
-      }
-      std::cout << "]" << std::endl;
-      // delete f; //-- TODO: implement virtual destructor
+      json j_set(f->get_unique_error_codes());
+      std::cout << j["id"] << " ";
+      std::cout << j_set << std::endl;
+      delete f; 
       lsFeatures.clear();
+    } else {
+        std::cout << j["id"] << " [904]" << std::endl;
     }
     linecount++;
   }
