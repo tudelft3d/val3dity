@@ -119,7 +119,7 @@ void cityjson_demo()
   }
   //-- validate it
   try {
-    json re = val3dity::validate(j);
+    json re = val3dity::validate(j, val3dity::Parameters().tol_snap(0.01).planarity_d2p_tol(0.04));
     std::cout << re << std::endl;
   }
   catch (std::exception& ex) {
