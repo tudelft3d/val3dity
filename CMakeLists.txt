@@ -66,7 +66,7 @@ add_library(thirdparty STATIC ${THIRDPARTY})
 
 FILE(GLOB SRC_FILES src/*.cpp)
 
-if ( LIBRARY )
+if ( VAL3DITY_LIBRARY )
   message(STATUS "Building val3dity library")
   list(REMOVE_ITEM SRC_FILES src/main.cpp)
   add_library(val3dity STATIC ${SRC_FILES})

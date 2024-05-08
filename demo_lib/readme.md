@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
 1. modify `CMakeLists.txt` to ensure that `add_subdirectory` (line 9) points to where you have the root folder of val3dity (in this demo it's the parent directory). Use an absolute path, and not a relative one!
 1. `mkdir build && cd build`
-1. `cmake .. -DLIBRARY=true`
+1. `cmake .. -DVAL3DITY_LIBRARY=true`
 1. `make`
 1. `./myprogram`
 
