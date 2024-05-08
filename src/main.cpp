@@ -40,6 +40,7 @@
 #include <time.h>  
 #include "nlohmann-json/json.hpp"
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 using namespace std;
 using namespace val3dity;
@@ -51,6 +52,10 @@ std::string VAL3DITY_VERSION = "2.4.1b0";
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        write_report_json(json& jr, std::string report);
+void        read_stream_cjseq(double tol_snap, 
+                              double tol_planarity_d2p, 
+                              double tol_planarity_normals, 
+                              double tol_overlap);
 
 
 
@@ -278,44 +283,10 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
-    std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  \n"
-    "This program comes with ABSOLUTELY NO WARRANTY.\n"
-    "This is free software, and you are welcome to redistribute it\n"
-    "under certain conditions; for details run val3dity with the '--license' option.\n---";
-    std::cout << licensewarning << std::endl;
-
     //-- vector with Features: CityObject, GenericObject, 
     //-- or IndoorModel (or others in the future)
     std::vector<Feature*> lsFeatures;
     
-    InputTypes inputtype = OTHER;
-    std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
-    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
-      inputtype = GML;
-      ioerrs.set_input_file_type("GML");
-    }
-    else if ( (extension == "poly") || (extension == "POLY") ) {
-      inputtype = POLY;    
-      ioerrs.set_input_file_type("POLY");
-    }
-    else if ( (extension == "json") || (extension == "JSON") ) {
-      inputtype = JSON;
-      ioerrs.set_input_file_type("JSON");
-    }
-    else if ( (extension == "jsonl") || (extension == "JSONL") ) {
-      inputtype = JSONL;
-      ioerrs.set_input_file_type("JSONL");
-    }
-    else if ( (extension == "obj") || (extension == "OBJ") ) {
-      inputtype = OBJ;
-      ioerrs.set_input_file_type("OBJ");
-    }
-    else if ( (extension == "off") || (extension == "OFF") ) {
-      inputtype = OFF;
-      ioerrs.set_input_file_type("OFF");
-    }
-
     //-- if verbose == false then log to a file
     if (verbose.getValue() == false)
     {
@@ -323,6 +294,48 @@ int main(int argc, char* const argv[])
       mylog.open("val3dity.log");
       std::clog.rdbuf(mylog.rdbuf());
     }
+
+    InputTypes inputtype = OTHER;
+    if ( (inputfile.getValue() == "stdin") || (inputfile.getValue() == "STDIN") ) {
+      inputtype = STDIN;
+      read_stream_cjseq(snap_tol.getValue(), planarity_d2p_tol.getValue(), planarity_n_tol.getValue(), overlap_tol.getValue());
+      return(0);
+    } else {
+      std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
+      if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
+        inputtype = GML;
+        ioerrs.set_input_file_type("GML");
+      }
+      else if ( (extension == "poly") || (extension == "POLY") ) {
+        inputtype = POLY;    
+        ioerrs.set_input_file_type("POLY");
+      }
+      else if ( (extension == "json") || (extension == "JSON") ) {
+        inputtype = JSON;
+        ioerrs.set_input_file_type("JSON");
+      }
+      else if ( (extension == "jsonl") || (extension == "JSONL") ) {
+        inputtype = JSONL;
+        ioerrs.set_input_file_type("JSONL");
+      }
+      else if ( (extension == "obj") || (extension == "OBJ") ) {
+        inputtype = OBJ;
+        ioerrs.set_input_file_type("OBJ");
+      }
+      else if ( (extension == "off") || (extension == "OFF") ) {
+        inputtype = OFF;
+        ioerrs.set_input_file_type("OFF");
+      }
+    }
+
+    //-- print the license (each time)
+    std::string licensewarning =
+    "---\nval3dity Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  \n"
+    "This program comes with ABSOLUTELY NO WARRANTY.\n"
+    "This is free software, and you are welcome to redistribute it\n"
+    "under certain conditions; for details run val3dity with the '--license' option.\n---";
+    std::cout << licensewarning << std::endl;
+
 
     //-- no negative snap_tol value
     if (snap_tol.getValue() < 0) 
@@ -648,6 +661,58 @@ int main(int argc, char* const argv[])
   }
 }
 
+void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_planarity_n, double tol_overlap = -1) {
+  std::cout << "Reading from stdin" << std::endl;
+  std::vector<Feature*> lsFeatures;
+  //-- read and store the GeometryTemplates
+  std::vector<GeometryTemplate*> lsGTs;
+  //-- transform
+  json jtransform;
+  std::string l;
+  int linecount = 0;
+  while (std::getline(std::cin, l)) {
+    std::istringstream iss(l);
+    json j;
+    try 
+    {
+      iss >> j;
+    }
+    catch (nlohmann::detail::parse_error e) 
+    {
+      std::string s = "Input file has invalid JSON at line #" + std::to_string(linecount);
+      std::cout << "ERROR: " << s << std::endl;
+      // errs.add_error(901, s);
+      break;
+    }
+    if (j["type"] == "CityJSON") {
+      if (j.count("geometry-templates") == 1)
+        process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
+      if (j.count("transform") == 0) {
+        std::string s = "Input file first line has no \"transform\" property";
+        std::cout << "ERROR: " << s << std::endl;
+        // errs.add_error(901, s);
+        break;
+      } else {
+        jtransform = j["transform"];
+      }
+    }
+    if (j["type"] == "CityJSONFeature") {
+      j["transform"] = jtransform; //-- add transform b/c BuildingPart overlap uses a tolerance
+      parse_cjseq(j, lsFeatures, tol_snap, lsGTs);
+      auto f = lsFeatures[0];
+      f->validate(tol_planarity_d2p, tol_planarity_n, tol_overlap);
+      std::cout << "is_valid() " << f->is_valid() << std::endl;
+      std::cout << "error codes = [";
+      for (auto& c : f->get_unique_error_codes()) {
+        std::cout << c << " "; 
+      }
+      std::cout << "]" << std::endl;
+      // delete f; //-- TODO: implement virtual destructor
+      lsFeatures.clear();
+    }
+    linecount++;
+  }
+}
 
 void write_report_json(json& jr, std::string report)
 {

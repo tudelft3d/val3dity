@@ -112,7 +112,8 @@ typedef enum
   OBJ   = 3,
   POLY  = 4,
   OFF   = 5,
-  OTHER = 6,
+  STDIN = 6,
+  OTHER = 7,
 } InputTypes;
 
 
