@@ -678,10 +678,7 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
     }
     catch (nlohmann::detail::parse_error e) 
     {
-      std::string s = "Input file has invalid JSON at line #" + std::to_string(linecount);
-      std::cout << "ERROR: " << s << std::endl;
-      // errs.add_error(901, s);
-      break;
+      std::cout << "line."  << linecount << " [905]" << std::endl;
     }
     if (j["type"] == "CityJSON") {
       if (j.count("geometry-templates") == 1)
@@ -706,7 +703,7 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
       delete f; 
       lsFeatures.clear();
     } else {
-        std::cout << j["id"] << " [904]" << std::endl;
+        std::cout << j["id"] << " [905]" << std::endl;
     }
     linecount++;
   }

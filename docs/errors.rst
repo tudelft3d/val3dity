@@ -367,6 +367,11 @@ The parameters used for the validation are not valid.
 ---------------------------
 It can be that certain versions of a supported format are not supported, eg v3.0 of CityGML is not.
 
+.. _e905:
+
+905 -- INVALID_JSON
+-------------------
+Used when a JSON object is invalid, or when a CityJSON object (or CityJSONSeq object) is not schema-valid. To ensure that this does not happen, files should be schema-validated with `cjval <https://github.com/cityjson/cjval>`_.
 
 .. _e906:
 
