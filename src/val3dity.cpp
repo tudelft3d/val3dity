@@ -349,9 +349,6 @@ json
 validate(json& j,
          Parameters params)
 {
-  std::ostream val3ditycout(set_cout(params._terminal_output).get());
-  std::ostream val3dityclog(set_clog(params._terminal_output).get());
-
   json re;
   //-- CityJSON
   if (j["type"] == "CityJSON") {
@@ -406,9 +403,6 @@ validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          Parameters params)
 {
-  std::ostream val3ditycout(set_cout(params._terminal_output).get());
-  std::ostream val3dityclog(set_clog(params._terminal_output).get());
-
   double _minx = 9e15;
   double _miny = 9e15; 
   //-- find (minx, miny)
@@ -473,8 +467,6 @@ validate(std::string& input,
          std::string format,
          Parameters params)
 {
-  std::ostream val3ditycout(set_cout(params._terminal_output).get());
-  std::ostream val3dityclog(set_clog(params._terminal_output).get());
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, params);
