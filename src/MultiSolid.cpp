@@ -37,7 +37,11 @@ MultiSolid::MultiSolid(std::string id) {
   _is_valid = -1;
 }
 
-MultiSolid::~MultiSolid() {
+MultiSolid::~MultiSolid() 
+{
+  for (auto& sol : _lsSolids) {
+    delete sol;
+  }
 }
 
 Primitive3D MultiSolid::get_type() 

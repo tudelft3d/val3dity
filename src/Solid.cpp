@@ -45,7 +45,12 @@ Solid::Solid(std::string id)
 
 
 Solid::~Solid()
-{}
+{
+  delete _nef;
+  for (auto& sh : _shells) {
+    delete sh;
+  }
+}
 
 Surface* Solid::get_oshell()
 {

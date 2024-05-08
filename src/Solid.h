@@ -44,8 +44,8 @@ namespace val3dity
 class Solid : public Primitive
 {
 public:
-  Solid(std::string id = "");
-  ~Solid();
+                  Solid(std::string id = "");
+                  ~Solid();
   
   Surface*        get_oshell();
   void            set_oshell(Surface* sh);

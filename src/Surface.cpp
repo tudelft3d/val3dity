@@ -58,6 +58,7 @@ Surface::~Surface()
 {
   // TODO: clear memory properly
   _lsPts.clear();
+  delete _polyhedron;
 }
 
 int Surface::get_id()

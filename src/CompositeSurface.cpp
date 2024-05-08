@@ -39,6 +39,7 @@ CompositeSurface::CompositeSurface(std::string id) {
 }
 
 CompositeSurface::~CompositeSurface() {
+  delete _surface;
 }
 
 bool CompositeSurface::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)

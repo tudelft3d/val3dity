@@ -45,6 +45,8 @@ namespace val3dity
 class Feature
 {
 public:
+                          Feature  ();
+  virtual                 ~Feature ();
 
   virtual bool            validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap = -1) = 0;
   virtual bool            is_valid() = 0;

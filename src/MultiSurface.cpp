@@ -39,6 +39,7 @@ MultiSurface::MultiSurface(std::string id) {
 }
 
 MultiSurface::~MultiSurface() {
+  delete _surface;
 }
 
 bool MultiSurface::validate(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)

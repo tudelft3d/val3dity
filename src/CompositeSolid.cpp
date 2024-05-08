@@ -41,7 +41,12 @@ CompositeSolid::CompositeSolid(std::string id)
 
 
 CompositeSolid::~CompositeSolid()
-{}
+{
+  delete _nef;
+  for (auto& sol : _lsSolids) {
+    delete sol;
+  }
+}
 
 
 Primitive3D CompositeSolid::get_type() 

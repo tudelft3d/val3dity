@@ -34,6 +34,15 @@ namespace val3dity
 {
 
 
+Feature::Feature() {
+}
+
+Feature::~Feature() {
+  for (auto& p : _lsPrimitives) {
+    delete p;
+  }
+
+}
 
 
 std::string Feature::get_id()
