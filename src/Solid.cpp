@@ -198,12 +198,9 @@ std::vector<json> Solid::get_errors(std::string preid)
       js.push_back(j);
     }
   }
-  int shid = 0;
   for (auto& sh : _shells) {
-    std::string t = "shell:" + std::to_string(shid);
-    auto e = sh->get_errors(t);
+    auto e = sh->get_errors();
     js.insert(js.end(), e.begin(), e.end());
-     shid++;
   }
   return js;
 }
@@ -235,7 +232,7 @@ json Solid::get_report_json(std::string preid)
   }
   int shid = 0;
   for (auto& sh : _shells) {
-    std::string t = "shell:" + std::to_string(shid);
+    std::string t = "shell=" + std::to_string(shid);
     for (auto& each: sh->get_report_json(t)) {
       j["errors"].push_back(each); 
     }

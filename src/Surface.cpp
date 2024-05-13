@@ -46,7 +46,7 @@ namespace val3dity
 double Surface::_shiftx = 0.0;
 double Surface::_shifty = 0.0;
 
-Surface::Surface(int id, double tol_snap)
+Surface::Surface(std::string id, double tol_snap)
 {
   _id = id;
   _is_valid_2d = -1;
@@ -60,7 +60,7 @@ Surface::~Surface()
   _lsPts.clear();
 }
 
-int Surface::get_id()
+std::string Surface::get_id()
 {
   return _id;
 }
@@ -113,11 +113,7 @@ std::vector<json> Surface::get_errors(std::string preid)
       json jj;
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      if (preid != "") {
-        jj["id"] = preid + " | " + "face:" + std::get<0>(e);
-      } else {
-        jj["id"] = "face:" + std::get<0>(e);
-      }
+      jj["id"] = this->get_id() + "|" + "face=" + std::get<0>(e);
       jj["info"] = std::get<1>(e);
       js.push_back(jj);
     }
@@ -137,7 +133,7 @@ json Surface::get_report_json(std::string preid)
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
       if (preid != "") {
-        jj["id"] = preid + " | " + "face:" + std::get<0>(e);
+        jj["id"] = preid + " | " + "face=" + std::get<0>(e);
       } else {
         jj["id"] = "face:" + std::get<0>(e);
       }

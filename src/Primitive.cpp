@@ -78,7 +78,7 @@ void Primitive::add_error(int code, std::string whichgeoms, std::string info)
   _errors[code].push_back(a);
   std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
   if (whichgeoms.empty() == false)
-    std::clog << " (id: " << whichgeoms << ")";
+    std::clog << " (id= " << whichgeoms << ")";
   std::clog << std::endl;
   if (info.empty() == false)
     std::clog << "\t[" << info << "]" << std::endl;

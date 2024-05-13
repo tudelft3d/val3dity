@@ -202,7 +202,7 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
 {
   std::string s = ".//" + NS["gml"] + "surfaceMember";
   pugi::xpath_node_set nsm = n.select_nodes(s.c_str());
-  Surface* sh = new Surface(id, tol_snap);
+  Surface* sh = new Surface(std::to_string(id), tol_snap);
   int i = 0;
   for (pugi::xpath_node_set::const_iterator it = nsm.begin(); it != nsm.end(); ++it)
   {
@@ -455,12 +455,12 @@ void process_jsonfg_surface(std::vector<std::vector<std::vector<double>>>& pgn, 
 
 void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap)
 {
-  int idgeom = co->number_of_primitives();
+  int idgeom = 0;
   for (auto& g : jco["geometry"]) {
-    std::string theid = std::to_string(idgeom);
+    std::string gid = "geom=" + std::to_string(idgeom);
     if  (g["type"] == "Solid")
     {
-      Solid* s = new Solid(theid);
+      Solid* s = new Solid(gid);
       std::string thelod = "";
       if (g["lod"].is_number()) {
         thelod = std::to_string(g["lod"].get<double>());
@@ -472,7 +472,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
       int c = 0;
       for (auto& shell : g["boundaries"]) 
       {
-        Surface* sh = new Surface(c, tol_snap);
+        Surface* sh = new Surface(std::to_string(c), tol_snap);
         c++;
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
@@ -490,7 +490,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     }
     else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
     {
-      Surface* sh = new Surface(-1, tol_snap);
+      Surface* sh = new Surface(std::to_string(-1), tol_snap);
       for (auto& p : g["boundaries"]) 
       { 
         std::vector< std::vector<int> > pa = p;
@@ -504,14 +504,14 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
       }
       if (g["type"] == "MultiSurface")
       {
-        MultiSurface* ms = new MultiSurface(theid);
+        MultiSurface* ms = new MultiSurface(gid);
         ms->set_lod(thelod);
         ms->set_surface(sh);
         co->add_primitive(ms);
       }
       else
       {
-        CompositeSurface* cs = new CompositeSurface(theid);
+        CompositeSurface* cs = new CompositeSurface(gid);
         cs->set_lod(thelod);
         cs->set_surface(sh);
         co->add_primitive(cs);
@@ -519,7 +519,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     }
     else if (g["type"] == "MultiSolid") 
     {
-      MultiSolid* ms = new MultiSolid(theid);
+      MultiSolid* ms = new MultiSolid(gid);
       std::string thelod = "";
       if (g["lod"].is_number()) {
         thelod = std::to_string(g["lod"].get<double>());
@@ -530,11 +530,14 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
       int no_solid = 0;
       for (auto& solid : g["boundaries"]) 
       {
-        Solid* s = new Solid(std::to_string(no_solid));
+        std::string id2 = gid + "|" + "solid=" + std::to_string(no_solid);
+        Solid* s = new Solid(id2);
         bool oshell = true;
+        int no_shell = 0;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(-1, tol_snap);
+          std::string shid = id2 + "|" + "shell=" + std::to_string(no_shell);
+          Surface* sh = new Surface(shid, tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, j, sh);
@@ -544,8 +547,10 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
             oshell = false;
             s->set_oshell(sh);
           }
-          else
+          else {
             s->add_ishell(sh);
+          }
+          no_shell++;
         }
         ms->add_solid(s);
         no_solid++;
@@ -554,7 +559,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
     }
     else if (g["type"] == "CompositeSolid") 
     {
-      CompositeSolid* cs = new CompositeSolid(theid);
+      CompositeSolid* cs = new CompositeSolid(gid);
       std::string thelod = "";
       if (g["lod"].is_number()) {
         thelod = std::to_string(g["lod"].get<double>());
@@ -569,7 +574,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
         bool oshell = true;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(-1, tol_snap);
+          Surface* sh = new Surface(std::to_string(-1), tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, j, sh);
@@ -755,7 +760,7 @@ void process_cityjson_geometrytemplates(json& j, std::vector<GeometryTemplate*>&
       int c = 0;
       for (auto& shell : jt["boundaries"]) 
       {
-        Surface* sh = new Surface(c, tol_snap);
+        Surface* sh = new Surface(std::to_string(c), tol_snap);
         c++;
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
@@ -773,7 +778,7 @@ void process_cityjson_geometrytemplates(json& j, std::vector<GeometryTemplate*>&
     }
     else if ( (jt["type"] == "MultiSurface") || (jt["type"] == "CompositeSurface") ) 
     {
-      Surface* sh = new Surface(-1, tol_snap);
+      Surface* sh = new Surface(std::to_string(-1), tol_snap);
       for (auto& p : jt["boundaries"]) 
       { 
         std::vector< std::vector<int> > pa = p;
@@ -1166,7 +1171,7 @@ Surface* parse_poly(std::istream &input, int shellid, IOErrors& errs)
   input.seekg(0);
   input >> num >> tmpint >> tmpint >> tmpint;
   //-- read verticess
-  Surface* sh = new Surface(shellid);  
+  Surface* sh = new Surface(std::to_string(shellid));  
   for (int i = 0; i < num; i++)
   {
     input >> tmpint >> x >> y >> z;
@@ -1273,7 +1278,7 @@ Surface* parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_
   input >> numpt >> numf >> tmpint;
   //-- read the points
   std::vector<int> newi;
-  Surface* sh = new Surface(shellid, tol_snap);
+  Surface* sh = new Surface(std::to_string(shellid), tol_snap);
   for (int i = 0; i < numpt; i++)
   {
     double x, y, z;
@@ -1331,7 +1336,7 @@ void parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive
   input.seekg(0);
   int primid = 0;
   std::string primids = "";
-  Surface* sh = new Surface(0, tol_snap);
+  Surface* sh = new Surface(std::to_string(0), tol_snap);
   std::vector<Point3*> allvertices;
   GenericObject* o = new GenericObject("none");
   while (std::getline(input, l)) {
@@ -1377,7 +1382,7 @@ void parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive
         primid++;
         std::string tmp;
         iss >> tmp >> primids; 
-        sh = new Surface(0, tol_snap);
+        sh = new Surface(std::to_string(0), tol_snap);
       }
     }
     else if (l.substr(0, 2) == "f ") {
@@ -1486,7 +1491,7 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
     int c = 0;
     for (auto& shell : j["place"]["coordinates"]) 
     {
-      Surface* sh = new Surface(c, tol_snap);
+      Surface* sh = new Surface(std::to_string(c), tol_snap);
       c++;
       for (auto& polygon : shell) { 
         std::vector<std::vector<std::vector<double>>> pa = polygon;
@@ -1510,7 +1515,7 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
       bool oshell = true;
       for (auto& shell : solid) 
       {
-        Surface* sh = new Surface(-1, tol_snap);
+        Surface* sh = new Surface(std::to_string(-1), tol_snap);
         for (auto& polygon : shell) { 
           std::vector<std::vector<std::vector<double>>> pa = polygon;
           process_jsonfg_surface(pa, sh, errs);
@@ -1546,7 +1551,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
       int c = 0;
       for (auto& shell : f["geometry"]["boundaries"]) 
       {
-        Surface* sh = new Surface(c, tol_snap);
+        Surface* sh = new Surface(std::to_string(c), tol_snap);
         c++;
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
@@ -1564,7 +1569,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
     }
     else if ( (f["geometry"]["type"] == "MultiSurface") || (f["geometry"]["type"] == "CompositeSurface") ) 
     {
-      Surface* sh = new Surface(-1, tol_snap);
+      Surface* sh = new Surface(std::to_string(-1), tol_snap);
       for (auto& p : f["geometry"]["boundaries"]) 
       { 
         std::vector< std::vector<int> > pa = p;
@@ -1592,7 +1597,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
         bool oshell = true;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(-1, tol_snap);
+          Surface* sh = new Surface(std::to_string(-1), tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, f["geometry"], sh);
@@ -1618,7 +1623,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
         bool oshell = true;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(-1, tol_snap);
+          Surface* sh = new Surface(std::to_string(-1), tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, f["geometry"], sh);
@@ -1652,7 +1657,7 @@ void parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double t
     int c = 0;
     for (auto& shell : j["boundaries"]) 
     {
-      Surface* sh = new Surface(c, tol_snap);
+      Surface* sh = new Surface(std::to_string(c), tol_snap);
       c++;
       for (auto& polygon : shell) { 
         std::vector< std::vector<int> > pa = polygon;
@@ -1670,7 +1675,7 @@ void parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double t
   }
   else if ( (j["type"] == "MultiSurface") || (j["type"] == "CompositeSurface") ) 
   {
-    Surface* sh = new Surface(-1, tol_snap);
+    Surface* sh = new Surface(std::to_string(-1), tol_snap);
     for (auto& p : j["boundaries"]) 
     { 
       std::vector< std::vector<int> > pa = p;
@@ -1698,7 +1703,7 @@ void parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double t
       bool oshell = true;
       for (auto& shell : solid) 
       {
-        Surface* sh = new Surface(-1, tol_snap);
+        Surface* sh = new Surface(std::to_string(-1), tol_snap);
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
           process_json_surface(pa, j, sh);
@@ -1724,7 +1729,7 @@ void parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double t
       bool oshell = true;
       for (auto& shell : solid) 
       {
-        Surface* sh = new Surface(-1, tol_snap);
+        Surface* sh = new Surface(std::to_string(-1), tol_snap);
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
           process_json_surface(pa, j, sh);

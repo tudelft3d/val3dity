@@ -615,8 +615,11 @@ int main(int argc, char* const argv[])
     //-- output report in JSON 
     if (report.getValue() != "") 
     {
+      string of = inputfile.getValue();
+      if (boost::filesystem::exists(inputfile.getValue()))
+        of = boost::filesystem::canonical(inputfile.getValue()).string();
       //-- save the json report in memory first
-      json jr = get_report_json(inputfile.getValue(),
+      json jr = get_report_json(of,
                                 lsFeatures,
                                 VAL3DITY_VERSION,
                                 snap_tol.getValue(),

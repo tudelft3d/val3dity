@@ -114,8 +114,7 @@ std::vector<json> MultiSolid::get_errors(std::string preid)
   int solid = 0;
   for (auto& sol : _lsSolids)
   {
-    std::string t = "solid: " + std::to_string(solid);
-    auto e = sol->get_errors(t);
+    auto e = sol->get_errors();
     js.insert(js.end(), e.begin(), e.end());    
     solid++;
   }
@@ -155,7 +154,7 @@ json MultiSolid::get_report_json(std::string preid)
     std::string t = "solid: " + std::to_string(solid);
     int shid = 0;
     for (auto& sh : sol->get_shells()) {
-      std::string t = "solid:" + std::to_string(solid) + " | shell:" + std::to_string(shid);
+      std::string t = "solid=" + std::to_string(solid) + " | shell=" + std::to_string(shid);
       for (auto& each: sh->get_report_json(t)) {
         j["errors"].push_back(each);
       }
