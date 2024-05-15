@@ -469,11 +469,11 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
       }
       s->set_lod(thelod);
       bool oshell = true;
-      int c = 0;
+      int no_shell = 0;
       for (auto& shell : g["boundaries"]) 
       {
-        Surface* sh = new Surface(std::to_string(c), tol_snap);
-        c++;
+        std::string shid = gid + "|" + "shell=" + std::to_string(no_shell);
+        Surface* sh = new Surface(shid, tol_snap);
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
           process_json_surface(pa, j, sh);
@@ -483,8 +483,10 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
           oshell = false;
           s->set_oshell(sh);
         }
-        else
+        else {
           s->add_ishell(sh);
+        }
+        no_shell++;
       }
       co->add_primitive(s);
     }
@@ -570,11 +572,14 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
       int no_solid = 0;
       for (auto& solid : g["boundaries"]) 
       {
-        Solid* s = new Solid(std::to_string(no_solid));
+        std::string id2 = gid + "|" + "solid=" + std::to_string(no_solid);
+        Solid* s = new Solid(id2);
         bool oshell = true;
+        int no_shell = 0;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(std::to_string(-1), tol_snap);
+          std::string shid = id2 + "|" + "shell=" + std::to_string(no_shell);
+          Surface* sh = new Surface(shid, tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, j, sh);
@@ -584,8 +589,10 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<Geomet
             oshell = false;
             s->set_oshell(sh);
           }
-          else
+          else {
             s->add_ishell(sh);
+          }
+          no_shell++;
         }
         cs->add_solid(s);
         no_solid++;

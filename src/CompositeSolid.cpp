@@ -230,9 +230,8 @@ std::vector<json> CompositeSolid::get_errors(std::string preid)
   int solid = 0;
   for (auto& sol : _lsSolids)
   {
-    std::string t = "solid: " + std::to_string(solid);
-    auto e = sol->get_errors(t);
-    js.insert(js.end(), e.begin(), e.end());
+    auto e = sol->get_errors();
+    js.insert(js.end(), e.begin(), e.end());    
     solid++;
   }
   return js;
