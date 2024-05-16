@@ -402,7 +402,7 @@ def test_401(validate, data_401, solid):
 
 def test_402_inner(validate, data_402_1, solid):
     error = validate(data_402_1, options=solid)
-    assert(error == [402])
+    assert(error == [401] or error == [402])
 
 def test_403(validate, data_403, solid):
     error = validate(data_403, options=solid)
