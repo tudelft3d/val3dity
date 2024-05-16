@@ -92,39 +92,24 @@ bool CompositeSurface::is_empty() {
   return _surface->is_empty();
 }
 
-
-json CompositeSurface::get_report_json(std::string preid)
+std::vector<json> CompositeSurface::get_errors()
 {
-  json j;
-  bool isValid = true;
-  j["type"] = "CompositeSurface";
-  if (this->get_id() != "")
-    j["id"] = this->_id;
-  else
-    j["id"] = "none";
-  j["numberfaces"] = this->num_faces();
-  j["numbervertices"] = this->num_vertices();  
-  j["errors"] = json::array();
+  std::vector<json> js;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])
     {
       json jj;
-      jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);
       jj["info"] = std::get<1>(e);
-      j["errors"].push_back(jj);
-      isValid = false;
+      js.push_back(jj);
     }
   }
-  for (auto& each: _surface->get_report_json())
-    j["errors"].push_back(each); 
-  if (_surface->has_errors() == true)
-    isValid = false;
-  j["validity"] = isValid;  
-  return j;
+  auto e = _surface->get_errors();
+  js.insert(js.end(), e.begin(), e.end());
+  return js;
 }
 
 

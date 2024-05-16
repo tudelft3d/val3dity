@@ -88,7 +88,7 @@ bool CityObject::validate_building(double tol_overlap)
         std::clog << "Error: overlapping building parts (LoD" << lod << ")" << std::endl;
         for (auto& e : lsErrors) {
           std::stringstream msg;
-          msg << "Geometries for LoD" << lod;
+          msg << "geometries are lod=" << lod;
           this->add_error(e.errorcode, e.info1, msg.str());
         }
       }

@@ -83,9 +83,13 @@ json Feature::get_report_json()
       j["errors"].push_back(jj);
     }
   }
-  j["primitives"];
-  for (auto& p : _lsPrimitives)
-    j["primitives"].push_back(p->get_report_json()); 
+  // j["primitives"];
+  for (auto& p : _lsPrimitives) {
+    auto errs = p->get_errors();
+    for (auto& e: errs)
+      j["errors"].push_back(e);
+  //   j["primitives"].push_back(p->get_report_json()); 
+  }
   return j;
 }
 

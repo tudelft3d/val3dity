@@ -436,7 +436,7 @@ int main(int argc, char* const argv[])
           Surface* sh = parse_poly(infile, 0, ioerrs);
           if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
           {
-            Solid* s = new Solid;
+            Solid* s = new Solid();
             s->set_oshell(sh);
             int sid = 1;
             for (auto ifile : ishellfiles.getValue())
@@ -628,8 +628,11 @@ int main(int argc, char* const argv[])
     //-- output report in JSON 
     if (report.getValue() != "") 
     {
+      string of = inputfile.getValue();
+      if (boost::filesystem::exists(inputfile.getValue()))
+        of = boost::filesystem::canonical(inputfile.getValue()).string();
       //-- save the json report in memory first
-      json jr = get_report_json(inputfile.getValue(),
+      json jr = get_report_json(of,
                                 lsFeatures,
                                 VAL3DITY_VERSION,
                                 snap_tol.getValue(),

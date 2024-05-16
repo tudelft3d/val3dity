@@ -46,7 +46,7 @@ namespace val3dity
 double Surface::_shiftx = 0.0;
 double Surface::_shifty = 0.0;
 
-Surface::Surface(int id, double tol_snap)
+Surface::Surface(std::string id, double tol_snap)
 {
   _id = id;
   _is_valid_2d = -1;
@@ -61,7 +61,7 @@ Surface::~Surface()
   delete _polyhedron;
 }
 
-int Surface::get_id()
+std::string Surface::get_id()
 {
   return _id;
 }
@@ -104,28 +104,22 @@ std::set<int> Surface::get_unique_error_codes()
   return errs;
 }
 
-
-json Surface::get_report_json(std::string preid)
+std::vector<json> Surface::get_errors()
 {
-  json j;
+  std::vector<json> js;
   for (auto& err : _errors)
   {
     for (auto& e : _errors[std::get<0>(err)])    
     {
       json jj;
-      jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      if (preid != "") {
-        jj["id"] = preid + " | " + "face:" + std::get<0>(e);
-      } else {
-        jj["id"] = "face:" + std::get<0>(e);
-      }
+      jj["id"] = this->get_id() + "|" + "face=" + std::get<0>(e);
       jj["info"] = std::get<1>(e);
-      j.push_back(jj);
+      js.push_back(jj);
     }
   }
-  return j;
+  return js;
 }
 
 
