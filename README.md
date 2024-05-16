@@ -23,7 +23,7 @@ There is no plan to support these geometries.
 val3dity accepts as input:
 
   - [CityJSON](http://www.cityjson.org)
-  - [CityJSON Sequence (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
+  - [CityJSON Sequences (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
   - [tu3djson](https://github.com/tudelft3d/tu3djson)
   - [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
@@ -116,9 +116,9 @@ Finally, to see all the options possible:
 
 ## Using val3dity as a library
 
-val3dity can be compiled as a library:
+val3dity can be compiled and used as a library:
 
-    $ cmake .. -DLIBRARY=true
+    $ cmake .. -DVAL3DITY_LIBRARY=true
 
 There is a simple example in `./demo_lib` with instructions to compile it.
 
