@@ -1178,7 +1178,7 @@ Surface* parse_poly(std::istream &input, int shellid, IOErrors& errs)
   input.seekg(0);
   input >> num >> tmpint >> tmpint >> tmpint;
   //-- read verticess
-  Surface* sh = new Surface(std::to_string(shellid));  
+  Surface* sh = new Surface("");  
   for (int i = 0; i < num; i++)
   {
     input >> tmpint >> x >> y >> z;
@@ -1285,7 +1285,7 @@ Surface* parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_
   input >> numpt >> numf >> tmpint;
   //-- read the points
   std::vector<int> newi;
-  Surface* sh = new Surface(std::to_string(shellid), tol_snap);
+  Surface* sh = new Surface("", tol_snap);
   for (int i = 0; i < numpt; i++)
   {
     double x, y, z;
