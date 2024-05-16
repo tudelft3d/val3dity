@@ -121,29 +121,6 @@ std::vector<json> Surface::get_errors(std::string preid)
   return js;
 }
 
-json Surface::get_report_json(std::string preid)
-{
-  json j;
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])    
-    {
-      json jj;
-      jj["type"] = "Error";
-      jj["code"] = std::get<0>(err);
-      jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      if (preid != "") {
-        jj["id"] = preid + " | " + "face=" + std::get<0>(e);
-      } else {
-        jj["id"] = "face:" + std::get<0>(e);
-      }
-      jj["info"] = std::get<1>(e);
-      j.push_back(jj);
-    }
-  }
-  return j;
-}
-
 
 std::string Surface::get_poly_representation()
 {

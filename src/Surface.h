@@ -67,7 +67,6 @@ public:
 
   std::vector<json> get_errors(std::string preid = "");
 
-  json          get_report_json(std::string preid = "");
   void          add_error(int code, std::string faceid = "", std::string info = "");
   bool          has_errors();
   std::set<int> get_unique_error_codes();

@@ -62,7 +62,6 @@ public:
   Nef_polyhedron* get_nef_polyhedron();
   void            get_min_bbox(double& x, double& y);
   void            translate_vertices();
-  json            get_report_json(std::string preid = "");
   std::string     get_poly_representation();
   std::string     get_off_representation(int shellno = 0);
   int             is_valid();

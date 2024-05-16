@@ -205,46 +205,6 @@ std::vector<json> Solid::get_errors(std::string preid)
   return js;
 }
 
-json Solid::get_report_json(std::string preid)
-{
-  json j;
-  j["type"] = "Solid";
-  if (this->get_id() != "")
-    j["id"] = this->_id;
-  else
-    j["id"] = "none";
-  j["numbershells"] = (this->num_ishells() + 1);
-  j["numberfaces"] = this->num_faces();
-  j["numbervertices"] = this->num_vertices();
-  j["errors"] = json::array();
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      json jj;
-      jj["type"] = "Error";
-      jj["code"] = std::get<0>(err);
-      jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      jj["id"] = std::get<0>(e);
-      jj["info"] = std::get<1>(e);
-      j["errors"].push_back(jj);
-    }
-  }
-  int shid = 0;
-  for (auto& sh : _shells) {
-    std::string t = "shell=" + std::to_string(shid);
-    for (auto& each: sh->get_report_json(t)) {
-      j["errors"].push_back(each); 
-    }
-    shid++;
-  }
-  if (this->is_valid() == 1)
-    j["validity"] = true;
-  else 
-    j["validity"] = false;  
-  return j;
-}
-
 
 Nef_polyhedron* Solid::get_nef_polyhedron()
 {

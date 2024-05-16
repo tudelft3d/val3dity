@@ -107,41 +107,6 @@ std::vector<json> GeometryTemplate::get_errors(std::string preid)
   return js;
 }
 
-json GeometryTemplate::get_report_json(std::string preid)
-{
-  json j;
-  bool isValid = true;
-  j["type"] = "GeometryTemplate";
-  if (this->get_id() != "")
-    j["id"] = this->_id;
-  else
-    j["id"] = "none";
-  j["errors"] = json::array();
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      json jj;
-      jj["type"] = "Error";
-      jj["code"] = std::get<0>(err);
-      jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      jj["id"] = std::get<0>(e);
-      jj["info"] = std::get<1>(e);
-      j["errors"].push_back(jj);
-      isValid = false;
-    }
-  }
-  for (auto& p : _lsPrimitives) //-- there should be just one by definition
-  {
-    j["template"].push_back(p->get_report_json());
-    if (p->is_valid() == false)
-      isValid = false;
-  }
-  j["validity"] = isValid;
-  return j;
-}
-
-
 
 bool GeometryTemplate::add_primitive(Primitive* s) {
   _lsPrimitives.push_back(s);

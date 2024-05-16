@@ -237,52 +237,6 @@ std::vector<json> CompositeSolid::get_errors(std::string preid)
   return js;
 }
 
-json CompositeSolid::get_report_json(std::string preid)
-{
-  json j;
-  bool isValid = true;
-  j["type"] = "CompositeSolid";
-  if (this->get_id() != "")
-    j["id"] = this->_id;
-  else
-    j["id"] = "none";
-  j["numbersolids"] = this->number_of_solids();
-  j["errors"]  = json::array();
-  for (auto& err : _errors)
-  {
-    for (auto& e : _errors[std::get<0>(err)])
-    {
-      json jj;
-      jj["type"] = "Error";
-      jj["code"] = std::get<0>(err);
-      jj["description"] = ALL_ERRORS[std::get<0>(err)];
-      jj["id"] = std::get<0>(e);
-      jj["info"] = std::get<1>(e);
-      j["errors"].push_back(jj);
-      isValid = false;
-    }
-  }
-  int solid = 0;
-  for (auto& sol : _lsSolids)
-  {
-    std::string t = "solid: " + std::to_string(solid);
-    int shid = 0;
-    for (auto& sh : sol->get_shells()) {
-      std::string t = "solid:" + std::to_string(solid) + " | shell:" + std::to_string(shid);
-      for (auto& each: sh->get_report_json(t)) {
-        j["errors"].push_back(each);
-      }
-      if (sol->is_valid() == false)
-        isValid = false;
-      shid++;
-    }
-    solid++;
-  }
-  j["validity"] = isValid;
-  return j;
-}
-
-
 
 std::set<int> CompositeSolid::get_unique_error_codes() {
   std::set<int> errs = Primitive::get_unique_error_codes();
