@@ -318,7 +318,7 @@ Surface* process_gml_surface(const pugi::xml_node& n, int id, std::map<std::stri
 Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
   //-- exterior shell
-  Solid* sol = new Solid;
+  Solid* sol = new Solid();
   if (nsolid.attribute("gml:id") != 0)
     sol->set_id(std::string(nsolid.attribute("gml:id").value()));
   std::string s = "./" + NS["gml"] + "exterior";
@@ -339,7 +339,7 @@ Solid* process_gml_solid(const pugi::xml_node& nsolid, std::map<std::string, pug
 
 MultiSolid* process_gml_multisolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
-  MultiSolid* ms = new MultiSolid;
+  MultiSolid* ms = new MultiSolid();
   if (nms.attribute("gml:id") != 0)
     ms->set_id(std::string(nms.attribute("gml:id").value()));
   std::string s = ".//" + NS["gml"] + "Solid";
@@ -357,7 +357,7 @@ MultiSolid* process_gml_multisolid(const pugi::xml_node& nms, std::map<std::stri
 
 CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
-  CompositeSolid* cs = new CompositeSolid;
+  CompositeSolid* cs = new CompositeSolid();
   if (nms.attribute("gml:id") != 0)
     cs->set_id(std::string(nms.attribute("gml:id").value()));
   std::string s = ".//" + NS["gml"] + "Solid";
@@ -376,7 +376,7 @@ CompositeSolid* process_gml_compositesolid(const pugi::xml_node& nms, std::map<s
 
 MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
-  MultiSurface* ms = new MultiSurface;
+  MultiSurface* ms = new MultiSurface();
   if (nms.attribute("gml:id") != 0)
     ms->set_id(std::string(nms.attribute("gml:id").value()));
   Surface* s = process_gml_surface(nms, 0, dallpoly, tol_snap, errs);
@@ -387,7 +387,7 @@ MultiSurface* process_gml_multisurface(const pugi::xml_node& nms, std::map<std::
 
 CompositeSurface* process_gml_compositesurface(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs)
 {
-  CompositeSurface* cs = new CompositeSurface;
+  CompositeSurface* cs = new CompositeSurface();
   if (nms.attribute("gml:id") != 0)
     cs->set_id(std::string(nms.attribute("gml:id").value()));
   Surface* s = process_gml_surface(nms, 0, dallpoly, tol_snap, errs);

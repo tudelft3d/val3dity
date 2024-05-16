@@ -96,7 +96,7 @@ bool MultiSolid::is_empty()
   return _lsSolids.empty();
 }
 
-std::vector<json> MultiSolid::get_errors(std::string preid)
+std::vector<json> MultiSolid::get_errors()
 {
   std::vector<json> js;
   for (auto& err : _errors)

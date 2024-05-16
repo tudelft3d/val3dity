@@ -212,7 +212,7 @@ bool CompositeSolid::is_empty() {
 }
 
 
-std::vector<json> CompositeSolid::get_errors(std::string preid)
+std::vector<json> CompositeSolid::get_errors()
 {
   std::vector<json> js;
   for (auto& err : _errors)

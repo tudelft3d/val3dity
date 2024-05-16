@@ -65,7 +65,7 @@ public:
   int    add_point(Point3 p);
   void   add_face(std::vector< std::vector<int> > f, std::string id = "");
 
-  std::vector<json> get_errors(std::string preid = "");
+  std::vector<json> get_errors();
 
   void          add_error(int code, std::string faceid = "", std::string info = "");
   bool          has_errors();

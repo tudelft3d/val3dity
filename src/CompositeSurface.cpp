@@ -91,7 +91,7 @@ bool CompositeSurface::is_empty() {
   return _surface->is_empty();
 }
 
-std::vector<json> CompositeSurface::get_errors(std::string preid)
+std::vector<json> CompositeSurface::get_errors()
 {
   std::vector<json> js;
   for (auto& err : _errors)

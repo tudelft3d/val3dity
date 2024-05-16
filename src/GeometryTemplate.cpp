@@ -83,7 +83,7 @@ bool GeometryTemplate::is_empty()
 }
 
 
-std::vector<json> GeometryTemplate::get_errors(std::string preid)
+std::vector<json> GeometryTemplate::get_errors()
 {
   std::vector<json> js;
   for (auto& err : _errors)

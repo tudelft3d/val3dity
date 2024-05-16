@@ -48,7 +48,7 @@ public:
   bool          is_empty();
   Primitive3D   get_type();
 
-  std::vector<json> get_errors(std::string preid = "");
+  std::vector<json> get_errors();
 
   void          get_min_bbox(double& x, double& y);
   void          translate_vertices();

@@ -423,7 +423,7 @@ int main(int argc, char* const argv[])
           Surface* sh = parse_poly(infile, 0, ioerrs);
           if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
           {
-            Solid* s = new Solid;
+            Solid* s = new Solid();
             s->set_oshell(sh);
             int sid = 1;
             for (auto ifile : ishellfiles.getValue())

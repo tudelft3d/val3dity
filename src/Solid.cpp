@@ -183,7 +183,7 @@ std::string Solid::get_off_representation(int shellno)
   return (_shells[shellno])->get_off_representation();
 }
 
-std::vector<json> Solid::get_errors(std::string preid)
+std::vector<json> Solid::get_errors()
 {
   std::vector<json> js;
   for (auto& err : _errors)

@@ -103,7 +103,7 @@ std::set<int> Surface::get_unique_error_codes()
   return errs;
 }
 
-std::vector<json> Surface::get_errors(std::string preid)
+std::vector<json> Surface::get_errors()
 {
   std::vector<json> js;
   for (auto& err : _errors)
