@@ -7,6 +7,7 @@ Using val3dity
 
   val3dity is a command-line program only, there is no graphical interface. Alternatively, you can use the `web application <http://geovalidation.bk.tudelft.nl/val3dity>`_.
 
+
 How to run val3dity?
 --------------------
 
@@ -42,7 +43,22 @@ The same file could be validated as a MultiSurface, ie each of its surface are v
 .. code-block:: bash
 
   $ val3dity -p MultiSurface input.obj
-    
+
+
+Using CityJSONSeq
+-----------------
+
+To validate a `CityJSONSeq stream <https://www.cityjson.org/cityjsonseq/>`_, you need to pipe the stream into val3dity and use ``--stdin`` for the input. 
+
+If you have a CityJSONSeq serialised in a file, then you can cat it:
+
+.. code-block:: bash
+
+  $ cat myfile.city.jsonl | val3dity stdin
+
+The output shows, line by line, what are the errors. If the list of error is empty (``[]``) this means the feature is geometrically valid.
+
+  
 
 Accepted input
 --------------
@@ -50,7 +66,7 @@ Accepted input
 val3dity accepts as input:
 
   - `CityJSON <http://www.cityjson.org>`_
-  - `CityJSON Sequence (CityJSONSeq) <https://www.cityjson.org/cityjsonseq/>`_
+  - `CityJSON Sequences (CityJSONSeq) <https://www.cityjson.org/cityjsonseq/>`_
   - `tu3djson <https://github.com/tudelft3d/tu3djson>`_
   - `JSON-FG (OGC Features and Geometries JSON) <https://github.com/opengeospatial/ogc-feat-geo-json>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
@@ -61,6 +77,9 @@ For **CityJSON** files, all the City Objects (eg ``Building`` or ``Bridge``) are
 The 3D primitives are bundled under their City Objects in the report.
 If your CityJSON contains ``Buildings`` with one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
 If there is one or more intersections, then :ref:`e601` will be reported.
+
+For **CityJSONSeq** streams, the validation is performed line-by-line and the errors are returned for each line. 
+If you want to generate a global report, you can serialise the stream into a .jsonl file and then validate this file as you would with any other input files.
 
 For **IndoorGML** files, all the cells (in the primal subdivisions, the rooms) are validated individually, and then some extra validation tests are run on the dual navigation network. All errors 7xx are related specifically to IndoorGML.
 
