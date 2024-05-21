@@ -1,24 +1,5 @@
 
 
-Vue.component('primitive-item', {
-    props: ['primitive'],
-    template: `
-    <li>
-        
-        <span class="badge badge-secondary">Hugo</span>
-    </li>
-    `,
-    data: function() {
-        return {
-            isOpen: false
-        }
-    },
-    methods: {
-        toggle() {
-            this.isOpen = !this.isOpen;
-        }
-    }
-})
 
 Vue.component('feature-item', {
     props: ['feature'],
@@ -145,10 +126,6 @@ var app = new Vue({
               return new_features.filter(function f(p) {
                 if (p.validity == true) {
                   return true;
-                }
-
-                if (p.primitives) {
-                  return (p.primitives = p.primitives.filter(f)).length
                 }
               });
             }
