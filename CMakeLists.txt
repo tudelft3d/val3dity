@@ -51,7 +51,7 @@ if ( NOT Boost_FOUND )
 endif()
 
 # GEOS
-find_package( GEOS REQUIRED CONFIG)
+find_package( GEOS REQUIRED )
 # if linux complains: 
 # find_package( GEOS )
 if ( NOT GEOS_FOUND )
@@ -62,7 +62,7 @@ include_directories( ${GEOS_INCLUDE_DIR} )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty )
 
 FILE(GLOB_RECURSE THIRDPARTY thirdparty/*.cpp)
-add_library(thirdparty STATIC ${THIRDPARTY})
+add_library(val3dity_thirdparty STATIC ${THIRDPARTY})
 
 FILE(GLOB SRC_FILES src/*.cpp)
 
@@ -80,8 +80,6 @@ else()
 endif()
 
 
-target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support GEOS::geos_c thirdparty Boost::filesystem)
-# if linux complains: 
-# target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support ${GEOS_LIBRARY} thirdparty Boost::filesystem)
+target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support ${GEOS_LIBRARY} val3dity_thirdparty Boost::filesystem)
 
 install(TARGETS val3dity DESTINATION bin)
