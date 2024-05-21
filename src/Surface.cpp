@@ -86,7 +86,7 @@ void Surface::add_error(int code, std::string faceid, std::string info)
 {
   std::tuple<std::string, std::string> a(faceid, info);
   _errors[code].push_back(a);
-  spdlog::info("e{}-{} (faceid={}; {}", code, ALL_ERRORS[code], faceid, info);
+  spdlog::info("e{}-{} (faceid={}; {})", code, ALL_ERRORS[code], faceid, info);
 }
 
 std::set<int> Surface::get_unique_error_codes()
