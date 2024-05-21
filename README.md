@@ -81,7 +81,7 @@ and then
     $ make
 
 
-### linux
+### Linux
 
 Under Linux (at least Ubuntu), CGAL has to be compiled because apt-get doesn't give you a version with Eigen.
 Thus, in a nutshell,
