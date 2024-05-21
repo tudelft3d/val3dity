@@ -110,7 +110,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
     for (int i = 0; i < _lsSolids.size(); i++)
       lsNefs.push_back(_lsSolids[i]->get_nef_polyhedron());
 //-- 1. check if any 2 are the same? ERROR:502
-    std::clog << "-----Are two solids duplicated" << std::endl;
+    // std::clog << "-----Are two solids duplicated" << std::endl;
     for (int i = 0; i < (lsNefs.size() - 1); i++)
     {
       for (int j = i + 1; j < lsNefs.size(); j++) 
@@ -128,7 +128,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
     if (isValid == true)
     {
 //-- 2. check if their interior intersects ERROR:501
-      std::clog << "-----Intersections of solids" << std::endl;
+      // std::clog << "-----Intersections of solids" << std::endl;
       std::vector<Nef_polyhedron*> lsNefsEroded;
       if (tol_overlap > 0.0)
       {
@@ -165,7 +165,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
     if (isValid == true)
     {
 //-- 3. check if their union yields one solid ERROR:503
-      std::clog << "-----Forming one solid (union)" << std::endl;
+      // std::clog << "-----Forming one solid (union)" << std::endl;
       std::vector<Nef_polyhedron*> lsNefsDilated;
       if (tol_overlap > 0.0)
       {

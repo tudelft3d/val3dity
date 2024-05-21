@@ -38,7 +38,6 @@
 #include <exception>      // std::exception
 
 
-
 namespace val3dity
 {
 

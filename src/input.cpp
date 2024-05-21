@@ -83,7 +83,7 @@ std::set<int> IOErrors::get_unique_error_codes()
 void IOErrors::add_error(int code, std::string info)
 {
   _errors[code].push_back(info);
-  std::cout << "ERROR " << code << " : " << info << std::endl;
+  spdlog::info("e{}-{} ({}", code, ALL_ERRORS[code], info);
 }
 
 
@@ -1171,7 +1171,7 @@ Surface* parse_poly(std::istream &input, int shellid, IOErrors& errs)
     if (y < _miny)
       _miny = y;
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   input.clear();
@@ -1275,7 +1275,7 @@ Surface* parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_
     if (y < _miny)
       _miny = y;
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- reset the file
@@ -1335,7 +1335,7 @@ void parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive
         _miny = y;
     }
   }
-  std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
+  // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);
   //-- read again file and parse everything

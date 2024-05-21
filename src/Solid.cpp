@@ -147,7 +147,7 @@ bool Solid::validate(double tol_planarity_d2p, double tol_planarity_normals, dou
       s += std::to_string(e);
       s += "; ";
     }
-    std::clog << "Errors: " << s << std::endl;
+    // std::clog << "Errors: " << s << std::endl;
     return false;
   }
   bool isValid = true;
@@ -297,7 +297,7 @@ bool Solid::validate_solid_with_nef()
 {
   bool isValid = true;
   //-- check orientation of the normals is outwards or inwards
-  std::clog << "-----Global orientation of normals" << std::endl;
+  // std::clog << "-----Global orientation of normals" << std::endl;
   int i = 0;
   for (auto& sh : this->get_shells())
   {
@@ -317,7 +317,7 @@ bool Solid::validate_solid_with_nef()
   if (this->num_ishells() == 0)
     return true;
     
-  std::clog << "---Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
+  // std::clog << "---Inspection interactions between the " << (this->num_ishells() + 1) << " shells" << std::endl;
   std::vector<Nef_polyhedron> nefs;
   for (auto& sh : this->get_shells())
   {

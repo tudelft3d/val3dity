@@ -46,6 +46,8 @@
 #include <CGAL/Aff_transformation_3.h>
 
 #include <string>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace val3dity
 {
