@@ -414,7 +414,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
       _miny = v[1];
   }
   //-- create a Surface (a 2-manifold)
-  Surface* sh = new Surface(0, params._tol_snap);
+  Surface* sh = new Surface("0", params._tol_snap);
   std::vector<Point3*> allvertices;
   GenericObject* o = new GenericObject("none");
   //-- read all the vertices
@@ -422,6 +422,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
     Point3 *p = new Point3(v[0] - _minx, v[1] - _miny, v[2]);
     allvertices.push_back(p);
   }
+
   //-- read all the faces (0-indexed!)
   for (auto& vids: faces) {
     std::vector<int> r;
