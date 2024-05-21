@@ -678,18 +678,25 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
     {
       std::cout << "line."  << linecount << " [905]" << std::endl;
     }
+    //-- first line/metadata
     if (j["type"] == "CityJSON") {
-      if (j.count("geometry-templates") == 1)
+      if ( (j["CityObjects"].empty() == false) || (j["vertices"].empty() == false) ) {
+        std::string s = "Input file is not a valid CityJSONSeq file (perhaps it's a CityJSON file?)";
+        std::cout << "ERROR: " << s << std::endl;
+        break;
+      }
+      if (j.count("geometry-templates") == 1) {
         process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
+      }
       if (j.count("transform") == 0) {
         std::string s = "Input file first line has no \"transform\" property";
         std::cout << "ERROR: " << s << std::endl;
         break;
       } else {
-      jtransform = j["transform"];
-      std::cout << "[]" << std::endl;
-
+        jtransform = j["transform"];
+        std::cout << "\"\" []" << std::endl;
       }
+    //-- all the other lines
     } else if (j["type"] == "CityJSONFeature") {
       j["transform"] = jtransform; //-- add transform b/c BuildingPart overlap uses a tolerance
       parse_cjseq(j, lsFeatures, tol_snap, lsGTs);
@@ -701,9 +708,13 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
       delete f; 
       lsFeatures.clear();
     } else {
-        std::cout << j["id"] << " [905]" << std::endl;
+      std::cout << j["id"] << " [905]" << std::endl;
     }
     linecount++;
+  }
+  if (linecount < 2) {
+    std::string s = "CityJSONSeq has only the 1st line, and no CityJSONFeature.";
+    std::cout << "ERROR: " << s << std::endl;
   }
 }
 
