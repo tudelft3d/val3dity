@@ -348,6 +348,7 @@ json
 validate(json& j,
          Parameters params)
 {
+  spdlog::set_level(spdlog::level::off);
   json re;
   //-- CityJSON
   if (j["type"] == "CityJSON") {
@@ -402,6 +403,7 @@ validate(const std::vector<std::array<double, 3>>& vertices,
          const std::vector<std::vector<int>>& faces,
          Parameters params)
 {
+  spdlog::set_level(spdlog::level::off);
   double _minx = 9e15;
   double _miny = 9e15; 
   //-- find (minx, miny)
@@ -466,6 +468,7 @@ validate(std::string& input,
          std::string format,
          Parameters params)
 {
+  spdlog::set_level(spdlog::level::off);
   json re;
   if (format == "IndoorGML") {
     json j = validate_indoorgml(input, params);
