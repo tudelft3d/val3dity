@@ -152,6 +152,14 @@ var errors = {
       "name": "FORMAT_NOT_SUPPORTED",
       "link": "https://val3dity.readthedocs.io/en/latest/errors/#format-not-supported"
     },
+    "905": {
+      "name": "INVALID_JSON",
+      "link": "https://val3dity.readthedocs.io/en/latest/errors/#invalid-json"
+    },
+    "906": {
+      "name": "PRIMITIVE_NO_GEOMETRY",
+      "link": "https://val3dity.readthedocs.io/en/latest/errors/#primitive-no-geometry"
+    },
     "999": {
       "name": "UNKNOWN_ERROR",
       "link": "https://val3dity.readthedocs.io/en/latest/errors/#unknown-error"
