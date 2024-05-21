@@ -104,11 +104,6 @@ def get_highest_error(f, v3re):
         for err in f["errors"]:
             if err["code"] > herr:
                 herr = err["code"]
-    if f["primitives"] is not None:
-        for p in f["primitives"]:
-            for err in p.get("errors", []):
-                if err["code"] > herr:
-                    herr = err["code"]
     return herr
 
 
