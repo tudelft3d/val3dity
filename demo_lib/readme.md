@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 ## input accepted
 
   - [CityJSON](http://www.cityjson.org)
-  - [CityJSON Lines (CityJSONL)](https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature)
+  - [CityJSON Sequences (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
   - [tu3djson](https://github.com/tudelft3d/tu3djson)
   - [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
@@ -68,7 +68,7 @@ It is also possible to use arrays of vertices and faces, basically the same stru
 
 ```cpp
   //-- add 8 corners of a cube
-  std::vector<std::vector<double>> pts;
+  std::vector<std::array<double, 3>> pts;
   pts.push_back({0.0, 0.0, 0.0});
   pts.push_back({1.0, 0.0, 0.0});
   pts.push_back({1.0, 1.0, 0.0});
