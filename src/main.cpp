@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -134,7 +134,7 @@ class LicensePrint : public TCLAP::Visitor
     {
       std::string thelicense =
       "\nval3dity\n\n"
-      "Copyright (c) 2011-2023  3D geoinformation research group, TU Delft\n\n"
+      "Copyright (c) 2011-2024  3D geoinformation research group, TU Delft\n\n"
       "val3dity is free software: you can redistribute it and/or modify\n"
       "it under the terms of the GNU General Public License as published by\n"
       "the Free Software Foundation, either version 3 of the License, or\n"
@@ -330,7 +330,7 @@ int main(int argc, char* const argv[])
 
     //-- print the license (each time)
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
