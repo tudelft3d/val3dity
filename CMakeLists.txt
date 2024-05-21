@@ -52,8 +52,6 @@ endif()
 
 # GEOS
 find_package( GEOS REQUIRED )
-# if linux complains: 
-# find_package( GEOS )
 if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
