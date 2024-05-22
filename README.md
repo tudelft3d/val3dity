@@ -33,22 +33,6 @@ val3dity accepts as input:
 For the CityJSON and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
 
-## Usage
-
-val3dity is a command-line interface (CLI) programme only, with [several options](https://val3dity.readthedocs.io/en/latest/usage/#options-for-the-validation).
-
-[![val3dity cli demo](./misc/cli.svg)](https://asciinema.org/a/329835)  
-_No demo visible here? View it on [asciinema](https://asciinema.org/a/329835)._
-
-
-## Web application
-
-If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity).
-Simply upload your file to our server and get a validation report back.
-We delete the file as soon as it has been validated (promised!).
-However, a file is limited to 50MB.
-
-
 ## Installation of the command-line tool
 
 ### macOS
@@ -123,13 +107,12 @@ val3dity can be compiled and used as a library:
 There is a simple example in `./demo_lib` with instructions to compile it.
 
 
-## Unit tests
+## Web application
 
-To verify that everything went fine during the compilation, run the unit tests (from the root folder of val3dity) (this requires `pip install pytest pyyaml`):
-
-    $ python -m pytest --runfull
-
-You shouldn't get any errors.
+If you don't want to go through the troubles of compiling and/or installing val3dity, we suggest you use the [web application](http://geovalidation.bk.tudelft.nl/val3dity).
+Simply upload your file to our server and get a validation report back.
+We delete the file as soon as it has been validated (promised!).
+However, a file is limited to 50MB.
 
 
 ## Simple visualiser for the errors: viz3dity
@@ -142,7 +125,6 @@ However, it's not possible to see where in an object the error is (eg which surf
 This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
 
 
-
 ## Documentation and help
 
 Read the full documentation at [https://val3dity.rtfd.io](https://val3dity.rtfd.io).
@@ -152,6 +134,13 @@ The primary channel to communicate with the developers is the Issues section.
 If you have a question or came across a bug, please submit an issue there.
 However we ask you check first whether your problem has already been solved by someone else.
 
+## Unit tests
+
+To verify that everything went fine during the compilation, run the unit tests (from the root folder of val3dity) (this requires `pip install pytest pyyaml`):
+
+    $ python -m pytest --runfull
+
+You shouldn't get any errors.
 
 ## If you use val3dity in a scientific context, please cite these articles:
 
