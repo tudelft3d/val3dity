@@ -453,11 +453,11 @@ void process_jsonfg_surface(std::vector<std::vector<std::vector<double>>>& pgn, 
 }
 
 
-void process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap)
+void process_json_geometries_of_co(json& jco, CityObject* co, std::string coid, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap)
 {
   int idgeom = 0;
   for (auto& g : jco["geometry"]) {
-    std::string gid = "geom=" + std::to_string(idgeom);
+    std::string gid = "coid=" + coid + "|geom=" + std::to_string(idgeom);
     if  (g["type"] == "Solid")
     {
       Solid* s = new Solid(gid);
@@ -716,13 +716,13 @@ void parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
     if (it.value()["type"] == "BuildingPart")
       continue;
     CityObject* co = new CityObject(it.key(), it.value()["type"]);
-    process_json_geometries_of_co(it.value(), co, lsGTs, j, tol_snap);
+    process_json_geometries_of_co(it.value(), co, co->get_id(), lsGTs, j, tol_snap);
     //-- if Building has Parts, put them here in _lsPrimitives
     if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) ) 
     {
       for (std::string bpid : it.value()["children"])
       {
-        process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, tol_snap);
+        process_json_geometries_of_co(j["CityObjects"][bpid], co, bpid, lsGTs, j, tol_snap);
       }
     }
     lsFeatures.push_back(co);
@@ -740,13 +740,13 @@ void parse_cjseq(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, st
     if (it.value()["type"] == "BuildingPart")
       continue;
     CityObject* co = new CityObject(it.key(), it.value()["type"]);
-    process_json_geometries_of_co(it.value(), co, lsGTs, j, tol_snap);
+    process_json_geometries_of_co(it.value(), co, co->get_id(), lsGTs, j, tol_snap);
     //-- if Building has Parts, put them here in _lsPrimitives
     if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) ) 
     {
       for (std::string bpid : it.value()["children"])
       {
-        process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, tol_snap);
+        process_json_geometries_of_co(j["CityObjects"][bpid], co, bpid, lsGTs, j, tol_snap);
       }
     }
     lsFeatures.push_back(co);

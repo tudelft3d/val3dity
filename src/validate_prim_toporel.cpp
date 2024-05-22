@@ -183,7 +183,7 @@ bool do_primitives_interior_overlap(std::vector<Primitive*>& lsPrimitives,
       {
         Error e;
         std::stringstream msg;
-        msg << lsPrimitives[i]->get_id() << " and " << lsPrimitives[j]->get_id();
+        msg << lsPrimitives[i]->get_id() << "&&" << lsPrimitives[j]->get_id();
         e.errorcode = errorcode_to_assign;
         e.info1 = msg.str();
         e.info2 = "";

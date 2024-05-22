@@ -137,13 +137,13 @@ validate_cityjson(json& j,
       if (it.value()["type"] == "BuildingPart")
           continue;
       CityObject* co = new CityObject(it.key(), it.value()["type"]);
-      process_json_geometries_of_co(it.value(), co, lsGTs, j, params._tol_snap);
+      process_json_geometries_of_co(it.value(), co, co->get_id(), lsGTs, j, params._tol_snap);
       //-- if Building has Parts, put them here in _lsPrimitives
       if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) )
       {
           for (std::string bpid : it.value()["children"])
           {
-              process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, params._tol_snap);
+              process_json_geometries_of_co(j["CityObjects"][bpid], co, bpid, lsGTs, j, params._tol_snap);
           }
       }
       lsFeatures.push_back(co);
@@ -188,13 +188,13 @@ validate_cityjsonfeature(json& j,
       if (it.value()["type"] == "BuildingPart")
           continue;
       CityObject* co = new CityObject(it.key(), it.value()["type"]);
-      process_json_geometries_of_co(it.value(), co, lsGTs, j, params._tol_snap);
+      process_json_geometries_of_co(it.value(), co, co->get_id(), lsGTs, j, params._tol_snap);
       //-- if Building has Parts, put them here in _lsPrimitives
       if ( (it.value()["type"] == "Building") && (it.value().count("children") != 0) )
       {
           for (std::string bpid : it.value()["children"])
           {
-              process_json_geometries_of_co(j["CityObjects"][bpid], co, lsGTs, j, params._tol_snap);
+              process_json_geometries_of_co(j["CityObjects"][bpid], co, bpid, lsGTs, j, params._tol_snap);
           }
       }
       lsFeatures.push_back(co);
