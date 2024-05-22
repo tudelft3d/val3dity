@@ -48,7 +48,7 @@ The same file could be validated as a MultiSurface, ie each of its surface are v
 Using CityJSONSeq
 -----------------
 
-To validate a `CityJSONSeq stream <https://www.cityjson.org/cityjsonseq/>`_, you need to pipe the stream into val3dity and use ``--stdin`` for the input. 
+To validate a `CityJSONSeq stream <https://www.cityjson.org/cityjsonseq/>`_, you need to pipe the stream into val3dity and use ``stdin`` for the input. 
 
 If you have a CityJSONSeq serialised in a file, then you can cat it:
 
