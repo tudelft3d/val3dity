@@ -98,15 +98,12 @@ public:
     std::cout << "\t\tValidate each 3D primitive in input.json (tu3djson file)" << std::endl;
     std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
     std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
-    
-    std::cout << "\tval3dity input.city.json --verbose" << std::endl;
-    std::cout << "\t\tAll details of the validation are printed out" << std::endl;
+
+    std::cout << "\tcat myfile.city.jsonl | val3dity stdin" << std::endl;
+    std::cout << "\t\tStream the CityJSONSeq file to stdout and validate it line-by-line" << std::endl;
     
     std::cout << "\tval3dity input.obj" << std::endl;
     std::cout << "\t\tValidate the geometries in input.obj as if they were an ISO19107 Solid (default)" << std::endl;
-    
-    std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
-    std::cout << "\t\tValidate the geometries in input.off as an ISO19107 MultiSurface" << std::endl;
     
     std::cout << "\tval3dity myindoorgml.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in myindoorgml.gml closer than 0.1unit are snapped together" << std::endl;
