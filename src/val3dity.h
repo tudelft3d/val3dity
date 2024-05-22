@@ -40,7 +40,6 @@ struct Parameters {
     double _planarity_d2p_tol = 0.01;
     double _planarity_n_tol = 20.0;
     double _overlap_tol = -1.0;
-    bool _terminal_output = true;
 
     Parameters& tol_snap(double tol_snap) { _tol_snap = tol_snap;
         return *this;
