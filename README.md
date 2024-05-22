@@ -141,18 +141,6 @@ In the folder `tools/viz3dity/`, there is a simple Python script where you load 
 However, it's not possible to see where in an object the error is (eg which surface is not planar).
 This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
 
-
-## Usage of Docker
-
-To run val3dity over Docker simply execute:
-
-    $ docker run --rm  -v <local path where your files are>:/data tudelft3d/val3dity:<tag> <name of the dedicated file>
-    
-Where `<tag>` is docker image tag from [https://hub.docker.com/r/tudelft3d/val3dity/tags](https://hub.docker.com/r/tudelft3d/val3dity/tags)
-
-If you are using the `--report` option, then **keep in mind that `<local path where your files are>` need to be writable by any user, otherwise your output won't be saved.**
-
-
 ## Documentation and help
 
 Read the full documentation at [https://val3dity.rtfd.io](https://val3dity.rtfd.io).
