@@ -77,7 +77,7 @@ The report contains several properties, one example:
 
 
 The property ``"validity"`` is used to report whether the file is 100% valid, or not.
-If it's invalid, then ``"all_errors"`` lists all the error codes present in the input file (the list is empty if the file is valid.
+If it's invalid, then ``"all_errors"`` lists all the error codes present in the input file (the list is empty if the file is valid).
 
 ``"dataset_errors"`` lists all the errors related to the input file (errors 9xx).
 
@@ -106,7 +106,7 @@ An example is as follows:
           {
             "code": 203,
             "description": "NON_PLANAR_POLYGON_DISTANCE_PLANE",
-            "id": "geom=0|shell=0|face=4",
+            "id": "coid=GUID_00D36CED-764E-4631-B88C-EA98528BA782_1|geom=0|shell=0|face=4",
             "info": "distance to fitted plane: 0.0122035 (tolerance=0.01)"
           }
         ]
@@ -117,30 +117,31 @@ An example is as follows:
         "validity": true,
         "errors": [],
       },
-      { 
-        "id": "GUID_0987B8E1-E4A5-4CBE-8267-C2B360505EE6",
+      {
+        "id": "GUID_032A685A-1262-4157-A797-C9ED49A65725",
         "type": "Building",
         "validity": false
         "errors": [
           {
             "code": 601,
             "description": "BUILDINGPARTS_OVERLAP",
-            "id": "geom=0 and geom=0",
+            "id": "coid=GUID_032A685A-1262-4157-A797-C9ED49A65725_1|geom=0&&coid=GUID_032A685A-1262-4157-A797-C9ED49A65725_2|geom=0",
             "info": "geometries are lod=2",
             "type": "Error"
           }
         ],
-      }
+      },
     ]
   } 
 
 
 For each primitive, its identifier is (``"id"``) is given, its ``"type"``, and its ``"validity"``.
-The ``"errors"`` is always given, and it is an array of the errors; it is an empty array is the feature is valid.
-Because a feature can contain several geometries, we report the error by giving extra information about its location.
-``geom=0`` tells you that it's the first geometry in the list of geometries (if CityJSON is used), and similarly ``shell=1`` would indicate that the 2nd shell in the Solid has an issue, and ``face=13`` would mean the 14th surface listed in the primitive has an issue.
-A 0-based system is used for reporting. 
+The ``"errors"`` property is always listed, and it is an array of the errors; it is an empty array is the feature is valid.
 
+Because a feature (eg a Building) can contain several geometries and children (eg the BuildingPart of a Building), we report the error by giving extra information about its location.
+``coid=`` tells you the City Object identifier.
+``geom=0`` tells you that it's the first geometry in the list of geometries (if CityJSON is used), and similarly ``solid=1`` would indicate the second solid in a MultiSolid, ``shell=1`` would indicate that the 2nd shell in the Solid has an issue, and ``face=13`` would mean the 14th surface listed in the primitive has an issue.
+A 0-based system is used for reporting. 
 
 You can navigate this report with a JSON browser (eg drag it into an empty window in Firefox) or by loading it to the `val3dity report browser <http://geovalidation.bk.tudelft.nl/val3dity/browser/>`_:
 
