@@ -97,6 +97,14 @@ Finally, to see all the options possible:
 
     $ ./val3dity --help
 
+To validate a [CityJSONSeq stream](https://www.cityjson.org/cityjsonseq/), you need to pipe the stream into val3dity and use ``stdin`` for the input. 
+If you have a CityJSONSeq serialised in a file, then you can cat it:
+
+    $ cat myfile.city.jsonl | val3dity stdin
+
+The output shows, line by line, what are the errors. 
+If the list of error is empty (``[]``) this means the feature is geometrically valid.    
+
 
 ## Using val3dity as a library
 
@@ -134,6 +142,7 @@ The primary channel to communicate with the developers is the Issues section.
 If you have a question or came across a bug, please submit an issue there.
 However we ask you check first whether your problem has already been solved by someone else.
 
+
 ## Unit tests
 
 To verify that everything went fine during the compilation, run the unit tests (from the root folder of val3dity) (this requires `pip install pytest pyyaml`):
@@ -141,6 +150,7 @@ To verify that everything went fine during the compilation, run the unit tests (
     $ python -m pytest --runfull
 
 You shouldn't get any errors.
+
 
 ## If you use val3dity in a scientific context, please cite these articles:
 
