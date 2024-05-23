@@ -31,6 +31,8 @@
 #include "CityObject.h"
 #include "GenericObject.h"
 #include "Solid.h"
+#include "MultiSurface.h"
+#include "CompositeSurface.h"
 #include "Surface.h"
 #include "input.h"
 
@@ -434,12 +436,30 @@ validate(const std::vector<std::array<double, 3>>& vertices,
     pgnids.push_back(r);
     sh->add_face(pgnids);
   }
-  //-- we assume it's a Solid (TODO: should this be a param?)
-  Solid* sol = new Solid("");
-  sol->set_oshell(sh);
-  o->add_primitive(sol);
-  o->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
+  //-- 
   IOErrors ioerrs;
+  if (params._primitive == SOLID)
+  {
+    Solid* sol = new Solid("");
+    sol->set_oshell(sh);
+    o->add_primitive(sol);
+  }
+  else if ( params._primitive == COMPOSITESURFACE)
+  {
+    CompositeSurface* cs = new CompositeSurface("");
+    cs->set_surface(sh);
+    o->add_primitive(cs);
+  }
+  else if (params._primitive == MULTISURFACE)
+  {
+    MultiSurface* ms = new MultiSurface("");
+    ms->set_surface(sh);
+    o->add_primitive(ms);
+  } else {
+    ioerrs.add_error(903, "only MULTISURFACE, COMPOSITESURFACE, or SOLID accepted as primitive");
+  }
+  if (ioerrs.has_errors() == false)
+    o->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
   ioerrs.set_input_file_type("std::vectors");
   std::vector<Feature*> lsFeatures;
   lsFeatures.push_back(o); 

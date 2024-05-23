@@ -26,22 +26,33 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
+#include "definitions.h"
 #include <iostream>
 
 #include "nlohmann-json/json.hpp"
 
 using json = nlohmann::json;
 
+// typedef enum
+// {
+//   SOLID             = 0,
+//   COMPOSITESURFACE  = 1,
+//   MULTISURFACE      = 2,
+// } Primitive;    
+
+
 namespace val3dity {
 
 
 struct Parameters {
-    double _tol_snap = 0.001;
-    double _planarity_d2p_tol = 0.01;
-    double _planarity_n_tol = 20.0;
-    double _overlap_tol = -1.0;
+    double      _tol_snap = 0.001;
+    double      _planarity_d2p_tol = 0.01;
+    double      _planarity_n_tol = 20.0;
+    double      _overlap_tol = -1.0;
+    Primitive3D _primitive = SOLID;
 
-    Parameters& tol_snap(double tol_snap) { _tol_snap = tol_snap;
+    Parameters& tol_snap(double tol_snap) { 
+        _tol_snap = tol_snap;
         return *this;
     }
 
@@ -57,6 +68,11 @@ struct Parameters {
 
     Parameters& overlap_tol(double overlap_tol) {
         _overlap_tol = overlap_tol;
+        return *this;
+    }
+
+    Parameters& primitive(Primitive3D primitive) {
+        _primitive = primitive;
         return *this;
     }
 };

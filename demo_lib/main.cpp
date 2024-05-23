@@ -22,7 +22,7 @@ void tu3djson_demo();
 int main(int argc, char *argv[])
 {
   arrays_demo();
-  arrays_w_holes_demo();
+  // arrays_w_holes_demo();
   // cityjson_demo();
   // cityjsonfeature_demo();
   // indoorgml_demo();
@@ -50,15 +50,15 @@ void arrays_demo()
   pts.push_back({0.0, 1.0, 1.0});
   //-- add faces
   std::vector<std::vector<int>> faces;
-  faces.push_back({0, 1, 2, 3});
+  faces.push_back({0, 3, 2, 1});
   faces.push_back({4, 5, 6, 7});
   faces.push_back({0, 1, 5, 4});
   faces.push_back({1, 2, 6, 5});
   faces.push_back({2, 3, 7, 6});
-  faces.push_back({3, 0, 4, 7});
+  // faces.push_back({3, 0, 4, 7});
   //-- validate it
   try {
-    json re = val3dity::validate(pts, faces);
+    json re = val3dity::validate(pts, faces, val3dity::Parameters().primitive(val3dity::SOLID));
     std::cout << re << std::endl;
   }
   catch (std::exception& ex) {
