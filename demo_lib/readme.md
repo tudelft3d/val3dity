@@ -1,4 +1,9 @@
 
+# Use val3dity as a library in your C++ code
+
+This demonstrate how to use val3dity as a library, the file `main.cpp` shows all the possibilities.
+
+
 ## How to use val3dity as a library in your code
 
 The API of the library is `val3dity.h`, you need to include the file in your source.
@@ -45,7 +50,7 @@ int main(int argc, char *argv[])
 ```
 
 
-## To compile
+## How to compile main.cpp?
 
 1. modify `CMakeLists.txt` to ensure that `add_subdirectory` (line 9) points to where you have the root folder of val3dity (in this demo it's the parent directory). Use an absolute path, and not a relative one!
 1. `mkdir build && cd build`
@@ -65,14 +70,15 @@ The parameters of val3dity can be setup by passing them to the functions `is_val
 Those 5 parameters can be setup and you can see their default values:
 
 ```cpp
-  double      _tol_snap = 0.001;
-  double      _planarity_d2p_tol = 0.01;
-  double      _planarity_n_tol = 20.0;
-  double      _overlap_tol = -1.0;
-  Primitive3D _primitive = SOLID;
+  double      tol_snap = 0.001;
+  double      planarity_d2p_tol = 0.01;
+  double      planarity_n_tol = 20.0;
+  double      overlap_tol = -1.0;
+  Primitive3D primitive = SOLID;
 ```
 
-The `Primitive3D` is used when validating formats for which the primitive to use (`Solid`, `MultiSurface`, or `CompositeSurface`) is unclear, eg OBJ, OFF, and when using std::vector and std::array (see below).
+The `Primitive3D` is used when validating formats for which the primitive to use is unclear, eg OBJ, OFF, and when using std::vector and std::array (see below).
+The 3 options are: `Solid` (default), `MultiSurface`, and `CompositeSurface`.
 
 
 ## Input accepted
@@ -84,8 +90,9 @@ The `Primitive3D` is used when validating formats for which the primitive to use
   - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
   - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
   - [IndoorGML](http://indoorgml.net/)
+  - arrays of points and faces (also with holes/inner-rings)
 
-It is also possible to use arrays of vertices and faces, basically the same structure as an OFF file (0-indexed vertices).
+To use arrays of vertices and faces (basically the same structure as an OFF file (0-indexed vertices)), see that example:
 
 ```cpp
   //-- add 8 corners of a cube
@@ -108,7 +115,7 @@ It is also possible to use arrays of vertices and faces, basically the same stru
   faces.push_back({3, 0, 4, 7});
   //-- validate it
   try {
-    bool re = val3dity::is_valid(pts, faces, val3dity::Parameters().primitive(val3dity::SOLID));
+    bool re = val3dity::is_valid(pts, faces, val3dity::Parameters().primitive(val3dity::MULTISURFACE));
     std::cout << re << std::endl;
   }
   catch (std::exception& ex) {
