@@ -113,10 +113,11 @@ void obj_demo()
 {
   std::cout << "\n=== obj_demo() ===" << std::endl;
   std::stringstream buffer;
-  buffer << std::ifstream("../../data/obj/duplicatevertices.obj").rdbuf();
+  buffer << std::ifstream("../../data/obj/cube.obj").rdbuf();
   try {
     std::string s = buffer.str();
-    bool re = val3dity::is_valid(s, "OBJ");
+    bool re = val3dity::is_valid(s, "OBJ", val3dity::Parameters().primitive(val3dity::SOLID));
+    // bool re = val3dity::is_valid(s, "OBJ", val3dity::Parameters().primitive(val3dity::COMPOSITESURFACE));
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else

@@ -280,7 +280,7 @@ validate_obj(std::string& input,
   ioerrs.set_input_file_type("OBJ");
   std::vector<Feature*> lsFeatures;
   std::istringstream iss(input);
-  parse_obj(iss, lsFeatures, SOLID, ioerrs, params._tol_snap);
+  parse_obj(iss, lsFeatures, params._primitive, ioerrs, params._tol_snap);
   //-- start the validation
   if (ioerrs.has_errors() == false) {
       //-- validate
