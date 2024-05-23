@@ -22,15 +22,15 @@ void tu3djson_demo();
 int main(int argc, char *argv[])
 {
   arrays_demo();
-  // arrays_w_holes_demo();
-  // cityjson_demo();
-  // cityjsonfeature_demo();
-  // indoorgml_demo();
-  // jsonfg_demo();
-  // obj_demo();
-  // off_demo();
-  // onegeom_demo();
-  // tu3djson_demo();
+  arrays_w_holes_demo();
+  cityjson_demo();
+  cityjsonfeature_demo();
+  indoorgml_demo();
+  jsonfg_demo();
+  obj_demo();
+  off_demo();
+  onegeom_demo();
+  tu3djson_demo();
   return 0;
 }
 
