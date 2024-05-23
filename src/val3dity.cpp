@@ -309,22 +309,32 @@ validate_off(std::string& input,
   GenericObject* o = new GenericObject("none");
   std::istringstream iss(input);
   Surface* sh = parse_off(iss, 0, ioerrs, params._tol_snap);
-  std::cout << "1" << std::endl;
-  Solid* s = new Solid;
-  s->set_oshell(sh);
-  o->add_primitive(s);
+  if (params._primitive == SOLID)
+  {
+    Solid* sol = new Solid("");
+    sol->set_oshell(sh);
+    o->add_primitive(sol);
+  }
+  else if ( params._primitive == COMPOSITESURFACE)
+  {
+    CompositeSurface* cs = new CompositeSurface("");
+    cs->set_surface(sh);
+    o->add_primitive(cs);
+  }
+  else if (params._primitive == MULTISURFACE)
+  {
+    MultiSurface* ms = new MultiSurface("");
+    ms->set_surface(sh);
+    o->add_primitive(ms);
+  }
   lsFeatures.push_back(o);
   //-- start the validation
-  // std::cout << "errors: " << ioerrs.has_errors() << std::endl;
   for (auto& each : ioerrs.get_unique_error_codes())
-      std::cout << each << std::endl;
+    std::cout << each << std::endl;
 
-  // if (ioerrs.has_errors() == false) {
   //-- validate
   for (auto& f : lsFeatures)
       f->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
-  // }
-  std::cout << "2" << std::endl;
   //-- get report in json
   json jr = get_report_json("OFF object",
                             lsFeatures,
@@ -334,7 +344,6 @@ validate_off(std::string& input,
                             params._planarity_d2p_tol,
                             params._planarity_n_tol,
                             ioerrs);
-  std::cout << "3" << std::endl;
   return jr;
 }
 
@@ -522,12 +531,30 @@ validate(const std::vector<std::array<double, 3>>& vertices,
     }
     sh->add_face(pgnids);
   }
-  //-- we assume it's a Solid (TODO: should this be a param?)
-  Solid* sol = new Solid("");
-  sol->set_oshell(sh);
-  o->add_primitive(sol);
-  o->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
+  //-- 
   IOErrors ioerrs;
+  if (params._primitive == SOLID)
+  {
+    Solid* sol = new Solid("");
+    sol->set_oshell(sh);
+    o->add_primitive(sol);
+  }
+  else if ( params._primitive == COMPOSITESURFACE)
+  {
+    CompositeSurface* cs = new CompositeSurface("");
+    cs->set_surface(sh);
+    o->add_primitive(cs);
+  }
+  else if (params._primitive == MULTISURFACE)
+  {
+    MultiSurface* ms = new MultiSurface("");
+    ms->set_surface(sh);
+    o->add_primitive(ms);
+  } else {
+    ioerrs.add_error(903, "only MULTISURFACE, COMPOSITESURFACE, or SOLID accepted as primitive");
+  }
+  if (ioerrs.has_errors() == false)
+    o->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
   ioerrs.set_input_file_type("std::vectors");
   std::vector<Feature*> lsFeatures;
   lsFeatures.push_back(o); 

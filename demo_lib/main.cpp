@@ -135,7 +135,7 @@ void off_demo()
   buffer << std::ifstream("../../data/test_valid/basecube.off").rdbuf();
   try {
     std::string s = buffer.str();
-    bool re = val3dity::is_valid(s, "OFF");
+    bool re = val3dity::is_valid(s, "OFF", val3dity::Parameters().primitive(val3dity::COMPOSITESURFACE));
     if (re == true)
       std::cout << "VALID!" << std::endl;
     else
