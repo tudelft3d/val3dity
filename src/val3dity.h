@@ -70,24 +70,36 @@ validate(json& j, Parameters params = Parameters());
 
 bool
 is_valid(std::string& input,
-              std::string format,
-              Parameters params = Parameters());
+         std::string format,
+         Parameters params = Parameters());
 
 json
 validate(std::string& input,
-              std::string format,
-              Parameters params = Parameters());
+         std::string format,
+         Parameters params = Parameters());
 
 
 json
 validate(const std::vector<std::array<double, 3>>& vertices,
-              const std::vector<std::vector<int>>& triangle_ids,
-              Parameters params = Parameters());
+         const std::vector<std::vector<int>>& faces,
+         Parameters params = Parameters());
 
 
 bool
 is_valid(const std::vector<std::array<double, 3>>& vertices,
-              const std::vector<std::vector<int>>& triangle_ids,
-              Parameters params = Parameters());
+         const std::vector<std::vector<int>>& faces,
+         Parameters params = Parameters());
+
+
+json
+validate(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<std::vector<int>>>& faces_w_holes,
+         Parameters params = Parameters());
+
+
+bool
+is_valid(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<std::vector<int>>>& faces_w_holes,
+         Parameters params = Parameters());
 
 }

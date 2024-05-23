@@ -454,6 +454,74 @@ validate(const std::vector<std::array<double, 3>>& vertices,
   return jr;
 }
 
+
+bool 
+is_valid(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<std::vector<int>>>& faces_w_holes,
+         Parameters params)
+{
+  json re = validate(vertices, faces_w_holes, params);
+  return re["validity"];
+}
+
+json
+validate(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<std::vector<int>>>& faces_w_holes,
+         Parameters params)
+{
+  spdlog::set_level(spdlog::level::off);
+  double _minx = 9e15;
+  double _miny = 9e15; 
+  //-- find (minx, miny)
+  for (auto& v: vertices) {
+    if (v[0] < _minx)
+      _minx = v[0];
+    if (v[1] < _miny)
+      _miny = v[1];
+  }
+  //-- create a Surface (a 2-manifold)
+  Surface* sh = new Surface("0", params._tol_snap);
+  std::vector<Point3*> allvertices;
+  GenericObject* o = new GenericObject("none");
+  //-- read all the vertices
+  for (auto& v: vertices) {
+    Point3 *p = new Point3(v[0] - _minx, v[1] - _miny, v[2]);
+    allvertices.push_back(p);
+  }
+
+  //-- read all the faces (0-indexed!)
+  for (auto& face: faces_w_holes) {
+    std::vector<std::vector<int> > pgnids;
+    for (auto& ring: face) {
+      std::vector<int> r;
+      for (auto& vid: ring) {
+        Point3* tp = allvertices[vid];
+        r.push_back(sh->add_point(*tp));
+      }
+      pgnids.push_back(r);
+    }
+    sh->add_face(pgnids);
+  }
+  //-- we assume it's a Solid (TODO: should this be a param?)
+  Solid* sol = new Solid("");
+  sol->set_oshell(sh);
+  o->add_primitive(sol);
+  o->validate(params._planarity_d2p_tol, params._planarity_n_tol, params._overlap_tol);
+  IOErrors ioerrs;
+  ioerrs.set_input_file_type("std::vectors");
+  std::vector<Feature*> lsFeatures;
+  lsFeatures.push_back(o); 
+  json jr = get_report_json("std::vectors",
+                            lsFeatures,
+                            VAL3DITY_VERSION,
+                            params._tol_snap,
+                            params._overlap_tol,
+                            params._planarity_d2p_tol,
+                            params._planarity_n_tol,
+                            ioerrs);
+  return jr;
+}
+
 //-- for ASCII + XML formats
 bool 
 is_valid(std::string& input,
