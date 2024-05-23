@@ -1,5 +1,5 @@
 
-## how to use val3dity as a library in your code
+## How to use val3dity as a library in your code
 
 The API of the library is `val3dity.h`, you need to include the file in your source.
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   }
   //-- validate it
   try {
-    json re = val3dity::validate(j);
+    json re = val3dity::validate(j, val3dity::Parameters().tol_snap(0.01).planarity_d2p_tol(0.04));
     // bool re = val3dity::is_valid(j); 
     std::cout << re << std::endl;
   }
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 ```
 
 
-## to compile
+## To compile
 
 1. modify `CMakeLists.txt` to ensure that `add_subdirectory` (line 9) points to where you have the root folder of val3dity (in this demo it's the parent directory). Use an absolute path, and not a relative one!
 1. `mkdir build && cd build`
@@ -54,7 +54,28 @@ int main(int argc, char *argv[])
 1. `./myprogram`
 
 
-## input accepted
+## Parameters
+
+The parameters of val3dity can be setup by passing them to the functions `is_valid()` or `validate()`, this is an example:
+
+```cpp
+  json re = val3dity::validate(j, val3dity::Parameters().tol_snap(0.01).planarity_d2p_tol(0.04));
+```
+
+Those 5 parameters can be setup and you can see their default values:
+
+```cpp
+  double      _tol_snap = 0.001;
+  double      _planarity_d2p_tol = 0.01;
+  double      _planarity_n_tol = 20.0;
+  double      _overlap_tol = -1.0;
+  Primitive3D _primitive = SOLID;
+```
+
+The `Primitive3D` is used when validating formats for which the primitive to use (`Solid`, `MultiSurface`, or `CompositeSurface`) is unclear, eg OBJ, OFF, and when using std::vector and std::array (see below).
+
+
+## Input accepted
 
   - [CityJSON](http://www.cityjson.org)
   - [CityJSON Sequences (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
@@ -87,7 +108,7 @@ It is also possible to use arrays of vertices and faces, basically the same stru
   faces.push_back({3, 0, 4, 7});
   //-- validate it
   try {
-    bool re = val3dity::is_valid(pts, faces);
+    bool re = val3dity::is_valid(pts, faces, val3dity::Parameters().primitive(val3dity::SOLID));
     std::cout << re << std::endl;
   }
   catch (std::exception& ex) {
