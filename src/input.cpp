@@ -1535,22 +1535,23 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
 
 void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
 {
-
   //-- TODO: not translation for tu3djson, is that okay?
   set_min_xy(0.0, 0.0);
-  int counter = 0;
+  int fcounter = 0;
   for (auto& f : j["features"]) {
-    GenericObject* go = new GenericObject(std::to_string(counter));
-    counter++;
+    std::string fid = "feature=" + std::to_string(fcounter);
+    GenericObject* go = new GenericObject(std::to_string(fcounter));
+    fcounter++;
     if  (f["geometry"]["type"] == "Solid")
     {
-      Solid* s = new Solid();
+      Solid* s = new Solid(fid);
       bool oshell = true;
-      int c = 0;
+      int no_shell = 0;
       for (auto& shell : f["geometry"]["boundaries"]) 
       {
-        Surface* sh = new Surface(std::to_string(c), tol_snap);
-        c++;
+        std::string shid = fid + "|" + "shell=" + std::to_string(no_shell);
+        Surface* sh = new Surface(shid, tol_snap);
+        no_shell++;
         for (auto& polygon : shell) { 
           std::vector< std::vector<int> > pa = polygon;
           process_json_surface(pa, f["geometry"], sh);
@@ -1567,7 +1568,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
     }
     else if ( (f["geometry"]["type"] == "MultiSurface") || (f["geometry"]["type"] == "CompositeSurface") ) 
     {
-      Surface* sh = new Surface(std::to_string(-1), tol_snap);
+      Surface* sh = new Surface(fid, tol_snap);
       for (auto& p : f["geometry"]["boundaries"]) 
       { 
         std::vector< std::vector<int> > pa = p;
@@ -1575,27 +1576,32 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
       }
       if (f["geometry"]["type"] == "MultiSurface")
       {
-        MultiSurface* ms = new MultiSurface();
+        MultiSurface* ms = new MultiSurface(fid);
         ms->set_surface(sh);
         go->add_primitive(ms);
       }
       else
       {
-        CompositeSurface* cs = new CompositeSurface();
+        CompositeSurface* cs = new CompositeSurface(fid);
         cs->set_surface(sh);
         go->add_primitive(cs);
       }
     }
     else if (f["geometry"]["type"] == "MultiSolid") 
     {
-      MultiSolid* ms = new MultiSolid();
+      MultiSolid* ms = new MultiSolid(fid);
+      int no_solid = 0;
       for (auto& solid : f["geometry"]["boundaries"]) 
       {
-        Solid* s = new Solid();
+        std::string sol_id = fid + "|" + "solid=" + std::to_string(no_solid);
+        Solid* s = new Solid(sol_id);
+        no_solid++;
         bool oshell = true;
+        int no_shell2 = 0;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(std::to_string(-1), tol_snap);
+          std::string shid = sol_id + "|" + "shell=" + std::to_string(no_shell2);
+          Surface* sh = new Surface(shid, tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, f["geometry"], sh);
@@ -1607,6 +1613,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
           }
           else
             s->add_ishell(sh);
+          no_shell2++;
         }
         ms->add_solid(s);
       }
@@ -1614,14 +1621,19 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
     }
     else if (f["geometry"]["type"] == "CompositeSolid") 
     {
-      CompositeSolid* cs = new CompositeSolid();
+      CompositeSolid* cs = new CompositeSolid(fid);
+      int no_solid = 0;
       for (auto& solid : f["geometry"]["boundaries"]) 
       {
-        Solid* s = new Solid();
+        std::string sol_id = fid + "|" + "solid=" + std::to_string(no_solid);
+        Solid* s = new Solid(sol_id);
+        no_solid++;
         bool oshell = true;
+        int no_shell2 = 0;
         for (auto& shell : solid) 
         {
-          Surface* sh = new Surface(std::to_string(-1), tol_snap);
+          std::string shid = sol_id + "|" + "shell=" + std::to_string(no_shell2);
+          Surface* sh = new Surface(shid, tol_snap);
           for (auto& polygon : shell) { 
             std::vector< std::vector<int> > pa = polygon;
             process_json_surface(pa, f["geometry"], sh);
@@ -1633,6 +1645,7 @@ void parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap)
           }
           else
             s->add_ishell(sh);
+          no_shell2++;
         }
         cs->add_solid(s);
       }
