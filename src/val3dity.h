@@ -33,13 +33,6 @@
 
 using json = nlohmann::json;
 
-// typedef enum
-// {
-//   SOLID             = 0,
-//   COMPOSITESURFACE  = 1,
-//   MULTISURFACE      = 2,
-// } Primitive;    
-
 
 namespace val3dity {
 
