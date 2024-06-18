@@ -7,14 +7,14 @@
 
 ## [2.5.0] - 
 ### Added 
-- val3dity can now accept a stream of CityJSONSeq as input from stdin: `cat myfile.jsonl | val3dity stdin` and it validates each line and outputs to stdout the result
-- a new error was added: error 905 INVALID_JSON for when the stream of CityJSONSeq has a wrong JSON in one line
+- val3dity now accepts a stream of CityJSONSeq as input from stdin: `cat myfile.jsonl | val3dity stdin` and it validates each line and outputs the result to stdout
+- a new error was added: error 905--INVALID_JSON for handling wrong JSON lines in a CityJSONSeq stream
 ### Changed
-- the API has a new way to accept parameters for the validation (named parameters), it's more flexible and simpler to use. If you used defaults then nothing needs to be changed.
+- the validation report in JSON has been greatly simplified. Now the errors are a flat list of errors and the "id" gives the position of the error in the feature.
+- the API has a new way to accept parameters for the validation (named parameters), it's more flexible and simpler to use. If you used v2.4 with defaults then nothing needs to be changed, if you passed them then a small change is required.
 - the API now accepts arrays of points/faces (including with inner-rings) as input
 - the API does not cout or clog anything anymore, so you can manage your own log without val3dity polluting it
-- val3dity doesn't output to clog anymore, instead the logger "spdlog" is used (when `--verbose` is activated) and a few logs are output
-- the report in JSON has been greatly simplified. Now the errors are a flat list of errors and the "id" gives the position of the error in the feature.
+- the val3dity binary doesn't output to clog anymore, instead the logger "spdlog" is used (when `--verbose` is activated) and a few logs are output
 - the CMake should now compile directly on macOS/Linux/Windows if GEOS is installed on your machine
 
 
