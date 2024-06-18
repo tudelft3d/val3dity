@@ -492,7 +492,7 @@ void process_json_geometries_of_co(json& jco, CityObject* co, std::string coid, 
     }
     else if ( (g["type"] == "MultiSurface") || (g["type"] == "CompositeSurface") ) 
     {
-      Surface* sh = new Surface(std::to_string(-1), tol_snap);
+      Surface* sh = new Surface(gid, tol_snap);
       for (auto& p : g["boundaries"]) 
       { 
         std::vector< std::vector<int> > pa = p;
