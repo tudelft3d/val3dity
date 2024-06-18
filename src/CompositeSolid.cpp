@@ -119,7 +119,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
         {
           std::stringstream msg1, msg2;
           msg1 << "Geometry (CompositeSolid) #" << this->get_id();
-          msg2 << "solid #" << _lsSolids[i]->get_id() << " and solid #" << _lsSolids[j]->get_id();
+          msg2 << "solid=" << _lsSolids[i]->get_id() << "&&solid=" << _lsSolids[j]->get_id();
           this->add_error(502, msg1.str(), msg2.str());
           isValid = false;
         }
@@ -150,7 +150,7 @@ bool CompositeSolid::validate(double tol_planarity_d2p, double tol_planarity_nor
           {
             std::stringstream msg1, msg2;
             msg1 << "Geometry (CompositeSolid) #" << this->get_id();
-            msg2 << "solid #" << _lsSolids[i]->get_id() << " and solid #" << _lsSolids[j]->get_id();
+            msg2 << "solid=" << _lsSolids[i]->get_id() << "&&solid=" << _lsSolids[j]->get_id();
             this->add_error(501, msg1.str(), msg2.str());
             isValid = false;
           }

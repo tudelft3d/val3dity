@@ -350,7 +350,7 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg1, msg2;
         msg1 << "Geometry (Solid) #" << this->get_id();
-        msg2 << "Shells #0 and #" << i;
+        msg2 << "shell=0&&shell=" << i;
         this->add_error(401, msg1.str(), msg2.str());
         isValid = false;
       }
@@ -362,7 +362,7 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg1, msg2;
         msg1 << "Geometry (Solid) #" << this->get_id();
-        msg2 << "Shells #0 and #" << i;
+        msg2 << "shell=0&&shell=" << i;
         this->add_error(401, msg1.str(), msg2.str());
         isValid = false;
       }
@@ -373,7 +373,7 @@ bool Solid::validate_solid_with_nef()
         {
           std::stringstream msg1, msg2;
           msg1 << "Geometry (Solid) #" << this->get_id();
-          msg2 << "Shells #0 and #" << i;
+          msg2 << "shell=0&&shell=" << i;
           this->add_error(401, msg1.str(), msg2.str());
           isValid = false;
         }
@@ -392,7 +392,7 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg1, msg2;
         msg1 << "Geometry (Solid) #" << this->get_id();
-        msg2 << "Shells #" << i << " and #" << j;
+        msg2 << "shell=" << i << "&&shell=" << j;
         this->add_error(401, msg1.str(), msg2.str());
         isValid = false;
         continue;
@@ -403,7 +403,7 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg1, msg2;
         msg1 << "Geometry (Solid) #" << this->get_id();
-        msg2 << "Shells #" << i << " and #" << j;
+        msg2 << "shell=" << i << "&&shell=" << j;
         this->add_error(401, msg1.str(), msg2.str());
         isValid = false;
         continue;
@@ -414,7 +414,7 @@ bool Solid::validate_solid_with_nef()
       {
         std::stringstream msg1, msg2;
         msg1 << "Geometry (Solid) #" << this->get_id();
-        msg2 << "Shells #" << i << " and #" << j;
+        msg2 << "shell=" << i << "&&shell=" << j;
         this->add_error(401, msg1.str(), msg2.str());
         isValid = false;
         continue;

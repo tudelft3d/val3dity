@@ -82,7 +82,7 @@ struct Report_intersections {
     {
       Error e;
       std::stringstream msg;
-      msg << lsCellIDs->at(id1) << " and " << lsCellIDs->at(id2);
+      msg << lsCellIDs->at(id1) << "&&" << lsCellIDs->at(id2);
       e.errorcode = ecode;
       e.info1 = msg.str();
       e.info2 = "";
