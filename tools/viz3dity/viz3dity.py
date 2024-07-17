@@ -100,10 +100,9 @@ def get_bbox(vs):
 
 def get_highest_error(f, v3re):
     herr = 0
-    if "errors" in f:
-        for err in f["errors"]:
-            if err["code"] > herr:
-                herr = err["code"]
+    for err in f["errors"]:
+        if err["code"] > herr:
+            herr = err["code"]
     return herr
 
 
