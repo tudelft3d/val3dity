@@ -5,7 +5,7 @@
 - validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
 
 
-## [2.5.0] - 
+## [2.5.0] - 2024-07-17
 ### Added 
 - val3dity now accepts a stream of CityJSONSeq as input from stdin: `cat myfile.jsonl | val3dity stdin` and it validates each line and outputs the result to stdout
 - a new error was added: error 905--INVALID_JSON for handling wrong JSON lines in a CityJSONSeq stream
