@@ -34,9 +34,9 @@ def load_cityjson(path):
     j = json.loads(open(path).read())
     v = []
     for each in j["vertices"]:
-        x = (each[0] * j["transform"]["scale"][0]) + j["transform"]["translate"][0]
-        y = (each[1] * j["transform"]["scale"][1]) + j["transform"]["translate"][1]
-        z = (each[2] * j["transform"]["scale"][2]) + j["transform"]["translate"][2]
+        x = (each[0] * j["transform"]["scale"][0])
+        y = (each[1] * j["transform"]["scale"][1])
+        z = (each[2] * j["transform"]["scale"][2])
         v.append([x, y, z])
     vs = np.asarray(v)
     ts = []
