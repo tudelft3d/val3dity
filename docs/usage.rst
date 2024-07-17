@@ -7,6 +7,7 @@ Using val3dity
 
   val3dity is a command-line program only, there is no graphical interface. Alternatively, you can use the `web application <http://geovalidation.bk.tudelft.nl/val3dity>`_.
 
+
 How to run val3dity?
 --------------------
 
@@ -14,35 +15,50 @@ To execute val3dity and see its options:
 
 .. code-block:: bash
 
-  $ val3dity --help
+  val3dity --help
     
 
 To validate all the 3D primitives in a CityJSON file and see a summary output:
 
 .. code-block:: bash
 
-  $ val3dity my3dcity.city.json 
+  val3dity my3dcity.city.json 
 
 
 To validate each 3D primitive in ``input.city.json``, and use a tolerance for testing the planarity of the surface of 20cm (0.2):
 
 .. code-block:: bash
 
-  $ val3dity --planarity_d2p_tol 0.2 input.city.json
+  val3dity --planarity_d2p_tol 0.2 input.city.json
 
 
 To validate an OBJ file and verify whether the 3D primitives from a Solid (this is the default):
 
 .. code-block:: bash
 
-  $ val3dity input.obj 
+  val3dity input.obj 
 
 The same file could be validated as a MultiSurface, ie each of its surface are validated independently
 
 .. code-block:: bash
 
-  $ val3dity -p MultiSurface input.obj
-    
+  val3dity -p MultiSurface input.obj
+
+
+Using CityJSONSeq
+-----------------
+
+To validate a `CityJSONSeq stream <https://www.cityjson.org/cityjsonseq/>`_, you need to pipe the stream into val3dity and use ``stdin`` for the input. 
+
+If you have a CityJSONSeq serialised in a file, then you can cat it:
+
+.. code-block:: bash
+
+  cat myfile.city.jsonl | val3dity stdin
+
+The output shows, line by line, what are the errors. If the list of error is empty (``[]``) this means the feature is geometrically valid.
+
+  
 
 Accepted input
 --------------
@@ -50,7 +66,7 @@ Accepted input
 val3dity accepts as input:
 
   - `CityJSON <http://www.cityjson.org>`_
-  - `CityJSON Lines (CityJSONL) <https://www.cityjson.org/specs/#text-sequences-and-streaming-with-cityjsonfeature>`_
+  - `CityJSON Sequences (CityJSONSeq) <https://www.cityjson.org/cityjsonseq/>`_
   - `tu3djson <https://github.com/tudelft3d/tu3djson>`_
   - `JSON-FG (OGC Features and Geometries JSON) <https://github.com/opengeospatial/ogc-feat-geo-json>`_
   - `OBJ <https://en.wikipedia.org/wiki/Wavefront_.obj_file>`_ 
@@ -61,6 +77,9 @@ For **CityJSON** files, all the City Objects (eg ``Building`` or ``Bridge``) are
 The 3D primitives are bundled under their City Objects in the report.
 If your CityJSON contains ``Buildings`` with one or more ``BuildingParts``, val3dity will perform an extra validation: it will ensure that the 3D primitives do not overlap (technically that the interior of each ``BuildingPart`` does not intersect with the interior of any other part of the ``Building``).
 If there is one or more intersections, then :ref:`e601` will be reported.
+
+For **CityJSONSeq** streams, the validation is performed line-by-line and the errors are returned for each line. 
+If you want to generate a global report, you can serialise the stream into a .jsonl file and then validate this file as you would with any other input files.
 
 For **IndoorGML** files, all the cells (in the primal subdivisions, the rooms) are validated individually, and then some extra validation tests are run on the dual navigation network. All errors 7xx are related specifically to IndoorGML.
 
@@ -182,12 +201,12 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 |  Tolerance for snapping vertices that are close to each others
 |  default = 0.001
 
-Geometries modelled in GML store amazingly very little topological relationships. 
-A cube is for instance represented with 6 surfaces, all stored independently. 
-This means that the coordinates xyz of a single vertex (where 3 surfaces "meet") is stored 3 times. 
-It is possible that these 3 vertices are not exactly at the same location (eg (0.01, 0.5, 1.0), (0.011, 0.49999, 1.00004) and (0.01002, 0.5002, 1.0007)), and that would create problems when validating since there would be holes in the cube for example. 
-The snap tolerance basically gives a threshold that says: "if 2 points are closer then *X*, then we assume that they are the same". 
-It's setup by default to be 1mm. 
+Geometries modelled in GML store very few topological relationships. 
+For instance, a cube is represented with 6 surfaces, all stored independently. 
+This means that the coordinates *xyz* of a single vertex (where 3 surfaces meet) are stored 3 times. 
+It is possible that these 3 vertices are not exactly at the same location (e.g., (0.01, 0.5, 1.0), (0.011, 0.49999, 1.00004) and (0.01002, 0.5002, 1.0007)), and that would create problems during validation since there would be holes in the cube, for example. 
+The snap tolerance basically provides a threshold that says: if 2 points are closer than X, then we assume they are the same. 
+It is set up by default to be 1mm.
 
 ----
 

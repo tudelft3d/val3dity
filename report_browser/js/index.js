@@ -1,30 +1,5 @@
 
 
-Vue.component('primitive-item', {
-    props: ['primitive'],
-    template: `
-    <li>
-        <i class="fas" :class="[ isOpen ? 'fa-minus' : 'fa-plus', primitive.validity ? 'text-white' : '' ]" @click="toggle()"></i> 
-        <span class="badge badge-secondary">{{ primitive.type }}</span>
-        <span class="badge" :class="[ primitive.validity ? 'badge-success' : 'badge-danger' ]">{{ primitive.validity ? 'valid' : 'invalid' }}</span>
-        {{ primitive.id }}
-        <ul class="list-unstyled ml-5" v-show="isOpen">
-            <li :primitive="e" v-for="e in primitive.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
-            <primitive-item :primitive="p" v-if="'primitives' in primitive" v-for="p in primitive.primitives"></primitive-item>
-        </ul>
-    </li>
-    `,
-    data: function() {
-        return {
-            isOpen: false
-        }
-    },
-    methods: {
-        toggle() {
-            this.isOpen = !this.isOpen;
-        }
-    }
-})
 
 Vue.component('feature-item', {
     props: ['feature'],
@@ -35,8 +10,7 @@ Vue.component('feature-item', {
         <span class="badge" :class="[ feature.validity ? 'badge-success' : 'badge-danger' ]">{{ feature.validity ? 'valid' : 'invalid' }}</span>
         {{ feature.id }}
         <ul class="list-unstyled ml-5" v-show="isOpen">
-            <li :error="e" v-for="e in feature.errors"><span class="badge badge-warning">Error {{ e.code }}</span> {{ e.description }} | id={{ e.id }} | info={{ e.info }}</li>
-            <primitive-item :primitive="p" v-for="p in feature.primitives"></primitive-item>
+            <li :error="e" v-for="e in feature.errors"><span class="badge badge-warning">Error {{ e.code }}</span> <span class="badge badge-light">{{ e.description }}</span> {{ e.id }} | info={{ e.info }}</li>
         </ul>
     </li>
     `,
@@ -153,10 +127,6 @@ var app = new Vue({
                 if (p.validity == true) {
                   return true;
                 }
-
-                if (p.primitives) {
-                  return (p.primitives = p.primitives.filter(f)).length
-                }
               });
             }
             else if (this.feature_filter == "invalid") {
@@ -169,10 +139,6 @@ var app = new Vue({
 
                 if (p.errors && p.errors.some(e => error_filters.includes(e.code))) {
                   show = true;
-                }
-
-                if (p.primitives) {
-                  show = show | (p.primitives = p.primitives.filter(f)).length;
                 }
 
                 return show;

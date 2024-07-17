@@ -3,9 +3,9 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0011 NEW)
 endif(COMMAND cmake_policy)
 
+cmake_minimum_required (VERSION 3.16)
 project( val3dity )
 
-cmake_minimum_required (VERSION 3.16)
 
 
 add_definitions(-std=c++14)
@@ -51,9 +51,7 @@ if ( NOT Boost_FOUND )
 endif()
 
 # GEOS
-find_package( GEOS REQUIRED CONFIG)
-# if linux complains: 
-# find_package( GEOS )
+find_package( GEOS REQUIRED )
 if ( NOT GEOS_FOUND )
   message(SEND_ERROR "val3dity requires the GEOS library")
 endif()
@@ -62,16 +60,16 @@ include_directories( ${GEOS_INCLUDE_DIR} )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty )
 
 FILE(GLOB_RECURSE THIRDPARTY thirdparty/*.cpp)
-add_library(thirdparty STATIC ${THIRDPARTY})
+add_library(val3dity_thirdparty STATIC ${THIRDPARTY})
 
 FILE(GLOB SRC_FILES src/*.cpp)
 
-if ( LIBRARY )
+if ( VAL3DITY_LIBRARY )
   message(STATUS "Building val3dity library")
   list(REMOVE_ITEM SRC_FILES src/main.cpp)
   add_library(val3dity STATIC ${SRC_FILES})
   target_include_directories(val3dity PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
-  set_property(TARGET thirdparty PROPERTY POSITION_INDEPENDENT_CODE ON)
+  set_property(TARGET val3dity_thirdparty PROPERTY POSITION_INDEPENDENT_CODE ON)
   set_property(TARGET val3dity PROPERTY POSITION_INDEPENDENT_CODE ON)
 else()
   message(STATUS "Building val3dity executable")
@@ -80,8 +78,6 @@ else()
 endif()
 
 
-target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support GEOS::geos_c thirdparty Boost::filesystem)
-# if linux complains: 
-# target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support ${GEOS_LIBRARY} thirdparty Boost::filesystem)
+target_link_libraries(val3dity CGAL::CGAL CGAL::Eigen3_support ${GEOS_LIBRARY} val3dity_thirdparty Boost::filesystem)
 
 install(TARGETS val3dity DESTINATION bin)

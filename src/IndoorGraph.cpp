@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -58,7 +58,7 @@ void IndoorGraph::add_vertex(std::string theid, double x, double y, double z, st
 
 bool IndoorGraph::validate() 
 {
-  std::cout << "VALIDATE IndoorGraph" << std::endl;
+  // std::cout << "VALIDATE IndoorGraph" << std::endl;
   return true;
   // if (_is_valid != -1)
   //   return _is_valid;

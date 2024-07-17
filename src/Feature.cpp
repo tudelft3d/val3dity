@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2022, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -34,6 +34,15 @@ namespace val3dity
 {
 
 
+Feature::Feature() {
+}
+
+Feature::~Feature() {
+  for (auto& p : _lsPrimitives) {
+    delete p;
+  }
+
+}
 
 
 std::string Feature::get_id()
@@ -74,9 +83,13 @@ json Feature::get_report_json()
       j["errors"].push_back(jj);
     }
   }
-  j["primitives"];
-  for (auto& p : _lsPrimitives)
-    j["primitives"].push_back(p->get_report_json()); 
+  // j["primitives"];
+  for (auto& p : _lsPrimitives) {
+    auto errs = p->get_errors();
+    for (auto& e: errs)
+      j["errors"].push_back(e);
+  //   j["primitives"].push_back(p->get_report_json()); 
+  }
   return j;
 }
 
@@ -99,40 +112,19 @@ const std::vector<Primitive*>& Feature::get_primitives()
 
 bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_normals, double tol_overlap)
 {
-  std::clog << std::endl << "######### Validating Feature #########" << std::endl;
-  std::clog << "id:   " << this->get_id() << std::endl;
-  std::clog << "type: " << this->get_type() << std::endl;
-  std::clog << "--" << std::endl;
+  spdlog::info("Validating Feature #{} (type={})", this->get_id(), this->get_type());
   bool bValid = true;
   if (this->is_empty() == true) {
     this->add_error(906, "Feature has no geometry defined (or val3dity doesn't handle this type).", "");
     bValid = false;
   }
-  if (_lsPrimitives.size() > 500) {
-    std::cout << "Validating " << _lsPrimitives.size() << " geometric primitives, this could be slow." << std::endl << std::flush;
-  }
+  // if (_lsPrimitives.size() > 500) {
+  //   std::cout << "Validating " << _lsPrimitives.size() << " geometric primitives, this could be slow." << std::endl << std::flush;
+  // }
   for (auto& p : _lsPrimitives)
   {
-    std::clog << "======== Validating Primitive ========" << std::endl;
-    switch(p->get_type())
-    {
-      case 0: std::clog << "Solid"             << std::endl; break;
-      case 1: std::clog << "CompositeSolid"    << std::endl; break;
-      case 2: std::clog << "MultiSolid"        << std::endl; break;
-      case 3: std::clog << "CompositeSurface"  << std::endl; break;
-      case 4: std::clog << "MultiSurface"      << std::endl; break;
-      case 5: std::clog << "GeometryTemplate"  << std::endl; break;
-      case 9: std::clog << "ALL"               << std::endl; break;
-    }
-    std::clog << "id: " << p->get_id() << std::endl;
-    std::clog << "--" << std::endl;
     if (p->validate(tol_planarity_d2p, tol_planarity_normals, tol_overlap) == false)
-    {
-      std::clog << "======== INVALID ========" << std::endl;
       bValid = false;
-    }
-    else
-      std::clog << "========= VALID =========" << std::endl;
   }
   _is_valid = bValid;
   return bValid;
@@ -144,12 +136,7 @@ void Feature::add_error(int code, std::string whichgeoms, std::string info)
   _is_valid = 0;
   std::tuple<std::string, std::string> a(whichgeoms, info);
   _errors[code].push_back(a);
-  std::clog << "\tERROR " << code << ": " << ALL_ERRORS[code];
-  if (whichgeoms.empty() == false)
-    std::clog << " (id: " << whichgeoms << ")";
-  std::clog << std::endl;
-  if (info.empty() == false)
-    std::clog << "\t[" << info << "]" << std::endl;
+  spdlog::info("e{}-{} (id={}; {})", code, ALL_ERRORS[code], whichgeoms, info);
 }
 
 std::set<int> Feature::get_unique_error_codes()

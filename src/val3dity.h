@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -26,44 +26,89 @@
   Julianalaan 134, Delft 2628BL, the Netherlands
 */
 
+#include "definitions.h"
+#include <iostream>
 
 #include "nlohmann-json/json.hpp"
 
 using json = nlohmann::json;
 
-namespace val3dity
-{
+
+namespace val3dity {
 
 
-bool 
-is_valid(json& j,
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+struct Parameters {
+    double      _tol_snap = 0.001;
+    double      _planarity_d2p_tol = 0.01;
+    double      _planarity_n_tol = 20.0;
+    double      _overlap_tol = -1.0;
+    Primitive3D _primitive = SOLID;
+
+    Parameters& tol_snap(double tol_snap) { 
+        _tol_snap = tol_snap;
+        return *this;
+    }
+
+    Parameters& planarity_d2p_tol(double planarity_d2p_tol) {
+        _planarity_d2p_tol = planarity_d2p_tol;
+        return *this;
+    }
+
+    Parameters& planarity_n_tol(double planarity_n_tol) {
+        _planarity_n_tol = planarity_n_tol;
+        return *this;
+    }
+
+    Parameters& overlap_tol(double overlap_tol) {
+        _overlap_tol = overlap_tol;
+        return *this;
+    }
+
+    Parameters& primitive(Primitive3D primitive) {
+        _primitive = primitive;
+        return *this;
+    }
+};
+
+
+bool
+is_valid(json& j, Parameters params = Parameters());
 
 json
-validate(json& j,
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+validate(json& j, Parameters params = Parameters());
 
-bool 
+bool
 is_valid(std::string& input,
-         std::string format, 
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+         std::string format,
+         Parameters params = Parameters());
 
-json 
+json
 validate(std::string& input,
-         std::string format, 
-         double tol_snap=0.001, 
-         double planarity_d2p_tol=0.01, 
-         double planarity_n_tol=20.0, 
-         double overlap_tol=-1.0);
+         std::string format,
+         Parameters params = Parameters());
 
+
+json
+validate(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<int>>& faces,
+         Parameters params = Parameters());
+
+
+bool
+is_valid(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<int>>& faces,
+         Parameters params = Parameters());
+
+
+json
+validate(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<std::vector<int>>>& faces_w_holes,
+         Parameters params = Parameters());
+
+
+bool
+is_valid(const std::vector<std::array<double, 3>>& vertices,
+         const std::vector<std::vector<std::vector<int>>>& faces_w_holes,
+         Parameters params = Parameters());
 
 }

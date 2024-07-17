@@ -136,13 +136,6 @@ def test_ignore_204(validate, data_ignore_204):
                                                "--ignore204"])
     assert(error == [])
 
-@pytest.mark.full
-def test_verbose(val3dity, validate_full, data_composite_solid, verbose_reference):
-    """Verbose log is redirected to stderr, see #80"""
-    options = ["--verbose"]
-    command = [val3dity] + options + data_composite_solid
-    out, err = validate_full(command)
-    assert verbose_reference in err
 
 @pytest.mark.full
 def test_ignore_rest(val3dity, validate_full, data_composite_solid):

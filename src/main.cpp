@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft
+  Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft
 
   This file is part of val3dity.
 
@@ -40,17 +40,24 @@
 #include <time.h>  
 #include "nlohmann-json/json.hpp"
 #include <boost/filesystem.hpp>
+#include <iostream>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 using namespace std;
 using namespace val3dity;
 using json = nlohmann::json;
 
-std::string VAL3DITY_VERSION = "2.4.0";
+std::string VAL3DITY_VERSION = "2.5.0b2";
 
 
 std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 std::string unit_test(std::vector<Feature*>& lsFeatures, IOErrors& ioerrs);
 void        write_report_json(json& jr, std::string report);
+void        read_stream_cjseq(double tol_snap, 
+                              double tol_planarity_d2p, 
+                              double tol_planarity_normals, 
+                              double tol_overlap);
 
 
 
@@ -64,7 +71,7 @@ public:
     std::cout << "\tval3dity [OPTION] myinput.json" << std::endl;
     std::cout << "ALLOWED FORMATS:" << std::endl;
     std::cout << "\tCityJSON" << std::endl;
-    std::cout << "\tCityJSON Lines (CityJSONL)" << std::endl;
+    std::cout << "\tCityJSONSeq" << std::endl;
     std::cout << "\ttu3djson" << std::endl;
     std::cout << "\tJSON-FG" << std::endl;
     std::cout << "\tOBJ" << std::endl;
@@ -91,15 +98,12 @@ public:
     std::cout << "\t\tValidate each 3D primitive in input.json (tu3djson file)" << std::endl;
     std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
     std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
-    
-    std::cout << "\tval3dity input.city.json --verbose" << std::endl;
-    std::cout << "\t\tAll details of the validation are printed out" << std::endl;
+
+    std::cout << "\tcat myfile.city.jsonl | val3dity stdin" << std::endl;
+    std::cout << "\t\tStream the CityJSONSeq file to stdout and validate it line-by-line" << std::endl;
     
     std::cout << "\tval3dity input.obj" << std::endl;
     std::cout << "\t\tValidate the geometries in input.obj as if they were an ISO19107 Solid (default)" << std::endl;
-    
-    std::cout << "\tval3dity input.off -p MultiSurface" << std::endl;
-    std::cout << "\t\tValidate the geometries in input.off as an ISO19107 MultiSurface" << std::endl;
     
     std::cout << "\tval3dity myindoorgml.gml --snap_tol 0.1" << std::endl;
     std::cout << "\t\tThe vertices in myindoorgml.gml closer than 0.1unit are snapped together" << std::endl;
@@ -127,7 +131,7 @@ class LicensePrint : public TCLAP::Visitor
     {
       std::string thelicense =
       "\nval3dity\n\n"
-      "Copyright (c) 2011-2023  3D geoinformation research group, TU Delft\n\n"
+      "Copyright (c) 2011-2024  3D geoinformation research group, TU Delft\n\n"
       "val3dity is free software: you can redistribute it and/or modify\n"
       "it under the terms of the GNU General Public License as published by\n"
       "the Free Software Foundation, either version 3 of the License, or\n"
@@ -187,7 +191,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "allowed formats: CityJSON, CityJSONL, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
+                                              "allowed formats: CityJSON, CityJSONSeq, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
                                               true, 
                                               "", 
                                               "string");
@@ -278,51 +282,57 @@ int main(int argc, char* const argv[])
     cmd.add(report);
     cmd.parse( argc, argv );
 
+    //-- vector with Features: CityObject, GenericObject, 
+    //-- or IndoorModel (or others in the future)
+    std::vector<Feature*> lsFeatures;
+    
+    //-- if verbose == false then log to a file
+    if (verbose.getValue() == false)
+    {
+      spdlog::set_level(spdlog::level::off);
+    }
+
+    InputTypes inputtype = OTHER;
+    if ( (inputfile.getValue() == "stdin") || (inputfile.getValue() == "STDIN") ) {
+      inputtype = STDIN;
+      read_stream_cjseq(snap_tol.getValue(), planarity_d2p_tol.getValue(), planarity_n_tol.getValue(), overlap_tol.getValue());
+      return(0);
+    } else {
+      std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
+      if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
+        inputtype = GML;
+        ioerrs.set_input_file_type("GML");
+      }
+      else if ( (extension == "poly") || (extension == "POLY") ) {
+        inputtype = POLY;    
+        ioerrs.set_input_file_type("POLY");
+      }
+      else if ( (extension == "json") || (extension == "JSON") ) {
+        inputtype = JSON;
+        ioerrs.set_input_file_type("JSON");
+      }
+      else if ( (extension == "jsonl") || (extension == "JSONL") ) {
+        inputtype = JSONL;
+        ioerrs.set_input_file_type("JSONL");
+      }
+      else if ( (extension == "obj") || (extension == "OBJ") ) {
+        inputtype = OBJ;
+        ioerrs.set_input_file_type("OBJ");
+      }
+      else if ( (extension == "off") || (extension == "OFF") ) {
+        inputtype = OFF;
+        ioerrs.set_input_file_type("OFF");
+      }
+    }
+
+    //-- print the license (each time)
     std::string licensewarning =
-    "---\nval3dity Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  \n"
+    "---\nval3dity Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft  \n"
     "This program comes with ABSOLUTELY NO WARRANTY.\n"
     "This is free software, and you are welcome to redistribute it\n"
     "under certain conditions; for details run val3dity with the '--license' option.\n---";
     std::cout << licensewarning << std::endl;
 
-    //-- vector with Features: CityObject, GenericObject, 
-    //-- or IndoorModel (or others in the future)
-    std::vector<Feature*> lsFeatures;
-    
-    InputTypes inputtype = OTHER;
-    std::string extension = inputfile.getValue().substr(inputfile.getValue().find_last_of(".") + 1);
-    if ( (extension == "gml") || (extension == "GML") || (extension == "xml") || (extension == "XML") ) {
-      inputtype = GML;
-      ioerrs.set_input_file_type("GML");
-    }
-    else if ( (extension == "poly") || (extension == "POLY") ) {
-      inputtype = POLY;    
-      ioerrs.set_input_file_type("POLY");
-    }
-    else if ( (extension == "json") || (extension == "JSON") ) {
-      inputtype = JSON;
-      ioerrs.set_input_file_type("JSON");
-    }
-    else if ( (extension == "jsonl") || (extension == "JSONL") ) {
-      inputtype = JSONL;
-      ioerrs.set_input_file_type("JSONL");
-    }
-    else if ( (extension == "obj") || (extension == "OBJ") ) {
-      inputtype = OBJ;
-      ioerrs.set_input_file_type("OBJ");
-    }
-    else if ( (extension == "off") || (extension == "OFF") ) {
-      inputtype = OFF;
-      ioerrs.set_input_file_type("OFF");
-    }
-
-    //-- if verbose == false then log to a file
-    if (verbose.getValue() == false)
-    {
-      savedBufferCLOG = clog.rdbuf();
-      mylog.open("val3dity.log");
-      std::clog.rdbuf(mylog.rdbuf());
-    }
 
     //-- no negative snap_tol value
     if (snap_tol.getValue() < 0) 
@@ -398,7 +408,7 @@ int main(int argc, char* const argv[])
       }
       else if (inputtype == JSONL)
       {
-        read_file_jsonl(inputfile.getValue(), 
+        read_file_cjseq(inputfile.getValue(), 
                         lsFeatures,
                         ioerrs, 
                         snap_tol.getValue());
@@ -423,7 +433,7 @@ int main(int argc, char* const argv[])
           Surface* sh = parse_poly(infile, 0, ioerrs);
           if ( (ioerrs.has_errors() == false) & (prim3d == SOLID) )
           {
-            Solid* s = new Solid;
+            Solid* s = new Solid();
             s->set_oshell(sh);
             int sid = 1;
             for (auto ifile : ishellfiles.getValue())
@@ -615,8 +625,11 @@ int main(int argc, char* const argv[])
     //-- output report in JSON 
     if (report.getValue() != "") 
     {
+      string of = inputfile.getValue();
+      if (boost::filesystem::exists(inputfile.getValue()))
+        of = boost::filesystem::canonical(inputfile.getValue()).string();
       //-- save the json report in memory first
-      json jr = get_report_json(inputfile.getValue(),
+      json jr = get_report_json(of,
                                 lsFeatures,
                                 VAL3DITY_VERSION,
                                 snap_tol.getValue(),
@@ -634,11 +647,6 @@ int main(int argc, char* const argv[])
     if (unittests.getValue() == true)
       std::cout << "\n" << unit_test(lsFeatures, ioerrs) << std::endl;
 
-    if (verbose.getValue() == false)
-    {
-      clog.rdbuf(savedBufferCLOG);
-      mylog.close();
-    }
     return(0);
   }
   catch (TCLAP::ArgException &e) 
@@ -648,6 +656,64 @@ int main(int argc, char* const argv[])
   }
 }
 
+void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_planarity_n, double tol_overlap = -1) {
+  std::vector<Feature*> lsFeatures;
+  //-- read and store the GeometryTemplates
+  std::vector<GeometryTemplate*> lsGTs;
+  //-- transform
+  json jtransform;
+  std::string l;
+  int linecount = 1;
+  while (std::getline(std::cin, l)) {
+    std::istringstream iss(l);
+    json j;
+    try 
+    {
+      iss >> j;
+    }
+    catch (nlohmann::detail::parse_error e) 
+    {
+      std::cout << "line."  << linecount << " [905]" << std::endl;
+    }
+    //-- first line/metadata
+    if (j["type"] == "CityJSON") {
+      if ( (j["CityObjects"].empty() == false) || (j["vertices"].empty() == false) ) {
+        std::string s = "Input file is not a valid CityJSONSeq file (perhaps it's a CityJSON file?)";
+        std::cout << "ERROR: " << s << std::endl;
+        break;
+      }
+      if (j.count("geometry-templates") == 1) {
+        process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
+      }
+      if (j.count("transform") == 0) {
+        std::string s = "Input file first line has no \"transform\" property";
+        std::cout << "ERROR: " << s << std::endl;
+        break;
+      } else {
+        jtransform = j["transform"];
+        std::cout << "\"\" []" << std::endl;
+      }
+    //-- all the other lines
+    } else if (j["type"] == "CityJSONFeature") {
+      j["transform"] = jtransform; //-- add transform b/c BuildingPart overlap uses a tolerance
+      parse_cjseq(j, lsFeatures, tol_snap, lsGTs);
+      auto f = lsFeatures[0];
+      f->validate(tol_planarity_d2p, tol_planarity_n, tol_overlap);
+      json j_set(f->get_unique_error_codes());
+      std::cout << j["id"] << " ";
+      std::cout << j_set << std::endl;
+      delete f; 
+      lsFeatures.clear();
+    } else {
+      std::cout << j["id"] << " [905]" << std::endl;
+    }
+    linecount++;
+  }
+  if (linecount < 2) {
+    std::string s = "CityJSONSeq has only the 1st line, and no CityJSONFeature.";
+    std::cout << "ERROR: " << s << std::endl;
+  }
+}
 
 void write_report_json(json& jr, std::string report)
 {

@@ -1,7 +1,7 @@
 /*
   val3dity 
 
-  Copyright (c) 2011-2023, 3D geoinformation research group, TU Delft  
+  Copyright (c) 2011-2024, 3D geoinformation research group, TU Delft  
 
   This file is part of val3dity.
 
@@ -161,14 +161,14 @@ std::map<std::string, std::string>
                   get_namespaces(pugi::xml_node& root);
 
 void              read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
-void              read_file_jsonl(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
+void              read_file_cjseq(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErrors& errs, double tol_snap);
 
 void              parse_obj(std::istream &input, std::vector<Feature*>& lsFeatures, Primitive3D prim3d, IOErrors& errs, double tol_snap);
 Surface*          parse_poly(std::istream &input, int shellid, IOErrors& errs);
 Surface*          parse_off(std::istream &input, int shellid, IOErrors& errs, double tol_snap);
 
 void              parse_cityjson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
-void              parse_cityjsonl(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs);
+void              parse_cjseq(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, std::vector<GeometryTemplate*>& lsGTs);
 void              parse_tu3djson(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_tu3djson_onegeom(json& j, std::vector<Feature*>& lsFeatures, double tol_snap);
 void              parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, IOErrors& errs);
@@ -183,7 +183,7 @@ MultiSolid*       process_gml_multisolid(const pugi::xml_node& nms, std::map<std
 CompositeSolid*   process_gml_compositesolid(const pugi::xml_node& nms, std::map<std::string, pugi::xpath_node>& dallpoly, double tol_snap, IOErrors& errs);
 
 
-void              process_json_geometries_of_co(json& jco, CityObject* co, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap);
+void              process_json_geometries_of_co(json& jco, CityObject* co, std::string coid, std::vector<GeometryTemplate*>& lsGTs, json& j, double tol_snap);
 void              process_json_surface(std::vector< std::vector<int> >& pgn, nlohmann::json& j, Surface* s);
 void              process_jsonfg_surface(std::vector< std::vector<int> >& pgn, Surface* s, IOErrors& errs);
 void              process_cityjson_geometrytemplates(json& jgt, std::vector<GeometryTemplate*>& lsGTs, double tol_snap);
