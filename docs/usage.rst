@@ -15,34 +15,34 @@ To execute val3dity and see its options:
 
 .. code-block:: bash
 
-  $ val3dity --help
+  val3dity --help
     
 
 To validate all the 3D primitives in a CityJSON file and see a summary output:
 
 .. code-block:: bash
 
-  $ val3dity my3dcity.city.json 
+  val3dity my3dcity.city.json 
 
 
 To validate each 3D primitive in ``input.city.json``, and use a tolerance for testing the planarity of the surface of 20cm (0.2):
 
 .. code-block:: bash
 
-  $ val3dity --planarity_d2p_tol 0.2 input.city.json
+  val3dity --planarity_d2p_tol 0.2 input.city.json
 
 
 To validate an OBJ file and verify whether the 3D primitives from a Solid (this is the default):
 
 .. code-block:: bash
 
-  $ val3dity input.obj 
+  val3dity input.obj 
 
 The same file could be validated as a MultiSurface, ie each of its surface are validated independently
 
 .. code-block:: bash
 
-  $ val3dity -p MultiSurface input.obj
+  val3dity -p MultiSurface input.obj
 
 
 Using CityJSONSeq
@@ -54,7 +54,7 @@ If you have a CityJSONSeq serialised in a file, then you can cat it:
 
 .. code-block:: bash
 
-  $ cat myfile.city.jsonl | val3dity stdin
+  cat myfile.city.jsonl | val3dity stdin
 
 The output shows, line by line, what are the errors. If the list of error is empty (``[]``) this means the feature is geometrically valid.
 
@@ -201,12 +201,12 @@ Helps to detect small folds in a surface. ``--planarity_n_tol`` refers to the no
 |  Tolerance for snapping vertices that are close to each others
 |  default = 0.001
 
-Geometries modelled in GML store amazingly very little topological relationships. 
-A cube is for instance represented with 6 surfaces, all stored independently. 
-This means that the coordinates xyz of a single vertex (where 3 surfaces "meet") is stored 3 times. 
-It is possible that these 3 vertices are not exactly at the same location (eg (0.01, 0.5, 1.0), (0.011, 0.49999, 1.00004) and (0.01002, 0.5002, 1.0007)), and that would create problems when validating since there would be holes in the cube for example. 
-The snap tolerance basically gives a threshold that says: "if 2 points are closer then *X*, then we assume that they are the same". 
-It's setup by default to be 1mm. 
+Geometries modelled in GML store very few topological relationships. 
+For instance, a cube is represented with 6 surfaces, all stored independently. 
+This means that the coordinates *xyz* of a single vertex (where 3 surfaces meet) are stored 3 times. 
+It is possible that these 3 vertices are not exactly at the same location (e.g., (0.01, 0.5, 1.0), (0.011, 0.49999, 1.00004) and (0.01002, 0.5002, 1.0007)), and that would create problems during validation since there would be holes in the cube, for example. 
+The snap tolerance basically provides a threshold that says: if 2 points are closer than X, then we assume they are the same. 
+It is set up by default to be 1mm.
 
 ----
 

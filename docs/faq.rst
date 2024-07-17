@@ -16,7 +16,7 @@ This tests, among many others, the following:
 - Various valid geometries and boundary conditions.
 - Command-line user input.
 
-You can read more about the `details <https://github.com/tudelft3d/val3dity/blob/master/tests/README.md>`_, or check the `complete list of tested geometries <https://github.com/tudelft3d/val3dity/blob/master/data/test_metadata.yml>`_
+You can read more about the `details <https://github.com/tudelft3d/val3dity/blob/main/tests/README.md>`_, or check the `complete list of tested geometries <https://github.com/tudelft3d/val3dity/blob/main/data/test_metadata.yml>`_
 
 
 How to interpret the report?
@@ -136,7 +136,7 @@ An example is as follows:
 
 
 For each primitive, its identifier is (``"id"``) is given, its ``"type"``, and its ``"validity"``.
-The ``"errors"`` property is always listed, and it is an array of the errors; it is an empty array is the feature is valid.
+The ``"errors"`` property is always listed, and it is an array of the errors; it is an empty array if the feature is valid.
 
 Because a feature (eg a Building) can contain several geometries and children (eg the BuildingPart of a Building), we report the error by giving extra information about its location.
 ``coid=`` tells you the City Object identifier.
@@ -200,14 +200,14 @@ We however plan to offer in the future this for all primitives/buildings in a fi
 
 
 The IDs for the geometries, shells, and surfaces in the report, are they 0-based or 1-based?
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 0-based.
 
 
 Where can I get files containing ``Solids`` or ``CompositeSolid``?
---------------------------------------------------------------------------
+------------------------------------------------------------------
 
-  - `www.cityjson.org <https://www.cityjson.org/datasets/>`_ has many files
+  - `www.cityjson.org/datasets/ <https://www.cityjson.org/datasets/>`_ has many files
   - in the folder ``/data/`` of the `GitHub repository of val3dity <https://github.com/tudelft3d/val3dity>`_ there are many examples of files containing different primitives, and in different formats.
   - `www.indoorgml.net <http://indoorgml.net/resources/>`_ has a few files
   - `overview of cities with 3D city models <https://3d.bk.tudelft.nl/opendata/opencities/>`_

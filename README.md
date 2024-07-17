@@ -4,9 +4,9 @@
 # val3dity
 
 val3dity---pronounced 'val-three-dity'---allows us to validate 3D primitives according to the international standard ISO19107.
-Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives (PostGIS only validates 2D primitives).
+Think of it as [PostGIS ST_IsValid](http://postgis.net/docs/ST_IsValid.html), but for 3D primitives.
 
-In short, it verifies whether a 3D primitive respects the definition as given in [ISO19107](http://www.iso.org/iso/catalogue_detail.htm?csnumber=26012) and [GML](https://en.wikipedia.org/wiki/Geography_Markup_Language).
+In short, it verifies whether a 3D primitive respects the definition as given in [ISO19107](https://www.iso.org/standard/66175.html).
 
 The validation of the following 3D primitives is fully supported:
 
@@ -17,6 +17,7 @@ The validation of the following 3D primitives is fully supported:
   - ``CompositeSolid``
 
 Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported and so are cavities in solids (also called voids or inner shells).
+
 However, as is the case for many formats used in practice, only planar and linear primitives are allowed: no curves or spheres or other parametrically-modelled primitives are supported. 
 There is no plan to support these geometries.
 
@@ -82,35 +83,35 @@ Thus, in a nutshell,
 For Windows, we offer [an executable](https://github.com/tudelft3d/val3dity/releases).
 
 It's also possible to compile val3dity yourself with the CMake file we offer, but it's slightly more complex with the dependencies.
-We suggest you look at [how we build it on GitHub Actions](https://github.com/tudelft3d/val3dity/blob/main/.github/workflows/build_exe.yml) to get some inspirate (and help).
+We suggest you look at [how we build it on GitHub Actions](https://github.com/tudelft3d/val3dity/blob/main/.github/workflows/build_exe.yml) to get some inspiration (and help).
 
 
 ## Usage
 
-To compile and run val3dity (from the val3dity folder):
+To run val3dity:
 
-    $ ./val3dity /data/cityjson/cube.json
+    val3dity ./data/cityjson/cube.json
 
 The summary of the validation is reported, and you should see that `cube.json` contains one valid primitive.
 
 Finally, to see all the options possible:
 
-    $ ./val3dity --help
+    val3dity --help
 
 To validate a [CityJSONSeq stream](https://www.cityjson.org/cityjsonseq/), you need to pipe the stream into val3dity and use ``stdin`` for the input. 
 If you have a CityJSONSeq serialised in a file, then you can cat it:
 
-    $ cat myfile.city.jsonl | val3dity stdin
+    cat myfile.city.jsonl | val3dity stdin
 
-The output shows, line by line, what are the errors. 
-If the list of error is empty (``[]``) this means the feature is geometrically valid.    
+The output shows, line by line, what the errors are. 
+If the list of error is empty (``[]``) this means the feature is geometrically valid 🎉
 
 
 ## Using val3dity as a library
 
 val3dity can be compiled and used as a library:
 
-    $ cmake .. -DVAL3DITY_LIBRARY=true
+    cmake .. -DVAL3DITY_LIBRARY=true
 
 There is a simple example in `./demo_lib` with instructions to compile it.
 
@@ -127,7 +128,7 @@ However, a file is limited to 50MB.
 
 ![](./tools/viz3dity/screenshot.png)
 
-In the folder `tools/viz3dity/`, there is a simple Python script where you load a CityJSON file with geometries and one with the val3dity report, and you can see which objects have specific errors (each error gets a colour).
+In the folder `tools/viz3dity/`, there is a simple Python script where you can load a CityJSON file with geometries and one with the val3dity report, and you can see which objects have specific errors (each error gets a colour).
 
 However, it's not possible to see where in an object the error is (eg which surface is not planar).
 This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
@@ -147,12 +148,12 @@ However we ask you check first whether your problem has already been solved by s
 
 To verify that everything went fine during the compilation, run the unit tests (from the root folder of val3dity) (this requires `pip install pytest pyyaml`):
 
-    $ python -m pytest --runfull
+    python -m pytest --runfull
 
-You shouldn't get any errors.
+You shouldn't get any errors, if you do then let us know by opening an issue.
 
 
-## If you use val3dity in a scientific context, please cite these articles:
+## If you use val3dity in a scientific context, please cite these two articles:
 
 ```bibtex
 @article{Ledoux18,
