@@ -41,7 +41,6 @@ jobs:
             cmake .. && make -j4
 
   build-windows:
-    name: windows-latest
     runs-on: windows-latest
     env:
       VCPKG_DEFAULT_TRIPLET: x64-windows
