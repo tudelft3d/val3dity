@@ -1,0 +1,57 @@
+name: Build
+
+ on:
+   push:
+#     branches: [ main, develop ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_linux_latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+            sudo apt-get update
+            sudo apt-get install libgmp-dev libmpfr-dev libboost-all-dev libeigen3-dev libgeos-dev
+      - name: Download CGAL
+        run: |
+            wget https://github.com/CGAL/cgal/releases/download/v5.6.1/CGAL-5.6.1-library.tar.xz -P ${{ github.workspace }}
+            cd ${{ github.workspace }}
+            tar -xvf CGAL-5.6.1-library.tar.xz
+      - name: Build
+        run: |
+            mkdir build && cd build
+            cmake .. -DCGAL_DIR=${{ github.workspace }}/CGAL-5.6.1 && make -j4
+
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+            brew update
+            brew upgrade || true
+            brew install cmake boost cgal eigen geos
+      - name: Build
+        run: |
+            mkdir build && cd build
+            cmake .. && make -j4
+
+  build-windows:
+    name: windows-latest
+    runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
+      VCPKG_INSTALLATION_ROOT: C:\vcpkg
+      VCPKG_FEATURE_FLAGS: manifests
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: |
+        vcpkg install
+        mkdir Release
+        cd Release
+        cmake .. -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
+        cmake --build . --parallel 4 --config Release
+
