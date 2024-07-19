@@ -1,7 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
+name: Win CD
 
 # on:
 #   push:
@@ -9,11 +6,12 @@ name: CI
 
 on:
   release:
-    types: [created]
+    types: [published]
+  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  Windows-build:
+  build-windows:
     name: Build Windows
     runs-on: windows-latest
     env:
