@@ -75,7 +75,6 @@ json Feature::get_report_json()
     for (auto& e : _errors[std::get<0>(err)])
     {
       json jj;
-      jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);

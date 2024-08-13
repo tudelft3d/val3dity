@@ -110,7 +110,6 @@ json IOErrors::get_report_json()
     for (auto i : err.second)
     {
       json jj;
-      jj["type"] = "Error";
       jj["code"] = err.first;
       jj["description"] = ALL_ERRORS[err.first];
       jj["info"] = i;

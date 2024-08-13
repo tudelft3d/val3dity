@@ -91,7 +91,6 @@ std::vector<json> GeometryTemplate::get_errors()
     for (auto& e : _errors[std::get<0>(err)])
     {
       json jj;
-      jj["type"] = "Error";
       jj["code"] = std::get<0>(err);
       jj["description"] = ALL_ERRORS[std::get<0>(err)];
       jj["id"] = std::get<0>(e);
