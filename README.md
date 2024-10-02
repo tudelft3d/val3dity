@@ -46,7 +46,7 @@ The simplest, if you have [Homebrew](http://brew.sh/), is:
 You can also get the code, and compile it yourself.
 You first need to install the following free libraries:
 
-  1. [CGAL v5.4+](http://www.cgal.org) 
+  1. [CGAL v5.4+](http://www.cgal.org) (CGAL 6.0 works too)
   1. [Eigen library](http://eigen.tuxfamily.org)
   1. [GEOS](http://trac.osgeo.org/geos/)
   1. [CMake](http://www.cmake.org)
