@@ -10,11 +10,11 @@ In short, it verifies whether a 3D primitive respects the definition as given in
 
 The validation of the following 3D primitives is fully supported:
 
-  - ``MultiSurface``
-  - ``CompositeSurface`` 
-  - ``Solid``
-  - ``MultiSolid``
-  - ``CompositeSolid``
+* ``MultiSurface``
+* ``CompositeSurface`` 
+* ``Solid``
+* ``MultiSolid``
+* ``CompositeSolid``
 
 Unlike many other validation tools in 3D GIS, inner rings in polygons/surfaces are supported and so are cavities in solids (also called voids or inner shells).
 
@@ -23,13 +23,13 @@ There is no plan to support these geometries.
 
 val3dity accepts as input:
 
-  - [CityJSON](http://www.cityjson.org)
-  - [CityJSON Sequences (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
-  - [tu3djson](https://github.com/tudelft3d/tu3djson)
-  - [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
-  - [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
-  - [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
-  - [IndoorGML](http://indoorgml.net/)
+* [CityJSON](http://www.cityjson.org)
+* [CityJSON Sequences (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
+* [tu3djson](https://github.com/tudelft3d/tu3djson)
+* [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
+* [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
+* [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
+* [IndoorGML](http://indoorgml.net/)
 
 For the CityJSON and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
@@ -132,6 +132,7 @@ In the folder `tools/viz3dity/`, there is a simple Python script where you can l
 
 However, it's not possible to see where in an object the error is (eg which surface is not planar).
 This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
+
 
 ## Documentation and help
 
