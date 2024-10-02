@@ -4,6 +4,11 @@
 ## [Unreleased]
 - validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
 
+## [2.5.1] - 2024-10-02
+### Changed
+- CGAL 6.0 can be used (small changes to the `CMakeLists.txt`)
+- fix a buggy report for complex geom types
+- improves the description of the validation report in the docs
 
 ## [2.5.0] - 2024-07-17
 ### Added 
