@@ -24,7 +24,9 @@ endif(MSVC)
 
 # CGAL
 find_package( CGAL QUIET COMPONENTS )
-if (NOT CGAL_FOUND )
+if ( CGAL_FOUND )
+  message(STATUS "CGAL found: ${CGAL_DIR}")
+else()
   message(SEND_ERROR "val3dity requires the CGAL library")
   return()  
 endif()
