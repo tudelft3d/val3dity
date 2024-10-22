@@ -31,7 +31,7 @@
 
 #include "Primitive.h"
 #include "definitions.h"
-#include "nlohmann-json/json.hpp"
+#include "nlohmann/json.hpp"
 #include <vector>
 #include <set>
 #include <string>

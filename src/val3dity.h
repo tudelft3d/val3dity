@@ -29,7 +29,7 @@
 #include "definitions.h"
 #include <iostream>
 
-#include "nlohmann-json/json.hpp"
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

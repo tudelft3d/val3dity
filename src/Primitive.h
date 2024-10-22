@@ -30,7 +30,7 @@
 #define Primitive_h
 
 #include "definitions.h"
-#include "nlohmann-json/json.hpp"
+#include "nlohmann/json.hpp"
 #include <map>
 #include <vector>
 #include <set>
