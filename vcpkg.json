@@ -11,6 +11,17 @@
         "cgal",
         "geos",
         "eigen3"
-    ]
+    ],
+    "features" : {
+        "do_not_use_internal_libs": {
+            "description": "Do not use dependencies that are shipped with val3dity.",
+            "dependencies": [
+                "spdlog",
+                "pugixml",
+                "nlohmann-json",
+                "tclap"
+            ]
+        }
+    }
 
 }

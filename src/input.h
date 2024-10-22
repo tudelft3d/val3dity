@@ -32,8 +32,8 @@
 #include "definitions.h"
 #include <fstream>
 #include <string>
-#include "pugixml/pugixml.hpp"
-#include "nlohmann-json/json.hpp"
+#include "pugixml.hpp"
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
