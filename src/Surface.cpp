@@ -732,7 +732,8 @@ bool Surface::validate_projected_ring(Polygon &pgn, std::string id)
 
 bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygonid)
 {
-  initGEOS(NULL, NULL);
+  // Use the _r geos functions to make it thread-safe
+  auto geos_ctx = GEOS_init_r();
   //-- check the orientation of the rings: oring != irings
   //-- we don't care about CCW or CW at this point, just opposite is important
   //-- GEOS doesn't do its job, so we have to do it here. Shame on you GEOS.
@@ -785,10 +786,10 @@ bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygo
   }
   wkt << ")";
   GEOSWKTReader* r;
-  r = GEOSWKTReader_create();
+  r = GEOSWKTReader_create_r(geos_ctx);
   GEOSGeometry* mygeom;
-  mygeom = GEOSWKTReader_read(r, wkt.str().c_str());
-  string reason = (string)GEOSisValidReason(mygeom);
+  mygeom = GEOSWKTReader_read_r(geos_ctx, r, wkt.str().c_str());
+  string reason = (string)GEOSisValidReason_r(geos_ctx, mygeom);
   if (reason.find("Valid Geometry") == string::npos)
   {
     isvalid = false;
@@ -805,8 +806,9 @@ bool Surface::validate_polygon(std::vector<Polygon> &lsRings, std::string polygo
     else
       this->add_error(999, polygonid, reason.c_str());
   }
-  GEOSGeom_destroy( mygeom );
-  finishGEOS();
+  GEOSWKTReader_destroy_r(geos_ctx, r);
+  GEOSGeom_destroy_r(geos_ctx, mygeom );
+  GEOS_finish_r(geos_ctx);
   return isvalid;
 }
 
