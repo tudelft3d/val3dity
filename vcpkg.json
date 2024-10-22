@@ -13,8 +13,8 @@
         "eigen3"
     ],
     "features" : {
-        "do_not_use_internal_libs": {
-            "description": "Do not use dependencies that are shipped with val3dity.",
+        "thirdparty": {
+            "description": "The thirdparty dependencies that are also shipped with val3dity itself.",
             "dependencies": [
                 "spdlog",
                 "pugixml",
