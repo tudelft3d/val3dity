@@ -1,6 +1,6 @@
 
 #include "val3dity.h" 
-#include "nlohmann-json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include <iostream>
 #include <fstream>

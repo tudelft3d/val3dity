@@ -38,7 +38,7 @@
 
 #include <tclap/CmdLine.h>
 #include <time.h>  
-#include "nlohmann-json/json.hpp"
+#include "nlohmann/json.hpp"
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include "spdlog/spdlog.h"

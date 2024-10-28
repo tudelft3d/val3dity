@@ -11,6 +11,17 @@
         "cgal",
         "geos",
         "eigen3"
-    ]
+    ],
+    "features" : {
+        "thirdparty": {
+            "description": "The thirdparty dependencies that are also shipped with val3dity itself.",
+            "dependencies": [
+                "spdlog",
+                "pugixml",
+                "nlohmann-json",
+                "tclap"
+            ]
+        }
+    }
 
 }
