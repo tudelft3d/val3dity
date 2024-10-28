@@ -16,7 +16,7 @@ The API reads `const char*` for XML data ([IndoorGML](http://indoorgml.net/) inp
 
 ```cpp
 #include "val3dity.h" 
-#include "nlohmann-json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include <fstream>
 
@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
 1. `cmake .. -DVAL3DITY_LIBRARY=true`
 1. `make`
 1. `./myprogram`
+
+You can also use the option `VAL3DITY_USE_INTERNAL_DEPS=false` if you do not want to use the dependencies bundled with val3dity, see the `./thirdparty/` folder (nlohmann JSON, spdlog, pugixml, tclap).
 
 
 ## Parameters
