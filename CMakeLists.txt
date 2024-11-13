@@ -102,7 +102,7 @@ target_link_libraries(val3dity_core
 if ( VAL3DITY_USE_INTERNAL_DEPS )
   target_link_libraries(val3dity_core PUBLIC val3dity_thirdparty)
 else()
-  target_link_libraries(val3dity_core PUBLIC nlohmann_json::nlohmann_json spdlog::spdlog PRIVATE pugixml::static)
+  target_link_libraries(val3dity_core PUBLIC nlohmann_json::nlohmann_json spdlog::spdlog PRIVATE pugixml::pugixml $<IF:$<TARGET_EXISTS:pugixml::static>,pugixml::static,pugixml::shared>)
 endif()
 
 if ( VAL3DITY_LIBRARY )
