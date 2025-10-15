@@ -164,7 +164,7 @@ You shouldn't get any errors, if you do then let us know by opening an issue.
     volume = {3},
     number = {1},
     pages = {1},
-    doi = {http://dx.doi.org/10.1186/s40965-018-0043-x}
+    doi = {10.1186/s40965-018-0043-x}
 }
 
 @article{Ledoux13,
@@ -175,7 +175,7 @@ You shouldn't get any errors, if you do then let us know by opening an issue.
   volume = {28},
   number = {9},
   pages = {693--706},
-  doi = {http://dx.doi.org/10.1111/mice.12043}
+  doi = {10.1111/mice.12043}
 }
 ```
 
