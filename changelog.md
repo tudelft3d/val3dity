@@ -4,6 +4,26 @@
 ## [Unreleased]
 - validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
 
+## [2.6.0] - 2026-01-XX
+### Added
+- option to provide thirdparty dependencies externally when compiling
+- added uv project for pytest management
+- added sphinx dirhtml output for documentation
+### Changed
+- renamed CityJSONL to CityJSONSeq (cjseq) throughout the codebase, reflecting the updated specification terminology
+- fixed issues with parsing CityJSONSeq as a stream
+- fixed compilation issues with Eigen 5 on macOS
+- fixed vcpkg build on Windows
+- use GEOS threadsafe functions (_r) and properly destroy GEOSWKTReader
+- fixed viz3dity with demo files and updated uv configuration
+- improved documentation: fixed error docs URL, fixed typos in docs/errors
+- improved readme for pytests with clearer instructions
+- extra compilation information for Linux users
+### Removed
+- removed error codes e905 and e906. 
+- e905 (INVALID_JSON) was never used and has now been replaced overall in the code by the more generic e901 (INVALID_INPUT_FILE). 
+- e906 (PRIMITIVE_NO_GEOMETRY) was more a warning and the 3DBAG contains many of those (all parent Buildings have no geometry, they are in the children BuildingParts). It is now not an error anymore, but you can scan the report for Features containing no primitive if you want to catch those cases.
+
 ## [2.5.1] - 2024-10-02
 ### Changed
 - CGAL 6.0 can be used (small changes to the `CMakeLists.txt`)
