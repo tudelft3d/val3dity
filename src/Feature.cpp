@@ -113,13 +113,6 @@ bool Feature::validate_generic(double tol_planarity_d2p, double tol_planarity_no
 {
   spdlog::info("Validating Feature #{} (type={})", this->get_id(), this->get_type());
   bool bValid = true;
-  if (this->is_empty() == true) {
-    this->add_error(906, "Feature has no geometry defined (or val3dity doesn't handle this type).", "");
-    bValid = false;
-  }
-  // if (_lsPrimitives.size() > 500) {
-  //   std::cout << "Validating " << _lsPrimitives.size() << " geometric primitives, this could be slow." << std::endl << std::flush;
-  // }
   for (auto& p : _lsPrimitives)
   {
     if (p->validate(tol_planarity_d2p, tol_planarity_normals, tol_overlap) == false)

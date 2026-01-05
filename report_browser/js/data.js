@@ -155,14 +155,6 @@ var errors = {
     name: "FORMAT_NOT_SUPPORTED",
     link: `${DOC_BASE_URL}/errors/#format-not-supported`,
   },
-  905: {
-    name: "INVALID_JSON",
-    link: `${DOC_BASE_URL}/errors/#invalid-json`,
-  },
-  906: {
-    name: "PRIMITIVE_NO_GEOMETRY",
-    link: `${DOC_BASE_URL}/errors/#primitive-no-geometry`,
-  },
   999: {
     name: "UNKNOWN_ERROR",
     link: `${DOC_BASE_URL}/errors/#unknown-error`,

@@ -171,8 +171,6 @@ static std::map<int,std::string> ALL_ERRORS = {
   {902, "EMPTY_PRIMITIVE"}, 
   {903, "WRONG_INPUT_PARAMETERS"}, 
   {904, "FORMAT_NOT_SUPPORTED"}, 
-  {905, "INVALID_JSON"}, 
-  {906, "PRIMITIVE_NO_GEOMETRY"}, 
   {999, "UNKNOWN_ERROR"} 
 };
 

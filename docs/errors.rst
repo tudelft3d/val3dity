@@ -399,22 +399,6 @@ The parameters used for the validation are not valid.
 
 It can be that certain versions of a supported format are not supported, eg v3.0 of CityGML is not.
 
-.. _e905:
-
-905 -- INVALID_JSON
--------------------
-
-Used when a JSON object is invalid, or when a CityJSON object (or CityJSONSeq object) is not schema-valid. To ensure that this does not happen, files should be schema-validated with `cjval <https://github.com/cityjson/cjval>`_.
-
-.. _e906:
-
-906 -- PRIMITIVE_NO_GEOMETRY
-----------------------------
-
-The primitive has no geometry that val3dity recognises.
-It could be that the primitive has a geometry, but that it is a 2D geometry or a format that is not processed by val3dity.
-In CityJSON, it is possible to have for instance a ``Building`` without geometry, so this error would be reported.
-In JSON-FG, the 2D geometries in ``"geometry"`` are not processed, and neither are the 3D geometries of type ``"Prism"``.
 
 .. _e999:
 
