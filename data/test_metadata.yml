@@ -15,12 +15,11 @@ test_file_format:
   "index0": a cube in OBJ with a 0-index (OBJ are 1-indexed)
   "index901": a cube in OBJ with a vertex that doesn't exist
 
-
 test_geometry_generic:
   "inner_shell": "+ basecube = Unit cube with a cavity (pyramid)"
   "101": Cube top face a line (with only 2 vertices)
   "102": Cube with one duplicate vertex (repeated in a ring)
-  "104": Unit cube where top face has a bow tie 
+  "104": Unit cube where top face has a bow tie
   "104_1": Unit cube with top face having a self-intersecting surface (2D invalid), where 2 out of 3 triangles that are forming a square are bundled as one polygon (which self-intersects)
   "104_2": One face closing in itself before the last vertex
   "104_3": Similar to 104_1 but triangles meet in one corner of the square
@@ -71,12 +70,12 @@ test_geometry_generic:
   "405": Pyramid with the normals pointing inwards
 
 test_geometry_specific:
-  "501":    CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
-  "501_1":  CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
-  "502":    CompositeSolid with 3 cubes, where cube 1-2 are identical
-  "503":    CompositeSolid with 3 cubes, where cube 1 is not connected to other
-  "601":    A Building with 2 BuildingParts that overlap by 50 units
-  "601_1":  A Building with 6 BuildingParts, part of open dataset Den Haag. Parts overlap by <1cm, with overlap_tol 0.01 it's valid
+  "501": CompositeSolid with 3 cubes adjacent, where cube 1-2 overlap by 1cm
+  "501_1": CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
+  "502": CompositeSolid with 3 cubes, where cube 1-2 are identical
+  "503": CompositeSolid with 3 cubes, where cube 1 is not connected to other
+  "601": A Building with 2 BuildingParts that overlap by 50 units
+  "601_1": A Building with 6 BuildingParts, part of open dataset Den Haag. Parts overlap by <1cm, with overlap_tol 0.01 it's valid
 
 test_valid:
   "basecube_large_coords": the basecube with 999999 added to each xyz, to test translation
@@ -106,10 +105,10 @@ test_tu3djson:
 test_jsonfg:
   "building.fg": "a simple building, taken (and fixed!) from JSON-FG website, stored as a 'Feature'"
   "cubes.fg": "a 'FeatureCollection', one valid cube (Polyhedron) and another one stored as a MultiPolyhedron"
+  "cubes2.fg": "a 'FeatureCollection', one valid cube (Polyhedron) and another Feature is a vanilla GeoJSON; thus e904"
   "e103.fg": "like the first feature of cubes.fg.json but w/o the repeat first-last, thus e103"
-  "geojson": "a 'standard' GeoJSON file, should return e609"
+  "geojson": "a 'standard' GeoJSON file, should return e904"
 
-  
 test_indoorgml:
   "igml_v1": "a valid cube as the only cell, no dual"
   "igml_v2": "a valid cube as the only cell, one dual point inside the cube"
@@ -130,10 +129,10 @@ test_cityjson:
   "several_lods_invalid": "one 3dbag building with 3 lods: 0/1.3/1.3/2.2, so two overlapping ==> e601"
   "torus.city": "a squared torus in CityJSON v1.1"
 
-test_cityjsonl:
-  "a": "first line has transform missing"
-  "denhaag_random_5": "5 random building from Den Haag, 2 valid 3 invalid"
+test_cjseq:
+  "notransform.city": "first line has transform missing"
+  "unclosedbracket.city": "first line has invalid JSON (unclosed bracket)"
+  "denhaag_random_5.city": "5 random building from Den Haag, 2 valid 3 invalid"
 
 test_duplicates:
   "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"
-  
