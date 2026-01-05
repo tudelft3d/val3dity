@@ -28,7 +28,6 @@
 
 #include "Feature.h"
 #include "input.h"
-#include <iostream>
 
 namespace val3dity
 {
