@@ -13,8 +13,8 @@ push = false
     'std::string VAL3DITY_VERSION = "{version}";',
 ]
 "docs/conf.py" = [
-    "release = u'{version}'",
-    "version = u'{version}'",
+    'release = "{version}"',
+    'version = "{version}"',
 ]
 "vcpkg.json" = [
     '"version-string": "{version}"',

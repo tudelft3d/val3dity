@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "bumpver>=2025.1131",
     "pytest>=9.0.2",
     "pyyaml>=6.0.3",
 ]
