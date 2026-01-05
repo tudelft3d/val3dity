@@ -19,3 +19,6 @@ push = false
 "vcpkg.json" = [
     '"version-string": "{version}"',
 ]
+"report_browser/js/data.js" = [
+    'const DOC_VERSION = "{version}";',
+]
