@@ -110,11 +110,7 @@ template <class HDS>
 void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_incremental_builder_3<HDS>& B)
 {
   int size = static_cast<int>((*lsPts).size());
-#ifdef WIN32
   bool *halfedges = new bool[size*size];
-#else
-  bool halfedges[size*size];
-#endif
   for (int i = 0; i <= (size*size); i++)
     halfedges[i] = false;
   
@@ -145,29 +141,19 @@ void ConstructShell<HDS>::construct_faces_flip_when_possible(CGAL::Polyhedron_in
   trFaces.pop_front();
   while (trFaces.size() > 0)
   {
-#ifdef WIN32
      if (try_to_add_face(B, trFaces, halfedges, true) == false)
-#else
-     if (try_to_add_face(B, trFaces, &halfedges[0], true) == false)
-#endif
     {
       //-- add first face possible, will be dangling by definition
       //cout << "had problems..." << endl;
-#ifdef WIN32
        if (try_to_add_face(B, trFaces, halfedges, false) == false)
-#else
-       if (try_to_add_face(B, trFaces, &halfedges[0], false) == false)
-#endif
       {
         //-- cannot repair. non-manifold situations.
         trFaces.clear();
       }
-           
+
     }
   }
-#ifdef WIN32
   delete [] halfedges; halfedges = NULL;
-#endif
 }
 
 
