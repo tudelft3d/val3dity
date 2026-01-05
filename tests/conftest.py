@@ -1,9 +1,10 @@
-import pytest
-import subprocess
 import os.path
+import subprocess
 import sys
 
-#------------------------- use concurrent test execution if xdist is installed
+import pytest
+
+# ------------------------- use concurrent test execution if xdist is installed
 # def pytest_cmdline_preparse(args):
 #     if 'xdist' in sys.modules:  # pytest-xdist plugin
 #         print("using xdist")
@@ -14,12 +15,15 @@ import sys
 #         print("xdist not installed")
 
 
-#------------------------------------ add option for running the full test set
+# ------------------------------------ add option for running the full test set
 def pytest_addoption(parser):
-    parser.addoption("--runfull", action="store_true",
-                     default=False, help="run full set of tests")
-    parser.addoption("--exe", action="store",
-                 default=None, help=("path to val3dity executable"))
+    parser.addoption(
+        "--runfull", action="store_true", default=False, help="run full set of tests"
+    )
+    parser.addoption(
+        "--exe", action="store", default=None, help=("path to val3dity executable")
+    )
+
 
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--runfull"):
@@ -38,19 +42,20 @@ def val3dity(request):
         return request.config.getoption("--exe")
     else:
         root = os.getcwd()
-        if sys.platform.lower() == 'windows':
+        if sys.platform.lower() == "windows":
             p = os.path.join(root, "build/val3dity.exe")
-        else: #-- darwin && linux
+        else:  # -- darwin && linux
             p = os.path.join(root, "build/val3dity")
         return os.path.abspath(p)
 
-#-------------------------------------------------------------- data & folders
+
+# -------------------------------------------------------------- data & folders
 @pytest.fixture(scope="session")
 def dir_indoorgml():
     """path to the data for test_indoorgml"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_indoorgml")
-    return(dir_path)
+    return dir_path
 
 
 @pytest.fixture(scope="session")
@@ -58,35 +63,39 @@ def dir_cityjson():
     """path to the data for test_cityjson"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_cityjson")
-    return(dir_path)
+    return dir_path
+
 
 @pytest.fixture(scope="session")
-def dir_cityjsonl():
-    """path to the data for test_cityjsonl"""
+def dir_cjseq():
+    """path to the data for test_cjseq"""
     root = os.getcwd()
-    dir_path = os.path.join(root, "data/test_cityjsonl")
-    return(dir_path)    
+    dir_path = os.path.join(root, "data/test_cjseq")
+    return dir_path
+
 
 @pytest.fixture(scope="session")
 def dir_tu3djson():
     """path to the data for test_tu3djson"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_tu3djson")
-    return(dir_path)
+    return dir_path
+
 
 @pytest.fixture(scope="session")
 def dir_jsonfg():
     """path to the data for test_jsonfg"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_jsonfg")
-    return(dir_path)    
+    return dir_path
+
 
 @pytest.fixture(scope="session")
 def dir_file_format():
     """path to the data for test_file_format"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_file_format")
-    return(dir_path)
+    return dir_path
 
 
 @pytest.fixture(scope="session")
@@ -94,7 +103,7 @@ def dir_valid():
     """path to the data for test_valid"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_valid")
-    return(dir_path)
+    return dir_path
 
 
 @pytest.fixture(scope="session")
@@ -102,7 +111,7 @@ def dir_empty():
     """path to the data for test_empty"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_empty")
-    return(dir_path)
+    return dir_path
 
 
 @pytest.fixture(scope="session")
@@ -110,7 +119,7 @@ def dir_geometry_generic():
     """path to the data for test_geometry_generic"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_geometry_generic")
-    return(dir_path)
+    return dir_path
 
 
 @pytest.fixture(scope="session")
@@ -118,23 +127,24 @@ def dir_geometry_specific():
     """path to the data for test_geometry_specific"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_geometry_specific")
-    return(dir_path)
+    return dir_path
+
 
 @pytest.fixture(scope="session")
 def dir_duplicates():
     """path to the data for test_duplicates"""
     root = os.getcwd()
     dir_path = os.path.join(root, "data/test_duplicates")
-    return(dir_path)
+    return dir_path
+
 
 @pytest.fixture(scope="session")
 def data_basecube():
     """unit cube that is used in combination with inner-shell testing"""
     root = os.getcwd()
-    file_path = os.path.abspath(
-        os.path.join(root, "data/test_valid/basecube.poly")
-        )
-    return([file_path])
+    file_path = os.path.abspath(os.path.join(root, "data/test_valid/basecube.poly"))
+    return [file_path]
+
 
 @pytest.fixture(scope="session")
 def data_composite_solid():
@@ -142,32 +152,36 @@ def data_composite_solid():
     root = os.getcwd()
     file_path = os.path.abspath(
         os.path.join(root, "data/test_valid/composite_solid.json")
-        )
-    return([file_path])
+    )
+    return [file_path]
 
 
-#------------------------------------------------------------- va3dity options
+# ------------------------------------------------------------- va3dity options
 @pytest.fixture(scope="session")
 def solid():
     """val3dity options for validating a Solid"""
-    return(["--unittests", "-p Solid"])
+    return ["--unittests", "-p Solid"]
+
 
 @pytest.fixture(scope="session")
 def compositesurface():
     """val3dity options for validating a CompositeSurface"""
-    return(["--unittests", "-p CompositeSurface"])
+    return ["--unittests", "-p CompositeSurface"]
+
 
 @pytest.fixture(scope="session")
 def multisurface():
     """val3dity options for validating a MultiSurface"""
-    return(["--unittests", "-p MultiSurface"])
+    return ["--unittests", "-p MultiSurface"]
+
 
 @pytest.fixture(scope="session")
 def unittests():
     """val3dity options for validating a file"""
-    return(["--unittests"])
+    return ["--unittests"]
 
-#-------------------------------------------------------- validation functions
+
+# -------------------------------------------------------- validation functions
 @pytest.fixture(scope="session")
 def validate(val3dity):
     def _validate(file_path, options=unittests, val3dity=val3dity):
@@ -182,75 +196,96 @@ def validate(val3dity):
         except AssertionError:
             assert isinstance(file_path, list)
         except Exception:
-            return(["Something went really wrong. Validate the file separately with val3dity."])
+            return [
+                "Something went really wrong. Validate the file separately with val3dity."
+            ]
         # assert isinstance(options, list)
 
         command = [val3dity] + options + file_path
-        
+
         try:
-            proc = subprocess.run(command,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  universal_newlines=True,
-                                  timeout=15)
+            proc = subprocess.run(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+                timeout=15,
+            )
         except subprocess.TimeoutExpired:
-            return([" ".join(["Something went really wrong.",
-                             "Validate the file separately with val3dity.",
-                             "Or set a higher timeout in conftest.py."])])
-        
+            return [
+                " ".join(
+                    [
+                        "Something went really wrong.",
+                        "Validate the file separately with val3dity.",
+                        "Or set a higher timeout in conftest.py.",
+                    ]
+                )
+            ]
+
         out = proc.stdout
         err = proc.stderr
         rcode = proc.returncode
-        
+
         if rcode < 0:
             # For example Segmentation fault
-            return(["CRASH"])
+            return ["CRASH"]
         else:
             output = []
-            if (out != ''):
-                if (out.find('@VALID') != -1):
-                    return(output)
-                elif (out.find('@INVALID') != -1):
-                    i = out.find('@INVALID')
-                    s = out[i + 9:]
+            if out != "":
+                if out.find("@VALID") != -1:
+                    return output
+                elif out.find("@INVALID") != -1:
+                    i = out.find("@INVALID")
+                    s = out[i + 9 :]
                     tmp = s.split(" ")
                     codes = map(int, tmp[:-1])
                     for each in codes:
                         if output.count(each) == 0:
                             output.append(each)
-                    return(output)
+                    return output
                 else:
-                    return([out.replace('\n', ' ')])
+                    return [out.replace("\n", " ")]
             else:
-                return(output)
-    
-    return(_validate)
+                return output
+
+    return _validate
 
 
 @pytest.fixture(scope="session")
 def validate_full():
     """Validate a file and return the full stdout, stderr
-    
+
     :rtype: list of strings
     """
+
     def _validate(command):
         try:
-            proc = subprocess.run(command,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  universal_newlines=True,
-                                  timeout=6)
+            proc = subprocess.run(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+                timeout=6,
+            )
         except subprocess.TimeoutExpired:
-            return([" ".join(["Something went really wrong.",
-                             "Validate the file separately with val3dity.",
-                             "Or set a higher timeout in conftest.py."])])
+            return [
+                " ".join(
+                    [
+                        "Something went really wrong.",
+                        "Validate the file separately with val3dity.",
+                        "Or set a higher timeout in conftest.py.",
+                    ]
+                )
+            ]
         out = proc.stdout
         err = proc.stderr
         rcode = proc.returncode
         if rcode < 0:
             # For example Segmentation fault
-            return(["Something went really wrong. Validate the file separately with val3dity."])
+            return [
+                "Something went really wrong. Validate the file separately with val3dity."
+            ]
         else:
-            return([out, err])
-        
-    return(_validate)
+            return [out, err]
+
+    return _validate
