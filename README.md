@@ -73,6 +73,7 @@ Thus, in a nutshell,
 
   1. install Eigen library: `$ sudo apt install libeigen3-dev`
   1. install GEOS library: `$ sudo apt install libgeos++-dev`
+  1. install Boost.Filesystem: `$ sudo apt install libboost-filesystem-dev`
   1. install CGAL: `$ sudo apt-get install libcgal-dev`
     - if it's not CGAL v5.4+ that is installed, download [latest CGAL code](https://github.com/CGAL/cgal/releases) and unzip somewhere
     - set `CGAL_DIR` to that folder, eg `export CGAL_DIR=/home/hledoux/software/CGAL-5.4.2`, this will tell your shell to use that version of CGAL (thus more version of CGAL can be installed on the same computer; see that [handy manual](https://github.com/CGAL/cgal/wiki/Branch-Build))
