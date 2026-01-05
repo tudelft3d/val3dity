@@ -4,8 +4,9 @@ This README is solely concerned with the integration tests for val3dity. These t
 
 Due to the current setup of file referencing in the tests, `pytest` need to be run from the `/val3dity` root directory, thus `somepath/val3dity $ pytest`
 
-`PyYAML` is required for running the metadata tests.
+The following are required for running the metadata tests:
 ```
+$ pip install pytest
 $ pip install pyyaml
 ```
 
@@ -100,8 +101,6 @@ tests/
 |–– test_<test case>.py
 |–– ...
 ```
-
-*The main purpose of structuring the tests in the described way is to provide clarity for the developers and help with systematic testing. Certainly there are other possible approaches.*
 
 ## A few details
 
@@ -204,6 +203,3 @@ def validate():
                                   universal_newlines=True,
                                   timeout=15)
 ```
-
-
-
