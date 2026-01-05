@@ -1,5 +1,5 @@
 [bumpver]
-current_version = "2.5.1"
+current_version = "2.6.0b0"
 version_pattern = "MAJOR.MINOR.PATCH[PYTAGNUM]"
 commit = false
 tag = false
