@@ -7,21 +7,12 @@
 ## dependencies
 
 ```
-pip install polyscope
-pip install numpy
-pip install click
-pip install tqdm
-pip install mapbox-earcut
+pip install polyscope numpy click tqdm mapbox-earcut
 ```
-
 
 ## to view the errors
 
 ```
-val3dity myfile.city.json --report myreport.json
-python viz3dity myfile.city.json myreport.json
+val3dity ../../data/rotterdam/3-20-DELFSHAVEN.city.json --report myreport.json
+python viz3dity ../../data/rotterdam/3-20-DELFSHAVEN.city.json myreport.json
 ```
-
-
-
-
