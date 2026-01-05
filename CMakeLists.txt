@@ -38,7 +38,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Eigen
-find_package(Eigen3 3.1.0 QUIET)
+find_package(Eigen3 REQUIRED)
 include(CGAL_Eigen3_support)
 
 
