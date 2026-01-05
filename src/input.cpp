@@ -632,17 +632,30 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
     std::cout << "# Features found: " << j["features"].size() << std::endl;
     parse_tu3djson(j, lsFeatures, tol_snap);
   }
-  else if ( (j["type"] == "Feature") || (j["type"] == "FeatureCollection") ) {
+  else if ( (j["type"] == "Feature") && (j.contains("place")) ) {
     errs.set_input_file_type("JSON-FG");
     std::cout << "JSON-FG input file" << std::endl;
-    if (j["type"] == "Feature")
-      std::cout << "# Features found: " << j["features"].size() << std::endl;
-    else
-      std::cout << "# Features found: " << j["features"].size() << std::endl;
+    std::cout << "# Features found: 1" << std::endl;
     parse_jsonfg(j, lsFeatures, tol_snap, errs);
   }
+  else if (j["type"] == "FeatureCollection") {
+    bool valid = true;
+    for (auto& f : j["features"]) {
+      if (!f.contains("place")) {
+        errs.add_error(904, "Input file type not a supported JSON file (only JSON-FG is supported, not standard GeoJSON).");
+        valid = false;
+        break;
+      }
+    }
+    if (valid) {
+      errs.set_input_file_type("JSON-FG");
+      std::cout << "JSON-FG input file" << std::endl;
+      std::cout << "# Features found: " << j["features"].size() << std::endl;
+      parse_jsonfg(j, lsFeatures, tol_snap, errs);
+    }
+  }
   else {
-    errs.add_error(904, "Input file type not a supported JSON file (only: CityJSON, JSON-FG, and tu3djson ).");
+    errs.add_error(904, "Input file type not a supported JSON file (only: CityJSON, JSON-FG, and tu3djson).");
     return;  
   }
 }
