@@ -27,7 +27,6 @@
 */
 
 #include "input.h"
-#include "Primitive.h"
 #include "Surface.h"
 #include "MultiSurface.h"
 #include "CompositeSurface.h"
@@ -901,7 +900,3 @@ std::string print_summary_validation(std::vector<Feature*>& lsFeatures, IOErrors
   ss << "+++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
   return ss.str();
 }
-
-
-
-
