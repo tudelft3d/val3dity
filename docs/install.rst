@@ -9,7 +9,7 @@ Windows executable
 For Windows, we offer an `executable <https://github.com/tudelft3d/val3dity/releases>`_, but you can always compile the project yourself with CMake.
 
 It's also possible to compile val3dity yourself with the CMake file we offer, but it's slightly more complex with the dependencies.
-We suggest you look at `how we build it on GitHub Actions <https://github.com/tudelft3d/val3dity/blob/main/.github/workflows/build_exe.yml>`_ to get some inspirate (and help).
+We suggest you look at `how we build it on GitHub Actions <https://github.com/tudelft3d/val3dity/tree/main/.github/workflows>`_ to get some inspirate (and help).
 
 
 macOS & Linux: you need to compile
@@ -33,4 +33,3 @@ Using val3dity as a library
 val3dity can be compiled and used as a library, see `the instructions <https://github.com/tudelft3d/val3dity#using-val3dity-as-a-library>`_.
 
 Also, there is a simple example of how to use it in `./demo_lib` with instructions to compile it.
-
