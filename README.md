@@ -95,6 +95,10 @@ To run val3dity:
 
 The summary of the validation is reported, and you should see that `cube.json` contains one valid primitive.
 
+To get a detailed report ([how to interpret the report?](https://val3dity.readthedocs.io/develop/usage/#how-to-interpret-the-report)):
+
+    val3dity ./data/cityjson/cube.json --report myreport.json
+
 Finally, to see all the options possible:
 
     val3dity --help
