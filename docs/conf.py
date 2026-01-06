@@ -46,7 +46,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "val3dity"
-copyright = "2011-2024, 3D geoinformation research group, TU Delft"
+copyright = "2011-2026, 3D geoinformation research group, TU Delft"
 author = "Hugo Ledoux"
 
 # The version info for the project you're documenting, acts as replacement for
