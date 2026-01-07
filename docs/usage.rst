@@ -79,12 +79,12 @@ If your CityJSON contains ``Buildings`` with one or more ``BuildingParts``, val3
 If there is one or more intersections, then :ref:`e601` will be reported.
 
 For **CityJSONSeq** streams, the validation is performed line-by-line and the errors are returned for each line. 
-If you want to generate a global report, you can serialise the stream into a .jsonl file and then validate this file as you would with any other input files.
+If you want to generate a global report, you can serialise the stream into a `.jsonl file <https://berthub.eu/articles/posts/aws-and-microsoft-are-selling-much-more-than-cloud/>`_ and then validate this file as you would with any other input files.
 
 For **IndoorGML** files, all the cells (in the primal subdivisions, the rooms) are validated individually, and then some extra validation tests are run on the dual navigation network. All errors 7xx are related specifically to IndoorGML.
 
 For **JSON-FG** files, only ``Polyhedron`` and ``MultiPolyhedron`` are processed, the other possible types are ignored (``Prism``, ``MultiPrism``, and all the 2D types inherited from `GeoJSON <https://geojson.org/>`_). 
-It should be noticed that the JSON-FG nomenclature is different: a ``Polyhedron`` is a ``Solid``, and a ``MultiPolyhedron`` is a ``MultiSolid`` (an arbitrary aggregation of several solids and there is no assumption regarding their topological relationships).
+It should be noticed that the JSON-FG nomenclature is different: a ``Polyhedron`` is a ``Solid`` in val3dity, and a ``MultiPolyhedron`` is a ``MultiSolid`` in val3dity (an arbitrary aggregation of several solids and there is no assumption regarding their topological relationships).
 
 For **OBJ** and **OFF** files, each primitive will be validated according to the ISO19107 rules. One must specify how the primitives should be validated (``MultiSurface``, ``CompositeSurface``, or ``Solid``).
 In an OBJ file, if there is more than one object (lines starting with "o", eg `o myobject`), each will be validated individually.
@@ -359,4 +359,3 @@ It is set up by default to be 1mm.
 ``--version``
 *****************
 |  Display version information and exit.
-
