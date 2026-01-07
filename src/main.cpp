@@ -672,12 +672,14 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
     }
     catch (nlohmann::detail::parse_error e) 
     {
+      std::cout << "ERROR: first line input stream is not valid. Abort." << std::endl;
       std::cout << "\"1st-line\" [901]" << std::endl;
       break;
     }
     //-- first line/metadata
     if (j["type"] == "CityJSON") {
       if ( (j["CityObjects"].empty() == false) || (j["vertices"].empty() == false) ) {
+        std::cout << "ERROR: not a CityJSON input. Abort." << std::endl;
         std::cout << "\"1st-line\" [901]" << std::endl;
         break;
       }
@@ -685,6 +687,7 @@ void read_stream_cjseq(double tol_snap, double tol_planarity_d2p, double tol_pla
         process_cityjson_geometrytemplates(j["geometry-templates"], lsGTs, tol_snap);
       }
       if (j.count("transform") == 0) {
+        std::cout << "ERROR: missing transform. Abort." << std::endl;
         std::cout << "\"1st-line\" [901]" << std::endl;
         break;
       } else {
