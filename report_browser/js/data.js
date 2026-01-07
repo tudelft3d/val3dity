@@ -1,5 +1,5 @@
 // Configuration
-const DOC_VERSION = "2.6.0b0";
+const DOC_VERSION = "2.6.0";
 const DOC_BASE_URL = `https://val3dity.readthedocs.io/${DOC_VERSION}`;
 
 var errors = {

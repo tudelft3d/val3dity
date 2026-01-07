@@ -43,7 +43,7 @@
 namespace val3dity
 {
 
-std::string VAL3DITY_VERSION = "2.6.0b0";
+std::string VAL3DITY_VERSION = "2.6.0";
 
 struct verror : std::exception {
   std::string whattext;

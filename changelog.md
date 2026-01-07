@@ -4,13 +4,13 @@
 ## [Unreleased]
 - validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
 
-## [2.6.0] - 2026-01-XX
+## [2.6.0] - 2026-01-07
 ### Added
 - option to provide thirdparty dependencies externally when compiling
 - added uv project for pytest management
 - added sphinx dirhtml output for documentation
 ### Changed
-- renamed CityJSONL to CityJSONSeq (cjseq) throughout the codebase, reflecting the updated specification terminology
+- renamed CityJSONL to CityJSONSeq (cjseq) throughout the codebase, because the name changed
 - fixed issues with parsing CityJSONSeq as a stream
 - fixed compilation issues with Eigen 5 on macOS
 - fixed vcpkg build on Windows
@@ -20,7 +20,7 @@
 - improved readme for pytests with clearer instructions
 - extra compilation information for Linux users
 ### Removed
-- removed error codes e905 and e906. 
+- removed error codes e905 and e906 
 - e905 (INVALID_JSON) was never used and has now been replaced overall in the code by the more generic e901 (INVALID_INPUT_FILE). 
 - e906 (PRIMITIVE_NO_GEOMETRY) was more a warning and the 3DBAG contains many of those (all parent Buildings have no geometry, they are in the children BuildingParts). It is now not an error anymore, but you can scan the report for Features containing no primitive if you want to catch those cases.
 
@@ -136,6 +136,8 @@
 - support for CityJSON
 
 
+[2.6.0]: https://github.com/tudelft3d/val3dity/compare/2.5.1...2.6.0
+[2.5.1]: https://github.com/tudelft3d/val3dity/compare/2.5.0...2.5.1
 [2.5.0]: https://github.com/tudelft3d/val3dity/compare/2.4.0...2.5.0
 [2.4.0]: https://github.com/tudelft3d/val3dity/compare/2.3.1...2.4.0
 [2.3.1]: https://github.com/tudelft3d/val3dity/compare/2.3.0...2.3.1
