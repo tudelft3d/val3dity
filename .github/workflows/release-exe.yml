@@ -18,6 +18,11 @@ jobs:
       shell: bash
       run: |
         eval "$(pixi shell-hook)"
+        echo "=== CONDA_PREFIX: $CONDA_PREFIX ==="
+        echo "=== DLLs in Library/bin: ==="
+        ls "$CONDA_PREFIX/Library/bin/"*.dll || echo "No DLLs in Library/bin"
+        echo "=== All DLLs in CONDA_PREFIX: ==="
+        find "$CONDA_PREFIX" -name "*.dll" || echo "No DLLs found"
         cp "$CONDA_PREFIX/Library/bin"/geos_c.dll build/
         cp "$CONDA_PREFIX/Library/bin"/geos.dll build/
         cp "$CONDA_PREFIX/Library/bin"/boost_filesystem*.dll build/
