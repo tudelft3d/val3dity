@@ -17,12 +17,12 @@ jobs:
     - name: Package binary files
       shell: bash
       run: |
-        PIXI_BIN=".pixi/envs/default/Library/bin"
-        cp "$PIXI_BIN"/geos_c.dll build/
-        cp "$PIXI_BIN"/geos.dll build/
-        cp "$PIXI_BIN"/boost_filesystem*.dll build/
-        cp "$PIXI_BIN"/gmp*.dll build/
-        cp "$PIXI_BIN"/mpfr*.dll build/
+        eval "$(pixi shell-hook)"
+        cp "$CONDA_PREFIX/Library/bin"/geos_c.dll build/
+        cp "$CONDA_PREFIX/Library/bin"/geos.dll build/
+        cp "$CONDA_PREFIX/Library/bin"/boost_filesystem*.dll build/
+        cp "$CONDA_PREFIX/Library/bin"/gmp*.dll build/
+        cp "$CONDA_PREFIX/Library/bin"/mpfr*.dll build/
         cd build
         7z a val3dity-win64.zip val3dity.exe *.dll
     - name: Upload binary files as artifact
