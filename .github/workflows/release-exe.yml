@@ -12,14 +12,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: prefix-dev/setup-pixi@v0.8.1
-      with:
-        activate-environment: true
     - name: Build
       run: pixi run build
     - name: Package binary files
       shell: bash
       run: |
-        PIXI_BIN="$CONDA_PREFIX/Library/bin"
+        PIXI_BIN=".pixi/envs/default/Library/bin"
         cp "$PIXI_BIN"/geos_c.dll build/
         cp "$PIXI_BIN"/geos.dll build/
         cp "$PIXI_BIN"/boost_filesystem*.dll build/
