@@ -206,6 +206,12 @@ int main(int argc, char* const argv[])
                                               false,
                                               "",
                                               "string");    
+    TCLAP::ValueArg<std::string>            report_cj("",
+                                              "report_in_cityjson",
+                                              "add validation results to the input CityJSON/CityJSONSeq file, using the val3dity Extension",
+                                              false,
+                                              "",
+                                              "string");    
     TCLAP::ValueArg<std::string>            primitives("p",
                                               "primitive",
                                               "geometric type of the input: <Solid|CompositeSurface|MultiSurface> (default=Solid)",
@@ -279,6 +285,7 @@ int main(int argc, char* const argv[])
     cmd.add(license);
     cmd.add(ishellfiles);
     cmd.add(report);
+    cmd.add(report_cj);
     cmd.parse( argc, argv );
 
     //-- vector with Features: CityObject, GenericObject, 
@@ -621,13 +628,14 @@ int main(int argc, char* const argv[])
       std::cout << std::endl;
     }
 
-    //-- output report in JSON 
-    if (report.getValue() != "") 
+    //-- output report in JSON or CityJSON extension
+    if (report.getValue() != "" && report_cj.getValue() != "") 
     {
+      std::cout << "Error: --report and --report_in_cityjson are mutually exclusive. Please use only one." << std::endl;
+      // Only run --report
       string of = inputfile.getValue();
       if (boost::filesystem::exists(inputfile.getValue()))
         of = boost::filesystem::canonical(inputfile.getValue()).string();
-      //-- save the json report in memory first
       json jr = get_report_json(of,
                                 lsFeatures,
                                 VAL3DITY_VERSION,
@@ -636,11 +644,42 @@ int main(int argc, char* const argv[])
                                 planarity_d2p_tol.getValue(),
                                 planarity_n_tol_updated,
                                 ioerrs);
-      if (report.getValue() != "")
-        write_report_json(jr, report.getValue());
+      write_report_json(jr, report.getValue());
+    }
+    else if (report.getValue() != "") 
+    {
+      string of = inputfile.getValue();
+      if (boost::filesystem::exists(inputfile.getValue()))
+        of = boost::filesystem::canonical(inputfile.getValue()).string();
+      json jr = get_report_json(of,
+                                lsFeatures,
+                                VAL3DITY_VERSION,
+                                snap_tol.getValue(),
+                                overlap_tol.getValue(),
+                                planarity_d2p_tol.getValue(),
+                                planarity_n_tol_updated,
+                                ioerrs);
+      write_report_json(jr, report.getValue());
+    }
+    else if (report_cj.getValue() != "")
+    {
+      if (inputtype != JSON && inputtype != JSONL) {
+        std::cout << "Error: --report_in_cityjson is only supported for CityJSON and CityJSONSeq input files." << std::endl;
+      } else {
+        write_report_cityjson(inputfile.getValue(),
+                              report_cj.getValue(),
+                              lsFeatures,
+                              VAL3DITY_VERSION,
+                              snap_tol.getValue(),
+                              overlap_tol.getValue(),
+                              planarity_d2p_tol.getValue(),
+                              planarity_n_tol_updated,
+                              ioerrs,
+                              inputtype);
+      }
     }
     else
-      std::cout << "==> The validation report wasn't saved, use option '--report'." << std::endl;
+      std::cout << "==> The validation report wasn't saved, use option '--report' or '--report_in_cityjson'." << std::endl;
 
     //-- unittests 
     if (unittests.getValue() == true)

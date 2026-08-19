@@ -40,6 +40,7 @@
 #include "CompositeSolid.h"
 #include "MultiSolid.h"
 #include "GeometryTemplate.h"
+#include <boost/filesystem.hpp>
 
 
 using namespace std;
@@ -1891,6 +1892,509 @@ json get_report_json(std::string ifile,
   jr["validity"] = bValid;
 
   return jr;
+}
+
+
+json parse_error_location(std::string error_id)
+{
+  json loc = json::object();
+  
+  // Look for |shell=N
+  size_t shell_pos = error_id.find("|shell=");
+  if (shell_pos != std::string::npos) {
+    size_t start = shell_pos + 7; // length of "|shell="
+    size_t end = error_id.find("|", start);
+    if (end == std::string::npos) {
+      end = error_id.length();
+    }
+    std::string shell_str = error_id.substr(start, end - start);
+    try {
+      int shell_idx = std::stoi(shell_str);
+      loc["shellIndex"] = shell_idx;
+    } catch (...) {
+      // ignore parse errors
+    }
+  }
+  
+  // Look for |face=N
+  size_t face_pos = error_id.find("|face=");
+  if (face_pos != std::string::npos) {
+    size_t start = face_pos + 6; // length of "|face="
+    size_t end = error_id.find("|", start);
+    if (end == std::string::npos) {
+      end = error_id.length();
+    }
+    std::string face_str = error_id.substr(start, end - start);
+    try {
+      int face_idx = std::stoi(face_str);
+      loc["faceIndex"] = face_idx;
+    } catch (...) {
+      // ignore parse errors
+    }
+  }
+  
+  return loc;
+}
+
+
+json build_cityobject_validation(std::string coid, std::vector<Feature*>& lsFeatures, std::map<std::string, std::string>& bp_to_parent)
+{
+  json jv;
+  jv["validity"] = true;
+  jv["geometries"] = json::array();
+  
+  // Determine which Feature contains primitives for this CityObject
+  Feature* target_feature = nullptr;
+  std::string feature_id = coid;
+  
+  // Check if this is a BuildingPart
+  if (bp_to_parent.find(coid) != bp_to_parent.end()) {
+    // This is a BuildingPart, find parent Building's Feature
+    std::string parent_id = bp_to_parent[coid];
+    for (auto& f : lsFeatures) {
+      if (f->get_id() == parent_id) {
+        target_feature = f;
+        break;
+      }
+    }
+  } else {
+    // Regular CityObject
+    for (auto& f : lsFeatures) {
+      if (f->get_id() == coid) {
+        target_feature = f;
+        break;
+      }
+    }
+  }
+  
+  if (target_feature == nullptr) {
+    return jv;
+  }
+  
+  // Check if this is the main feature (not a BuildingPart)
+  bool is_main_feature = (target_feature->get_id() == coid);
+  
+  // Check validity - include feature-level errors for main features only
+  bool all_valid = true;
+  if (is_main_feature && !target_feature->is_valid()) {
+    all_valid = false;
+  }
+  
+  // Filter primitives belonging to this CityObject
+  std::string prefix = "coid=" + coid + "|";
+  std::vector<Primitive*> co_primitives;
+  for (auto& p : target_feature->get_primitives()) {
+    if (p->get_id().find(prefix) == 0) {
+      co_primitives.push_back(p);
+    }
+  }
+  
+  // Check primitive validity
+  for (auto& p : co_primitives) {
+    if (p->is_valid() == false) {
+      all_valid = false;
+      break;
+    }
+  }
+  jv["validity"] = all_valid;
+  
+  // Group errors by geometry index
+  std::map<int, std::vector<json>> errors_by_geom;
+  
+  for (auto& p : co_primitives) {
+    // Extract geometry index from primitive ID
+    std::string pid = p->get_id();
+    size_t geom_pos = pid.find("|geom=");
+    if (geom_pos == std::string::npos) {
+      continue;
+    }
+    size_t start = geom_pos + 6; // length of "|geom="
+    size_t end = pid.find("|", start);
+    if (end == std::string::npos) {
+      end = pid.length();
+    }
+    std::string geom_str = pid.substr(start, end - start);
+    int geom_idx = 0;
+    try {
+      geom_idx = std::stoi(geom_str);
+    } catch (...) {
+      continue;
+    }
+    
+    // Get errors for this primitive
+    auto errors = p->get_errors();
+    for (auto& err : errors) {
+      json jerr;
+      jerr["code"] = err["code"];
+      jerr["description"] = err["description"];
+      jerr["info"] = err.value("info", "");
+      jerr["sourceId"] = err.value("id", "");
+      
+      // Parse location
+      std::string err_id = err.value("id", "");
+      json location = parse_error_location(err_id);
+      if (!location.empty()) {
+        jerr["location"] = location;
+      }
+      
+      errors_by_geom[geom_idx].push_back(jerr);
+    }
+  }
+  
+  // Build geometries array
+  for (auto& pair : errors_by_geom) {
+    json jgeom;
+    jgeom["geometryIndex"] = pair.first;
+    jgeom["errors"] = pair.second;
+    jv["geometries"].push_back(jgeom);
+  }
+  
+  // If no errors, still add empty geometries for each primitive
+  if (errors_by_geom.empty()) {
+    std::set<int> geom_indices;
+    for (auto& p : co_primitives) {
+      std::string pid = p->get_id();
+      size_t geom_pos = pid.find("|geom=");
+      if (geom_pos == std::string::npos) {
+        continue;
+      }
+      size_t start = geom_pos + 6;
+      size_t end = pid.find("|", start);
+      if (end == std::string::npos) {
+        end = pid.length();
+      }
+      std::string geom_str = pid.substr(start, end - start);
+      try {
+        int geom_idx = std::stoi(geom_str);
+        geom_indices.insert(geom_idx);
+      } catch (...) {
+        continue;
+      }
+    }
+    for (int idx : geom_indices) {
+      json jgeom;
+      jgeom["geometryIndex"] = idx;
+      jgeom["errors"] = json::array();
+      jv["geometries"].push_back(jgeom);
+    }
+  }
+  
+  return jv;
+}
+
+
+json build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3dity_version, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs)
+{
+  json jr;
+  jr["val3dityVersion"] = val3dity_version;
+  
+  // Parameters
+  jr["parameters"]["snap_tol"] = snap_tol;
+  jr["parameters"]["overlap_tol"] = overlap_tol;
+  jr["parameters"]["planarity_d2p_tol"] = planarity_d2p_tol;
+  jr["parameters"]["planarity_n_tol"] = planarity_n_tol;
+  
+  // Features overview
+  std::map<std::string, std::tuple<int,int>> feat_o;
+  for (auto& f : lsFeatures) {
+    std::string ftype = f->get_type();
+    if (feat_o.find(ftype) == feat_o.end()) {
+      feat_o[ftype] = std::make_tuple(0, 0);
+    }
+    std::get<0>(feat_o[ftype]) += 1;
+    if (f->is_valid()) {
+      std::get<1>(feat_o[ftype]) += 1;
+    }
+  }
+  jr["featuresOverview"] = json::array();
+  for (auto& pair : feat_o) {
+    json j;
+    j["type"] = pair.first;
+    j["total"] = std::get<0>(pair.second);
+    j["valid"] = std::get<1>(pair.second);
+    jr["featuresOverview"].push_back(j);
+  }
+  
+  // Primitives overview
+  std::map<int, std::tuple<int,int>> prim_o;
+  for (auto& f : lsFeatures) {
+    for (auto& p : f->get_primitives()) {
+      int ptype = p->get_type();
+      if (prim_o.find(ptype) == prim_o.end()) {
+        prim_o[ptype] = std::make_tuple(0, 0);
+      }
+      std::get<0>(prim_o[ptype]) += 1;
+      if (p->is_valid()) {
+        std::get<1>(prim_o[ptype]) += 1;
+      }
+    }
+  }
+  jr["primitivesOverview"] = json::array();
+  for (auto& pair : prim_o) {
+    json j;
+    switch(pair.first) {
+      case 0: j["type"] = "Solid"; break;
+      case 1: j["type"] = "CompositeSolid"; break;
+      case 2: j["type"] = "MultiSolid"; break;
+      case 3: j["type"] = "CompositeSurface"; break;
+      case 4: j["type"] = "MultiSurface"; break;
+      case 5: j["type"] = "GeometryTemplate"; break;
+      case 9: j["type"] = "ALL"; break;
+    }
+    j["total"] = std::get<0>(pair.second);
+    j["valid"] = std::get<1>(pair.second);
+    jr["primitivesOverview"].push_back(j);
+  }
+  
+  // Error code summary - count ALL occurrences
+  std::map<int, int> error_counts;
+  for (auto& f : lsFeatures) {
+    // Feature-level errors
+    for (auto& err : f->get_report_json()["errors"]) {
+      int code = err["code"];
+      error_counts[code] += 1;
+    }
+    // Primitive-level errors
+    for (auto& p : f->get_primitives()) {
+      auto errors = p->get_errors();
+      for (auto& err : errors) {
+        int code = err["code"];
+        error_counts[code] += 1;
+      }
+    }
+  }
+  jr["errorCodeSummary"] = json::array();
+  for (auto& pair : error_counts) {
+    json j;
+    j["code"] = pair.first;
+    j["count"] = pair.second;
+    jr["errorCodeSummary"].push_back(j);
+  }
+  
+  // Dataset errors
+  jr["datasetErrors"] = json::array();
+  if (ioerrs.has_errors()) {
+    jr["datasetErrors"] = ioerrs.get_report_json();
+  }
+  
+  // Overall validity
+  bool bValid = true;
+  for (auto& f : lsFeatures) {
+    if (!f->is_valid()) {
+      bValid = false;
+      break;
+    }
+  }
+  if (ioerrs.has_errors()) {
+    bValid = false;
+  }
+  jr["validity"] = bValid;
+  
+  return jr;
+}
+
+
+void write_report_cityjson(std::string inputfile, std::string outputfile, std::vector<Feature*>& lsFeatures, std::string val3dity_version, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, InputTypes inputtype)
+{
+  // Build the root report
+  json report = build_val3dity_report(lsFeatures, val3dity_version, snap_tol, overlap_tol, planarity_d2p_tol, planarity_n_tol, ioerrs);
+  
+  // Build Feature lookup map
+  std::map<std::string, Feature*> feature_map;
+  for (auto& f : lsFeatures) {
+    feature_map[f->get_id()] = f;
+  }
+  
+  if (inputtype == JSON) {
+    // CityJSON input
+    std::ifstream input(inputfile);
+    json j;
+    try {
+      input >> j;
+    } catch (nlohmann::detail::parse_error e) {
+      std::cout << "Error: cannot re-read input file for CityJSON extension output." << std::endl;
+      return;
+    }
+    
+    std::string cjversion = j.value("version", "0.0");
+    int major = std::stoi(cjversion.substr(0, cjversion.find('.')));
+    if (major < 2) {
+      std::cout << "Warning: --report_in_cityjson requires CityJSON >= v2.0 (input file is v" << cjversion << "). Nothing saved." << std::endl;
+      return;
+    }
+    
+    // Add extensions
+    j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.2.0/val3dity.ext.json";
+    j["extensions"]["val3dity"]["version"] = "0.2.0";
+    
+    // Add root report
+    j["+val3dity-report"] = report;
+    
+    // Build BuildingPart to parent Building map
+    std::map<std::string, std::string> bp_to_parent;
+    for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+      if (it.value()["type"] == "Building" && it.value().count("children") > 0) {
+        for (std::string child_id : it.value()["children"]) {
+          bp_to_parent[child_id] = it.key();
+        }
+      }
+    }
+    
+    // Add validation to each CityObject
+    for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+      std::string coid = it.key();
+      json& co = it.value();
+      
+      // Skip if no geometry or empty geometry
+      if (co.count("geometry") == 0 || co["geometry"].empty()) {
+        continue;
+      }
+      
+      // Build validation for this CityObject
+      json validation = build_cityobject_validation(coid, lsFeatures, bp_to_parent);
+      
+      // Add to attributes
+      if (co.count("attributes") == 0) {
+        co["attributes"] = json::object();
+      }
+      co["attributes"]["+val3dity-validation"] = validation;
+    }
+    
+    // Write output
+    boost::filesystem::path outpath(outputfile);
+    if (boost::filesystem::exists(outpath.parent_path()) == false) {
+      boost::filesystem::path fullpath(boost::filesystem::current_path() / outputfile);
+      if (boost::filesystem::exists(fullpath.parent_path()) == false) {
+        std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+        return;
+      } else {
+        outpath = fullpath;
+      }
+    }
+    if (outpath.extension() != ".json") {
+      outpath += ".json";
+    }
+    std::ofstream o(outpath.string());
+    o << j.dump(2) << std::endl;
+    o.close();
+    std::cout << "CityJSON file with validation results saved to " << boost::filesystem::canonical(outpath) << std::endl;
+    
+  } else if (inputtype == JSONL) {
+    // CityJSONSeq input
+    std::ifstream infile(inputfile);
+    if (!infile) {
+      std::cout << "Error: cannot re-read input file for CityJSONSeq extension output." << std::endl;
+      return;
+    }
+    
+    // Build BuildingPart to parent Building map
+    std::map<std::string, std::string> bp_to_parent;
+    // For CityJSONSeq, we need to re-read to find parent relationships
+    std::ifstream infile2(inputfile);
+    std::string line;
+    bool first_line = true;
+    while (std::getline(infile2, line)) {
+      if (first_line) {
+        first_line = false;
+        continue; // Skip metadata line
+      }
+      std::istringstream iss(line);
+      json j;
+      try {
+        iss >> j;
+      } catch (...) {
+        continue;
+      }
+      if (j["type"] == "CityJSONFeature") {
+        for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+          if (it.value()["type"] == "Building" && it.value().count("children") > 0) {
+            for (std::string child_id : it.value()["children"]) {
+              bp_to_parent[child_id] = it.key();
+            }
+          }
+        }
+      }
+    }
+    infile2.close();
+    
+    // Check CityJSONSeq version from metadata line
+    std::string firstline;
+    if (std::getline(infile, firstline)) {
+      std::istringstream iss_meta(firstline);
+      json jmeta;
+      try {
+        iss_meta >> jmeta;
+        std::string cjversion = jmeta.value("version", "0.0");
+        int major = std::stoi(cjversion.substr(0, cjversion.find('.')));
+        if (major < 2) {
+          std::cout << "Warning: --report_in_cityjson requires CityJSON >= v2.0 (input file is v" << cjversion << "). Nothing saved." << std::endl;
+          infile.close();
+          return;
+        }
+      } catch (...) {}
+    }
+    infile.seekg(0);
+    
+    // Output file
+    boost::filesystem::path outpath(outputfile);
+    if (boost::filesystem::exists(outpath.parent_path()) == false) {
+      boost::filesystem::path fullpath(boost::filesystem::current_path() / outputfile);
+      if (boost::filesystem::exists(fullpath.parent_path()) == false) {
+        std::cout << "Error: file " << outpath << " impossible to create, wrong path." << std::endl;
+        return;
+      } else {
+        outpath = fullpath;
+      }
+    }
+    if (outpath.extension() != ".jsonl") {
+      outpath += ".jsonl";
+    }
+    std::ofstream outfile(outpath.string());
+    
+    // Process line by line
+    first_line = true;
+    while (std::getline(infile, line)) {
+      std::istringstream iss(line);
+      json j;
+      try {
+        iss >> j;
+      } catch (...) {
+        outfile << line << std::endl;
+        continue;
+      }
+      
+      if (first_line) {
+        // Metadata line
+        first_line = false;
+        j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.2.0/val3dity.ext.json";
+        j["extensions"]["val3dity"]["version"] = "0.2.0";
+        j["+val3dity-report"] = report;
+      } else if (j["type"] == "CityJSONFeature") {
+        // Feature line - add validation to each CityObject
+        for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+          std::string coid = it.key();
+          json& co = it.value();
+          
+          if (co.count("geometry") == 0 || co["geometry"].empty()) {
+            continue;
+          }
+          
+          json validation = build_cityobject_validation(coid, lsFeatures, bp_to_parent);
+          
+          if (co.count("attributes") == 0) {
+            co["attributes"] = json::object();
+          }
+          co["attributes"]["+val3dity-validation"] = validation;
+        }
+      }
+      
+      outfile << j.dump() << std::endl;
+    }
+    
+    infile.close();
+    outfile.close();
+    std::cout << "CityJSONSeq file with validation results saved to " << boost::filesystem::canonical(outpath) << std::endl;
+  }
 }
 
 

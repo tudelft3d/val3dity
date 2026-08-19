@@ -201,6 +201,14 @@ void              compute_min_xy(json& j);
 
 json              get_report_json(std::string ifile, std::vector<Feature*>& lsFeatures, std::string val3dity_version, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs);
 
+void              write_report_cityjson(std::string inputfile, std::string outputfile, std::vector<Feature*>& lsFeatures, std::string val3dity_version, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs, InputTypes inputtype);
+
+json              build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3dity_version, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs);
+
+json              build_cityobject_validation(std::string coid, std::vector<Feature*>& lsFeatures, std::map<std::string, std::string>& bp_to_parent);
+
+json              parse_error_location(std::string error_id);
+
 } // namespace val3dity
 
 #endif
