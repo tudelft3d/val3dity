@@ -129,14 +129,13 @@ We delete the file as soon as it has been validated (promised!).
 However, a file is limited to 50MB.
 
 
-## Simple visualiser for the errors: viz3dity
+## Visualiser for the errors: CJLoupe
 
-![](./tools/viz3dity/screenshot.png)
+[![](./tools/cjloupe.png)](https://3dgi.github.io/CJLoupe/)
 
-In the folder `tools/viz3dity/`, there is a simple Python script where you can load a CityJSON file with geometries and one with the val3dity report, and you can see which objects have specific errors (each error gets a colour).
+The web-application [CJLoupe](https://3dgi.github.io/CJLoupe/) is very handy: you need to open both the CityJSON/Seq file, and the report from val3dity (generated with `--report myreport.json`) and you can see the errors, zoom in, and try to understand them (hopefully).
 
-However, it's not possible to see where in an object the error is (eg which surface is not planar).
-This tool helps to quickly visualise where the errors are in a large dataset, for instance a city.
+This web-application was developed and is maintained by [3DGI](https://3dgi.nl), and its [source code is open](https://github.com/3DGI/CJLoupe).
 
 
 ## Documentation and help
