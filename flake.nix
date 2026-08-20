@@ -68,5 +68,25 @@
           default = packages.val3dity;
         }
       );
+
+      devShells = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          packages = packagesFor system;
+        in
+        {
+          default = pkgs.mkShell {
+            inputsFrom = [ packages.val3dity ];
+            packages = with pkgs; [
+              cmake
+              ninja
+            ];
+
+            shellHook = ''
+              echo "val3dity development shell"
+            '';
+          };
+        }
+      );
     };
 }
