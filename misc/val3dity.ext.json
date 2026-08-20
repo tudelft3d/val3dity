@@ -164,7 +164,7 @@
     "report": {
       "type": "object",
       "properties": {
-        "val3dityVersion": {
+        "val3dity_version": {
           "type": "string"
         },
         "validity": {
@@ -186,32 +186,32 @@
             ]
           }
         },
-        "featuresOverview": {
+        "features_overview": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/summary"
           }
         },
-        "primitivesOverview": {
+        "primitives_overview": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/summary"
           }
         },
-        "errorCodeSummary": {
+        "error_code_summary": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/error-code-count"
           }
         },
-        "datasetErrors": {
+        "dataset_errors": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/dataset-error"
           }
         }
       },
-      "required": ["val3dityVersion", "validity"],
+      "required": ["val3dity_version", "validity"],
       "additionalProperties": false
     }
   },

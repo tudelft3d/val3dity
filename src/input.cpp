@@ -2103,7 +2103,7 @@ json build_cityobject_validation(std::string coid, std::vector<Feature*>& lsFeat
 json build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3dity_version, double snap_tol, double overlap_tol, double planarity_d2p_tol, double planarity_n_tol, IOErrors ioerrs)
 {
   json jr;
-  jr["val3dityVersion"] = val3dity_version;
+  jr["val3dity_version"] = val3dity_version;
   
   // Parameters
   jr["parameters"]["snap_tol"] = snap_tol;
@@ -2123,13 +2123,13 @@ json build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3di
       std::get<1>(feat_o[ftype]) += 1;
     }
   }
-  jr["featuresOverview"] = json::array();
+  jr["features_overview"] = json::array();
   for (auto& pair : feat_o) {
     json j;
     j["type"] = pair.first;
     j["total"] = std::get<0>(pair.second);
     j["valid"] = std::get<1>(pair.second);
-    jr["featuresOverview"].push_back(j);
+    jr["features_overview"].push_back(j);
   }
   
   // Primitives overview
@@ -2146,7 +2146,7 @@ json build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3di
       }
     }
   }
-  jr["primitivesOverview"] = json::array();
+  jr["primitives_overview"] = json::array();
   for (auto& pair : prim_o) {
     json j;
     switch(pair.first) {
@@ -2160,7 +2160,7 @@ json build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3di
     }
     j["total"] = std::get<0>(pair.second);
     j["valid"] = std::get<1>(pair.second);
-    jr["primitivesOverview"].push_back(j);
+    jr["primitives_overview"].push_back(j);
   }
   
   // Error code summary - count ALL occurrences
@@ -2180,18 +2180,18 @@ json build_val3dity_report(std::vector<Feature*>& lsFeatures, std::string val3di
       }
     }
   }
-  jr["errorCodeSummary"] = json::array();
+  jr["error_code_summary"] = json::array();
   for (auto& pair : error_counts) {
     json j;
     j["code"] = pair.first;
     j["count"] = pair.second;
-    jr["errorCodeSummary"].push_back(j);
+    jr["error_code_summary"].push_back(j);
   }
   
   // Dataset errors
-  jr["datasetErrors"] = json::array();
+  jr["dataset_errors"] = json::array();
   if (ioerrs.has_errors()) {
-    jr["datasetErrors"] = ioerrs.get_report_json();
+    jr["dataset_errors"] = ioerrs.get_report_json();
   }
   
   // Overall validity
@@ -2238,6 +2238,25 @@ void write_report_cityjson(std::string inputfile, std::string outputfile, std::v
     if (major < 2) {
       std::cout << "Warning: --report_in_cityjson requires CityJSON >= v2.0 (input file is v" << cjversion << "). Nothing saved." << std::endl;
       return;
+    }
+    
+    // Remove existing val3dity extension data if present
+    if (j.count("+val3dity-report") > 0) {
+      j.erase("+val3dity-report");
+    }
+    if (j.count("extensions") > 0 && j["extensions"].count("val3dity") > 0) {
+      j["extensions"].erase("val3dity");
+      if (j["extensions"].empty()) {
+        j.erase("extensions");
+      }
+    }
+    for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
+      if (it.value().count("attributes") > 0 && it.value()["attributes"].count("+val3dity-validation") > 0) {
+        it.value()["attributes"].erase("+val3dity-validation");
+        if (it.value()["attributes"].empty()) {
+          it.value().erase("attributes");
+        }
+      }
     }
     
     // Add extensions
@@ -2398,14 +2417,35 @@ void write_report_cityjson(std::string inputfile, std::string outputfile, std::v
       if (first_line) {
         // Metadata line
         first_line = false;
+        
+        // Remove existing val3dity extension data if present
+        if (j.count("+val3dity-report") > 0) {
+          j.erase("+val3dity-report");
+        }
+        if (j.count("extensions") > 0 && j["extensions"].count("val3dity") > 0) {
+          j["extensions"].erase("val3dity");
+          if (j["extensions"].empty()) {
+            j.erase("extensions");
+          }
+        }
+        
+        // Add new extension data
         j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.3.0/val3dity.ext.json";
         j["extensions"]["val3dity"]["version"] = "0.3.0";
         j["+val3dity-report"] = report;
       } else if (j["type"] == "CityJSONFeature") {
-        // Feature line - add validation to each CityObject
+        // Feature line - remove existing validation and add new
         for (json::iterator it = j["CityObjects"].begin(); it != j["CityObjects"].end(); ++it) {
           std::string coid = it.key();
           json& co = it.value();
+          
+          // Remove existing val3dity validation if present
+          if (co.count("attributes") > 0 && co["attributes"].count("+val3dity-validation") > 0) {
+            co["attributes"].erase("+val3dity-validation");
+            if (co["attributes"].empty()) {
+              co.erase("attributes");
+            }
+          }
           
           // Check if this CityObject should have validation
           bool has_geometry = (co.count("geometry") > 0 && !co["geometry"].empty());
