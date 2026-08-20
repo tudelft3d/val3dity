@@ -1,0 +1,392 @@
+{
+  "type": "CityJSONExtension",
+  "name": "val3dity",
+  "uri": "https://cityjson.github.io/extensions/val3dity/0.3.0/val3dity.ext.json",
+  "version": "0.3.0",
+  "versionCityJSON": "2.0",
+  "description": "Extension to store val3dity validation reports and per-geometry diagnostics.",
+  "definitions": {
+    "summary": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "valid": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["type", "total", "valid"],
+      "additionalProperties": false
+    },
+    "error-code-count": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["code", "count"],
+      "additionalProperties": false
+    },
+    "point-location": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "enum": ["reported", "derived-centroid"]
+        },
+        "coordinates": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "required": ["role", "coordinates"],
+      "additionalProperties": false
+    },
+    "error-location": {
+      "type": "object",
+      "properties": {
+        "shellIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "faceIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ringIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "vertexIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "point": {
+          "$ref": "#/definitions/point-location"
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation-error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "info": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/definitions/error-location"
+        }
+      },
+      "required": ["code", "description", "sourceId", "location"],
+      "additionalProperties": false
+    },
+    "geometry-validation": {
+      "type": "object",
+      "properties": {
+        "geometryIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/validation-error"
+          }
+        }
+      },
+      "required": ["geometryIndex", "errors"],
+      "additionalProperties": false
+    },
+    "cityobject-validation": {
+      "type": "object",
+      "properties": {
+        "validity": {
+          "type": "boolean"
+        },
+        "geometries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/geometry-validation"
+          }
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/validation-error"
+          }
+        }
+      },
+      "required": ["validity"],
+      "additionalProperties": false
+    },
+    "dataset-error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "info": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        }
+      },
+      "required": ["code", "description"],
+      "additionalProperties": false
+    },
+    "report": {
+      "type": "object",
+      "properties": {
+        "val3dity_version": {
+          "type": "string"
+        },
+        "validity": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "features_overview": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/summary"
+          }
+        },
+        "primitives_overview": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/summary"
+          }
+        },
+        "error_code_summary": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/error-code-count"
+          }
+        },
+        "dataset_errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dataset-error"
+          }
+        }
+      },
+      "required": ["val3dity_version", "validity"],
+      "additionalProperties": false
+    }
+  },
+  "extraRootProperties": {
+    "+val3dity-report": {
+      "$ref": "#/definitions/report"
+    }
+  },
+  "extraAttributes": {
+    "Bridge": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BridgeConstructiveElement": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BridgeFurniture": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BridgeInstallation": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BridgePart": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BridgeRoom": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "Building": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingPart": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingConstructiveElement": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingFurniture": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingInstallation": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingRoom": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingStorey": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "BuildingUnit": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "CityFurniture": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "CityObjectGroup": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "GenericCityObject": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "LandUse": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "OtherConstruction": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "PlantCover": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "Railway": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "Road": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "SolitaryVegetationObject": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TINRelief": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TransportSquare": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "Tunnel": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TunnelConstructiveElement": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TunnelFurniture": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TunnelHollowSpace": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TunnelInstallation": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "TunnelPart": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "WaterBody": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    },
+    "Waterway": {
+      "+val3dity-validation": {
+        "$ref": "#/definitions/cityobject-validation"
+      }
+    }
+  },
+  "extraCityObjects": {},
+  "extraSemanticSurfaces": {}
+}

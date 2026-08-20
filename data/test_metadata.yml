@@ -74,7 +74,7 @@ test_geometry_specific:
   "501_1": CompositeSolid with (1) basecube + inner_shell (2) inner_shell filling the void
   "502": CompositeSolid with 3 cubes, where cube 1-2 are identical
   "503": CompositeSolid with 3 cubes, where cube 1 is not connected to other
-  "601": A Building with 2 BuildingParts that overlap by 50 units
+  "601.city": A Building with 2 BuildingParts that overlap by 50 units
   "601_1": A Building with 6 BuildingParts, part of open dataset Den Haag. Parts overlap by <1cm, with overlap_tol 0.01 it's valid
 
 test_valid:
@@ -133,6 +133,7 @@ test_cjseq:
   "notransform.city": "first line has transform missing"
   "unclosedbracket.city": "first line has invalid JSON (unclosed bracket)"
   "denhaag_random_5.city": "5 random building from Den Haag, 2 valid 3 invalid"
+  "3dbag_b2.city": "2 buildings from the 3dbag, one has one invalid geometry."
 
 test_duplicates:
   "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"
