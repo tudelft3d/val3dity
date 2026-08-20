@@ -131,7 +131,7 @@ However, a file is limited to 50MB.
 
 ## Visualiser for the errors: CJLoupe
 
-[![](./tools/cjloupe.png)](https://3dgi.github.io/CJLoupe/)
+[![](./misc/cjloupe.png)](https://3dgi.github.io/CJLoupe/)
 
 The web-application [CJLoupe](https://3dgi.github.io/CJLoupe/) is very handy: you need to open both the CityJSON/Seq file, and the report from val3dity (generated with `--report myreport.json`) and you can see the errors, zoom in, and try to understand them (hopefully).
 
