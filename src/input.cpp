@@ -41,6 +41,7 @@
 #include "MultiSolid.h"
 #include "GeometryTemplate.h"
 #include <boost/filesystem.hpp>
+#include <limits>
 
 
 using namespace std;
@@ -1009,18 +1010,29 @@ void set_min_xy(double minx, double miny)
 
 void compute_min_xy(json& j)
 {
+  double minx = std::numeric_limits<double>::max();
+  double miny = std::numeric_limits<double>::max();
+  bool found = false;
   for (auto& v : j["vertices"])
   {
-    if (v[0] < _minx)
-      _minx = v[0];
-    if (v[1] < _miny)
-      _miny = v[1];
+    found = true;
+    if (v[0] < minx)
+      minx = v[0];
+    if (v[1] < miny)
+      miny = v[1];
   }
-  if (j.count("transform") != 0)
+  if (found == false)
   {
-    _minx = (_minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
-    _miny = (_miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
+    minx = 0.0;
+    miny = 0.0;
   }
+  else if (j.count("transform") != 0)
+  {
+    minx = (minx * double(j["transform"]["scale"][0])) + double(j["transform"]["translate"][0]);
+    miny = (miny * double(j["transform"]["scale"][1])) + double(j["transform"]["translate"][1]);
+  }
+  _minx = minx;
+  _miny = miny;
   // std::cout << "Translating all coordinates by (-" << _minx << ", -" << _miny << ")" << std::endl;
   Primitive::set_translation_min_values(_minx, _miny);
   Surface::set_translation_min_values(_minx, _miny);

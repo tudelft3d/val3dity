@@ -34,6 +34,7 @@
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <CGAL/Side_of_triangle_mesh.h>
 #include <geos_c.h>
+#include <limits>
 #include <sstream>
 
 using namespace std;
@@ -52,6 +53,8 @@ Surface::Surface(std::string id, double tol_snap)
   _is_valid_2d = -1;
   _vertices_added = 0;
   _tol_snap = tol_snap;
+  _local_shiftx = Surface::_shiftx;
+  _local_shifty = Surface::_shifty;
 }
 
 Surface::~Surface()
@@ -363,7 +366,7 @@ void Surface::translate_vertices()
   std::vector<Point3>::iterator it = _lsPts.begin();
   for (it = _lsPts.begin(); it != _lsPts.end(); it++)
   {
-    Point3 tp(CGAL::to_double(it->x() - Surface::_shiftx), CGAL::to_double(it->y() - Surface::_shifty), CGAL::to_double(it->z()));
+    Point3 tp(CGAL::to_double(it->x() - _local_shiftx), CGAL::to_double(it->y() - _local_shifty), CGAL::to_double(it->z()));
     *it = tp;
   }
 }
@@ -586,10 +589,11 @@ bool Surface::contains_nonmanifold_vertices()
     if (v.second > 2)
     {
       std::stringstream st;
+      st << setprecision(std::numeric_limits<double>::max_digits10);
       st << "Non-manifold vertex at (";;
-      st << (v.first->point().x() + _shiftx);
+      st << (v.first->point().x() + _local_shiftx);
       st << ", ";
-      st << (v.first->point().y() + _shifty);
+      st << (v.first->point().y() + _local_shifty);
       st << ", ";
       st << v.first->point().z();
       st << ")";
@@ -619,10 +623,11 @@ bool Surface::does_self_intersect()
                                 each->halfedge()->next()->vertex()->point(),
                                 each->halfedge()->next()->next()->vertex()->point()); 
       std::stringstream st;
+      st << setprecision(std::numeric_limits<double>::max_digits10);
       st << "Location close to: (";
-      st << c.x() + _shiftx;
+      st << c.x() + _local_shiftx;
       st << ", ";
-      st << c.y() + _shifty;
+      st << c.y() + _local_shifty;
       st << ", ";
       st << c.z();
       st << ")"; 
@@ -672,13 +677,14 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
           if (_polyhedron->is_closed() == false)
           {
             std::stringstream st;
+            st << setprecision(std::numeric_limits<double>::max_digits10);
             _polyhedron->normalize_border();
             while (_polyhedron->size_of_border_edges() > 0) {
               CgalPolyhedron::Halfedge_handle he = ++(_polyhedron->border_halfedges_begin());
               st << "Location hole: (";
-              st << (he->vertex()->point().x() + _shiftx);
+              st << (he->vertex()->point().x() + _local_shiftx);
               st << ", ";
-              st << (he->vertex()->point().y() + _shifty);
+              st << (he->vertex()->point().y() + _local_shifty);
               st << ", ";
               st << he->vertex()->point().z();
               st << ")";
@@ -858,7 +864,7 @@ int Surface::side_of_triangle_surface(Point3& p)
   if ( (_polyhedron != NULL) && (CGAL::is_triangle_mesh(*_polyhedron) == true) )
   {
     CGAL::Side_of_triangle_mesh<CgalPolyhedron, K> inside(*_polyhedron);
-    Point3 p_translated(p.x() - Surface::_shiftx, p.y() - Surface::_shifty, p.z());
+    Point3 p_translated(p.x() - _local_shiftx, p.y() - _local_shifty, p.z());
     re = inside(p_translated);
   }
   return re;

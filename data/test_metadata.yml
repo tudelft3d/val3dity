@@ -134,6 +134,7 @@ test_cjseq:
   "unclosedbracket.city": "first line has invalid JSON (unclosed bracket)"
   "denhaag_random_5.city": "5 random building from Den Haag, 2 valid 3 invalid"
   "3dbag_b2.city": "2 buildings from the 3dbag, one has one invalid geometry."
+  "shifted_302.city": "per-feature coordinate shift is retained in hole locations"
 
 test_duplicates:
   "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"
