@@ -2079,6 +2079,23 @@ json build_cityobject_validation(std::string coid, std::vector<Feature*>& lsFeat
     }
   }
   
+  // Add feature-level errors (only for main features, not BuildingParts)
+  if (is_main_feature) {
+    auto feature_errors = target_feature->get_feature_errors();
+    if (!feature_errors.empty()) {
+      jv["features"] = json::array();
+      for (auto& err : feature_errors) {
+        json jerr;
+        jerr["code"] = err["code"];
+        jerr["description"] = err["description"];
+        jerr["info"] = err.value("info", "");
+        jerr["sourceId"] = err.value("sourceId", "");
+        jerr["location"] = json::object();
+        jv["features"].push_back(jerr);
+      }
+    }
+  }
+  
   return jv;
 }
 
@@ -2224,8 +2241,8 @@ void write_report_cityjson(std::string inputfile, std::string outputfile, std::v
     }
     
     // Add extensions
-    j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.2.0/val3dity.ext.json";
-    j["extensions"]["val3dity"]["version"] = "0.2.0";
+    j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.3.0/val3dity.ext.json";
+    j["extensions"]["val3dity"]["version"] = "0.3.0";
     
     // Add root report
     j["+val3dity-report"] = report;
@@ -2245,19 +2262,34 @@ void write_report_cityjson(std::string inputfile, std::string outputfile, std::v
       std::string coid = it.key();
       json& co = it.value();
       
-      // Skip if no geometry or empty geometry
-      if (co.count("geometry") == 0 || co["geometry"].empty()) {
+      // Check if this CityObject should have validation
+      bool has_geometry = (co.count("geometry") > 0 && !co["geometry"].empty());
+      bool is_building_with_parts = (co["type"] == "Building" && co.count("children") > 0);
+      
+      // Skip if no geometry and not a Building with parts
+      if (!has_geometry && !is_building_with_parts) {
         continue;
       }
       
       // Build validation for this CityObject
       json validation = build_cityobject_validation(coid, lsFeatures, bp_to_parent);
       
-      // Add to attributes
-      if (co.count("attributes") == 0) {
-        co["attributes"] = json::object();
+      // Only add if there's actual validation data (geometries or features)
+      bool has_validation_data = false;
+      if (validation.count("geometries") > 0 && !validation["geometries"].empty()) {
+        has_validation_data = true;
       }
-      co["attributes"]["+val3dity-validation"] = validation;
+      if (validation.count("features") > 0 && !validation["features"].empty()) {
+        has_validation_data = true;
+      }
+      
+      if (has_validation_data) {
+        // Add to attributes
+        if (co.count("attributes") == 0) {
+          co["attributes"] = json::object();
+        }
+        co["attributes"]["+val3dity-validation"] = validation;
+      }
     }
     
     // Write output
@@ -2366,8 +2398,8 @@ void write_report_cityjson(std::string inputfile, std::string outputfile, std::v
       if (first_line) {
         // Metadata line
         first_line = false;
-        j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.2.0/val3dity.ext.json";
-        j["extensions"]["val3dity"]["version"] = "0.2.0";
+        j["extensions"]["val3dity"]["url"] = "https://cityjson.github.io/extensions/val3dity/0.3.0/val3dity.ext.json";
+        j["extensions"]["val3dity"]["version"] = "0.3.0";
         j["+val3dity-report"] = report;
       } else if (j["type"] == "CityJSONFeature") {
         // Feature line - add validation to each CityObject
@@ -2375,16 +2407,32 @@ void write_report_cityjson(std::string inputfile, std::string outputfile, std::v
           std::string coid = it.key();
           json& co = it.value();
           
-          if (co.count("geometry") == 0 || co["geometry"].empty()) {
+          // Check if this CityObject should have validation
+          bool has_geometry = (co.count("geometry") > 0 && !co["geometry"].empty());
+          bool is_building_with_parts = (co["type"] == "Building" && co.count("children") > 0);
+          
+          // Skip if no geometry and not a Building with parts
+          if (!has_geometry && !is_building_with_parts) {
             continue;
           }
           
           json validation = build_cityobject_validation(coid, lsFeatures, bp_to_parent);
           
-          if (co.count("attributes") == 0) {
-            co["attributes"] = json::object();
+          // Only add if there's actual validation data (geometries or features)
+          bool has_validation_data = false;
+          if (validation.count("geometries") > 0 && !validation["geometries"].empty()) {
+            has_validation_data = true;
           }
-          co["attributes"]["+val3dity-validation"] = validation;
+          if (validation.count("features") > 0 && !validation["features"].empty()) {
+            has_validation_data = true;
+          }
+          
+          if (has_validation_data) {
+            if (co.count("attributes") == 0) {
+              co["attributes"] = json::object();
+            }
+            co["attributes"]["+val3dity-validation"] = validation;
+          }
         }
       }
       

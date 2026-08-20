@@ -64,6 +64,7 @@ public:
 
   void                    add_error(int code, std::string info, std::string whichgeoms);
   json                    get_report_json();
+  std::vector<json>       get_feature_errors();
   std::set<int>           get_unique_error_codes();
 
 protected:

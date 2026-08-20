@@ -143,4 +143,23 @@ std::set<int> Feature::get_unique_error_codes()
   return errs;
 }
 
+
+std::vector<json> Feature::get_feature_errors()
+{
+  std::vector<json> js;
+  for (auto& err : _errors)
+  {
+    for (auto& e : _errors[std::get<0>(err)])
+    {
+      json jj;
+      jj["code"] = std::get<0>(err);
+      jj["description"] = ALL_ERRORS[std::get<0>(err)];
+      jj["sourceId"] = std::get<0>(e);
+      jj["info"] = std::get<1>(e);
+      js.push_back(jj);
+    }
+  }
+  return js;
+}
+
 } // namespace val3dity
