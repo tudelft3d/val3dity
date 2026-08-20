@@ -34,6 +34,7 @@
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <CGAL/Side_of_triangle_mesh.h>
 #include <geos_c.h>
+#include <limits>
 #include <sstream>
 
 using namespace std;
@@ -588,7 +589,7 @@ bool Surface::contains_nonmanifold_vertices()
     if (v.second > 2)
     {
       std::stringstream st;
-      st << setprecision(15);
+      st << setprecision(std::numeric_limits<double>::max_digits10);
       st << "Non-manifold vertex at (";;
       st << (v.first->point().x() + _local_shiftx);
       st << ", ";
@@ -622,7 +623,7 @@ bool Surface::does_self_intersect()
                                 each->halfedge()->next()->vertex()->point(),
                                 each->halfedge()->next()->next()->vertex()->point()); 
       std::stringstream st;
-      st << setprecision(15);
+      st << setprecision(std::numeric_limits<double>::max_digits10);
       st << "Location close to: (";
       st << c.x() + _local_shiftx;
       st << ", ";
@@ -676,7 +677,7 @@ bool Surface::validate_as_shell(double tol_planarity_d2p, double tol_planarity_n
           if (_polyhedron->is_closed() == false)
           {
             std::stringstream st;
-            st << setprecision(15);
+            st << setprecision(std::numeric_limits<double>::max_digits10);
             _polyhedron->normalize_border();
             while (_polyhedron->size_of_border_edges() > 0) {
               CgalPolyhedron::Halfedge_handle he = ++(_polyhedron->border_halfedges_begin());

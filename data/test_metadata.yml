@@ -133,6 +133,7 @@ test_cjseq:
   "notransform.city": "first line has transform missing"
   "unclosedbracket.city": "first line has invalid JSON (unclosed bracket)"
   "denhaag_random_5.city": "5 random building from Den Haag, 2 valid 3 invalid"
+  "shifted_302.city": "per-feature coordinate shift is retained in hole locations"
 
 test_duplicates:
   "cube_tol_1": "one unit cube with a duplicate vertex (closer than 1e-4 to another one)"

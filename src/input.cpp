@@ -40,6 +40,7 @@
 #include "CompositeSolid.h"
 #include "MultiSolid.h"
 #include "GeometryTemplate.h"
+#include <limits>
 
 
 using namespace std;
@@ -1008,8 +1009,8 @@ void set_min_xy(double minx, double miny)
 
 void compute_min_xy(json& j)
 {
-  double minx = 9e15;
-  double miny = 9e15;
+  double minx = std::numeric_limits<double>::max();
+  double miny = std::numeric_limits<double>::max();
   bool found = false;
   for (auto& v : j["vertices"])
   {
