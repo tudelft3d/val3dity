@@ -108,6 +108,7 @@ test_jsonfg:
   "cubes2.fg": "a 'FeatureCollection', one valid cube (Polyhedron) and another Feature is a vanilla GeoJSON; thus e904"
   "e103.fg": "like the first feature of cubes.fg.json but w/o the repeat first-last, thus e103"
   "geojson": "a 'standard' GeoJSON file, should return e904"
+  "torontocityhall.fg": "FeatureCollection with Prism (so nothing gets validated)"
 
 test_indoorgml:
   "igml_v1": "a valid cube as the only cell, no dual"
