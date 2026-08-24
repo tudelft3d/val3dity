@@ -56,3 +56,6 @@ tools/viz3dity/imgui.ini
 
 .idea/
 cmake-build-debug/
+
+# Pixi
+.pixi/
