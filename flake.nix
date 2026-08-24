@@ -80,7 +80,11 @@
             packages = with pkgs; [
               cmake
               ninja
+              python313
+              uv
             ];
+
+            UV_PYTHON_DOWNLOADS = "never";
 
             shellHook = ''
               echo "val3dity development shell"
