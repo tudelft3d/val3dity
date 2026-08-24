@@ -24,7 +24,7 @@ configure-lib = { cmd = "cmake -S demo_lib -B demo_lib/build -G Ninja -DCMAKE_BU
 build-lib = { cmd = "cmake --build demo_lib/build --parallel", depends-on = ["configure-lib"] }
 
 [target.win-64.tasks]
-configure = { cmd = "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$CONDA_PREFIX" }
-build = { cmd = "cmake --build build --config Release --parallel", depends-on = ["configure"] }
-configure-lib = { cmd = "cmake -S demo_lib -B demo_lib/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DVAL3DITY_LIBRARY=ON" }
-build-lib = { cmd = "cmake --build demo_lib/build --config Release --parallel", depends-on = ["configure-lib"] }
+configure = { cmd = "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$CONDA_PREFIX" }
+build = { cmd = "cmake --build build --parallel", depends-on = ["configure"] }
+configure-lib = { cmd = "cmake -S demo_lib -B demo_lib/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DVAL3DITY_LIBRARY=ON" }
+build-lib = { cmd = "cmake --build demo_lib/build --parallel", depends-on = ["configure-lib"] }
