@@ -641,19 +641,20 @@ void read_file_json(std::string &ifile, std::vector<Feature*>& lsFeatures, IOErr
     parse_jsonfg(j, lsFeatures, tol_snap, errs);
   }
   else if (j["type"] == "FeatureCollection") {
-    bool valid = true;
+    bool has_place = false;
     for (auto& f : j["features"]) {
-      if (!f.contains("place")) {
-        errs.add_error(904, "Input file type not a supported JSON file (only JSON-FG is supported, not standard GeoJSON).");
-        valid = false;
+      if (f.contains("place") && !f["place"].is_null()) {
+        has_place = true;
         break;
       }
     }
-    if (valid) {
+    if (has_place) {
       errs.set_input_file_type("JSON-FG");
       std::cout << "JSON-FG input file" << std::endl;
       std::cout << "# Features found: " << j["features"].size() << std::endl;
       parse_jsonfg(j, lsFeatures, tol_snap, errs);
+    } else {
+      errs.add_error(904, "Input file type not a supported JSON file (only JSON-FG is supported, not standard GeoJSON).");
     }
   }
   else {
@@ -1489,7 +1490,9 @@ void parse_jsonfg(json& j, std::vector<Feature*>& lsFeatures, double tol_snap, I
   else { //-- then it's FeatureCollection
     int counter = 0;
     for (auto& f : j["features"]) {
-      parse_jsonfg_onefeature(f, lsFeatures, tol_snap, counter, errs);
+      if (f.contains("place") && !f["place"].is_null()) {
+        parse_jsonfg_onefeature(f, lsFeatures, tol_snap, counter, errs);
+      }
       counter++;
     }
   }
@@ -1508,6 +1511,10 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
   }
   //-- create the object
   GenericObject* go = new GenericObject(sid);
+  if (!j.contains("place") || j["place"].is_null()) {
+    delete go;
+    return;
+  }
   if (j["place"]["type"] == "Polyhedron") {
     Solid* s = new Solid();
     bool oshell = true;
@@ -1554,6 +1561,14 @@ void parse_jsonfg_onefeature(json& j, std::vector<Feature*>& lsFeatures, double 
       ms->add_solid(s);
     }
     go->add_primitive(ms);
+  }
+  else {
+    std::string ptype = j["place"]["type"];
+    if (ptype != "Polyhedron" && ptype != "MultiPolyhedron") {
+      spdlog::warn("JSON-FG geometry type '{}' is not supported (only Polyhedron and MultiPolyhedron), skipping feature '{}'", ptype, sid);
+      delete go;
+      return;
+    }
   }
   lsFeatures.push_back(go);
 }
