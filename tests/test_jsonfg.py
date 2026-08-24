@@ -30,6 +30,12 @@ def data_vanilla_geojson(request, dir_jsonfg):
     return [file_path]
 
 
+@pytest.fixture(scope="module", params=["torontocityhall.fg.json"])
+def data_jsonfg_prism(request, dir_jsonfg):
+    file_path = os.path.abspath(os.path.join(dir_jsonfg, request.param))
+    return [file_path]
+
+
 # ----------------------------------------------------------------------- Tests
 def test_data_jsonfg_valid(validate, data_jsonfg_valid, unittests):
     error = validate(data_jsonfg_valid, options=unittests)
@@ -38,7 +44,7 @@ def test_data_jsonfg_valid(validate, data_jsonfg_valid, unittests):
 
 def test_data_jsonfg_one_geojson(validate, data_jsonfg_one_geojson, unittests):
     error = validate(data_jsonfg_one_geojson, options=unittests)
-    assert error == [904]
+    assert error == []
 
 
 def test_data_jsonfg_invalid(validate, data_jsonfg_invalid, unittests):
@@ -49,3 +55,8 @@ def test_data_jsonfg_invalid(validate, data_jsonfg_invalid, unittests):
 def test_vanilla_geojson(validate, data_vanilla_geojson, unittests):
     error = validate(data_vanilla_geojson, options=unittests)
     assert error == [904]
+
+
+def test_data_jsonfg_prism(validate, data_jsonfg_prism, unittests):
+    error = validate(data_jsonfg_prism, options=unittests)
+    assert error == []
