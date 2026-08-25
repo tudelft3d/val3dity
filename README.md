@@ -25,11 +25,11 @@ val3dity accepts as input:
 
 * [CityJSON](http://www.cityjson.org)
 * [CityJSON Sequences (CityJSONSeq)](https://www.cityjson.org/cityjsonseq/)
-* [tu3djson](https://github.com/tudelft3d/tu3djson)
+* [IndoorGML](http://indoorgml.net/)
 * [JSON-FG (OGC Features and Geometries JSON)](https://github.com/opengeospatial/ogc-feat-geo-json)
 * [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
 * [OFF](https://en.wikipedia.org/wiki/OFF_(file_format))
-* [IndoorGML](http://indoorgml.net/)
+* [tu3djson](https://github.com/tudelft3d/tu3djson)
 
 For the CityJSON and IndoorGML formats, extra validations are performed (specific to the format), eg the overlap between different parts of a building, or the validation of the navigation graph in IndoorGML.
 
@@ -46,7 +46,7 @@ The simplest, if you have [Homebrew](http://brew.sh/), is:
 You can also get the code, and compile it yourself.
 You first need to install the following free libraries:
 
-  1. [CGAL v5.4+](http://www.cgal.org) (CGAL 6.0 works too)
+  1. [CGAL v5.4+](http://www.cgal.org) (CGAL 6+ works too)
   1. [Eigen library](http://eigen.tuxfamily.org)
   1. [GEOS](http://trac.osgeo.org/geos/)
   1. [CMake](http://www.cmake.org)
@@ -98,6 +98,10 @@ The summary of the validation is reported, and you should see that `cube.json` c
 To get a detailed report ([how to interpret the report?](https://val3dity.readthedocs.io/develop/usage/#how-to-interpret-the-report)):
 
     val3dity ./data/cityjson/cube.json --report myreport.json
+
+If CityJSON is used as input, you can embed the results of the validation directly in a CityJSON file using the [val3dity Extension](https://github.com/cityjson/extensions):
+
+    val3dity ./data/cityjson/cube.city.json --report_in_cityjson cube_w_report.city.json
 
 Finally, to see all the options possible:
 
