@@ -71,11 +71,11 @@ public:
     std::cout << "ALLOWED FORMATS:" << std::endl;
     std::cout << "\tCityJSON" << std::endl;
     std::cout << "\tCityJSONSeq" << std::endl;
-    std::cout << "\ttu3djson" << std::endl;
+    std::cout << "\tIndoorGML" << std::endl;
     std::cout << "\tJSON-FG" << std::endl;
     std::cout << "\tOBJ" << std::endl;
     std::cout << "\tOFF" << std::endl;
-    std::cout << "\tIndoorGML" << std::endl;
+    std::cout << "\ttu3djson" << std::endl;
     std::cout << "OPTIONS:" << std::endl;
     std::list<TCLAP::Arg*> args = c.getArgList();
     for (TCLAP::ArgListIterator it = args.begin(); it != args.end(); it++) {
@@ -93,8 +93,8 @@ public:
     std::cout << "\t\tValidate each City Object and each 3D primitive in input.json (CityJSON file)" << std::endl;
     std::cout << "\t\tand print a summary" << std::endl;
     
-    std::cout << "\tval3dity input.json --report /home/elvis/temp/myreport.json" << std::endl;
-    std::cout << "\t\tValidate each 3D primitive in input.json (tu3djson file)" << std::endl;
+    std::cout << "\tval3dity input.city.json --report /home/elvis/temp/myreport.json" << std::endl;
+    std::cout << "\t\tValidate each 3D primitive in input.city.json (CityJSON file)" << std::endl;
     std::cout << "\t\tand output a detailed JSON report '/home/elvis/temp/myreport.json';" << std::endl;
     std::cout << "\t\tbrowse that report at http://geovalidation.bk.tudelft.nl/val3dity/browser/" << std::endl;
 
@@ -103,9 +103,6 @@ public:
     
     std::cout << "\tval3dity input.obj" << std::endl;
     std::cout << "\t\tValidate the geometries in input.obj as if they were an ISO19107 Solid (default)" << std::endl;
-    
-    std::cout << "\tval3dity myindoorgml.gml --snap_tol 0.1" << std::endl;
-    std::cout << "\t\tThe vertices in myindoorgml.gml closer than 0.1unit are snapped together" << std::endl;
   }
 
   virtual void failure(TCLAP::CmdLineInterface& c, TCLAP::ArgException& e)
@@ -190,7 +187,7 @@ int main(int argc, char* const argv[])
   try {
     TCLAP::UnlabeledValueArg<std::string>   inputfile(
                                               "inputfile", 
-                                              "allowed formats: CityJSON, CityJSONSeq, tu3djson, JSON-FG, IndoorGML, OBJ, or OFF",
+                                              "allowed formats: CityJSON, CityJSONSeq, IndoorGML, JSON-FG, OBJ, OFF, and tu3djson",
                                               true, 
                                               "", 
                                               "string");
