@@ -1,8 +1,19 @@
 
 # Changelog
 
-## [Unreleased]
-- validation of topological relationships between features, eg ensuring that buildings in a city do not overlap
+## [2.7.0] - 2026-08-25
+### Added
+- a CityJSON Extension (val3dity 0.3.0, see <https://github.com/cityjson/extensions>) that allows embedding the validation report directly in the CityJSON/Seq file (use `--report_in_cityjson`); the report and per-geometry diagnostics are stored as extra attributes on each feature
+- compilation can now be done with a [pixi](https://pixi.sh) environment and a Nix flake/devshell are provided -- Windows compilation is now "easy" and fast
+- the JSON-FG parser was updated to follow version 1.0 of the spec; a feature having no geometry/place no longer skips the whole file (only that feature is ignored)
+### Changed
+- [CJLoupe](https://3dgi.github.io/CJLoupe/) replaces the old `viz3dity` Python viewer to visualise the errors (see `README.md`)
+- a feature in a CityJSONSeq stream without a proper location for error 302 now gets the correct coordinates (fixes the reported location of some errors)
+- the build/packaging was switched to pixi; the pre-built Windows ZIP now also bundles the required DLLs
+### Removed
+- removed the `viz3dity` tool (replaced by CJLoupe)
+- removed the vcpkg configuration, they were not used anymore
+
 
 ## [2.6.0] - 2026-01-07
 ### Added
@@ -136,6 +147,7 @@
 - support for CityJSON
 
 
+[2.7.0]: https://github.com/tudelft3d/val3dity/compare/2.6.0...2.7.0
 [2.6.0]: https://github.com/tudelft3d/val3dity/compare/2.5.1...2.6.0
 [2.5.1]: https://github.com/tudelft3d/val3dity/compare/2.5.0...2.5.1
 [2.5.0]: https://github.com/tudelft3d/val3dity/compare/2.4.0...2.5.0
