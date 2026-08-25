@@ -3,7 +3,7 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0011 NEW)
 endif(COMMAND cmake_policy)
 
-cmake_minimum_required (VERSION 3.30)
+cmake_minimum_required (VERSION 3.16...3.30)
 project( val3dity )
 
 option(VAL3DITY_LIBRARY "Build val3dity as a library instead of an executable." OFF)
