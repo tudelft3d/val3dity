@@ -23,7 +23,7 @@
         {
           val3dity = pkgs.stdenv.mkDerivation {
             pname = "val3dity";
-            version = "2.6.0";
+            version = "2.7.0";
             src = self;
 
             nativeBuildInputs = with pkgs; [
