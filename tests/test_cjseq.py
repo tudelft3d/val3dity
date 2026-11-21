@@ -54,6 +54,25 @@ def test_data_3_cjseq(validate, data_3, unittests):
     assert error == [901]
 
 
+def test_stdin_cleans_up_multisurface_after_solid(val3dity, dir_cjseq):
+    input_path = os.path.join(dir_cjseq, "solid_then_multisurface.city.jsonl")
+    with open(input_path, encoding="utf-8") as stream:
+        result = subprocess.run(
+            [val3dity, "stdin"],
+            stdin=stream,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=True,
+        )
+
+    assert result.stdout.splitlines() == [
+        '"1st-line" []',
+        '"tetrahedron" []',
+        '"triangle" []',
+    ]
+
+
 def test_3dbag_b2_same_errors(validate, data_3dbag_b2, unittests):
     """Test that both .json and .jsonl versions of 3dbag_b2 produce the same errors"""
     error = validate(data_3dbag_b2, options=unittests)
