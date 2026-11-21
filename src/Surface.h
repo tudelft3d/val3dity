@@ -86,7 +86,7 @@ private:
   std::vector<std::vector<std::vector<int>>>  _lsFaces;
   std::vector<std::string>                    _lsFacesID;
   std::vector<std::vector<int*>>              _lsTr;
-  CgalPolyhedron*                             _polyhedron;
+  CgalPolyhedron*                             _polyhedron = nullptr;
   double                                      _tol_snap;
   int                                         _is_valid_2d; //-1: not done yet; 0: nope; 1: yes it's valid
   int                                         _vertices_added;
